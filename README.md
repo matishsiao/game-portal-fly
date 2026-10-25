@@ -1,5 +1,15 @@
 # 離線小遊戲
 
+**線上遊玩：<https://matishsiao.github.io/game-portal-fly/>**
+
+| 遊戲 | 網址 |
+| --- | --- |
+| 遊戲大廳 | <https://matishsiao.github.io/game-portal-fly/> |
+| 數獨 | <https://matishsiao.github.io/game-portal-fly/sudoku/> |
+| 數學填字 | <https://matishsiao.github.io/game-portal-fly/crossmath/> |
+
+用手機開啟大廳並加入主畫面，連網時會自動下載所有遊戲，之後沒有網路也能玩。
+
 遊戲大廳與所有遊戲的原始碼都在這個專案統一開發。部署時大廳在網站根目錄，每個遊戲放在自己的目錄，各自擁有 Service Worker 與快取，彼此互不影響。
 
 ```
