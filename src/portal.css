@@ -20,6 +20,8 @@
   --crossmath-2: #b84a17;
   --numberlink-1: #18a39b;
   --numberlink-2: #0e6a7e;
+  --idiom-1: #2f7a5c;
+  --idiom-2: #174433;
   color-scheme: light;
 }
 
@@ -46,6 +48,8 @@
     --crossmath-2: #93391a;
     --numberlink-1: #16928b;
     --numberlink-2: #0b5566;
+    --idiom-1: #2a6d52;
+    --idiom-2: #123628;
     color-scheme: dark;
   }
 }
@@ -326,6 +330,10 @@ summary:focus-visible {
 
 .game-card[data-theme="numberlink"] {
   background: linear-gradient(135deg, var(--numberlink-1), var(--numberlink-2));
+}
+
+.game-card[data-theme="idiom"] {
+  background: linear-gradient(135deg, var(--idiom-1), var(--idiom-2));
 }
 
 /* 卡片右上的大型浮水印圖示，營造主視覺。 */

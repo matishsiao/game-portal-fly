@@ -1,6 +1,6 @@
 # 離線小遊戲共用規格
 
-本文件是 `games/` 下所有遊戲的共用規格，涵蓋產品原則、與遊戲大廳的整合介面、操作體驗、儲存、離線、部署與驗收。各遊戲目錄另有自己的規格（例如 `games/sudoku/spec.md`、`games/crossmath/cm_spec.md`、`games/numberlink/spec.md`），描述遊戲規則、盤面、難度、出題與該遊戲特有的操作。
+本文件是 `games/` 下所有遊戲的共用規格，涵蓋產品原則、與遊戲大廳的整合介面、操作體驗、儲存、離線、部署與驗收。各遊戲目錄另有自己的規格（例如 `games/sudoku/spec.md`、`games/crossmath/cm_spec.md`、`games/numberlink/spec.md`、`games/idiom/spec.md`），描述遊戲規則、盤面、難度、出題與該遊戲特有的操作。
 
 ## 文件關係
 
@@ -248,5 +248,5 @@
 ## 參考資料
 
 - 大廳說明：`README.md`（專案根目錄），含遊玩網址與部署方式；上架流程以本文件「上架到大廳」為準。
-- 現有遊戲規格：`games/sudoku/spec.md`、`games/crossmath/cm_spec.md`、`games/numberlink/spec.md`。
+- 現有遊戲規格：`games/sudoku/spec.md`、`games/crossmath/cm_spec.md`、`games/numberlink/spec.md`、`games/idiom/spec.md`。
 - [mkcert 開發憑證說明](https://github.com/FiloSottile/mkcert)：選用的區網 HTTPS 開發模式參考。

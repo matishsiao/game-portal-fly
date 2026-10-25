@@ -17,6 +17,7 @@ const GAMES = {
   sudoku: 'games/sudoku',
   crossmath: 'games/crossmath',
   numberlink: 'games/numberlink',
+  idiom: 'games/idiom',
 };
 
 /**
