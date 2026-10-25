@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>離線小遊戲</title>
+  <meta name="description" content="可離線遊玩的小遊戲大廳">
+  <meta name="theme-color" content="#eef1f8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#11131a" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="小遊戲">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="portal.css">
+  <script type="module" src="portal.js"></script>
+</head>
+<body>
+  <!-- 內嵌圖示集：以 <use href="#i-名稱"> 引用，離線也能顯示。 -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.8 2.8L16.5 9.5"/></symbol>
+    <symbol id="i-plane" viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 16l.7 1.8 1.8.7-1.8.7L19 21l-.7-1.8-1.8-.7 1.8-.7z"/></symbol>
+    <symbol id="i-gamepad" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="11" rx="5.5"/><path d="M7 10.5v4M5 12.5h4"/><circle cx="15.5" cy="11.5" r="1" fill="currentColor"/><circle cx="18" cy="14" r="1" fill="currentColor"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></symbol>
+    <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a6.5 6.5 0 0 0 11 11z"/></symbol>
+    <symbol id="i-sunset" viewBox="0 0 24 24"><path d="M17 18a5 5 0 0 0-10 0M12 9V3M8.5 6.5L12 3l3.5 3.5M2 18h2M20 18h2M4.9 11.9l1.4 1.4M17.7 13.3l1.4-1.4M2 22h20"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8M8 12h8"/></symbol>
+    <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="18" rx="2"/><path d="M9 4V2.5h6V4M9 11l2 2 4-4M9 17h6"/></symbol>
+    <symbol id="i-wifi-off" viewBox="0 0 24 24"><path d="M3 3l18 18M8.5 16.5a5 5 0 0 1 7 0M5 12.6a10 10 0 0 1 4.3-2.4M19 12.6a10 10 0 0 0-2.2-1.6M2 8.8a15 15 0 0 1 4.2-2.6M22 8.8A15 15 0 0 0 11 5"/><circle cx="12" cy="20" r="1" fill="currentColor"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+  </svg>
+
+  <main class="lobby">
+    <header class="hero">
+      <div class="hero-deco" aria-hidden="true">
+        <span style="left:58%;top:10%;font-size:34px">+</span>
+        <span style="left:78%;top:4%;font-size:26px">7</span>
+        <span style="left:90%;top:38%;font-size:30px">÷</span>
+        <span style="left:70%;top:52%;font-size:22px">9</span>
+        <span style="left:48%;top:62%;font-size:24px">×</span>
+        <span style="left:84%;top:72%;font-size:28px">=</span>
+        <span style="left:62%;top:30%;font-size:18px">3</span>
+      </div>
+      <div class="hero-top">
+        <span id="ready-chip" class="chip" role="status"></span>
+      </div>
+      <div class="brand">
+        <img class="brand-icon" src="icons/icon.svg" alt="" width="52" height="52">
+        <div>
+          <p class="greeting"><svg class="i" aria-hidden="true"><use id="greeting-icon" href="#i-sun"></use></svg><span id="greeting">歡迎回來</span></p>
+          <h1>離線小遊戲</h1>
+        </div>
+      </div>
+      <p class="hero-sub"><svg class="i" aria-hidden="true"><use href="#i-wifi-off"></use></svg>沒有網路也能玩，飛機上打發時間剛剛好</p>
+    </header>
+
+    <section id="continue-section" class="section" hidden>
+      <h2 class="section-title"><svg class="i" aria-hidden="true"><use href="#i-play"></use></svg>繼續遊戲</h2>
+      <div id="continue-list" class="continue-list"></div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title"><svg class="i" aria-hidden="true"><use href="#i-gamepad"></use></svg>遊戲</h2>
+      <ul id="games" class="games"></ul>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title"><svg class="i" aria-hidden="true"><use href="#i-trophy"></use></svg>我的戰績</h2>
+      <div class="stats-strip">
+        <div class="stat">
+          <span class="stat-badge badge-gold"><svg class="i" aria-hidden="true"><use href="#i-trophy"></use></svg></span>
+          <span id="stat-completed" class="stat-value">0</span><span class="stat-label">完成局數</span>
+        </div>
+        <div class="stat">
+          <span class="stat-badge badge-purple"><svg class="i" aria-hidden="true"><use href="#i-sparkle"></use></svg></span>
+          <span id="stat-nohint" class="stat-value">0</span><span class="stat-label">無提示完成</span>
+        </div>
+        <div class="stat">
+          <span class="stat-badge badge-blue"><svg class="i" aria-hidden="true"><use href="#i-clock"></use></svg></span>
+          <span id="stat-time" class="stat-value">0</span><span class="stat-label">累計遊玩</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="prepare" class="prepare">
+      <div class="prepare-head">
+        <span class="prepare-icon"><svg class="i" aria-hidden="true"><use id="prepare-icon" href="#i-plane"></use></svg></span>
+        <div class="prepare-text">
+          <h2 id="prepare-title">準備出發</h2>
+          <p id="prepare-desc">連網時會自動下載所有遊戲；完成後搭機或沒有網路時也能玩。</p>
+        </div>
+      </div>
+      <button type="button" id="download-btn" class="download-btn" hidden><svg class="i" aria-hidden="true"><use href="#i-download"></use></svg><span id="download-label">下載全部遊戲的離線資源</span></button>
+      <p id="download-hint" class="hint" hidden></p>
+      <p id="portal-status" class="portal-status"></p>
+    </section>
+
+    <div id="notice" class="notice" hidden></div>
+
+    <details class="help">
+      <summary><svg class="i" aria-hidden="true"><use href="#i-clipboard"></use></svg>出發前檢查</summary>
+      <ol>
+        <li>在有網路時開啟本頁，所有遊戲會自動下載，等「準備出發」變成「可以出發了」。</li>
+        <li><b>加入主畫面</b>：iPhone 用 Safari 的「分享 → 加入主畫面」；Android 用 Chrome 選單的「安裝應用程式」。</li>
+        <li>從主畫面圖示開啟，開啟<b>飛航模式</b>並重新開機，再開啟確認每個遊戲都能開新局。</li>
+      </ol>
+      <p><b>iPhone 注意</b>：每個主畫面圖示的進度與統計各自獨立，也和 Safari 不相通。請固定從同一個入口玩：只把「離線小遊戲」加到主畫面，或只把各遊戲分別加到主畫面，不要混用。</p>
+    </details>
+  </main>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "offline-game-portal",
+  "version": "1.0.0",
+  "private": true,
+  "description": "離線小遊戲：遊戲大廳與各遊戲原始碼（games/）統一開發",
+  "type": "module",
+  "engines": {
+    "node": ">=16.17"
+  },
+  "scripts": {
+    "test": "npm --prefix games/sudoku test && npm --prefix games/crossmath test",
+    "check:puzzles": "npm --prefix games/sudoku run check:puzzles && npm --prefix games/crossmath run check:puzzles",
+    "build": "node scripts/build.mjs",
+    "assemble": "node scripts/assemble.mjs",
+    "preview": "node scripts/assemble.mjs && node scripts/serve.mjs",
+    "deploy": "node scripts/deploy.mjs",
+    "icons": "node scripts/make-icons.mjs",
+    "dev:sudoku": "npm --prefix games/sudoku run dev",
+    "dev:crossmath": "npm --prefix games/crossmath run dev"
+  }
+}

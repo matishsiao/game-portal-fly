@@ -1,0 +1,7 @@
+node_modules/
+dist/
+site/
+.DS_Store
+nas/
+.certs/
+*.pem

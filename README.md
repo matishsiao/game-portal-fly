@@ -1,0 +1,84 @@
+# 離線小遊戲
+
+遊戲大廳與所有遊戲的原始碼都在這個專案統一開發。部署時大廳在網站根目錄，每個遊戲放在自己的目錄，各自擁有 Service Worker 與快取，彼此互不影響。
+
+```
+game-portal/
+├── src/                 大廳原始碼
+├── scripts/             大廳建置、組合（assemble）、預覽、部署
+├── games/
+│   ├── sudoku/          數獨（自成一個專案：src/、scripts/、tests/、spec.md）
+│   └── crossmath/       數學填字（自成一個專案：src/、scripts/、tests/、cm_spec.md）
+└── site/                組合結果（不進版本控制），內容即網站根目錄
+```
+
+部署後的網站結構：
+
+```
+網站根目錄（NAS 的 web/game-fly/）
+├── index.html、portal.js、portal.css、sw.js、manifest.webmanifest、icons/   ← 大廳
+├── sudoku/       ← games/sudoku 的 dist/
+└── crossmath/    ← games/crossmath 的 dist/
+```
+
+## 功能
+
+- 遊戲大廳：依時段的問候、離線就緒標記、「繼續遊戲」卡片、各遊戲主視覺卡片（完成局數、最佳紀錄）與戰績總覽（完成局數、無提示完成、累計遊玩時間）。
+  進度與戰績以唯讀方式讀取各遊戲在同網域 localStorage 的 `<目錄>.save`、`<目錄>.stats`，資料不完整時忽略。
+- 圖示為頁面內嵌的 SVG 圖示集（`index.html` 開頭的 `<symbol>`），不依賴外部資源，離線也能顯示。
+- 各遊戲卡片顯示離線狀態（離線可玩／尚未下載／下載中）。
+- 自動下載：開啟大廳且有網路時，自動在背景安裝每個遊戲的 Service Worker（全部約 400 KB），不必逐一開啟遊戲；省數據模式下不自動下載，改用「下載全部遊戲的離線資源」按鈕（也用於失敗重試）。
+- 選單本身也可離線開啟，並可加入主畫面（只用一個圖示就能玩所有遊戲）。
+- 選單會在 localStorage 記錄自己的路徑（`games.portal`），同網域的遊戲首頁據此顯示「‹ 所有遊戲」連結。
+- 選單的 Service Worker 只處理選單自己的檔案，不攔截遊戲目錄的請求，只清除 `portal-` 開頭的快取。
+
+## 指令
+
+在專案根目錄執行：
+
+| 指令 | 用途 |
+| --- | --- |
+| `npm test` | 執行所有遊戲的單元測試 |
+| `npm run check:puzzles` | 所有遊戲各難度批次出題驗收 |
+| `npm run dev:sudoku`／`npm run dev:crossmath` | 單獨開發某個遊戲（不啟用離線快取） |
+| `npm run preview` | 建置大廳與所有遊戲、組合成 `site/`，以 `http://localhost:5180/` 預覽 |
+| `npm run assemble` | 只建置並組合成 `site/`（加 `-- --no-build` 則不重新建置遊戲） |
+| `npm run deploy` | 建置、組合並同步到 NAS 的 `/Volumes/web/game-fly/` |
+| `npm run build` | 只建置大廳到 `dist/` |
+| `npm run icons` | 重新產生大廳圖示 |
+
+各遊戲也可以在自己的目錄單獨執行原本的指令（例如 `cd games/sudoku && npm test`）。遊戲位置設定在 `scripts/assemble.mjs` 的 `GAMES`；遊戲尚無 `src/index.html` 或建置失敗時會略過。
+
+## 新增遊戲
+
+所有遊戲的共通要求（產品原則、大廳整合介面、操作、儲存、離線、部署與共用驗收）見 [games/spec.md](games/spec.md)；各遊戲規格只寫遊戲特有的內容。
+
+1. 在 `src/portal.js` 的 `GAMES` 加一筆（`dir` 即目錄名稱）。
+2. 把遊戲原始碼放在 `games/<dir>/`（需有 `src/index.html` 與 `scripts/build.mjs`，建置到 `dist/`），並在 `scripts/assemble.mjs` 的 `GAMES` 加上 `<dir>: 'games/<dir>'`。
+3. 在 `src/icons/` 放一個 `<dir>.svg` 卡片圖示（可在 `scripts/make-icons.mjs` 產生）。
+4. 遊戲專案需符合：
+   - 使用相對路徑，可放在任意子目錄運作。
+   - Service Worker 位於遊戲目錄的 `sw.js`，快取名稱使用獨立前綴，只清除自己的舊快取。
+   - Service Worker 支援 `CHECK_CACHE` 訊息（回覆 `{ ok, missing, version }`），選單用它判斷是否已可離線。
+   - 判斷離線狀態時詢問**自己註冊的** Service Worker（`registration.active`），不要用 `navigator.serviceWorker.controller`：首次開啟時頁面可能暫時由選單的 Service Worker 控制。
+   - 首頁讀取 `localStorage['games.portal']`，有值時顯示返回選單的連結。
+
+## 部署到 Synology NAS
+
+NAS 上的 `web/game-fly/` 是 game-fly 網域的根目錄，內容就是三個專案的 dist：
+
+```
+web/game-fly/          ← game-portal 的 dist（大廳）
+├── sudoku/            ← games/sudoku 的 dist
+└── crossmath/         ← games/crossmath 的 dist
+```
+
+1. 在 Finder 以 ⌘K 掛載 `smb://<NAS-IP>/web`（掛在 `/Volumes/web`）。
+2. `npm run deploy`：建置三個專案、組合後同步到 `/Volumes/web/game-fly/`。只新增與覆蓋，不刪除任何檔案。
+   - `npm run deploy -- --no-build`：不重新建置遊戲，直接用各專案現有的 dist。
+   - 目標資料夾可用環境變數 `DEPLOY_DIR` 覆寫。
+3. 以 `https://game-fly 網域/` 開啟大廳。憑證須為受信任的憑證（例如 DSM 的 Let's Encrypt），不可用 DSM 預設的自簽憑證。
+
+## iPhone 注意
+
+每個主畫面圖示的資料（進度、統計）各自獨立，也和 Safari 不相通。請固定一種入口：只把選單加到主畫面，或只把各遊戲分別加到主畫面，不要混用。
