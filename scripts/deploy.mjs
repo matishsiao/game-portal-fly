@@ -13,7 +13,7 @@ const SITE = join(ROOT, 'site');
 const target = process.env.DEPLOY_DIR || '/Volumes/web/game-fly';
 
 if (!existsSync(target) || !statSync(target).isDirectory()) {
-  console.error(`找不到部署目標 ${target}。請先在 Finder 以 ⌘K 掛載 smb://<NAS-IP>/web，或設定 DEPLOY_DIR。`);
+  console.error(`找不到部署目標 ${target}。請先掛載部署目標的共用資料夾，或設定 DEPLOY_DIR。`);
   process.exit(1);
 }
 

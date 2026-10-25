@@ -15,7 +15,7 @@ game-portal/
 部署後的網站結構：
 
 ```
-網站根目錄（NAS 的 web/game-fly/）
+網站根目錄（GitHub Pages：https://matishsiao.github.io/game-portal-fly/）
 ├── index.html、portal.js、portal.css、sw.js、manifest.webmanifest、icons/   ← 大廳
 ├── sudoku/       ← games/sudoku 的 dist/
 └── crossmath/    ← games/crossmath 的 dist/
@@ -43,7 +43,6 @@ game-portal/
 | `npm run dev:sudoku`／`npm run dev:crossmath` | 單獨開發某個遊戲（不啟用離線快取） |
 | `npm run preview` | 建置大廳與所有遊戲、組合成 `site/`，以 `http://localhost:5180/` 預覽 |
 | `npm run assemble` | 只建置並組合成 `site/`（加 `-- --no-build` 則不重新建置遊戲） |
-| `npm run deploy` | 建置、組合並同步到 NAS 的 `/Volumes/web/game-fly/` |
 | `npm run build` | 只建置大廳到 `dist/` |
 | `npm run icons` | 重新產生大廳圖示 |
 
@@ -63,21 +62,14 @@ game-portal/
    - 判斷離線狀態時詢問**自己註冊的** Service Worker（`registration.active`），不要用 `navigator.serviceWorker.controller`：首次開啟時頁面可能暫時由選單的 Service Worker 控制。
    - 首頁讀取 `localStorage['games.portal']`，有值時顯示返回選單的連結。
 
-## 部署到 Synology NAS
+## 部署（GitHub Pages）
 
-NAS 上的 `web/game-fly/` 是 game-fly 網域的根目錄，內容就是三個專案的 dist：
+推送到 `main` 後，`.github/workflows/pages.yml` 會自動執行所有遊戲的單元測試、組合 `site/`，並部署到 GitHub Pages：
 
-```
-web/game-fly/          ← game-portal 的 dist（大廳）
-├── sudoku/            ← games/sudoku 的 dist
-└── crossmath/         ← games/crossmath 的 dist
-```
-
-1. 在 Finder 以 ⌘K 掛載 `smb://<NAS-IP>/web`（掛在 `/Volumes/web`）。
-2. `npm run deploy`：建置三個專案、組合後同步到 `/Volumes/web/game-fly/`。只新增與覆蓋，不刪除任何檔案。
-   - `npm run deploy -- --no-build`：不重新建置遊戲，直接用各專案現有的 dist。
-   - 目標資料夾可用環境變數 `DEPLOY_DIR` 覆寫。
-3. 以 `https://game-fly 網域/` 開啟大廳。憑證須為受信任的憑證（例如 DSM 的 Let's Encrypt），不可用 DSM 預設的自簽憑證。
+- 網址：`https://matishsiao.github.io/game-portal-fly/`（大廳），遊戲在 `/sudoku/`、`/crossmath/`。
+- HTTPS 憑證由 GitHub 自動提供與續期。
+- 首次使用需在 repo 的 **Settings → Pages** 把 Source 設為 **GitHub Actions**。公開 repo 使用 GitHub Actions 與 Pages 不需付費。
+- 也可在 Actions 分頁對「Deploy to GitHub Pages」按 **Run workflow** 手動重新部署。
 
 ## iPhone 注意
 
