@@ -180,11 +180,12 @@
 
 ## 部署與 HTTPS
 
-- 正式環境為自有 Synology NAS：在大廳專案根目錄執行 `npm run deploy`，建置大廳與所有遊戲、組合成 `site/` 後同步到 NAS 的 `web/game-fly/`（網域根目錄）。部署只新增與覆蓋檔案，不刪除。
-- 以 Web Station 提供靜態檔案，不使用 Docker（ARM 機型不支援，且靜態網站不需要）。
-- 憑證使用 DSM 的 Let's Encrypt 憑證並由 DSM 自動續期；不得使用 DSM 預設的自簽憑證，手機須以憑證上的網域開啟（不可用 IP）。
-- 對外開放時，路由器只轉送 443（Let's Encrypt 以 HTTP 驗證時另需 80），不得轉送 DSM 管理埠 5000／5001。
-- 遊戲也可以單獨部署到其他提供自動 HTTPS 的靜態網站服務（例如 GitHub Pages、Cloudflare Pages），此時不顯示「‹ 所有遊戲」連結。
+- 正式環境為 GitHub Pages：推送到 `game-portal-fly` repo 的 `main` 後，根目錄的 `.github/workflows/pages.yml` 執行 `npm test`、以 `scripts/assemble.mjs` 組合大廳與所有遊戲為 `site/`，並部署到 GitHub Pages。
+  - 網址：大廳 `https://matishsiao.github.io/game-portal-fly/`，各遊戲 `https://matishsiao.github.io/game-portal-fly/<目錄>/`。
+  - repo 須為公開，免費方案即可使用 GitHub Actions 與 GitHub Pages；repo 的 **Settings → Pages** 的 Source 設為 **GitHub Actions**。
+  - 部署一律由根目錄的 workflow 執行，各遊戲目錄不另設 `.github` workflow。
+- HTTPS 憑證由 GitHub 自動提供與續期；正式環境不得使用開發用自簽憑證。
+- 建置產物為純靜態檔案，不需要後端。
 - 選用的區網 HTTPS 開發模式以 mkcert 產生本機 CA 簽發的憑證；憑證私鑰與本機 CA 私鑰不得提交至版本控制。
 
 ## 共用驗收條件
@@ -202,7 +203,7 @@
 9. 未啟用 Service Worker 時，頁面已開啟的情況下斷網，仍可連續開始每種難度的新局。
 10. 連上尚未登入的 Captive Portal Wi-Fi 或極慢網路時，仍立即以快取開啟並可遊玩。
 11. 部署新版後，進行中的遊戲不被強制中斷；新版資源未下載完成前斷網，仍以舊版正常運作；玩家同意更新後能讀回原進度與統計。更新某個遊戲不影響大廳與其他遊戲的快取與離線狀態。
-12. 正式網站使用有效且受信任的 HTTPS 憑證，並由 DSM 或靜態網站服務自動續期。
+12. 正式網站使用有效且受信任的 HTTPS 憑證，並由 GitHub Pages 自動續期。
 
 ## 新增遊戲檢查清單
 

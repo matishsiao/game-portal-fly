@@ -1,5 +1,5 @@
 // 組合完整網站到 site/：根目錄為遊戲選單，每個遊戲放在自己的目錄（site/sudoku/、site/crossmath/）。
-// 部署時把 site/ 的內容上傳到網站根目錄（例如 Synology 的 web/）。
+// GitHub Actions（.github/workflows/pages.yml）會把 site/ 部署到 GitHub Pages。
 // 用法：node scripts/assemble.mjs [--no-build]
 //   預設會先在各遊戲專案執行 scripts/build.mjs；--no-build 直接使用各專案現有的 dist/。
 

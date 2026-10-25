@@ -130,13 +130,8 @@
 
 ## 部署與 HTTPS
 
-- 正式網站部署於提供自動 HTTPS 的靜態網站服務（例如 GitHub Pages、Cloudflare Pages 或 Netlify），由服務商自動處理受信任憑證的申請與續期；不需自行管理憑證或伺服器。正式環境不得使用開發用自簽憑證。
-- 建置產物為純靜態檔案，部署時不需要後端。提供一個建置與部署的指令或步驟說明。
-- 替代方案：部署於自有 Synology NAS。
-  - 以 Web Station 提供 `dist/` 的靜態檔案（例如 `web/sudoku/`，網址 `https://網域/sudoku/`），不使用 Docker：ARM 機型（如 DS216、DS216j）不支援，且靜態網站不需要。
-  - 憑證使用 DSM 的 Let's Encrypt 憑證並由 DSM 自動續期，在「控制台 → 安全性 → 憑證 → 設定」指定給網頁伺服器；不得使用 DSM 預設的自簽憑證，手機須以憑證上的網域開啟（不可用 IP）。
-  - 對外開放時，路由器只轉送 443（Let's Encrypt 以 HTTP 驗證時另需 80），不得轉送 DSM 管理埠 5000／5001。
-  - 更新時重新建置並覆蓋上傳 `dist/` 的內容。
+- 正式網站隨遊戲大廳一起部署於 GitHub Pages（`game-portal-fly` repo），網址 `https://matishsiao.github.io/game-portal-fly/sudoku/`；由 GitHub 自動提供受信任憑證並續期，部署流程見 `games/spec.md`「部署與 HTTPS」。正式環境不得使用開發用自簽憑證。
+- 建置產物為純靜態檔案，部署時不需要後端；`npm run build` 輸出到 `dist/`，由大廳的 `scripts/assemble.mjs` 組合到網站的 `sudoku/` 目錄。
 - 手機測試以部署後的正式網址為主。
 - 選用：區網 HTTPS 開發模式（若需要在部署前以手機透過區網測試 Service Worker）：
   - 提供開發用 HTTPS 啟動指令，以 mkcert 產生本機 CA 簽發的憑證；首次執行自動產生，之後重用有效憑證，過期或區網 IP 改變時重新產生。

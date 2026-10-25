@@ -38,11 +38,9 @@ tests/                  node:test 單元測試（fixtures.mjs 為共用的小盤
 
 ## 部署（GitHub Pages）
 
-1. 把專案推到 GitHub。
-2. 在 repo 的 **Settings → Pages → Build and deployment** 把 Source 設為 **GitHub Actions**。
-3. 推送到 `main` 分支後，`.github/workflows/deploy.yml` 會自動測試、建置並部署 `dist/`。HTTPS 憑證由 GitHub 自動提供與續期。
+本遊戲隨遊戲大廳一起部署，網址：<https://matishsiao.github.io/game-portal-fly/crossmath/>
 
-也可以把 `npm run build` 產生的 `dist/` 上傳到 Cloudflare Pages、Netlify，或 Synology NAS 的 Web Station 子目錄（例如 `web/crossmath/`，見規格的「部署與 HTTPS」）。與數獨、遊戲選單一起部署時，由 game-portal 專案的 `npm run assemble` 組合到同一個網站。
+推送到 `game-portal-fly` 的 `main` 後，專案根目錄的 `.github/workflows/pages.yml` 會自動測試、組合並部署到 GitHub Pages，HTTPS 憑證由 GitHub 自動提供與續期。本目錄不另設 GitHub Actions；部署細節見根目錄的 `README.md` 與 `games/spec.md`。
 
 ## 出發前檢查
 
