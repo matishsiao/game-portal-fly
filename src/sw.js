@@ -1,9 +1,11 @@
 // 選單頁的 Service Worker：只快取並回應選單自己的檔案。
 // 遊戲目錄（例如 ./sudoku/）的請求一律不處理，交給各遊戲自己的 Service Worker 或網路，
 // 確保選單與各遊戲的快取、更新互不影響。
-// VERSION 與 ASSETS 的佔位字串由 scripts/build.mjs 在建置時替換；開發模式不提供此檔。
+// VERSION、LABEL 與 ASSETS 的佔位字串由 scripts/build.mjs 在建置時替換；開發模式不提供此檔。
 
 const VERSION = '__VERSION__';
+/** 顯示用版本標籤（最後修改日期・雜湊）。 */
+const LABEL = '__LABEL__';
 const ASSETS = __ASSETS__;
 const CACHE = `portal-${VERSION}`;
 const OWN_URLS = new Set(ASSETS.map((url) => new URL(url, self.registration.scope).href));
@@ -71,7 +73,7 @@ self.addEventListener('message', (event) => {
     source.hash = '';
   }
   if (source && source.href !== ROOT && source.href !== `${ROOT}index.html`) {
-    port.postMessage({ ok: false, missing: -1, version: VERSION, notOwner: true });
+    port.postMessage({ ok: false, missing: -1, version: VERSION, label: LABEL, notOwner: true });
     return;
   }
   event.waitUntil(
@@ -80,8 +82,8 @@ self.addEventListener('message', (event) => {
       .then((cache) => Promise.all(ASSETS.map((url) => cache.match(url))))
       .then((results) => {
         const missing = results.filter((r) => !r).length;
-        port.postMessage({ ok: missing === 0, missing, version: VERSION });
+        port.postMessage({ ok: missing === 0, missing, version: VERSION, label: LABEL });
       })
-      .catch(() => port.postMessage({ ok: false, missing: ASSETS.length, version: VERSION })),
+      .catch(() => port.postMessage({ ok: false, missing: ASSETS.length, version: VERSION, label: LABEL })),
   );
 });

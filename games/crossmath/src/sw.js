@@ -1,7 +1,9 @@
 // Service Worker：預先快取全部資源，一律快取優先；新版完整下載後才可啟用。
-// VERSION 與 ASSETS 的佔位字串由 scripts/build.mjs 在建置時替換；開發模式不提供此檔。
+// VERSION、LABEL 與 ASSETS 的佔位字串由 scripts/build.mjs 在建置時替換；開發模式不提供此檔。
 
 const VERSION = '__VERSION__';
+/** 顯示用版本標籤（最後修改日期・雜湊）。 */
+const LABEL = '__LABEL__';
 const ASSETS = __ASSETS__;
 const CACHE = `crossmath-${VERSION}`;
 
@@ -62,9 +64,9 @@ self.addEventListener('message', (event) => {
         .then((cache) => Promise.all(ASSETS.map((url) => cache.match(url))))
         .then((results) => {
           const missing = results.filter((r) => !r).length;
-          port.postMessage({ ok: missing === 0, missing, version: VERSION });
+          port.postMessage({ ok: missing === 0, missing, version: VERSION, label: LABEL });
         })
-        .catch(() => port.postMessage({ ok: false, missing: ASSETS.length, version: VERSION })),
+        .catch(() => port.postMessage({ ok: false, missing: ASSETS.length, version: VERSION, label: LABEL })),
     );
   }
 });

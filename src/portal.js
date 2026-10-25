@@ -149,6 +149,7 @@ function renderGames() {
         <span>
           <span class="game-title"></span>
           <span class="game-desc"></span>
+          <span class="game-version"></span>
         </span>
       </span>
       <span class="card-meta">
@@ -324,6 +325,20 @@ async function hasPendingUpdate(game) {
   return !!(reg && reg.active && reg.waiting);
 }
 
+/**
+ * 在遊戲卡片顯示目前版本，以及已下載、等待玩家更新的新版本。
+ * @param {{dir: string}} game 遊戲。
+ */
+async function renderGameVersion(game) {
+  const el = document.querySelector(`.game-card[data-theme="${game.dir}"] .game-version`);
+  const reg = await gameRegistration(game);
+  const current = reg && reg.active ? (await checkCache(reg.active)).label : null;
+  const next = reg && reg.active && reg.waiting ? (await checkCache(reg.waiting)).label : null;
+  let text = current ? `版本 ${current}` : '';
+  if (next) text += `\n新版 ${next} 已下載`;
+  el.textContent = text;
+}
+
 /** 上次替遊戲檢查更新的時間。 */
 let lastUpdateCheck = 0;
 
@@ -376,6 +391,7 @@ async function refreshAll() {
     document.querySelector(`.game-card[data-theme="${game.dir}"] .update-chip`).hidden = !updates[idx];
   });
   const updateNames = GAMES.filter((_, idx) => updates[idx]).map((game) => game.title);
+  await Promise.all(GAMES.map(renderGameVersion));
   const readyCount = statuses.filter((s) => s === 'ready').length;
   const allReady = readyCount === GAMES.length;
   const chip = document.getElementById('ready-chip');
@@ -441,6 +457,21 @@ function setPortalStatus(text) {
 }
 
 /**
+ * 顯示大廳版本。目前頁面由控制它的 Service Worker 提供，所以以控制者的版本為準；
+ * 背景已下載的新版會在下次開啟時套用。
+ * @param {ServiceWorkerRegistration} reg 大廳的註冊資訊。
+ * @param {string | undefined} activeLabel 最新啟用版本的標籤。
+ */
+async function renderPortalVersion(reg, activeLabel) {
+  const own = new URL('./sw.js', location.href).href;
+  const controller = navigator.serviceWorker.controller;
+  const current = controller && controller.scriptURL === own ? (await checkCache(controller)).label : activeLabel;
+  let text = current ? `大廳版本 ${current}` : '';
+  if (current && activeLabel && activeLabel !== current) text += `（新版 ${activeLabel} 已下載，下次開啟時套用）`;
+  document.getElementById('version-line').textContent = text;
+}
+
+/**
  * 註冊大廳的 Service Worker（只快取大廳本身），並更新狀態。
  */
 async function setupPortalWorker() {
@@ -458,6 +489,7 @@ async function setupPortalWorker() {
   if (await waitForActive(reg)) {
     const result = await checkCache(reg.active);
     setPortalStatus(result.ok ? '大廳已可離線開啟' : '大廳離線資源下載中…');
+    renderPortalVersion(reg, result.label);
   } else {
     setPortalStatus('大廳離線資源下載失敗，請連網後重新開啟');
   }

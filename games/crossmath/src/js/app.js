@@ -1197,7 +1197,7 @@ async function refreshOfflineStatus() {
   }
   try {
     const result = await askServiceWorker(own, { type: 'CHECK_CACHE' }, 5000);
-    if (result && result.ok) setOfflineStatus('✓ 已可離線使用', true);
+    if (result && result.ok) setOfflineStatus(`✓ 已可離線使用${result.label ? `・版本 ${result.label}` : ''}`, true);
     else setOfflineStatus(`離線資源不完整（缺 ${result ? result.missing : '?'} 個檔案），請連網後重新開啟`, false);
   } catch {
     setOfflineStatus('無法確認離線狀態，請連網後重新開啟', false);
