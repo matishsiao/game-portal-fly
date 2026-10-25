@@ -18,6 +18,7 @@ const GAMES = {
   crossmath: 'games/crossmath',
   numberlink: 'games/numberlink',
   idiom: 'games/idiom',
+  roll: 'games/roll',
 };
 
 /**

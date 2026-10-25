@@ -1,0 +1,20 @@
+{
+  "name": "offline-roll",
+  "version": "1.0.0",
+  "private": true,
+  "description": "可離線遊玩的物理邏輯解謎（滾滾解謎）PWA",
+  "type": "module",
+  "engines": {
+    "node": ">=16.17"
+  },
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "build": "node scripts/build-levels.mjs && node scripts/build.mjs",
+    "preview": "node scripts/build-levels.mjs && node scripts/build.mjs && node scripts/serve.mjs --dist",
+    "test": "node --test tests/",
+    "levels": "node scripts/build-levels.mjs",
+    "check:levels": "node scripts/check-levels.mjs",
+    "check:puzzles": "node scripts/check-levels.mjs",
+    "icons": "node scripts/make-icons.mjs"
+  }
+}

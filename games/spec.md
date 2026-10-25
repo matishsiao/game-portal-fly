@@ -248,5 +248,5 @@
 ## 參考資料
 
 - 大廳說明：`README.md`（專案根目錄），含遊玩網址與部署方式；上架流程以本文件「上架到大廳」為準。
-- 現有遊戲規格：`games/sudoku/spec.md`、`games/crossmath/cm_spec.md`、`games/numberlink/spec.md`、`games/idiom/spec.md`。
+- 現有遊戲規格：`games/sudoku/spec.md`、`games/crossmath/cm_spec.md`、`games/numberlink/spec.md`、`games/idiom/spec.md`、`games/roll/spec.md`。
 - [mkcert 開發憑證說明](https://github.com/FiloSottile/mkcert)：選用的區網 HTTPS 開發模式參考。
