@@ -1,4 +1,6 @@
-# 離線小遊戲
+# 遊戲飛行（PlayFlight）
+
+可離線遊玩的小遊戲合集，適合搭機、搭車等沒有網路的時候打發時間。
 
 **線上遊玩：<https://matishsiao.github.io/game-portal-fly/>**
 
@@ -82,3 +84,18 @@ game-portal/
 ## iPhone 注意
 
 每個主畫面圖示的資料（進度、統計）各自獨立，也和 Safari 不相通。請固定一種入口：只把選單加到主畫面，或只把各遊戲分別加到主畫面，不要混用。
+
+## 授權
+
+本專案以 [Apache License 2.0](LICENSE) 授權，任何人都可以**免費**使用、修改、散布，包含商業用途。
+
+唯一的要求是**註明出處**：fork、修改或散布本專案（含衍生作品）時，請
+
+1. 保留 [`LICENSE`](LICENSE) 與 [`NOTICE`](NOTICE) 檔案；
+2. 在你的 README 或關於頁面註明源自本專案，例如：
+
+   > 本作品 fork 自「遊戲飛行（PlayFlight）」：<https://github.com/matishsiao/game-portal-fly>
+
+3. 修改過的檔案請標示已修改。
+
+完整條款以 [`LICENSE`](LICENSE) 為準。

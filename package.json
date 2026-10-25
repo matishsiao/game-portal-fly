@@ -2,7 +2,8 @@
   "name": "offline-game-portal",
   "version": "1.0.0",
   "private": true,
-  "description": "離線小遊戲：遊戲大廳與各遊戲原始碼（games/）統一開發",
+  "license": "Apache-2.0",
+  "description": "遊戲飛行（PlayFlight）：遊戲大廳與各遊戲原始碼（games/）統一開發",
   "type": "module",
   "engines": {
     "node": ">=16.17"

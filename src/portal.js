@@ -541,7 +541,7 @@ function setupInstall() {
   window.addEventListener('appinstalled', () => {
     installPrompt = null;
     btn.hidden = true;
-    showNotice('已安裝到主畫面。之後請從主畫面的「小遊戲」圖示開啟。');
+    showNotice('已安裝到主畫面。之後請從主畫面的「遊戲飛行」圖示開啟。');
   });
 }
 

@@ -1,4 +1,4 @@
-# 離線小遊戲共用規格
+# 遊戲飛行（PlayFlight）共用規格
 
 本文件是 `games/` 下所有遊戲的共用規格，涵蓋產品原則、與遊戲大廳的整合介面、操作體驗、儲存、離線、部署與驗收。各遊戲目錄另有自己的規格（例如 `games/sudoku/spec.md`、`games/crossmath/cm_spec.md`、`games/numberlink/spec.md`、`games/idiom/spec.md`），描述遊戲規則、盤面、難度、出題與該遊戲特有的操作。
 
