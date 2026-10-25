@@ -62,17 +62,7 @@ game-portal/
 
 ## 新增遊戲
 
-所有遊戲的共通要求（產品原則、大廳整合介面、操作、儲存、離線、部署與共用驗收）見 [games/spec.md](games/spec.md)；各遊戲規格只寫遊戲特有的內容。
-
-1. 在 `src/portal.js` 的 `GAMES` 加一筆（`dir` 即目錄名稱）。
-2. 把遊戲原始碼放在 `games/<dir>/`（需有 `src/index.html` 與 `scripts/build.mjs`，建置到 `dist/`），並在 `scripts/assemble.mjs` 的 `GAMES` 加上 `<dir>: 'games/<dir>'`。
-3. 在 `src/icons/` 放一個 `<dir>.svg` 卡片圖示（可在 `scripts/make-icons.mjs` 產生）。
-4. 遊戲專案需符合：
-   - 使用相對路徑，可放在任意子目錄運作。
-   - Service Worker 位於遊戲目錄的 `sw.js`，快取名稱使用獨立前綴，只清除自己的舊快取。
-   - Service Worker 支援 `CHECK_CACHE` 訊息（回覆 `{ ok, missing, version }`），選單用它判斷是否已可離線。
-   - 判斷離線狀態時詢問**自己註冊的** Service Worker（`registration.active`），不要用 `navigator.serviceWorker.controller`：首次開啟時頁面可能暫時由選單的 Service Worker 控制。
-   - 首頁讀取 `localStorage['games.portal']`，有值時顯示返回選單的連結。
+開發中的遊戲放在 `games/<目錄>/` 單獨開發，不加入大廳；**遊戲完成後必須加入大廳才算上架**。上架前提、步驟（大廳清單、組合清單、卡片圖示與主色、根目錄指令、文件）與驗證方式見 [`games/spec.md`「上架到大廳」](games/spec.md#上架到大廳遊戲完成後)。
 
 ## 部署（GitHub Pages）
 

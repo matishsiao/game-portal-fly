@@ -25,7 +25,7 @@
   ```
   games/<目錄>/
   ├── src/                原始碼，至少含 index.html、sw.js、manifest.webmanifest、icons/
-  ├── scripts/build.mjs   建置到 dist/，並在 sw.js 寫入版本號與預先快取清單
+  ├── scripts/build.mjs   建置到 dist/，並在 sw.js 寫入版本號、顯示用版本標籤與預先快取清單
   ├── scripts/serve.mjs   本機伺服器（開發模式不提供 sw.js）
   ├── tests/              node:test 單元測試
   ├── package.json
@@ -56,11 +56,7 @@
 ### 目錄與註冊
 
 - 網站結構：大廳在網站根目錄，每個遊戲的 `dist/` 放在根目錄下的 `<目錄>/`。
-- 新增遊戲時須同時修改大廳：
-  1. `src/portal.js` 的 `GAMES` 加一筆（`dir`、`title`、`desc`、`tags`）。
-  2. `scripts/assemble.mjs` 的 `GAMES` 加上 `<目錄>: 'games/<目錄>'`。
-  3. 在大廳的 `src/icons/` 放 `<目錄>.svg` 卡片圖示；遊戲自己的 `src/icons/icon.svg` 建議使用同一圖案。
-  4. 根目錄 `package.json` 的 `test`、`check:puzzles` 串上新遊戲，並加上 `dev:<目錄>`。
+- 遊戲完成後須依「上架到大廳」一節加入大廳；開發中的遊戲不加入大廳。
 
 ### 本機儲存鍵
 
@@ -83,7 +79,8 @@
 - Service Worker 位於遊戲目錄的 `sw.js`，以 `./sw.js` 註冊，scope 為遊戲目錄本身。
 - 快取名稱使用 `<目錄>-<版本>` 格式；啟用新版時只刪除 `<目錄>-` 開頭的舊快取，不得刪除大廳（`portal-`）或其他遊戲的快取。
 - 只處理自己 scope 內的同源 GET 請求；不呼叫會影響其他 scope 的 API。
-- 支援 `CHECK_CACHE` 訊息：以 `MessageChannel` 回覆 `{ ok, missing, version }`，`ok` 表示所有必要資源都已在快取中，`missing` 為缺少的檔案數。大廳以此判斷「離線可玩」。
+- 支援 `CHECK_CACHE` 訊息：以 `MessageChannel` 回覆 `{ ok, missing, version, label }`，`ok` 表示所有必要資源都已在快取中，`missing` 為缺少的檔案數，`version` 為內容雜湊（快取名稱用），`label` 為顯示用版本標籤。大廳以此判斷「離線可玩」並顯示版本。
+- 版本標籤格式為「最後修改 `src/` 的 commit 日期・內容雜湊前 7 碼」（例如 `2026.10.25・c27e2a1`），由 `scripts/build.mjs` 產生並寫入 `sw.js` 的 `LABEL`；遊戲首頁的離線狀態旁顯示此版本。只改文件（`src/` 以外）不得產生新版本。
 - 支援 `SKIP_WAITING` 訊息：由頁面在玩家同意更新時送出，啟用等待中的新版。
 - 大廳可能在玩家從未開啟遊戲時，就直接註冊 `<目錄>/sw.js` 預先下載；`install` 階段須能獨立完成全部資源的快取，不得依賴頁面先開啟過。
 - 判斷自己的離線狀態與新版本時，一律詢問**自己註冊的** Service Worker（`registration.active`／`registration.waiting`），不得使用 `navigator.serviceWorker.controller`：首次開啟時頁面可能暫時由大廳的 Service Worker 控制。
@@ -205,18 +202,51 @@
 11. 部署新版後，進行中的遊戲不被強制中斷；新版資源未下載完成前斷網，仍以舊版正常運作；玩家同意更新後能讀回原進度與統計。更新某個遊戲不影響大廳與其他遊戲的快取與離線狀態。
 12. 正式網站使用有效且受信任的 HTTPS 憑證，並由 GitHub Pages 自動續期。
 
-## 新增遊戲檢查清單
+## 上架到大廳（遊戲完成後）
 
-- [ ] 建立 `games/<目錄>/`，結構與指令符合「專案結構與技術」。
-- [ ] 撰寫遊戲規格：只寫遊戲特有內容，開頭註明「共通要求依 `games/spec.md`」。
-- [ ] localStorage 鍵全部使用 `<目錄>.` 前綴；`.save`、`.stats` 符合大廳讀取格式；難度使用共用代碼。
-- [ ] Service Worker 快取前綴 `<目錄>-`，支援 `CHECK_CACHE`、`SKIP_WAITING`，離線狀態詢問自己的註冊。
-- [ ] 首頁依 `games.portal` 顯示「‹ 所有遊戲」。
-- [ ] 大廳：`src/portal.js` 與 `scripts/assemble.mjs` 的 `GAMES`、`src/icons/<目錄>.svg`、根目錄 `package.json` 指令。
-- [ ] `npm run preview` 在大廳中驗證共用驗收條件 4、6、7、11。
+遊戲開發期間只放在 `games/<目錄>/` 單獨開發與測試（`cd games/<目錄> && npm run dev`），**不加入大廳**，因此不會被組合進網站、也不會被部署。**遊戲完成後必須加入大廳才算上架**：大廳是唯一的發布入口，玩家只會從大廳看到並下載遊戲。
+
+### 上架前提（遊戲完成的定義）
+
+- 遊戲規格的驗收條件與本文件的「共用驗收條件」全部通過。
+- 在遊戲目錄執行 `npm test` 全部通過；有出題器的遊戲 `npm run check:puzzles` 各難度 100 題全部合格且符合效能目標。
+- 符合「大廳整合介面」：localStorage 鍵前綴、`.save`／`.stats` 格式與難度代碼、Service Worker（快取前綴、`CHECK_CACHE` 含 `label`、`SKIP_WAITING`、詢問自己的註冊）、版本標籤、「‹ 所有遊戲」連結。
+- 外觀採用與大廳一致的豐富色調：選定一組遊戲主色（漸層的兩個顏色），首頁漸層橫幅、各難度漸層按鈕、遊戲頂部列、彩色工具列；做法參考現有遊戲 `src/css/style.css` 末尾的「豐富色調」段落。盤面上代表語意的顏色（錯誤、提示、選取）不得被主色取代。
+- 遊戲首頁不提供「出發前檢查」，由大廳統一提供。
+
+### 上架步驟
+
+1. **大廳遊戲清單**：在 `src/portal.js` 的 `GAMES` 加一筆，順序即大廳卡片順序：
+   - `dir`：遊戲目錄名稱。
+   - `title`：遊戲名稱（例如「數獨」）。
+   - `desc`：一句話介紹，手機直向下不超過一行半。
+   - `tags`：2 個標籤，每個為 `[圖示名稱, 文字]`，圖示名稱須存在於 `src/index.html` 的內嵌圖示集（`<symbol id="i-名稱">`），需要新圖示時一併加入。
+2. **組合清單**：在 `scripts/assemble.mjs` 的 `GAMES` 加上 `<目錄>: 'games/<目錄>'`。
+3. **卡片圖示**：在 `scripts/make-icons.mjs` 加入 56 × 56 的 `<目錄>.svg`（圓角、以遊戲主色為底），執行 `npm run icons` 產生 `src/icons/<目錄>.svg`；遊戲自己的 `src/icons/icon.svg` 建議使用同一圖案。
+4. **卡片主色**：在 `src/portal.css` 的淺色與深色 `:root` 各加入 `--<目錄>-1`、`--<目錄>-2`（與遊戲主色相同），並加入 `.game-card[data-theme="<目錄>"] { background: linear-gradient(135deg, var(--<目錄>-1), var(--<目錄>-2)); }`。
+5. **根目錄指令**：在根目錄 `package.json` 的 `test`、`check:puzzles`（有出題器時）串上 `npm --prefix games/<目錄> …`，並加上 `dev:<目錄>`。
+6. **難度代碼**：遊戲使用共用難度代碼以外的代碼時，先更新大廳 `src/portal.js` 的 `DIFFICULTY_LABEL`。
+7. **文件**：根目錄 `README.md` 的遊玩網址表加上 `https://matishsiao.github.io/game-portal-fly/<目錄>/`，並更新專案結構與網站結構；本文件「參考資料」加上該遊戲規格。
+
+### 上架驗證與發布
+
+1. 在根目錄執行 `npm test`，所有遊戲全部通過。
+2. 執行 `npm run preview`，在 `http://localhost:5180/` 確認：
+   - 大廳出現新遊戲卡片，圖示、主色、名稱、介紹、標籤與版本號正確，手機直向無水平捲動。
+   - 自動下載後顯示「離線可玩」，「離線就緒」計數包含新遊戲。
+   - 玩一局後回大廳，「繼續遊戲」卡片與戰績正確；完成一局後完成局數與最佳紀錄正確。
+   - 遊戲首頁顯示「‹ 所有遊戲」且能返回大廳。
+   - 離線後大廳與新遊戲都能開啟並開始新局；各遊戲與大廳的快取各自獨立（共用驗收條件 4、6、7、11）。
+3. commit 並推送到 `main`，GitHub Actions 部署完成後，以正式網址再確認一次大廳與新遊戲。
+4. 已安裝大廳的玩家下次連網開啟大廳時會自動看到新遊戲並下載其離線資源，不需要重新安裝。
+
+### 下架與改名
+
+- 遊戲目錄名稱一經上架不得更改（會讓玩家的存檔、統計與離線快取失聯）。
+- 下架時從 `src/portal.js`、`scripts/assemble.mjs` 的 `GAMES` 移除，並移除卡片圖示、卡片主色與根目錄指令；已下載過的玩家手機中仍會保留舊版快取，直到瀏覽器清除。
 
 ## 參考資料
 
-- 大廳說明：`README.md`（專案根目錄），含部署步驟與新增遊戲流程。
+- 大廳說明：`README.md`（專案根目錄），含遊玩網址與部署方式；上架流程以本文件「上架到大廳」為準。
 - 現有遊戲規格：`games/sudoku/spec.md`、`games/crossmath/cm_spec.md`。
 - [mkcert 開發憑證說明](https://github.com/FiloSottile/mkcert)：選用的區網 HTTPS 開發模式參考。
