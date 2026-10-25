@@ -628,3 +628,32 @@ summary:focus-visible {
     transition: none;
   }
 }
+
+/* ---------- 安裝與說明 ---------- */
+
+.install-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #3cbf73, #1f8a4c);
+  color: #fff;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.help-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 4px;
+  font-size: 15px;
+}
+
+.help p {
+  margin: 6px 0;
+}

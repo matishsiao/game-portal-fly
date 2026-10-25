@@ -100,6 +100,7 @@
           <p id="prepare-desc">連網時會自動下載所有遊戲；完成後搭機或沒有網路時也能玩。</p>
         </div>
       </div>
+      <button type="button" id="install-btn" class="install-btn" hidden><svg class="i" aria-hidden="true"><use href="#i-plus"></use></svg>安裝到主畫面</button>
       <button type="button" id="download-btn" class="download-btn" hidden><svg class="i" aria-hidden="true"><use href="#i-download"></use></svg><span id="download-label">下載全部遊戲的離線資源</span></button>
       <p id="download-hint" class="hint" hidden></p>
       <p id="portal-status" class="portal-status"></p>
@@ -107,14 +108,30 @@
 
     <div id="notice" class="notice" hidden></div>
 
-    <details class="help">
-      <summary><svg class="i" aria-hidden="true"><use href="#i-clipboard"></use></svg>出發前檢查</summary>
+    <details id="help" class="help">
+      <summary><svg class="i" aria-hidden="true"><use href="#i-clipboard"></use></svg>出發前檢查（安裝到手機）</summary>
       <ol>
-        <li>在有網路時開啟本頁，所有遊戲會自動下載，等「準備出發」變成「可以出發了」。</li>
-        <li><b>加入主畫面</b>：iPhone 用 Safari 的「分享 → 加入主畫面」；Android 用 Chrome 選單的「安裝應用程式」。</li>
-        <li>從主畫面圖示開啟，開啟<b>飛航模式</b>並重新開機，再開啟確認每個遊戲都能開新局。</li>
+        <li>在<b>有網路</b>時開啟本頁，所有遊戲會自動下載，等「準備出發」變成「<b>可以出發了</b>」。</li>
+        <li>依手機把本頁<b>加到主畫面</b>（見下方）。只要安裝大廳，所有遊戲都從大廳進入。</li>
+        <li>從<b>主畫面圖示</b>開啟，開啟<b>飛航模式</b>並重新開機，再開啟確認每個遊戲都能開新局。</li>
       </ol>
-      <p><b>iPhone 注意</b>：每個主畫面圖示的進度與統計各自獨立，也和 Safari 不相通。請固定從同一個入口玩：只把「離線小遊戲」加到主畫面，或只把各遊戲分別加到主畫面，不要混用。</p>
+
+      <h3 class="help-title"><svg class="i" aria-hidden="true"><use href="#i-download"></use></svg>Android</h3>
+      <p><b>Chrome</b>（建議）：</p>
+      <ol>
+        <li>用 Chrome 開啟本頁。</li>
+        <li>點上方「準備出發」裡的「<b>安裝到主畫面</b>」按鈕；沒有出現按鈕時，點右上角 <b>⋮</b> 選單 →「<b>安裝應用程式</b>」（部分版本為「加到主畫面」→「安裝」）。</li>
+        <li>按「<b>安裝</b>」，主畫面會出現「<b>小遊戲</b>」圖示。</li>
+      </ol>
+      <p><b>三星瀏覽器</b>：點下方 <b>≡</b> 選單 →「<b>新增頁面至</b>」→「<b>主畫面</b>」。</p>
+      <p>Android 上主畫面 App 與 Chrome 分頁的進度、統計是共用的。</p>
+
+      <h3 class="help-title"><svg class="i" aria-hidden="true"><use href="#i-download"></use></svg>iPhone／iPad</h3>
+      <ol>
+        <li>用 <b>Safari</b> 開啟本頁（其他瀏覽器無法安裝）。</li>
+        <li>點下方的「<b>分享</b>」按鈕 →「<b>加入主畫面</b>」→「<b>新增</b>」。</li>
+      </ol>
+      <p>iPhone 上每個主畫面圖示的進度與統計各自獨立，也和 Safari 不相通；請固定從主畫面的「小遊戲」圖示進入。只在 Safari 中玩時，7 天未使用可能被清除資料。</p>
     </details>
   </main>
 </body>

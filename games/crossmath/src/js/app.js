@@ -38,7 +38,6 @@ const els = {
   difficultyList: $('difficulty-list'),
   rulesBtn: $('rules-btn'),
   statsBtn: $('stats-btn'),
-  helpBtn: $('help-btn'),
   homeBtn: $('home-btn'),
   menuBtn: $('menu-btn'),
   gameDifficulty: $('game-difficulty'),
@@ -944,23 +943,6 @@ async function openStats() {
   }
 }
 
-/** 顯示出發前檢查說明。 */
-function openHelp() {
-  openModal({
-    title: '出發前檢查',
-    html: `<p>出國前請在有網路時完成以下步驟，確保在飛機上或沒有網路時也能玩：</p>
-      <ol>
-        <li><b>加入主畫面</b>：iPhone 用 Safari 的「分享 → 加入主畫面」；Android 用 Chrome 選單的「安裝應用程式」或「加到主畫面」。</li>
-        <li>從<b>主畫面的圖示</b>開啟，確認首頁顯示「✓ 已可離線使用」。</li>
-        <li>開啟<b>飛航模式</b>，關掉 App 再重新開啟，開始一局確認可以玩。</li>
-        <li>測試完成後再關閉飛航模式。</li>
-      </ol>
-      <p><b>iPhone 注意</b>：主畫面 App 和 Safari 的進度、統計互不相通；只在 Safari 裡玩時，7 天沒開可能被系統清除資料。請以主畫面 App 為主。</p>
-      <p><b>操作小技巧</b>：點「筆記」切換候選數字模式；遊戲中按返回鍵會回到首頁，進度會自動保存。</p>`,
-    actions: [{ label: '知道了', value: null, className: 'primary' }],
-  });
-}
-
 /** 顯示玩法說明。 */
 function openRules() {
   openModal({
@@ -1299,7 +1281,6 @@ function bindEvents() {
   });
   els.rulesBtn.addEventListener('click', openRules);
   els.statsBtn.addEventListener('click', openStats);
-  els.helpBtn.addEventListener('click', openHelp);
   els.homeBtn.addEventListener('click', goHome);
   els.menuBtn.addEventListener('click', openGameMenu);
   els.board.addEventListener('click', (e) => {

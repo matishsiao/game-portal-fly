@@ -400,13 +400,58 @@ async function setupPortalWorker() {
 // ---------- 啟動 ----------
 
 /**
- * 判斷是否為 iOS／iPadOS 的瀏覽器分頁（非主畫面 App）。
+ * 判斷是否已從主畫面以 App 模式開啟。
  * @returns {boolean} 是時為 true。
  */
-function isIosBrowserTab() {
-  const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  const standalone = navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-  return ios && !standalone;
+function isStandalone() {
+  return navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+}
+
+/**
+ * 判斷目前的手機平台。
+ * @returns {'ios' | 'android' | 'other'} 平台。
+ */
+function mobilePlatform() {
+  if (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'ios';
+  if (/Android/i.test(navigator.userAgent)) return 'android';
+  return 'other';
+}
+
+/** Chrome 提供的安裝提示事件，保留到玩家按下「安裝到主畫面」時使用。 */
+let installPrompt = null;
+
+/**
+ * 設定 Android Chrome 的一鍵安裝：攔截瀏覽器的安裝提示，改由「安裝到主畫面」按鈕觸發。
+ */
+function setupInstall() {
+  const btn = document.getElementById('install-btn');
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    installPrompt = e;
+    btn.hidden = false;
+  });
+  btn.addEventListener('click', async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    await installPrompt.userChoice.catch(() => null);
+    installPrompt = null;
+    btn.hidden = true;
+  });
+  window.addEventListener('appinstalled', () => {
+    installPrompt = null;
+    btn.hidden = true;
+    showNotice('已安裝到主畫面。之後請從主畫面的「小遊戲」圖示開啟。');
+  });
+}
+
+/**
+ * 在大廳顯示提示訊息。
+ * @param {string} text 訊息（內建字串）。
+ */
+function showNotice(text) {
+  const notice = document.getElementById('notice');
+  notice.innerHTML = `${icon('info')} ${text}`;
+  notice.hidden = false;
 }
 
 /**
@@ -431,10 +476,16 @@ function refreshView() {
 function init() {
   renderGames();
   rememberPortal();
-  if (isIosBrowserTab()) {
-    const notice = document.getElementById('notice');
-    notice.innerHTML = `${icon('info')} 建議用 Safari 的「分享 → 加入主畫面」安裝，並固定從主畫面圖示開啟；只在 Safari 中玩時，7 天未使用可能被清除資料。`;
-    notice.hidden = false;
+  setupInstall();
+  const platform = mobilePlatform();
+  if (platform !== 'other' && !isStandalone()) {
+    // 手機瀏覽器分頁中開啟（尚未從主畫面開啟）：展開安裝說明並提示。
+    document.getElementById('help').open = true;
+    showNotice(
+      platform === 'ios'
+        ? '建議用 Safari 的「分享 → 加入主畫面」安裝，並固定從主畫面圖示開啟；只在 Safari 中玩時，7 天未使用可能被清除資料。'
+        : '建議安裝到主畫面：點「安裝到主畫面」按鈕，或 Chrome 右上角 ⋮ →「安裝應用程式」。步驟見下方「出發前檢查」。',
+    );
   }
   document.getElementById('download-btn').addEventListener('click', downloadAll);
   window.addEventListener('online', () => {
