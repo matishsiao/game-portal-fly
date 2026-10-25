@@ -380,6 +380,11 @@ summary:focus-visible {
   white-space: nowrap;
 }
 
+.update-chip {
+  background: linear-gradient(135deg, #ffd65c, #f5a623);
+  color: #3b2c00;
+}
+
 .game-status[data-status="ready"] {
   background: rgba(255, 255, 255, 0.95);
   color: #1f6b32;

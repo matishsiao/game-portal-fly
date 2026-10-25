@@ -152,6 +152,7 @@ function renderGames() {
         </span>
       </span>
       <span class="card-meta">
+        <span class="meta-chip update-chip" hidden>${icon('sparkle')}有新版本</span>
         <span class="meta-chip game-status">${icon('check')}<span class="status-text">檢查中…</span></span>
         ${game.tags.map(([name, label]) => `<span class="meta-chip">${icon(name)}${label}</span>`).join('')}
       </span>
@@ -303,7 +304,64 @@ async function installGame(game) {
 }
 
 /**
- * 重新整理所有遊戲的離線狀態、就緒標記與「準備出發」區塊。
+ * 取得某個遊戲自己的 Service Worker 註冊；尚未註冊時回傳 null。
+ * @param {{dir: string}} game 遊戲。
+ * @returns {Promise<ServiceWorkerRegistration | null>} 註冊資訊。
+ */
+async function gameRegistration(game) {
+  if (!supported) return null;
+  const reg = await navigator.serviceWorker.getRegistration(scopeOf(game));
+  return reg && reg.scope === scopeOf(game) ? reg : null;
+}
+
+/**
+ * 判斷遊戲是否已下載好新版、等待玩家在遊戲內按「重新整理以更新」。
+ * @param {{dir: string}} game 遊戲。
+ * @returns {Promise<boolean>} 有等待中的新版時為 true。
+ */
+async function hasPendingUpdate(game) {
+  const reg = await gameRegistration(game);
+  return !!(reg && reg.active && reg.waiting);
+}
+
+/** 上次替遊戲檢查更新的時間。 */
+let lastUpdateCheck = 0;
+
+/**
+ * 有網路時替每個已下載的遊戲檢查新版本，並在背景下載完成；不會直接切換版本，
+ * 由玩家進入遊戲後按「重新整理以更新」決定何時更新，避免影響進行中的局。
+ * @param {boolean} [force=false] 為 true 時忽略 10 分鐘的檢查間隔。
+ */
+async function checkGameUpdates(force = false) {
+  if (!supported || !navigator.onLine) return;
+  if (!force && Date.now() - lastUpdateCheck < 10 * 60 * 1000) return;
+  lastUpdateCheck = Date.now();
+  await Promise.all(
+    GAMES.map(async (game) => {
+      const reg = await gameRegistration(game);
+      if (!reg || !reg.active) return;
+      try {
+        await reg.update();
+      } catch {
+        return;
+      }
+      const worker = reg.installing;
+      if (!worker) return;
+      await new Promise((resolve) => {
+        /** 新版安裝完成或失敗時結束等待。 */
+        const onChange = () => {
+          if (worker.state !== 'installing') resolve();
+        };
+        worker.addEventListener('statechange', onChange);
+        onChange();
+      });
+    }),
+  );
+  refreshAll();
+}
+
+/**
+ * 重新整理所有遊戲的離線狀態、新版本標記、就緒標記與「準備出發」區塊。
  */
 async function refreshAll() {
   const statuses = await Promise.all(
@@ -313,6 +371,11 @@ async function refreshAll() {
       return status;
     }),
   );
+  const updates = await Promise.all(GAMES.map(hasPendingUpdate));
+  GAMES.forEach((game, idx) => {
+    document.querySelector(`.game-card[data-theme="${game.dir}"] .update-chip`).hidden = !updates[idx];
+  });
+  const updateNames = GAMES.filter((_, idx) => updates[idx]).map((game) => game.title);
   const readyCount = statuses.filter((s) => s === 'ready').length;
   const allReady = readyCount === GAMES.length;
   const chip = document.getElementById('ready-chip');
@@ -323,9 +386,13 @@ async function refreshAll() {
   prepare.classList.toggle('done', allReady);
   document.getElementById('prepare-icon').setAttribute('href', allReady ? '#i-check' : '#i-plane');
   document.getElementById('prepare-title').textContent = allReady ? '可以出發了' : '準備出發';
-  document.getElementById('prepare-desc').textContent = allReady
+  let desc = allReady
     ? '所有遊戲都已下載，沒有網路也能玩。'
     : '連網時會自動下載所有遊戲；完成後搭機或沒有網路時也能玩。';
+  if (updateNames.length) {
+    desc += `${updateNames.join('、')}已下載新版本，進入遊戲後點上方「重新整理以更新」即可使用。`;
+  }
+  document.getElementById('prepare-desc').textContent = desc;
 
   const btn = document.getElementById('download-btn');
   const hint = document.getElementById('download-hint');
@@ -470,6 +537,7 @@ function refreshView() {
   renderGreeting();
   renderProgress();
   refreshAll();
+  checkGameUpdates();
 }
 
 /** 啟動大廳。 */
@@ -491,6 +559,7 @@ function init() {
   window.addEventListener('online', () => {
     refreshAll();
     autoDownload();
+    checkGameUpdates(true);
   });
   window.addEventListener('offline', refreshAll);
   window.addEventListener('pageshow', (e) => {
