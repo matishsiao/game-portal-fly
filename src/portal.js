@@ -6,6 +6,7 @@
 const GAMES = [
   { dir: 'sudoku', title: '數獨', desc: '9 × 9 經典數獨，邏輯推理', tags: [['layers', '4 種難度'], ['bulb', '提示・筆記']] },
   { dir: 'crossmath', title: '數學填字', desc: '交叉算式，用數字庫填滿空格', tags: [['layers', '4 種難度'], ['plus', '加減乘除']] },
+  { dir: 'numberlink', title: '數字連線', desc: '連起相同數字，線不交叉並填滿棋盤', tags: [['layers', '4 種難度'], ['link', '4×4～10×10']] },
 ];
 
 /** 難度代碼與名稱，依由易到難排列。 */

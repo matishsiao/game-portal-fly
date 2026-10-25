@@ -16,6 +16,7 @@ const noBuild = process.argv.includes('--no-build');
 const GAMES = {
   sudoku: 'games/sudoku',
   crossmath: 'games/crossmath',
+  numberlink: 'games/numberlink',
 };
 
 /**
