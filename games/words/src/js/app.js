@@ -275,11 +275,16 @@ async function confirmDialog(title, text, okLabel) {
 
 /**
  * 產生發音按鈕的 HTML（不可用時為空字串）。
+ * 遊戲卡片本身是按鈕，按鈕裡不能再放按鈕（手機上點按會被外層卡片接走），所以卡片內改用 span。
  * @param {string} en 英文。
+ * @param {boolean} [inCard=false] 是否放在遊戲卡片內。
  * @returns {string} HTML。
  */
-function speakButton(en) {
-  return speechOn() ? `<button type="button" class="speak-btn" data-speak="${esc(en)}" aria-label="唸出 ${esc(en)}">🔊</button>` : '';
+function speakButton(en, inCard = false) {
+  if (!speechOn()) return '';
+  const tag = inCard ? 'span' : 'button';
+  const type = inCard ? 'role="button"' : 'type="button"';
+  return `<${tag} ${type} class="speak-btn" data-speak="${esc(en)}" aria-label="唸出 ${esc(en)}">🔊</${tag}>`;
 }
 
 /**
@@ -500,8 +505,13 @@ function makeCard(side, w, showEnglish, index) {
   b.dataset.id = w.id;
   const key = side === 'left' ? String(index + 1) : RIGHT_KEYS[index].toUpperCase();
   b.setAttribute('aria-label', `${text}（按鍵 ${key}）`);
-  b.innerHTML = `<span>${esc(text)}</span>${showEnglish ? speakButton(w.en) : ''}`;
-  b.addEventListener('click', () => onCard(side, w.id));
+  b.innerHTML = `<span>${esc(text)}</span>${showEnglish ? speakButton(w.en, true) : ''}`;
+  /** 點到發音圖示時只發音，不選取卡片；其他位置選取卡片。 */
+  b.addEventListener('click', (e) => {
+    const sp = e.target.closest('[data-speak]');
+    if (sp) speak(sp.dataset.speak);
+    else onCard(side, w.id);
+  });
   return b;
 }
 
@@ -518,7 +528,6 @@ function renderBoard() {
   els.rightCol.innerHTML = '';
   board.left.forEach((id, i) => els.leftCol.appendChild(makeCard('left', wordById.get(id), !cfg.reverse, i)));
   board.right.forEach((id, i) => els.rightCol.appendChild(makeCard('right', wordById.get(id), cfg.reverse, i)));
-  bindSpeakButtons(els.columns);
   renderState();
 }
 

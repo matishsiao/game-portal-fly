@@ -13,6 +13,10 @@ const ODD = /^(eddy|flo|grandma|grandpa|reed|rocko|sandy|shelley)\b/i;
 export const RATES = { normal: 0.95, slow: 0.7 };
 
 let voices = [];
+/** 裝置是否回報了任何語音（iOS 等有時一開始回傳空清單，之後才載入）。 */
+let anyVoices = false;
+/** 正在播放的語句；保留參照，避免 Chrome 在播放前回收而沒有聲音。 */
+let current = null;
 let preferred = '';
 let rate = RATES.normal;
 let checked = false;
@@ -66,20 +70,29 @@ export function initSpeech(onReady) {
   }
   /** 重新整理語音清單並通知。 */
   const update = () => {
+    anyVoices = window.speechSynthesis.getVoices().length > 0;
     voices = rankVoices();
     checked = true;
-    onReady(voices.length > 0);
+    onReady(speechAvailable());
   };
   update();
   window.speechSynthesis.addEventListener('voiceschanged', update);
+  // iOS Safari 不一定會觸發 voiceschanged：清單還是空的時候，每 0.5 秒再查一次，最多 10 秒。
+  let tries = 0;
+  const timer = setInterval(() => {
+    tries += 1;
+    if (anyVoices || tries > 20) clearInterval(timer);
+    else update();
+  }, 500);
 }
 
 /**
- * 是否有可用的英文語音。
+ * 是否可以發音：有英文語音，或裝置還沒回報語音清單（此時交給系統預設的英文語音）。
+ * 只有在裝置回報了語音、但其中沒有英文時才視為不可用。
  * @returns {boolean} 可用時為 true。
  */
 export function speechAvailable() {
-  return checked && voices.length > 0;
+  return checked && 'speechSynthesis' in window && (voices.length > 0 || !anyVoices);
 }
 
 /**
@@ -113,17 +126,45 @@ export function configureSpeech({ voice, rate: r }) {
  * @param {string} text 英文。
  */
 export function speak(text) {
-  const voice = currentVoice();
-  if (!voice) return;
+  if (!speechAvailable()) return;
   try {
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.voice = voice;
-    u.lang = voice.lang;
-    u.rate = rate;
-    u.pitch = 1;
-    window.speechSynthesis.speak(u);
+    const synth = window.speechSynthesis;
+    if (synth.speaking || synth.pending) synth.cancel();
+    // Chrome 偶爾會卡在暫停狀態，之後的語句都不會播放。
+    synth.resume();
+    synth.speak(makeUtterance(text, currentVoice(), true));
   } catch {
     // 忽略：語音合成失敗時不影響遊戲。
   }
+}
+
+/**
+ * 建立語句；指定的語音播放失敗時，改用系統預設的英文語音再試一次。
+ * @param {string} text 英文。
+ * @param {SpeechSynthesisVoice | null} voice 語音；null 時使用系統預設的英文語音。
+ * @param {boolean} retry 失敗時是否重試。
+ * @returns {SpeechSynthesisUtterance} 語句。
+ */
+function makeUtterance(text, voice, retry) {
+  const u = new SpeechSynthesisUtterance(text);
+  if (voice) u.voice = voice;
+  u.lang = voice ? voice.lang : 'en-US';
+  u.rate = rate;
+  u.pitch = 1;
+  /** 播放結束後釋放參照。 */
+  u.onend = () => {
+    if (current === u) current = null;
+  };
+  /**
+   * 播放失敗時改用預設語音重試（被新的發音中斷時不重試）。
+   * @param {SpeechSynthesisErrorEvent} e 錯誤事件。
+   */
+  u.onerror = (e) => {
+    if (current === u) current = null;
+    if (retry && voice && e.error !== 'interrupted' && e.error !== 'canceled') {
+      window.speechSynthesis.speak(makeUtterance(text, null, false));
+    }
+  };
+  current = u;
+  return u;
 }
