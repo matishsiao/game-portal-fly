@@ -1,0 +1,902 @@
+[
+  {
+    "id": "bus",
+    "en": "bus",
+    "pos": "n.",
+    "zh": "公車、巴士",
+    "categories": [
+      "transport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I take the bus to work every day.",
+    "exampleZh": "我每天搭公車上班。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "car",
+    "en": "car",
+    "pos": "n.",
+    "zh": "汽車",
+    "categories": [
+      "transport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We rented a car for the weekend.",
+    "exampleZh": "我們週末租了一輛車。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "train",
+    "en": "train",
+    "pos": "n.",
+    "zh": "火車",
+    "categories": [
+      "transport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The train to Tainan is full.",
+    "exampleZh": "往台南的火車客滿了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "taxi",
+    "en": "taxi",
+    "pos": "n.",
+    "zh": "計程車",
+    "categories": [
+      "transport"
+    ],
+    "level": 1,
+    "syn": "taxi",
+    "example": "Let's take a taxi to the hotel.",
+    "exampleZh": "我們搭計程車去飯店吧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "bike",
+    "en": "bike",
+    "pos": "n.",
+    "zh": "腳踏車、自行車",
+    "categories": [
+      "transport"
+    ],
+    "level": 1,
+    "syn": "bike",
+    "example": "You can rent a bike by the river.",
+    "exampleZh": "你可以在河邊租腳踏車。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "boat",
+    "en": "boat",
+    "pos": "n.",
+    "zh": "船、小船",
+    "categories": [
+      "transport"
+    ],
+    "level": 1,
+    "syn": "boat",
+    "example": "We took a boat to the island.",
+    "exampleZh": "我們搭船到那座島。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "ship",
+    "en": "ship",
+    "pos": "n.",
+    "zh": "輪船",
+    "categories": [
+      "transport"
+    ],
+    "level": 1,
+    "syn": "boat",
+    "example": "The big ship sails at noon.",
+    "exampleZh": "那艘大船中午啟航。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "stop",
+    "en": "stop",
+    "pos": "n.",
+    "zh": "站、停靠站",
+    "categories": [
+      "transport"
+    ],
+    "level": 1,
+    "syn": "stop",
+    "example": "Get off at the next stop.",
+    "exampleZh": "在下一站下車。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "station",
+    "en": "station",
+    "pos": "n.",
+    "zh": "車站",
+    "categories": [
+      "transport"
+    ],
+    "level": 1,
+    "syn": "stop",
+    "example": "Where is the train station?",
+    "exampleZh": "火車站在哪裡？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "drive-v",
+    "en": "drive",
+    "pos": "v.",
+    "zh": "開車",
+    "categories": [
+      "transport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Can you drive me to the airport?",
+    "exampleZh": "你可以開車送我去機場嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "ride-v",
+    "en": "ride",
+    "pos": "v.",
+    "zh": "騎、搭乘",
+    "categories": [
+      "transport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Many people ride scooters in Taipei.",
+    "exampleZh": "台北有很多人騎機車。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "walk-v",
+    "en": "walk",
+    "pos": "v.",
+    "zh": "走路",
+    "categories": [
+      "transport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "It's faster to walk than to take the bus.",
+    "exampleZh": "走路比搭公車還快。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "road",
+    "en": "road",
+    "pos": "n.",
+    "zh": "道路、馬路",
+    "categories": [
+      "transport"
+    ],
+    "level": 1,
+    "syn": "road",
+    "example": "This road goes to the beach.",
+    "exampleZh": "這條路通往海邊。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "street",
+    "en": "street",
+    "pos": "n.",
+    "zh": "街道",
+    "categories": [
+      "transport"
+    ],
+    "level": 1,
+    "syn": "road",
+    "example": "The bus stop is across the street.",
+    "exampleZh": "公車站在對街。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "fast-adj",
+    "en": "fast",
+    "pos": "adj.",
+    "zh": "快的",
+    "categories": [
+      "transport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The high-speed train is very fast.",
+    "exampleZh": "高鐵非常快。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "slow-adj",
+    "en": "slow",
+    "pos": "adj.",
+    "zh": "慢的",
+    "categories": [
+      "transport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "This local train is slow but cheap.",
+    "exampleZh": "這班區間車很慢但很便宜。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "driver",
+    "en": "driver",
+    "pos": "n.",
+    "zh": "司機",
+    "categories": [
+      "transport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The bus driver was very kind.",
+    "exampleZh": "公車司機人很好。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "ticket",
+    "en": "ticket",
+    "pos": "n.",
+    "zh": "票",
+    "categories": [
+      "transport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Buy your ticket from the machine.",
+    "exampleZh": "請在售票機買車票。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "subway",
+    "en": "subway",
+    "pos": "n.",
+    "zh": "地鐵、捷運",
+    "categories": [
+      "transport"
+    ],
+    "level": 1,
+    "syn": "subway",
+    "example": "The subway is the easiest way to get around.",
+    "exampleZh": "搭地鐵是最方便的移動方式。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "metro",
+    "en": "metro",
+    "pos": "n.",
+    "zh": "地鐵",
+    "categories": [
+      "transport"
+    ],
+    "level": 2,
+    "syn": "subway",
+    "example": "The Paris metro is easy to use.",
+    "exampleZh": "巴黎的地鐵很好搭。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "get-on",
+    "en": "get on",
+    "pos": "phr.",
+    "zh": "上車",
+    "categories": [
+      "transport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Let's get on the bus now.",
+    "exampleZh": "我們現在上公車吧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "get-off",
+    "en": "get off",
+    "pos": "phr.",
+    "zh": "下車",
+    "categories": [
+      "transport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Where should I get off?",
+    "exampleZh": "我應該在哪裡下車？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "park-v",
+    "en": "park",
+    "pos": "v.",
+    "zh": "停車",
+    "categories": [
+      "transport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "You can't park here.",
+    "exampleZh": "這裡不能停車。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "truck",
+    "en": "truck",
+    "pos": "n.",
+    "zh": "卡車",
+    "categories": [
+      "transport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "A big truck is blocking the road.",
+    "exampleZh": "一輛大卡車擋住了道路。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "scooter",
+    "en": "scooter",
+    "pos": "n.",
+    "zh": "機車、速克達",
+    "categories": [
+      "transport"
+    ],
+    "level": 2,
+    "syn": "scooter",
+    "example": "My brother rides a scooter to school.",
+    "exampleZh": "我哥哥騎機車上學。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "motorcycle",
+    "en": "motorcycle",
+    "pos": "n.",
+    "zh": "摩托車",
+    "categories": [
+      "transport"
+    ],
+    "level": 2,
+    "syn": "scooter",
+    "example": "He rode his motorcycle along the coast.",
+    "exampleZh": "他沿著海岸騎摩托車。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "bicycle",
+    "en": "bicycle",
+    "pos": "n.",
+    "zh": "自行車、腳踏車",
+    "categories": [
+      "transport"
+    ],
+    "level": 2,
+    "syn": "bike",
+    "example": "Is it safe to ride a bicycle here?",
+    "exampleZh": "在這裡騎自行車安全嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "cab",
+    "en": "cab",
+    "pos": "n.",
+    "zh": "計程車",
+    "categories": [
+      "transport"
+    ],
+    "level": 2,
+    "syn": "taxi",
+    "example": "We caught a cab outside the station.",
+    "exampleZh": "我們在車站外面攔了計程車。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "traffic",
+    "en": "traffic",
+    "pos": "n.",
+    "zh": "交通、車流",
+    "categories": [
+      "transport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The traffic is heavy this morning.",
+    "exampleZh": "今天早上車流量很大。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "traffic-jam",
+    "en": "traffic jam",
+    "pos": "n.",
+    "zh": "塞車",
+    "categories": [
+      "transport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We were stuck in a traffic jam for an hour.",
+    "exampleZh": "我們塞車塞了一個小時。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "fare",
+    "en": "fare",
+    "pos": "n.",
+    "zh": "車資、票價",
+    "categories": [
+      "transport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The bus fare is fifteen dollars.",
+    "exampleZh": "公車車資是十五元。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "platform",
+    "en": "platform",
+    "pos": "n.",
+    "zh": "月台",
+    "categories": [
+      "transport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The train leaves from platform three.",
+    "exampleZh": "火車從第三月台出發。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "schedule",
+    "en": "schedule",
+    "pos": "n.",
+    "zh": "時刻表、行程表",
+    "categories": [
+      "transport"
+    ],
+    "level": 2,
+    "syn": "timetable",
+    "example": "Check the bus schedule before you go.",
+    "exampleZh": "出門前先看公車時刻表。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "timetable",
+    "en": "timetable",
+    "pos": "n.",
+    "zh": "時刻表",
+    "categories": [
+      "transport"
+    ],
+    "level": 2,
+    "syn": "timetable",
+    "example": "The train timetable is on the wall.",
+    "exampleZh": "火車時刻表貼在牆上。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "passenger",
+    "en": "passenger",
+    "pos": "n.",
+    "zh": "乘客、旅客",
+    "categories": [
+      "transport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Please give your seat to older passengers.",
+    "exampleZh": "請讓座給年長的乘客。",
+    "form": "passengers",
+    "reviewed": true
+  },
+  {
+    "id": "transfer",
+    "en": "transfer",
+    "pos": "n.",
+    "zh": "轉乘、轉車",
+    "categories": [
+      "transport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "This ticket includes one free transfer.",
+    "exampleZh": "這張票包含一次免費轉乘。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "ferry",
+    "en": "ferry",
+    "pos": "n.",
+    "zh": "渡輪",
+    "categories": [
+      "transport"
+    ],
+    "level": 2,
+    "syn": "boat",
+    "example": "The ferry to the island takes one hour.",
+    "exampleZh": "搭渡輪到島上要一小時。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "helmet",
+    "en": "helmet",
+    "pos": "n.",
+    "zh": "安全帽",
+    "categories": [
+      "transport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Always wear a helmet on a scooter.",
+    "exampleZh": "騎機車一定要戴安全帽。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "gas-station",
+    "en": "gas station",
+    "pos": "n.",
+    "zh": "加油站",
+    "categories": [
+      "transport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We need to find a gas station soon.",
+    "exampleZh": "我們得趕快找到加油站。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "parking-lot",
+    "en": "parking lot",
+    "pos": "n.",
+    "zh": "停車場",
+    "categories": [
+      "transport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The parking lot is behind the mall.",
+    "exampleZh": "停車場在購物中心後面。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "rent-v",
+    "en": "rent",
+    "pos": "v.",
+    "zh": "租",
+    "categories": [
+      "transport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We can rent a car at the airport.",
+    "exampleZh": "我們可以在機場租車。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "express-train",
+    "en": "express train",
+    "pos": "n.",
+    "zh": "特快車",
+    "categories": [
+      "transport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The express train skips small stations.",
+    "exampleZh": "特快車不停小站。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "high-speed-rail",
+    "en": "high-speed rail",
+    "pos": "n.",
+    "zh": "高鐵",
+    "categories": [
+      "transport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The high-speed rail gets to Kaohsiung in two hours.",
+    "exampleZh": "搭高鐵兩小時就到高雄。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "rush-hour",
+    "en": "rush hour",
+    "pos": "n.",
+    "zh": "尖峰時間",
+    "categories": [
+      "transport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Avoid the subway during rush hour.",
+    "exampleZh": "尖峰時間盡量別搭地鐵。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "highway",
+    "en": "highway",
+    "pos": "n.",
+    "zh": "高速公路",
+    "categories": [
+      "transport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The highway is closed because of the rain.",
+    "exampleZh": "高速公路因為下雨封閉了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "tram",
+    "en": "tram",
+    "pos": "n.",
+    "zh": "路面電車",
+    "categories": [
+      "transport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We rode the old tram around the city.",
+    "exampleZh": "我們搭老式路面電車繞了城市一圈。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "route",
+    "en": "route",
+    "pos": "n.",
+    "zh": "路線",
+    "categories": [
+      "transport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Which bus route goes to the museum?",
+    "exampleZh": "哪一條公車路線會到博物館？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "vehicle",
+    "en": "vehicle",
+    "pos": "n.",
+    "zh": "車輛",
+    "categories": [
+      "transport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "No vehicles are allowed on this street.",
+    "exampleZh": "這條街禁止車輛進入。",
+    "form": "vehicles",
+    "reviewed": true
+  },
+  {
+    "id": "commuter",
+    "en": "commuter",
+    "pos": "n.",
+    "zh": "通勤族",
+    "categories": [
+      "transport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The train was full of commuters.",
+    "exampleZh": "火車上擠滿了通勤族。",
+    "form": "commuters",
+    "reviewed": true
+  },
+  {
+    "id": "train-car",
+    "en": "train car",
+    "pos": "n.",
+    "zh": "車廂",
+    "categories": [
+      "transport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Our train car is number five.",
+    "exampleZh": "我們的車廂是第五節。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "toll",
+    "en": "toll",
+    "pos": "n.",
+    "zh": "過路費",
+    "categories": [
+      "transport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "You have to pay a toll on this highway.",
+    "exampleZh": "走這條高速公路要付過路費。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "shuttle",
+    "en": "shuttle",
+    "pos": "n.",
+    "zh": "接駁車",
+    "categories": [
+      "transport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The hotel has a free shuttle to the airport.",
+    "exampleZh": "飯店有到機場的免費接駁車。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "public-transportation",
+    "en": "public transportation",
+    "pos": "n.",
+    "zh": "大眾運輸",
+    "categories": [
+      "transport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Public transportation in Tokyo is very good.",
+    "exampleZh": "東京的大眾運輸非常好。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "detour",
+    "en": "detour",
+    "pos": "n.",
+    "zh": "繞道",
+    "categories": [
+      "transport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We took a detour because of the roadwork.",
+    "exampleZh": "因為道路施工，我們繞道而行。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "speed-limit",
+    "en": "speed limit",
+    "pos": "n.",
+    "zh": "速限",
+    "categories": [
+      "transport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The speed limit here is fifty.",
+    "exampleZh": "這裡的速限是五十。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "license",
+    "en": "license",
+    "pos": "n.",
+    "zh": "駕照、執照",
+    "categories": [
+      "transport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "You need an international driver's license to drive here.",
+    "exampleZh": "在這裡開車需要國際駕照。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "breakdown",
+    "en": "breakdown",
+    "pos": "n.",
+    "zh": "拋錨、故障",
+    "categories": [
+      "transport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Our car had a breakdown on the highway.",
+    "exampleZh": "我們的車在高速公路上拋錨了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sleeper-train",
+    "en": "sleeper train",
+    "pos": "n.",
+    "zh": "臥鋪火車",
+    "categories": [
+      "transport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We took a sleeper train to the north.",
+    "exampleZh": "我們搭臥鋪火車往北走。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "reserved-seat",
+    "en": "reserved seat",
+    "pos": "n.",
+    "zh": "對號座",
+    "categories": [
+      "transport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I booked a reserved seat on the express.",
+    "exampleZh": "我在特快車上訂了對號座。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "cable-car",
+    "en": "cable car",
+    "pos": "n.",
+    "zh": "纜車",
+    "categories": [
+      "transport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Let's take the cable car up the mountain.",
+    "exampleZh": "我們搭纜車上山吧。",
+    "form": "",
+    "reviewed": true
+  }
+]

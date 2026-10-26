@@ -1,0 +1,914 @@
+[
+  {
+    "id": "go-v",
+    "en": "go",
+    "pos": "v.",
+    "zh": "去",
+    "categories": [
+      "verbs"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We went to the night market yesterday.",
+    "exampleZh": "我們昨天去了夜市。",
+    "form": "went",
+    "reviewed": true
+  },
+  {
+    "id": "come-v",
+    "en": "come",
+    "pos": "v.",
+    "zh": "來",
+    "categories": [
+      "verbs"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Can you come to dinner tonight?",
+    "exampleZh": "你今晚可以來吃晚餐嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "eat-v",
+    "en": "eat",
+    "pos": "v.",
+    "zh": "吃",
+    "categories": [
+      "verbs",
+      "food"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I ate beef noodles for lunch today.",
+    "exampleZh": "我今天午餐吃了牛肉麵。",
+    "form": "ate",
+    "reviewed": true
+  },
+  {
+    "id": "drink-v",
+    "en": "drink",
+    "pos": "v.",
+    "zh": "喝",
+    "categories": [
+      "verbs",
+      "drinks"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Remember to drink more water on long flights.",
+    "exampleZh": "搭長途飛機時記得多喝水。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "buy-v",
+    "en": "buy",
+    "pos": "v.",
+    "zh": "買",
+    "categories": [
+      "verbs",
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "She bought a new hat at the market.",
+    "exampleZh": "她在市場買了一頂新帽子。",
+    "form": "bought",
+    "reviewed": true
+  },
+  {
+    "id": "sleep-v",
+    "en": "sleep",
+    "pos": "v.",
+    "zh": "睡覺",
+    "categories": [
+      "verbs"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I slept well at the hotel last night.",
+    "exampleZh": "我昨晚在旅館睡得很好。",
+    "form": "slept",
+    "reviewed": true
+  },
+  {
+    "id": "walk-v",
+    "en": "walk",
+    "pos": "v.",
+    "zh": "走路",
+    "categories": [
+      "verbs"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We walked to the station together.",
+    "exampleZh": "我們一起走路到車站。",
+    "form": "walked",
+    "reviewed": true
+  },
+  {
+    "id": "run-v",
+    "en": "run",
+    "pos": "v.",
+    "zh": "跑步、跑",
+    "categories": [
+      "verbs"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "He runs in the park every morning.",
+    "exampleZh": "他每天早上在公園跑步。",
+    "form": "runs",
+    "reviewed": true
+  },
+  {
+    "id": "see-v",
+    "en": "see",
+    "pos": "v.",
+    "zh": "看見",
+    "categories": [
+      "verbs"
+    ],
+    "level": 1,
+    "syn": "look",
+    "example": "Did you see the sunset from the hotel roof?",
+    "exampleZh": "你有從旅館頂樓看到夕陽嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "look-v",
+    "en": "look",
+    "pos": "v.",
+    "zh": "看",
+    "categories": [
+      "verbs"
+    ],
+    "level": 1,
+    "syn": "look",
+    "example": "Look at the map before we leave.",
+    "exampleZh": "我們出發前先看一下地圖。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "watch-v",
+    "en": "watch",
+    "pos": "v.",
+    "zh": "觀看",
+    "categories": [
+      "verbs"
+    ],
+    "level": 1,
+    "syn": "look",
+    "example": "We watched a movie on the flight.",
+    "exampleZh": "我們在飛機上看了一部電影。",
+    "form": "watched",
+    "reviewed": true
+  },
+  {
+    "id": "listen-v",
+    "en": "listen",
+    "pos": "v.",
+    "zh": "聽",
+    "categories": [
+      "verbs"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Please listen to the safety announcement.",
+    "exampleZh": "請注意聽安全廣播。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "speak-v",
+    "en": "speak",
+    "pos": "v.",
+    "zh": "說、講",
+    "categories": [
+      "verbs"
+    ],
+    "level": 1,
+    "syn": "speak",
+    "example": "Do you speak English?",
+    "exampleZh": "你會說英文嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "talk-v",
+    "en": "talk",
+    "pos": "v.",
+    "zh": "談話、聊天",
+    "categories": [
+      "verbs"
+    ],
+    "level": 1,
+    "syn": "speak",
+    "example": "Let's talk about our plans over coffee.",
+    "exampleZh": "我們邊喝咖啡邊聊聊計畫吧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "say-v",
+    "en": "say",
+    "pos": "v.",
+    "zh": "說",
+    "categories": [
+      "verbs"
+    ],
+    "level": 1,
+    "syn": "speak",
+    "example": "What did the driver say?",
+    "exampleZh": "司機剛剛說了什麼？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "read-v",
+    "en": "read",
+    "pos": "v.",
+    "zh": "閱讀、讀",
+    "categories": [
+      "verbs"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I like to read on the train.",
+    "exampleZh": "我喜歡在火車上看書。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "write-v",
+    "en": "write",
+    "pos": "v.",
+    "zh": "寫",
+    "categories": [
+      "verbs"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Please write your name here.",
+    "exampleZh": "請在這裡寫上您的名字。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "open-v",
+    "en": "open",
+    "pos": "v.",
+    "zh": "打開",
+    "categories": [
+      "verbs"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Could you open the window, please?",
+    "exampleZh": "可以麻煩你打開窗戶嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "close-v",
+    "en": "close",
+    "pos": "v.",
+    "zh": "關上",
+    "categories": [
+      "verbs"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Don't forget to close the door.",
+    "exampleZh": "別忘了把門關上。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "give-v",
+    "en": "give",
+    "pos": "v.",
+    "zh": "給",
+    "categories": [
+      "verbs"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "She gave me a map of the city.",
+    "exampleZh": "她給了我一張市區地圖。",
+    "form": "gave",
+    "reviewed": true
+  },
+  {
+    "id": "take-v",
+    "en": "take",
+    "pos": "v.",
+    "zh": "拿、帶走",
+    "categories": [
+      "verbs"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Take an umbrella with you today.",
+    "exampleZh": "今天帶把傘出門吧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sit-v",
+    "en": "sit",
+    "pos": "v.",
+    "zh": "坐",
+    "categories": [
+      "verbs"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "May I sit here?",
+    "exampleZh": "我可以坐這裡嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "stand-v",
+    "en": "stand",
+    "pos": "v.",
+    "zh": "站",
+    "categories": [
+      "verbs"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We stood in line for an hour.",
+    "exampleZh": "我們排隊站了一個小時。",
+    "form": "stood",
+    "reviewed": true
+  },
+  {
+    "id": "wait-v",
+    "en": "wait",
+    "pos": "v.",
+    "zh": "等待",
+    "categories": [
+      "verbs"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Please wait here for a moment.",
+    "exampleZh": "請在這裡稍等一下。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "arrive-v",
+    "en": "arrive",
+    "pos": "v.",
+    "zh": "抵達",
+    "categories": [
+      "verbs",
+      "transport"
+    ],
+    "level": 2,
+    "syn": "arrive",
+    "example": "Our train arrived ten minutes late.",
+    "exampleZh": "我們的火車晚了十分鐘抵達。",
+    "form": "arrived",
+    "reviewed": true
+  },
+  {
+    "id": "reach-v",
+    "en": "reach",
+    "pos": "v.",
+    "zh": "到達",
+    "categories": [
+      "verbs"
+    ],
+    "level": 2,
+    "syn": "arrive",
+    "example": "We reached the hotel before dark.",
+    "exampleZh": "我們在天黑前到達旅館。",
+    "form": "reached",
+    "reviewed": true
+  },
+  {
+    "id": "leave-v",
+    "en": "leave",
+    "pos": "v.",
+    "zh": "離開",
+    "categories": [
+      "verbs"
+    ],
+    "level": 2,
+    "syn": "leave",
+    "example": "The last bus leaves at eleven.",
+    "exampleZh": "最後一班公車十一點開走。",
+    "form": "leaves",
+    "reviewed": true
+  },
+  {
+    "id": "borrow-v",
+    "en": "borrow",
+    "pos": "v.",
+    "zh": "借用、借入",
+    "categories": [
+      "verbs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Can I borrow your pen for a second?",
+    "exampleZh": "我可以借用一下你的筆嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "lend-v",
+    "en": "lend",
+    "pos": "v.",
+    "zh": "借給、借出",
+    "categories": [
+      "verbs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Could you lend me your charger?",
+    "exampleZh": "你可以借我你的充電器嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "carry-v",
+    "en": "carry",
+    "pos": "v.",
+    "zh": "攜帶、搬",
+    "categories": [
+      "verbs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "He carried my heavy bag upstairs.",
+    "exampleZh": "他幫我把很重的包包搬上樓。",
+    "form": "carried",
+    "reviewed": true
+  },
+  {
+    "id": "bring-v",
+    "en": "bring",
+    "pos": "v.",
+    "zh": "帶來",
+    "categories": [
+      "verbs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Please bring your passport tomorrow.",
+    "exampleZh": "明天請帶你的護照來。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "send-v",
+    "en": "send",
+    "pos": "v.",
+    "zh": "寄、傳送",
+    "categories": [
+      "verbs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I sent a postcard to my mom.",
+    "exampleZh": "我寄了一張明信片給我媽媽。",
+    "form": "sent",
+    "reviewed": true
+  },
+  {
+    "id": "receive-v",
+    "en": "receive",
+    "pos": "v.",
+    "zh": "收到",
+    "categories": [
+      "verbs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Did you receive my message?",
+    "exampleZh": "你有收到我的訊息嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "choose-v",
+    "en": "choose",
+    "pos": "v.",
+    "zh": "選擇",
+    "categories": [
+      "verbs"
+    ],
+    "level": 2,
+    "syn": "choose",
+    "example": "You can choose any seat you like.",
+    "exampleZh": "你可以選任何喜歡的座位。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "pick-v",
+    "en": "pick",
+    "pos": "v.",
+    "zh": "挑選",
+    "categories": [
+      "verbs"
+    ],
+    "level": 2,
+    "syn": "choose",
+    "example": "Pick a flavor and I will order it.",
+    "exampleZh": "挑一個口味，我來幫你點。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "explain-v",
+    "en": "explain",
+    "pos": "v.",
+    "zh": "解釋、說明",
+    "categories": [
+      "verbs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Can you explain the rules again?",
+    "exampleZh": "你可以再解釋一次規則嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "remember-v",
+    "en": "remember",
+    "pos": "v.",
+    "zh": "記得",
+    "categories": [
+      "verbs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I remember this street from last year.",
+    "exampleZh": "我記得去年來過這條街。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "forget-v",
+    "en": "forget",
+    "pos": "v.",
+    "zh": "忘記",
+    "categories": [
+      "verbs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I forgot to bring my umbrella.",
+    "exampleZh": "我忘了帶雨傘。",
+    "form": "forgot",
+    "reviewed": true
+  },
+  {
+    "id": "prepare-v",
+    "en": "prepare",
+    "pos": "v.",
+    "zh": "準備",
+    "categories": [
+      "verbs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We prepared some snacks for the trip.",
+    "exampleZh": "我們為這趟旅行準備了一些零食。",
+    "form": "prepared",
+    "reviewed": true
+  },
+  {
+    "id": "order-v",
+    "en": "order",
+    "pos": "v.",
+    "zh": "點餐",
+    "categories": [
+      "verbs",
+      "restaurant"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I ordered a pizza for dinner.",
+    "exampleZh": "我晚餐點了一個披薩。",
+    "form": "ordered",
+    "reviewed": true
+  },
+  {
+    "id": "pay-v",
+    "en": "pay",
+    "pos": "v.",
+    "zh": "付錢",
+    "categories": [
+      "verbs",
+      "money"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Can I pay by credit card?",
+    "exampleZh": "我可以用信用卡付款嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "book-v",
+    "en": "book",
+    "pos": "v.",
+    "zh": "預訂",
+    "categories": [
+      "verbs",
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "book",
+    "example": "I booked a room near the station.",
+    "exampleZh": "我在車站附近訂了一間房。",
+    "form": "booked",
+    "reviewed": true
+  },
+  {
+    "id": "return-v-2",
+    "en": "return",
+    "pos": "v.",
+    "zh": "歸還、返回",
+    "categories": [
+      "verbs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Please return the key to the front desk.",
+    "exampleZh": "請把鑰匙還給櫃檯。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "change-v",
+    "en": "change",
+    "pos": "v.",
+    "zh": "改變、更換",
+    "categories": [
+      "verbs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I need to change my flight.",
+    "exampleZh": "我需要更改我的班機。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "check-v",
+    "en": "check",
+    "pos": "v.",
+    "zh": "檢查、查看",
+    "categories": [
+      "verbs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Check the bus time before you go.",
+    "exampleZh": "出門前先查一下公車時間。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "climb-v",
+    "en": "climb",
+    "pos": "v.",
+    "zh": "爬、攀登",
+    "categories": [
+      "verbs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We climbed the mountain on Sunday.",
+    "exampleZh": "我們星期天去爬山。",
+    "form": "climbed",
+    "reviewed": true
+  },
+  {
+    "id": "travel-v",
+    "en": "travel",
+    "pos": "v.",
+    "zh": "旅行",
+    "categories": [
+      "verbs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "They traveled around Japan by train.",
+    "exampleZh": "他們搭火車在日本各地旅行。",
+    "form": "traveled",
+    "reviewed": true
+  },
+  {
+    "id": "visit-v",
+    "en": "visit",
+    "pos": "v.",
+    "zh": "參觀、拜訪",
+    "categories": [
+      "verbs",
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We visited the museum this morning.",
+    "exampleZh": "我們今天早上參觀了博物館。",
+    "form": "visited",
+    "reviewed": true
+  },
+  {
+    "id": "depart-v",
+    "en": "depart",
+    "pos": "v.",
+    "zh": "出發",
+    "categories": [
+      "verbs",
+      "airport"
+    ],
+    "level": 3,
+    "syn": "leave",
+    "example": "The flight departs from Gate 12.",
+    "exampleZh": "這班飛機從十二號登機門出發。",
+    "form": "departs",
+    "reviewed": true
+  },
+  {
+    "id": "reserve-v",
+    "en": "reserve",
+    "pos": "v.",
+    "zh": "預約",
+    "categories": [
+      "verbs",
+      "restaurant"
+    ],
+    "level": 3,
+    "syn": "book",
+    "example": "I reserved a table for four at seven.",
+    "exampleZh": "我預約了七點的四人座位。",
+    "form": "reserved",
+    "reviewed": true
+  },
+  {
+    "id": "select-v",
+    "en": "select",
+    "pos": "v.",
+    "zh": "選取",
+    "categories": [
+      "verbs"
+    ],
+    "level": 3,
+    "syn": "choose",
+    "example": "Select your language on the screen.",
+    "exampleZh": "請在螢幕上選取您的語言。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "confirm-v",
+    "en": "confirm",
+    "pos": "v.",
+    "zh": "確認",
+    "categories": [
+      "verbs"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Please confirm your booking by email.",
+    "exampleZh": "請透過電子郵件確認您的訂位。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "cancel-v",
+    "en": "cancel",
+    "pos": "v.",
+    "zh": "取消",
+    "categories": [
+      "verbs"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We canceled the boat tour because of rain.",
+    "exampleZh": "因為下雨，我們取消了遊船行程。",
+    "form": "canceled",
+    "reviewed": true
+  },
+  {
+    "id": "exchange-v-2",
+    "en": "exchange",
+    "pos": "v.",
+    "zh": "兌換、交換",
+    "categories": [
+      "verbs",
+      "money"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I exchanged some dollars for yen at the airport.",
+    "exampleZh": "我在機場把一些美元換成日圓。",
+    "form": "exchanged",
+    "reviewed": true
+  },
+  {
+    "id": "deliver-v",
+    "en": "deliver",
+    "pos": "v.",
+    "zh": "遞送、送貨",
+    "categories": [
+      "verbs"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "They delivered the package this morning.",
+    "exampleZh": "他們今天早上把包裹送到了。",
+    "form": "delivered",
+    "reviewed": true
+  },
+  {
+    "id": "recommend-v",
+    "en": "recommend",
+    "pos": "v.",
+    "zh": "推薦",
+    "categories": [
+      "verbs"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Can you recommend a good local restaurant?",
+    "exampleZh": "你可以推薦一間不錯的在地餐廳嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "request-v",
+    "en": "request",
+    "pos": "v.",
+    "zh": "要求、請求",
+    "categories": [
+      "verbs"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "You can request a late checkout.",
+    "exampleZh": "你可以要求延後退房。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "apologize-v",
+    "en": "apologize",
+    "pos": "v.",
+    "zh": "道歉",
+    "categories": [
+      "verbs"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "He apologized for being late.",
+    "exampleZh": "他為遲到道了歉。",
+    "form": "apologized",
+    "reviewed": true
+  },
+  {
+    "id": "complain-v",
+    "en": "complain",
+    "pos": "v.",
+    "zh": "抱怨、投訴",
+    "categories": [
+      "verbs"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "She complained about the noisy room.",
+    "exampleZh": "她投訴房間太吵。",
+    "form": "complained",
+    "reviewed": true
+  },
+  {
+    "id": "declare-v",
+    "en": "declare",
+    "pos": "v.",
+    "zh": "申報",
+    "categories": [
+      "verbs",
+      "airport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Do you have anything to declare?",
+    "exampleZh": "您有任何東西要申報嗎？",
+    "form": "",
+    "reviewed": true
+  }
+]

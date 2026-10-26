@@ -1,0 +1,902 @@
+[
+  {
+    "id": "weather",
+    "en": "weather",
+    "pos": "n.",
+    "zh": "天氣",
+    "categories": [
+      "weather"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The weather in Taipei is great today.",
+    "exampleZh": "今天台北的天氣很好。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sun",
+    "en": "sun",
+    "pos": "n.",
+    "zh": "太陽",
+    "categories": [
+      "weather"
+    ],
+    "level": 1,
+    "syn": "sun",
+    "example": "The sun sets around six in winter.",
+    "exampleZh": "冬天太陽大約六點下山。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sunny-adj",
+    "en": "sunny",
+    "pos": "adj.",
+    "zh": "晴朗的",
+    "categories": [
+      "weather"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "It's sunny, so let's go to the beach.",
+    "exampleZh": "天氣晴朗，我們去海邊吧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "rain",
+    "en": "rain",
+    "pos": "n.",
+    "zh": "雨",
+    "categories": [
+      "weather"
+    ],
+    "level": 1,
+    "syn": "rain",
+    "example": "The rain stopped just before our tour started.",
+    "exampleZh": "雨在我們的行程開始前停了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "rainy-adj",
+    "en": "rainy",
+    "pos": "adj.",
+    "zh": "下雨的",
+    "categories": [
+      "weather"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We visited a museum on a rainy afternoon.",
+    "exampleZh": "我們在一個下雨的午後參觀了博物館。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "cloud",
+    "en": "cloud",
+    "pos": "n.",
+    "zh": "雲",
+    "categories": [
+      "weather"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "There isn't a cloud in the sky today.",
+    "exampleZh": "今天天空萬里無雲。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "cloudy-adj",
+    "en": "cloudy",
+    "pos": "adj.",
+    "zh": "多雲的",
+    "categories": [
+      "weather"
+    ],
+    "level": 1,
+    "syn": "cloudy",
+    "example": "It's cloudy, but it probably won't rain.",
+    "exampleZh": "天氣多雲，但應該不會下雨。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "wind",
+    "en": "wind",
+    "pos": "n.",
+    "zh": "風",
+    "categories": [
+      "weather"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The wind is too strong for the ferry today.",
+    "exampleZh": "今天風太大，渡輪不能開。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "windy-adj",
+    "en": "windy",
+    "pos": "adj.",
+    "zh": "風大的",
+    "categories": [
+      "weather"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "It's very windy on top of the mountain.",
+    "exampleZh": "山頂上風很大。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "snow",
+    "en": "snow",
+    "pos": "n.",
+    "zh": "雪",
+    "categories": [
+      "weather"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We saw snow for the first time in Japan.",
+    "exampleZh": "我們在日本第一次看到雪。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "hot-adj",
+    "en": "hot",
+    "pos": "adj.",
+    "zh": "熱的",
+    "categories": [
+      "weather"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "It's too hot to walk around at noon.",
+    "exampleZh": "中午太熱了，不適合到處走。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "cold-adj",
+    "en": "cold",
+    "pos": "adj.",
+    "zh": "冷的",
+    "categories": [
+      "weather"
+    ],
+    "level": 1,
+    "syn": "cold",
+    "example": "Bring a jacket because it gets cold at night.",
+    "exampleZh": "晚上會變冷，帶件外套吧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "warm-adj",
+    "en": "warm",
+    "pos": "adj.",
+    "zh": "溫暖的",
+    "categories": [
+      "weather"
+    ],
+    "level": 1,
+    "syn": "warm",
+    "example": "The water is warm enough for swimming.",
+    "exampleZh": "水溫夠暖，可以游泳。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "cool-adj",
+    "en": "cool",
+    "pos": "adj.",
+    "zh": "涼爽的",
+    "categories": [
+      "weather"
+    ],
+    "level": 1,
+    "syn": "cold",
+    "example": "Mornings are cool in the mountains.",
+    "exampleZh": "山上的早晨很涼爽。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "spring",
+    "en": "spring",
+    "pos": "n.",
+    "zh": "春天",
+    "categories": [
+      "weather"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Cherry blossoms bloom in spring.",
+    "exampleZh": "櫻花在春天盛開。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "summer",
+    "en": "summer",
+    "pos": "n.",
+    "zh": "夏天",
+    "categories": [
+      "weather"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Summer in Taiwan is hot and humid.",
+    "exampleZh": "台灣的夏天又熱又潮濕。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "fall",
+    "en": "fall",
+    "pos": "n.",
+    "zh": "秋天",
+    "categories": [
+      "weather"
+    ],
+    "level": 1,
+    "syn": "autumn",
+    "example": "Fall is the best season to visit Kyoto.",
+    "exampleZh": "秋天是去京都最好的季節。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "autumn",
+    "en": "autumn",
+    "pos": "n.",
+    "zh": "秋天",
+    "categories": [
+      "weather"
+    ],
+    "level": 1,
+    "syn": "autumn",
+    "example": "The leaves turn red in autumn.",
+    "exampleZh": "秋天時樹葉會變紅。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "winter",
+    "en": "winter",
+    "pos": "n.",
+    "zh": "冬天",
+    "categories": [
+      "weather"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We plan to go skiing this winter.",
+    "exampleZh": "我們打算今年冬天去滑雪。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sky",
+    "en": "sky",
+    "pos": "n.",
+    "zh": "天空",
+    "categories": [
+      "weather"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The sky is so blue after the storm.",
+    "exampleZh": "暴風雨過後天空好藍。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "season",
+    "en": "season",
+    "pos": "n.",
+    "zh": "季節",
+    "categories": [
+      "weather"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Which season is best for hiking here?",
+    "exampleZh": "這裡哪個季節最適合健行？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "umbrella",
+    "en": "umbrella",
+    "pos": "n.",
+    "zh": "雨傘",
+    "categories": [
+      "weather"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Don't forget your umbrella. It might rain.",
+    "exampleZh": "別忘了帶雨傘，可能會下雨。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "wet-adj",
+    "en": "wet",
+    "pos": "adj.",
+    "zh": "濕的",
+    "categories": [
+      "weather"
+    ],
+    "level": 1,
+    "syn": "wet",
+    "example": "My shoes got wet in the rain.",
+    "exampleZh": "我的鞋子被雨淋濕了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "dry-adj",
+    "en": "dry",
+    "pos": "adj.",
+    "zh": "乾燥的",
+    "categories": [
+      "weather"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The air is very dry in winter.",
+    "exampleZh": "冬天的空氣很乾燥。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "storm",
+    "en": "storm",
+    "pos": "n.",
+    "zh": "暴風雨",
+    "categories": [
+      "weather"
+    ],
+    "level": 2,
+    "syn": "storm",
+    "example": "All flights were canceled because of the storm.",
+    "exampleZh": "因為暴風雨，所有航班都取消了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "typhoon",
+    "en": "typhoon",
+    "pos": "n.",
+    "zh": "颱風",
+    "categories": [
+      "weather"
+    ],
+    "level": 2,
+    "syn": "typhoon",
+    "example": "A typhoon is coming, so stay indoors.",
+    "exampleZh": "颱風要來了，待在室內吧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "thunder",
+    "en": "thunder",
+    "pos": "n.",
+    "zh": "雷、雷聲",
+    "categories": [
+      "weather"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The thunder woke me up last night.",
+    "exampleZh": "昨晚雷聲把我吵醒了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "lightning",
+    "en": "lightning",
+    "pos": "n.",
+    "zh": "閃電",
+    "categories": [
+      "weather"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Stay away from tall trees when there's lightning.",
+    "exampleZh": "有閃電時要遠離高大的樹木。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "temperature-2",
+    "en": "temperature",
+    "pos": "n.",
+    "zh": "氣溫、溫度",
+    "categories": [
+      "weather"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The temperature will drop tonight.",
+    "exampleZh": "今晚氣溫會下降。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "degree-2",
+    "en": "degree",
+    "pos": "n.",
+    "zh": "度",
+    "categories": [
+      "weather"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "It's thirty-five degrees outside!",
+    "exampleZh": "外面三十五度！",
+    "form": "degrees",
+    "reviewed": true
+  },
+  {
+    "id": "fog",
+    "en": "fog",
+    "pos": "n.",
+    "zh": "霧",
+    "categories": [
+      "weather"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The fog made it hard to see the road.",
+    "exampleZh": "霧讓人很難看清楚路。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "foggy-adj",
+    "en": "foggy",
+    "pos": "adj.",
+    "zh": "有霧的",
+    "categories": [
+      "weather"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "It's often foggy in the mountains in the morning.",
+    "exampleZh": "山上早晨常常起霧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "humid-adj",
+    "en": "humid",
+    "pos": "adj.",
+    "zh": "潮濕的",
+    "categories": [
+      "weather"
+    ],
+    "level": 2,
+    "syn": "wet",
+    "example": "It's hot and humid in Bangkok.",
+    "exampleZh": "曼谷又熱又潮濕。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "freezing-adj",
+    "en": "freezing",
+    "pos": "adj.",
+    "zh": "極冷的",
+    "categories": [
+      "weather"
+    ],
+    "level": 2,
+    "syn": "cold",
+    "example": "It's freezing outside, so wear a thick coat.",
+    "exampleZh": "外面冷死了，穿件厚外套吧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "ice-2",
+    "en": "ice",
+    "pos": "n.",
+    "zh": "冰",
+    "categories": [
+      "weather"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Be careful, there's ice on the road.",
+    "exampleZh": "小心，路上有結冰。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "rainbow",
+    "en": "rainbow",
+    "pos": "n.",
+    "zh": "彩虹",
+    "categories": [
+      "weather"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Look, there's a rainbow over the lake!",
+    "exampleZh": "你看，湖上有一道彩虹！",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "shower-2",
+    "en": "shower",
+    "pos": "n.",
+    "zh": "陣雨",
+    "categories": [
+      "weather"
+    ],
+    "level": 2,
+    "syn": "rain",
+    "example": "Expect showers in the afternoon.",
+    "exampleZh": "下午預計會有陣雨。",
+    "form": "showers",
+    "reviewed": true
+  },
+  {
+    "id": "forecast",
+    "en": "forecast",
+    "pos": "n.",
+    "zh": "預報",
+    "categories": [
+      "weather"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The forecast says it will be sunny tomorrow.",
+    "exampleZh": "預報說明天會是晴天。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "raincoat",
+    "en": "raincoat",
+    "pos": "n.",
+    "zh": "雨衣",
+    "categories": [
+      "weather"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I bought a cheap raincoat at the convenience store.",
+    "exampleZh": "我在便利商店買了一件便宜的雨衣。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "heat",
+    "en": "heat",
+    "pos": "n.",
+    "zh": "炎熱、高溫",
+    "categories": [
+      "weather"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The heat in July is hard to bear.",
+    "exampleZh": "七月的高溫讓人難以忍受。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "breeze",
+    "en": "breeze",
+    "pos": "n.",
+    "zh": "微風",
+    "categories": [
+      "weather"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "A cool breeze is coming from the sea.",
+    "exampleZh": "一陣涼爽的微風從海上吹來。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sunshine",
+    "en": "sunshine",
+    "pos": "n.",
+    "zh": "陽光",
+    "categories": [
+      "weather"
+    ],
+    "level": 2,
+    "syn": "sun",
+    "example": "Let's enjoy the sunshine in the park.",
+    "exampleZh": "我們去公園享受陽光吧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "snowy-adj",
+    "en": "snowy",
+    "pos": "adj.",
+    "zh": "下雪的",
+    "categories": [
+      "weather"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The village looks beautiful on snowy days.",
+    "exampleZh": "下雪天的村莊看起來很美。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "chilly-adj",
+    "en": "chilly",
+    "pos": "adj.",
+    "zh": "涼颼颼的",
+    "categories": [
+      "weather"
+    ],
+    "level": 2,
+    "syn": "cold",
+    "example": "It's a bit chilly, so please close the window.",
+    "exampleZh": "有點涼颼颼的，請把窗戶關上。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "rain-boots",
+    "en": "rain boots",
+    "pos": "n.",
+    "zh": "雨鞋",
+    "categories": [
+      "weather"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Kids love jumping in puddles in their rain boots.",
+    "exampleZh": "孩子們喜歡穿著雨鞋踩水坑。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "stormy-adj",
+    "en": "stormy",
+    "pos": "adj.",
+    "zh": "暴風雨的",
+    "categories": [
+      "weather"
+    ],
+    "level": 2,
+    "syn": "storm",
+    "example": "The sea was too stormy for the boat tour.",
+    "exampleZh": "海上風雨太大，無法搭船遊覽。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "heavy-rain",
+    "en": "heavy rain",
+    "pos": "phr.",
+    "zh": "大雨",
+    "categories": [
+      "weather"
+    ],
+    "level": 2,
+    "syn": "rain",
+    "example": "Heavy rain caused delays on the train line.",
+    "exampleZh": "大雨造成鐵路誤點。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sunscreen",
+    "en": "sunscreen",
+    "pos": "n.",
+    "zh": "防曬乳",
+    "categories": [
+      "weather"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Put on sunscreen before going to the beach.",
+    "exampleZh": "去海邊前要擦防曬乳。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "humidity",
+    "en": "humidity",
+    "pos": "n.",
+    "zh": "濕度",
+    "categories": [
+      "weather"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The humidity is over ninety percent today.",
+    "exampleZh": "今天的濕度超過百分之九十。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "hurricane",
+    "en": "hurricane",
+    "pos": "n.",
+    "zh": "颶風",
+    "categories": [
+      "weather"
+    ],
+    "level": 3,
+    "syn": "typhoon",
+    "example": "The hurricane hit the coast of Florida.",
+    "exampleZh": "颶風襲擊了佛羅里達的海岸。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "drizzle",
+    "en": "drizzle",
+    "pos": "n.",
+    "zh": "毛毛雨",
+    "categories": [
+      "weather"
+    ],
+    "level": 3,
+    "syn": "rain",
+    "example": "It's only a drizzle, so we don't need an umbrella.",
+    "exampleZh": "只是毛毛雨，我們不需要帶傘。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "frost",
+    "en": "frost",
+    "pos": "n.",
+    "zh": "霜",
+    "categories": [
+      "weather"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "There was frost on the car this morning.",
+    "exampleZh": "今天早上車上結了霜。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "celsius",
+    "en": "Celsius",
+    "pos": "n.",
+    "zh": "攝氏",
+    "categories": [
+      "weather"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "It's twenty degrees Celsius today.",
+    "exampleZh": "今天攝氏二十度。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "fahrenheit",
+    "en": "Fahrenheit",
+    "pos": "n.",
+    "zh": "華氏",
+    "categories": [
+      "weather"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Americans use Fahrenheit for temperature.",
+    "exampleZh": "美國人用華氏來表示溫度。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "heat-wave",
+    "en": "heat wave",
+    "pos": "n.",
+    "zh": "熱浪",
+    "categories": [
+      "weather"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Europe is having a heat wave this week.",
+    "exampleZh": "歐洲這週正遭遇熱浪。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "blizzard",
+    "en": "blizzard",
+    "pos": "n.",
+    "zh": "暴風雪",
+    "categories": [
+      "weather"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The blizzard closed the airport for two days.",
+    "exampleZh": "暴風雪讓機場關閉了兩天。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "mild-adj",
+    "en": "mild",
+    "pos": "adj.",
+    "zh": "溫和的",
+    "categories": [
+      "weather"
+    ],
+    "level": 3,
+    "syn": "warm",
+    "example": "The winter here is mild, so you won't need a heavy coat.",
+    "exampleZh": "這裡的冬天很溫和，不需要厚外套。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "thunderstorm",
+    "en": "thunderstorm",
+    "pos": "n.",
+    "zh": "雷雨",
+    "categories": [
+      "weather"
+    ],
+    "level": 3,
+    "syn": "storm",
+    "example": "A thunderstorm is expected this afternoon.",
+    "exampleZh": "今天下午預計會有雷雨。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "overcast-adj",
+    "en": "overcast",
+    "pos": "adj.",
+    "zh": "陰天的",
+    "categories": [
+      "weather"
+    ],
+    "level": 3,
+    "syn": "cloudy",
+    "example": "The sky was overcast all day.",
+    "exampleZh": "天空整天都陰陰的。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "uv-index",
+    "en": "UV index",
+    "pos": "n.",
+    "zh": "紫外線指數",
+    "categories": [
+      "weather"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The UV index is very high today.",
+    "exampleZh": "今天的紫外線指數很高。",
+    "form": "",
+    "reviewed": true
+  }
+]

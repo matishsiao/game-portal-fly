@@ -1,0 +1,902 @@
+[
+  {
+    "id": "zero-num",
+    "en": "zero",
+    "pos": "num.",
+    "zh": "零",
+    "categories": [
+      "numbers"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The temperature dropped below zero last night.",
+    "exampleZh": "昨晚氣溫降到零度以下。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "one-num",
+    "en": "one",
+    "pos": "num.",
+    "zh": "一",
+    "categories": [
+      "numbers"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "One ticket to Kyoto, please.",
+    "exampleZh": "請給我一張到京都的票。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "two-num",
+    "en": "two",
+    "pos": "num.",
+    "zh": "二、兩",
+    "categories": [
+      "numbers"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "A table for two, please.",
+    "exampleZh": "請給我兩人的座位。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "three-num",
+    "en": "three",
+    "pos": "num.",
+    "zh": "三",
+    "categories": [
+      "numbers"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I'm staying here for three nights.",
+    "exampleZh": "我要在這裡住三晚。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "four-num",
+    "en": "four",
+    "pos": "num.",
+    "zh": "四",
+    "categories": [
+      "numbers"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We are a family of four.",
+    "exampleZh": "我們一家四口。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "five-num",
+    "en": "five",
+    "pos": "num.",
+    "zh": "五",
+    "categories": [
+      "numbers"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The station is five minutes away on foot.",
+    "exampleZh": "走路到車站要五分鐘。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "six-num",
+    "en": "six",
+    "pos": "num.",
+    "zh": "六",
+    "categories": [
+      "numbers"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Dinner will be ready at six.",
+    "exampleZh": "晚餐六點會準備好。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "seven-num",
+    "en": "seven",
+    "pos": "num.",
+    "zh": "七",
+    "categories": [
+      "numbers"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The shop is open seven days a week.",
+    "exampleZh": "這家店每週營業七天。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "eight-num",
+    "en": "eight",
+    "pos": "num.",
+    "zh": "八",
+    "categories": [
+      "numbers"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My flight leaves at eight in the morning.",
+    "exampleZh": "我的班機早上八點起飛。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "nine-num",
+    "en": "nine",
+    "pos": "num.",
+    "zh": "九",
+    "categories": [
+      "numbers"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Our tour group has nine people.",
+    "exampleZh": "我們的旅行團有九個人。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "ten-num",
+    "en": "ten",
+    "pos": "num.",
+    "zh": "十",
+    "categories": [
+      "numbers"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "It costs ten dollars to get in.",
+    "exampleZh": "入場要十美元。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "eleven-num",
+    "en": "eleven",
+    "pos": "num.",
+    "zh": "十一",
+    "categories": [
+      "numbers"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Platform eleven is at the end of the hall.",
+    "exampleZh": "第十一月台在大廳盡頭。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "twelve-num",
+    "en": "twelve",
+    "pos": "num.",
+    "zh": "十二",
+    "categories": [
+      "numbers"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "There are twelve eggs in a box.",
+    "exampleZh": "一盒有十二顆蛋。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "twenty-num",
+    "en": "twenty",
+    "pos": "num.",
+    "zh": "二十",
+    "categories": [
+      "numbers"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Please wait about twenty minutes.",
+    "exampleZh": "請等大約二十分鐘。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "fifty-num",
+    "en": "fifty",
+    "pos": "num.",
+    "zh": "五十",
+    "categories": [
+      "numbers"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The bus fare is fifty dollars.",
+    "exampleZh": "公車票價是五十元。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "hundred-num",
+    "en": "hundred",
+    "pos": "num.",
+    "zh": "百",
+    "categories": [
+      "numbers"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The hotel is over a hundred years old.",
+    "exampleZh": "這間飯店有一百多年的歷史。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "thousand-num",
+    "en": "thousand",
+    "pos": "num.",
+    "zh": "千",
+    "categories": [
+      "numbers"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "This bag costs three thousand dollars.",
+    "exampleZh": "這個包包要三千元。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "first-num",
+    "en": "first",
+    "pos": "num.",
+    "zh": "第一",
+    "categories": [
+      "numbers"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Is this your first time in Taiwan?",
+    "exampleZh": "這是你第一次來台灣嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "second-num",
+    "en": "second",
+    "pos": "num.",
+    "zh": "第二",
+    "categories": [
+      "numbers"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The restroom is on the second floor.",
+    "exampleZh": "廁所在二樓。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "third-num",
+    "en": "third",
+    "pos": "num.",
+    "zh": "第三",
+    "categories": [
+      "numbers"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Turn right at the third traffic light.",
+    "exampleZh": "在第三個紅綠燈右轉。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "half",
+    "en": "half",
+    "pos": "n.",
+    "zh": "一半",
+    "categories": [
+      "numbers"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Half of the cake is gone already.",
+    "exampleZh": "蛋糕已經吃掉一半了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "number",
+    "en": "number",
+    "pos": "n.",
+    "zh": "數字、號碼",
+    "categories": [
+      "numbers"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "What's your room number?",
+    "exampleZh": "你的房號是幾號？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "many-det",
+    "en": "many",
+    "pos": "det.",
+    "zh": "許多的",
+    "categories": [
+      "numbers"
+    ],
+    "level": 1,
+    "syn": "many",
+    "example": "There are many temples in Kyoto.",
+    "exampleZh": "京都有很多寺廟。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "a-lot-of",
+    "en": "a lot of",
+    "pos": "phr.",
+    "zh": "很多",
+    "categories": [
+      "numbers"
+    ],
+    "level": 1,
+    "syn": "many",
+    "example": "We took a lot of photos at the beach.",
+    "exampleZh": "我們在海邊拍了很多照片。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "thirteen-num",
+    "en": "thirteen",
+    "pos": "num.",
+    "zh": "十三",
+    "categories": [
+      "numbers"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "My daughter turns thirteen next week.",
+    "exampleZh": "我女兒下週滿十三歲。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "fifteen-num",
+    "en": "fifteen",
+    "pos": "num.",
+    "zh": "十五",
+    "categories": [
+      "numbers"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The shuttle bus leaves every fifteen minutes.",
+    "exampleZh": "接駁車每十五分鐘發一班。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "thirty-num",
+    "en": "thirty",
+    "pos": "num.",
+    "zh": "三十",
+    "categories": [
+      "numbers"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Check-in starts at three thirty.",
+    "exampleZh": "下午三點半開始辦理入住。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "forty-num",
+    "en": "forty",
+    "pos": "num.",
+    "zh": "四十",
+    "categories": [
+      "numbers"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The tour takes forty minutes.",
+    "exampleZh": "導覽要四十分鐘。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "million-num",
+    "en": "million",
+    "pos": "num.",
+    "zh": "百萬",
+    "categories": [
+      "numbers"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Over a million people visit this park every year.",
+    "exampleZh": "每年有超過一百萬人造訪這座公園。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "dozen",
+    "en": "dozen",
+    "pos": "n.",
+    "zh": "一打",
+    "categories": [
+      "numbers"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I bought a dozen eggs at the market.",
+    "exampleZh": "我在市場買了一打雞蛋。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "pair",
+    "en": "pair",
+    "pos": "n.",
+    "zh": "一對、一雙",
+    "categories": [
+      "numbers"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I need a new pair of shoes.",
+    "exampleZh": "我需要一雙新鞋。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "double-adj",
+    "en": "double",
+    "pos": "adj.",
+    "zh": "兩倍的",
+    "categories": [
+      "numbers"
+    ],
+    "level": 2,
+    "syn": "double",
+    "example": "Prices are double during the holidays.",
+    "exampleZh": "假期期間價格是平時的兩倍。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "twice-adv",
+    "en": "twice",
+    "pos": "adv.",
+    "zh": "兩次、兩倍",
+    "categories": [
+      "numbers"
+    ],
+    "level": 2,
+    "syn": "double",
+    "example": "I've been to Tokyo twice.",
+    "exampleZh": "我去過東京兩次。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "once-adv",
+    "en": "once",
+    "pos": "adv.",
+    "zh": "一次",
+    "categories": [
+      "numbers"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Take this medicine once a day.",
+    "exampleZh": "這個藥一天吃一次。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "quarter",
+    "en": "quarter",
+    "pos": "n.",
+    "zh": "四分之一、一刻鐘",
+    "categories": [
+      "numbers"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I'll meet you at a quarter past six.",
+    "exampleZh": "我六點十五分和你碰面。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "percent",
+    "en": "percent",
+    "pos": "n.",
+    "zh": "百分之",
+    "categories": [
+      "numbers"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Students get ten percent off.",
+    "exampleZh": "學生可以打九折。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "several-det",
+    "en": "several",
+    "pos": "det.",
+    "zh": "幾個、數個",
+    "categories": [
+      "numbers"
+    ],
+    "level": 2,
+    "syn": "several",
+    "example": "We visited several museums in Paris.",
+    "exampleZh": "我們在巴黎參觀了幾間博物館。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "amount",
+    "en": "amount",
+    "pos": "n.",
+    "zh": "數量、金額",
+    "categories": [
+      "numbers"
+    ],
+    "level": 2,
+    "syn": "amount",
+    "example": "Please enter the amount you want to pay.",
+    "exampleZh": "請輸入您要付款的金額。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "total",
+    "en": "total",
+    "pos": "n.",
+    "zh": "總數、總計",
+    "categories": [
+      "numbers"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The total is two hundred dollars.",
+    "exampleZh": "總共是兩百元。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "count-v",
+    "en": "count",
+    "pos": "v.",
+    "zh": "數、計算",
+    "categories": [
+      "numbers"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Please count your change before leaving.",
+    "exampleZh": "離開前請點清找的零錢。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "plus-prep",
+    "en": "plus",
+    "pos": "prep.",
+    "zh": "加",
+    "categories": [
+      "numbers"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Two plus three is five.",
+    "exampleZh": "二加三等於五。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "minus-prep",
+    "en": "minus",
+    "pos": "prep.",
+    "zh": "減",
+    "categories": [
+      "numbers"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Ten minus four is six.",
+    "exampleZh": "十減四等於六。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "both-det",
+    "en": "both",
+    "pos": "det.",
+    "zh": "兩者都",
+    "categories": [
+      "numbers"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Both rooms have a sea view.",
+    "exampleZh": "兩間房間都有海景。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "each-det",
+    "en": "each",
+    "pos": "det.",
+    "zh": "每個",
+    "categories": [
+      "numbers"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Each ticket costs twenty dollars.",
+    "exampleZh": "每張票二十元。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "a-few",
+    "en": "a few",
+    "pos": "phr.",
+    "zh": "幾個、一些",
+    "categories": [
+      "numbers"
+    ],
+    "level": 2,
+    "syn": "several",
+    "example": "I'll stay for a few days.",
+    "exampleZh": "我會待幾天。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "a-couple-of",
+    "en": "a couple of",
+    "pos": "phr.",
+    "zh": "兩三個",
+    "categories": [
+      "numbers"
+    ],
+    "level": 2,
+    "syn": "several",
+    "example": "We waited a couple of minutes for a taxi.",
+    "exampleZh": "我們等了兩三分鐘的計程車。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "fifth-num",
+    "en": "fifth",
+    "pos": "num.",
+    "zh": "第五",
+    "categories": [
+      "numbers"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "This is my fifth visit to Japan.",
+    "exampleZh": "這是我第五次來日本。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "single-adj",
+    "en": "single",
+    "pos": "adj.",
+    "zh": "單人的、單一的",
+    "categories": [
+      "numbers"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I'd like a single room for two nights.",
+    "exampleZh": "我想要一間單人房，住兩晚。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "billion-num",
+    "en": "billion",
+    "pos": "num.",
+    "zh": "十億",
+    "categories": [
+      "numbers"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The new airport cost over a billion dollars.",
+    "exampleZh": "新機場花了超過十億元。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "triple-adj",
+    "en": "triple",
+    "pos": "adj.",
+    "zh": "三倍的",
+    "categories": [
+      "numbers"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The price was triple what we expected.",
+    "exampleZh": "價格是我們預期的三倍。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "quantity",
+    "en": "quantity",
+    "pos": "n.",
+    "zh": "數量",
+    "categories": [
+      "numbers"
+    ],
+    "level": 3,
+    "syn": "amount",
+    "example": "Please write the quantity on the order form.",
+    "exampleZh": "請在訂購單上寫數量。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "average-adj",
+    "en": "average",
+    "pos": "adj.",
+    "zh": "平均的",
+    "categories": [
+      "numbers"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The average price of a hotel here is high.",
+    "exampleZh": "這裡飯店的平均價格很高。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "majority",
+    "en": "majority",
+    "pos": "n.",
+    "zh": "大多數",
+    "categories": [
+      "numbers"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The majority of visitors come in summer.",
+    "exampleZh": "大多數遊客在夏天來訪。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "decimal",
+    "en": "decimal",
+    "pos": "n.",
+    "zh": "小數",
+    "categories": [
+      "numbers"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Please write the answer as a decimal, not a fraction.",
+    "exampleZh": "請用小數寫答案，不要用分數。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "fraction",
+    "en": "fraction",
+    "pos": "n.",
+    "zh": "分數",
+    "categories": [
+      "numbers"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Kids learn fractions in elementary school.",
+    "exampleZh": "孩子們在小學學分數。",
+    "form": "fractions",
+    "reviewed": true
+  },
+  {
+    "id": "multiply-v",
+    "en": "multiply",
+    "pos": "v.",
+    "zh": "乘",
+    "categories": [
+      "numbers"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Multiply the price by three to get the total.",
+    "exampleZh": "把價格乘以三就是總額。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "divide-v",
+    "en": "divide",
+    "pos": "v.",
+    "zh": "除、分攤",
+    "categories": [
+      "numbers"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Let's divide the bill among four people.",
+    "exampleZh": "我們把帳單分成四個人付吧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "odd-number",
+    "en": "odd number",
+    "pos": "n.",
+    "zh": "奇數",
+    "categories": [
+      "numbers"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Rooms with odd numbers are on the left.",
+    "exampleZh": "奇數號的房間在左邊。",
+    "form": "odd numbers",
+    "reviewed": true
+  },
+  {
+    "id": "even-number",
+    "en": "even number",
+    "pos": "n.",
+    "zh": "偶數",
+    "categories": [
+      "numbers"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Even numbers are on the right side of the street.",
+    "exampleZh": "偶數門牌在街道的右側。",
+    "form": "even numbers",
+    "reviewed": true
+  },
+  {
+    "id": "approximately-adv",
+    "en": "approximately",
+    "pos": "adv.",
+    "zh": "大約",
+    "categories": [
+      "numbers"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The flight takes approximately two hours.",
+    "exampleZh": "飛行時間大約兩小時。",
+    "form": "",
+    "reviewed": true
+  }
+]

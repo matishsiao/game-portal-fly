@@ -1,0 +1,843 @@
+[
+  {
+    "id": "movie",
+    "en": "movie",
+    "pos": "n.",
+    "zh": "電影",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 1,
+    "syn": "movie",
+    "example": "Let's watch a movie tonight.",
+    "exampleZh": "我們今晚看部電影吧。",
+    "form": ""
+  },
+  {
+    "id": "song",
+    "en": "song",
+    "pos": "n.",
+    "zh": "歌、歌曲",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "This song reminds me of my trip to Seoul.",
+    "exampleZh": "這首歌讓我想起首爾之旅。",
+    "form": ""
+  },
+  {
+    "id": "singer",
+    "en": "singer",
+    "pos": "n.",
+    "zh": "歌手",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The singer waved to the crowd.",
+    "exampleZh": "歌手向群眾揮手。",
+    "form": ""
+  },
+  {
+    "id": "tv",
+    "en": "TV",
+    "pos": "n.",
+    "zh": "電視",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "There's nothing good on TV tonight.",
+    "exampleZh": "今晚電視沒有好看的節目。",
+    "form": ""
+  },
+  {
+    "id": "show",
+    "en": "show",
+    "pos": "n.",
+    "zh": "節目、表演",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 1,
+    "syn": "show",
+    "example": "The magic show starts at eight.",
+    "exampleZh": "魔術表演八點開始。",
+    "form": ""
+  },
+  {
+    "id": "video-game",
+    "en": "video game",
+    "pos": "n.",
+    "zh": "電玩、電子遊戲",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My son plays video games on the train.",
+    "exampleZh": "我兒子在火車上玩電玩。",
+    "form": "video games"
+  },
+  {
+    "id": "cartoon",
+    "en": "cartoon",
+    "pos": "n.",
+    "zh": "卡通",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The kids are watching cartoons in the hotel room.",
+    "exampleZh": "孩子們在旅館房間看卡通。",
+    "form": "cartoons"
+  },
+  {
+    "id": "party",
+    "en": "party",
+    "pos": "n.",
+    "zh": "派對",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We're having a birthday party on Saturday.",
+    "exampleZh": "我們星期六要辦生日派對。",
+    "form": ""
+  },
+  {
+    "id": "dance",
+    "en": "dance",
+    "pos": "v.",
+    "zh": "跳舞",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Let's dance to this song!",
+    "exampleZh": "我們跟著這首歌跳舞吧！",
+    "form": ""
+  },
+  {
+    "id": "sing",
+    "en": "sing",
+    "pos": "v.",
+    "zh": "唱歌、唱",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Everyone sang together at the concert.",
+    "exampleZh": "演唱會上大家一起唱歌。",
+    "form": "sang"
+  },
+  {
+    "id": "ticket",
+    "en": "ticket",
+    "pos": "n.",
+    "zh": "票、門票",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I bought two tickets for the concert.",
+    "exampleZh": "我買了兩張演唱會的票。",
+    "form": "tickets"
+  },
+  {
+    "id": "star",
+    "en": "star",
+    "pos": "n.",
+    "zh": "明星",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 1,
+    "syn": "star",
+    "example": "We saw a movie star at the airport!",
+    "exampleZh": "我們在機場看到一位電影明星！",
+    "form": ""
+  },
+  {
+    "id": "actor",
+    "en": "actor",
+    "pos": "n.",
+    "zh": "演員",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 1,
+    "syn": "actor",
+    "example": "My favorite actor is in this film.",
+    "exampleZh": "我最喜歡的演員有演這部電影。",
+    "form": ""
+  },
+  {
+    "id": "story",
+    "en": "story",
+    "pos": "n.",
+    "zh": "故事",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Grandma told us a funny story.",
+    "exampleZh": "奶奶跟我們講了一個好笑的故事。",
+    "form": ""
+  },
+  {
+    "id": "news",
+    "en": "news",
+    "pos": "n.",
+    "zh": "新聞",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I read the news on my phone every morning.",
+    "exampleZh": "我每天早上用手機看新聞。",
+    "form": ""
+  },
+  {
+    "id": "radio",
+    "en": "radio",
+    "pos": "n.",
+    "zh": "收音機、廣播",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We listened to the radio during the road trip.",
+    "exampleZh": "自駕旅行時我們一路聽廣播。",
+    "form": ""
+  },
+  {
+    "id": "newspaper",
+    "en": "newspaper",
+    "pos": "n.",
+    "zh": "報紙",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The hotel gives guests a free newspaper.",
+    "exampleZh": "旅館提供房客免費報紙。",
+    "form": ""
+  },
+  {
+    "id": "funny",
+    "en": "funny",
+    "pos": "adj.",
+    "zh": "好笑的、有趣的",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "That movie was really funny.",
+    "exampleZh": "那部電影真的很好笑。",
+    "form": ""
+  },
+  {
+    "id": "band",
+    "en": "band",
+    "pos": "n.",
+    "zh": "樂團",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 1,
+    "syn": "band",
+    "example": "A local band plays at this bar on Fridays.",
+    "exampleZh": "每週五都有當地樂團在這家酒吧表演。",
+    "form": ""
+  },
+  {
+    "id": "guitar",
+    "en": "guitar",
+    "pos": "n.",
+    "zh": "吉他",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "He plays the guitar on the street.",
+    "exampleZh": "他在街頭彈吉他。",
+    "form": ""
+  },
+  {
+    "id": "piano",
+    "en": "piano",
+    "pos": "n.",
+    "zh": "鋼琴",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "There's a piano in the hotel lobby.",
+    "exampleZh": "旅館大廳有一架鋼琴。",
+    "form": ""
+  },
+  {
+    "id": "comic-book",
+    "en": "comic book",
+    "pos": "n.",
+    "zh": "漫畫、漫畫書",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I bought a Japanese comic book at the airport.",
+    "exampleZh": "我在機場買了一本日本漫畫。",
+    "form": ""
+  },
+  {
+    "id": "music",
+    "en": "music",
+    "pos": "n.",
+    "zh": "音樂",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "What kind of music do you like?",
+    "exampleZh": "你喜歡什麼類型的音樂？",
+    "form": ""
+  },
+  {
+    "id": "magazine",
+    "en": "magazine",
+    "pos": "n.",
+    "zh": "雜誌",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I read a travel magazine on the plane.",
+    "exampleZh": "我在飛機上看旅遊雜誌。",
+    "form": ""
+  },
+  {
+    "id": "film",
+    "en": "film",
+    "pos": "n.",
+    "zh": "電影",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 2,
+    "syn": "movie",
+    "example": "This film won many awards.",
+    "exampleZh": "這部電影得過很多獎。",
+    "form": ""
+  },
+  {
+    "id": "actress",
+    "en": "actress",
+    "pos": "n.",
+    "zh": "女演員",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 2,
+    "syn": "actor",
+    "example": "The actress signed autographs for her fans.",
+    "exampleZh": "這位女演員為粉絲簽名。",
+    "form": ""
+  },
+  {
+    "id": "theater",
+    "en": "theater",
+    "pos": "n.",
+    "zh": "劇院、戲院",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 2,
+    "syn": "theater",
+    "example": "We saw a musical at a theater in London.",
+    "exampleZh": "我們在倫敦一家劇院看了音樂劇。",
+    "form": ""
+  },
+  {
+    "id": "movie-theater",
+    "en": "movie theater",
+    "pos": "n.",
+    "zh": "電影院",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 2,
+    "syn": "theater",
+    "example": "The movie theater is on the fifth floor of the mall.",
+    "exampleZh": "電影院在購物中心的五樓。",
+    "form": ""
+  },
+  {
+    "id": "concert",
+    "en": "concert",
+    "pos": "n.",
+    "zh": "演唱會、音樂會",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The concert was sold out in one hour.",
+    "exampleZh": "演唱會一小時內就賣光了。",
+    "form": ""
+  },
+  {
+    "id": "audience",
+    "en": "audience",
+    "pos": "n.",
+    "zh": "觀眾",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The audience clapped for five minutes.",
+    "exampleZh": "觀眾鼓掌了五分鐘。",
+    "form": ""
+  },
+  {
+    "id": "channel",
+    "en": "channel",
+    "pos": "n.",
+    "zh": "頻道",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Which channel shows the news in English?",
+    "exampleZh": "哪個頻道播英文新聞？",
+    "form": ""
+  },
+  {
+    "id": "program",
+    "en": "program",
+    "pos": "n.",
+    "zh": "節目",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 2,
+    "syn": "show",
+    "example": "This cooking program is very popular.",
+    "exampleZh": "這個烹飪節目很受歡迎。",
+    "form": ""
+  },
+  {
+    "id": "episode",
+    "en": "episode",
+    "pos": "n.",
+    "zh": "一集、集",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I watched three episodes on the flight.",
+    "exampleZh": "我在飛機上看了三集。",
+    "form": "episodes"
+  },
+  {
+    "id": "series",
+    "en": "series",
+    "pos": "n.",
+    "zh": "影集、系列",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 2,
+    "syn": "series",
+    "example": "Have you seen this new Korean series?",
+    "exampleZh": "你看過這部新的韓國影集嗎？",
+    "form": ""
+  },
+  {
+    "id": "drama",
+    "en": "drama",
+    "pos": "n.",
+    "zh": "戲劇、連續劇",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 2,
+    "syn": "series",
+    "example": "My mom loves watching Korean dramas.",
+    "exampleZh": "我媽媽很愛看韓劇。",
+    "form": "dramas"
+  },
+  {
+    "id": "director",
+    "en": "director",
+    "pos": "n.",
+    "zh": "導演",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The director talked about the movie after the show.",
+    "exampleZh": "放映結束後導演談了這部電影。",
+    "form": ""
+  },
+  {
+    "id": "musician",
+    "en": "musician",
+    "pos": "n.",
+    "zh": "音樂家、樂手",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Street musicians play near the station every evening.",
+    "exampleZh": "每天傍晚都有街頭樂手在車站附近演奏。",
+    "form": "musicians"
+  },
+  {
+    "id": "festival",
+    "en": "festival",
+    "pos": "n.",
+    "zh": "節慶、慶典",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The music festival lasts three days.",
+    "exampleZh": "這個音樂節為期三天。",
+    "form": ""
+  },
+  {
+    "id": "performance",
+    "en": "performance",
+    "pos": "n.",
+    "zh": "表演、演出",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 2,
+    "syn": "show",
+    "example": "The dance performance was amazing.",
+    "exampleZh": "舞蹈表演太精彩了。",
+    "form": ""
+  },
+  {
+    "id": "comedy",
+    "en": "comedy",
+    "pos": "n.",
+    "zh": "喜劇",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I prefer comedy to horror movies.",
+    "exampleZh": "比起恐怖片，我更喜歡喜劇。",
+    "form": ""
+  },
+  {
+    "id": "celebrity",
+    "en": "celebrity",
+    "pos": "n.",
+    "zh": "名人",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 2,
+    "syn": "star",
+    "example": "Many celebrities stay at this hotel.",
+    "exampleZh": "很多名人會住這家旅館。",
+    "form": "celebrities"
+  },
+  {
+    "id": "podcast",
+    "en": "podcast",
+    "pos": "n.",
+    "zh": "Podcast節目",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I listen to a podcast on my way to work.",
+    "exampleZh": "我上班途中會聽 Podcast 節目。",
+    "form": ""
+  },
+  {
+    "id": "subtitles",
+    "en": "subtitles",
+    "pos": "n.",
+    "zh": "字幕",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Does this movie have English subtitles?",
+    "exampleZh": "這部電影有英文字幕嗎？",
+    "form": ""
+  },
+  {
+    "id": "karaoke",
+    "en": "karaoke",
+    "pos": "n.",
+    "zh": "卡拉OK、KTV",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Let's go to karaoke after dinner.",
+    "exampleZh": "晚餐後我們去唱 KTV 吧。",
+    "form": ""
+  },
+  {
+    "id": "magic",
+    "en": "magic",
+    "pos": "n.",
+    "zh": "魔術",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "My son learned a magic trick from a street performer.",
+    "exampleZh": "我兒子跟一位街頭藝人學了一個魔術。",
+    "form": ""
+  },
+  {
+    "id": "circus",
+    "en": "circus",
+    "pos": "n.",
+    "zh": "馬戲團",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We took the kids to the circus.",
+    "exampleZh": "我們帶孩子去看馬戲團表演。",
+    "form": ""
+  },
+  {
+    "id": "stage",
+    "en": "stage",
+    "pos": "n.",
+    "zh": "舞台",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The band walked onto the stage.",
+    "exampleZh": "樂團走上舞台。",
+    "form": ""
+  },
+  {
+    "id": "album",
+    "en": "album",
+    "pos": "n.",
+    "zh": "專輯",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Her new album comes out next week.",
+    "exampleZh": "她的新專輯下週發行。",
+    "form": ""
+  },
+  {
+    "id": "documentary",
+    "en": "documentary",
+    "pos": "n.",
+    "zh": "紀錄片",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We watched a documentary about whales.",
+    "exampleZh": "我們看了一部關於鯨魚的紀錄片。",
+    "form": ""
+  },
+  {
+    "id": "box-office",
+    "en": "box office",
+    "pos": "n.",
+    "zh": "售票處、票房",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "You can buy tickets at the box office.",
+    "exampleZh": "你可以在售票處買票。",
+    "form": ""
+  },
+  {
+    "id": "streaming",
+    "en": "streaming",
+    "pos": "n.",
+    "zh": "串流",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Most people watch movies on streaming services now.",
+    "exampleZh": "現在大多數人用串流平台看電影。",
+    "form": ""
+  },
+  {
+    "id": "headline",
+    "en": "headline",
+    "pos": "n.",
+    "zh": "頭條、標題",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The headline was about the typhoon.",
+    "exampleZh": "頭條新聞是關於颱風。",
+    "form": ""
+  },
+  {
+    "id": "advertisement",
+    "en": "advertisement",
+    "pos": "n.",
+    "zh": "廣告",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I saw an advertisement for the concert on the subway.",
+    "exampleZh": "我在捷運上看到演唱會的廣告。",
+    "form": ""
+  },
+  {
+    "id": "journalist",
+    "en": "journalist",
+    "pos": "n.",
+    "zh": "記者",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "A journalist interviewed people on the street.",
+    "exampleZh": "一位記者在街上訪問民眾。",
+    "form": ""
+  },
+  {
+    "id": "premiere",
+    "en": "premiere",
+    "pos": "n.",
+    "zh": "首映、首映會",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The stars arrived for the movie premiere.",
+    "exampleZh": "明星們抵達電影首映會。",
+    "form": ""
+  },
+  {
+    "id": "sequel",
+    "en": "sequel",
+    "pos": "n.",
+    "zh": "續集",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The sequel is even better than the first movie.",
+    "exampleZh": "續集甚至比第一集還好看。",
+    "form": ""
+  },
+  {
+    "id": "soundtrack",
+    "en": "soundtrack",
+    "pos": "n.",
+    "zh": "原聲帶",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I love the soundtrack of this film.",
+    "exampleZh": "我很喜歡這部電影的原聲帶。",
+    "form": ""
+  },
+  {
+    "id": "orchestra",
+    "en": "orchestra",
+    "pos": "n.",
+    "zh": "管弦樂團",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 3,
+    "syn": "band",
+    "example": "The orchestra played in the park for free.",
+    "exampleZh": "管弦樂團在公園免費演出。",
+    "form": ""
+  },
+  {
+    "id": "exhibition",
+    "en": "exhibition",
+    "pos": "n.",
+    "zh": "展覽",
+    "categories": [
+      "entertainment",
+      "sightseeing"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "There's a photo exhibition at the museum.",
+    "exampleZh": "博物館有一場攝影展。",
+    "form": ""
+  },
+  {
+    "id": "intermission",
+    "en": "intermission",
+    "pos": "n.",
+    "zh": "中場休息",
+    "categories": [
+      "entertainment"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We bought snacks during the intermission.",
+    "exampleZh": "我們在中場休息時買了零食。",
+    "form": ""
+  }
+]

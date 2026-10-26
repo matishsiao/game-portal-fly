@@ -1,0 +1,916 @@
+[
+  {
+    "id": "restaurant",
+    "en": "restaurant",
+    "pos": "n.",
+    "zh": "餐廳",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Can you recommend a good restaurant nearby?",
+    "exampleZh": "你能推薦附近一家好餐廳嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "menu",
+    "en": "menu",
+    "pos": "n.",
+    "zh": "菜單",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Do you have an English menu?",
+    "exampleZh": "你們有英文菜單嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "order-v",
+    "en": "order",
+    "pos": "v.",
+    "zh": "點餐",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Are you ready to order?",
+    "exampleZh": "請問可以點餐了嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "eat-v",
+    "en": "eat",
+    "pos": "v.",
+    "zh": "吃",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Where do you want to eat tonight?",
+    "exampleZh": "你今晚想去哪裡吃？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "waiter",
+    "en": "waiter",
+    "pos": "n.",
+    "zh": "服務生",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 1,
+    "syn": "waiter",
+    "example": "The waiter brought us some water.",
+    "exampleZh": "服務生幫我們送了水來。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "waitress",
+    "en": "waitress",
+    "pos": "n.",
+    "zh": "女服務生",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 1,
+    "syn": "waiter",
+    "example": "Let's ask the waitress for more napkins.",
+    "exampleZh": "我們跟女服務生多要一些紙巾吧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "table",
+    "en": "table",
+    "pos": "n.",
+    "zh": "桌子",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Can we have a table by the window?",
+    "exampleZh": "可以給我們靠窗的桌子嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "seat",
+    "en": "seat",
+    "pos": "n.",
+    "zh": "座位",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Excuse me, is this seat taken?",
+    "exampleZh": "不好意思，這個座位有人坐嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "bill",
+    "en": "bill",
+    "pos": "n.",
+    "zh": "帳單",
+    "categories": [
+      "restaurant",
+      "money"
+    ],
+    "level": 1,
+    "syn": "bill",
+    "example": "Could we have the bill, please?",
+    "exampleZh": "可以給我們帳單嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "check",
+    "en": "check",
+    "pos": "n.",
+    "zh": "帳單",
+    "categories": [
+      "restaurant",
+      "money"
+    ],
+    "level": 2,
+    "syn": "bill",
+    "example": "Excuse me, can I get the check?",
+    "exampleZh": "不好意思，可以給我帳單嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "tip",
+    "en": "tip",
+    "pos": "n.",
+    "zh": "小費",
+    "categories": [
+      "restaurant",
+      "money"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "In the US, people usually leave a tip.",
+    "exampleZh": "在美國，大家通常會留小費。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "fork",
+    "en": "fork",
+    "pos": "n.",
+    "zh": "叉子",
+    "categories": [
+      "restaurant",
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Could I get a fork instead of chopsticks?",
+    "exampleZh": "可以給我叉子而不是筷子嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "spoon",
+    "en": "spoon",
+    "pos": "n.",
+    "zh": "湯匙",
+    "categories": [
+      "restaurant",
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I need a spoon for the soup.",
+    "exampleZh": "我需要一支湯匙喝湯。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "knife",
+    "en": "knife",
+    "pos": "n.",
+    "zh": "刀子",
+    "categories": [
+      "restaurant",
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "This steak knife isn't very sharp.",
+    "exampleZh": "這把牛排刀不太利。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "chopsticks",
+    "en": "chopsticks",
+    "pos": "n.",
+    "zh": "筷子",
+    "categories": [
+      "restaurant",
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Can you use chopsticks?",
+    "exampleZh": "你會用筷子嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "plate",
+    "en": "plate",
+    "pos": "n.",
+    "zh": "盤子",
+    "categories": [
+      "restaurant",
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Can we get an extra plate to share?",
+    "exampleZh": "可以多給我們一個盤子分著吃嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "bowl",
+    "en": "bowl",
+    "pos": "n.",
+    "zh": "碗",
+    "categories": [
+      "restaurant",
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I'll have a small bowl of rice.",
+    "exampleZh": "我要一小碗白飯。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "napkin",
+    "en": "napkin",
+    "pos": "n.",
+    "zh": "餐巾紙、紙巾",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "There are napkins on the counter.",
+    "exampleZh": "紙巾在櫃檯上。",
+    "form": "napkins",
+    "reviewed": true
+  },
+  {
+    "id": "hungry-adj",
+    "en": "hungry",
+    "pos": "adj.",
+    "zh": "餓的",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I'm so hungry. Let's eat now.",
+    "exampleZh": "我好餓，我們現在去吃吧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "full-adj",
+    "en": "full",
+    "pos": "adj.",
+    "zh": "滿的、飽的",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "No dessert for me, thanks. I'm full.",
+    "exampleZh": "我不用甜點了，謝謝，我吃飽了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "delicious-adj",
+    "en": "delicious",
+    "pos": "adj.",
+    "zh": "美味的、好吃的",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 1,
+    "syn": "delicious",
+    "example": "Everything on this menu looks delicious.",
+    "exampleZh": "這菜單上的每樣東西看起來都很好吃。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "spicy-adj",
+    "en": "spicy",
+    "pos": "adj.",
+    "zh": "辣的",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Can you make it less spicy?",
+    "exampleZh": "可以做小辣一點嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "dish",
+    "en": "dish",
+    "pos": "n.",
+    "zh": "菜餚、一道菜",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "What's the most popular dish here?",
+    "exampleZh": "這裡最受歡迎的菜是什麼？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "share-v",
+    "en": "share",
+    "pos": "v.",
+    "zh": "分享、共用",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Let's share a few plates of dumplings.",
+    "exampleZh": "我們點幾盤餃子一起分著吃吧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "order",
+    "en": "order",
+    "pos": "n.",
+    "zh": "餐點、點單",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Your order will be ready in ten minutes.",
+    "exampleZh": "您的餐點十分鐘後就好。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "reservation",
+    "en": "reservation",
+    "pos": "n.",
+    "zh": "預訂、預約",
+    "categories": [
+      "restaurant",
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "reservation",
+    "example": "I have a reservation for two at seven.",
+    "exampleZh": "我訂了七點兩位的位子。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "book-v",
+    "en": "book",
+    "pos": "v.",
+    "zh": "預訂",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 2,
+    "syn": "reservation",
+    "example": "We should book a table for Saturday night.",
+    "exampleZh": "我們應該訂星期六晚上的位子。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "takeout",
+    "en": "takeout",
+    "pos": "n.",
+    "zh": "外帶餐點",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 2,
+    "syn": "takeout",
+    "example": "Let's get takeout and eat at the hotel.",
+    "exampleZh": "我們買外帶回飯店吃吧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "to-go",
+    "en": "to go",
+    "pos": "phr.",
+    "zh": "外帶",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 2,
+    "syn": "takeout",
+    "example": "One iced latte to go, please.",
+    "exampleZh": "一杯冰拿鐵外帶，謝謝。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "for-here",
+    "en": "for here",
+    "pos": "phr.",
+    "zh": "內用",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 2,
+    "syn": "for-here",
+    "example": "Is that for here or to go?",
+    "exampleZh": "請問內用還是外帶？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "service-charge",
+    "en": "service charge",
+    "pos": "n.",
+    "zh": "服務費",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "A ten percent service charge is added to the bill.",
+    "exampleZh": "帳單會另加一成服務費。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "set-meal",
+    "en": "set meal",
+    "pos": "n.",
+    "zh": "套餐",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 2,
+    "syn": "set-meal",
+    "example": "The lunch set meal comes with soup and a drink.",
+    "exampleZh": "午間套餐附湯和飲料。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "combo",
+    "en": "combo",
+    "pos": "n.",
+    "zh": "套餐、組合餐",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 2,
+    "syn": "set-meal",
+    "example": "I'll take the number three combo.",
+    "exampleZh": "我要三號套餐。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "main-course",
+    "en": "main course",
+    "pos": "n.",
+    "zh": "主菜",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "For the main course, I'll have the fish.",
+    "exampleZh": "主菜我要魚。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "side-dish",
+    "en": "side dish",
+    "pos": "n.",
+    "zh": "配菜、小菜",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 2,
+    "syn": "side-dish",
+    "example": "Korean meals come with many free side dishes.",
+    "exampleZh": "韓式餐點附有很多免費小菜。",
+    "form": "side dishes",
+    "reviewed": true
+  },
+  {
+    "id": "vegetarian-adj",
+    "en": "vegetarian",
+    "pos": "adj.",
+    "zh": "素食的",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Do you have any vegetarian options?",
+    "exampleZh": "你們有素食的選擇嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "allergic-adj",
+    "en": "allergic",
+    "pos": "adj.",
+    "zh": "過敏的",
+    "categories": [
+      "restaurant",
+      "health"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I'm allergic to peanuts.",
+    "exampleZh": "我對花生過敏。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "recommend-v",
+    "en": "recommend",
+    "pos": "v.",
+    "zh": "推薦",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "What do you recommend?",
+    "exampleZh": "你推薦什麼？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "special",
+    "en": "special",
+    "pos": "n.",
+    "zh": "特餐",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Today's special is grilled salmon.",
+    "exampleZh": "今日特餐是烤鮭魚。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "chef",
+    "en": "chef",
+    "pos": "n.",
+    "zh": "主廚",
+    "categories": [
+      "restaurant",
+      "jobs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The chef came out to greet us.",
+    "exampleZh": "主廚出來跟我們打招呼。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "cashier",
+    "en": "cashier",
+    "pos": "n.",
+    "zh": "收銀員",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Please pay the cashier at the front.",
+    "exampleZh": "請到前面跟收銀員結帳。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "counter",
+    "en": "counter",
+    "pos": "n.",
+    "zh": "櫃檯",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Order and pay at the counter.",
+    "exampleZh": "請在櫃檯點餐並付款。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "cafe",
+    "en": "cafe",
+    "pos": "n.",
+    "zh": "咖啡廳",
+    "categories": [
+      "restaurant",
+      "city"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Let's rest at that cafe for a while.",
+    "exampleZh": "我們去那間咖啡廳休息一下吧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "fast-food",
+    "en": "fast food",
+    "pos": "n.",
+    "zh": "速食",
+    "categories": [
+      "restaurant",
+      "food"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We only had time for fast food.",
+    "exampleZh": "我們只來得及吃速食。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "tasty-adj",
+    "en": "tasty",
+    "pos": "adj.",
+    "zh": "好吃的",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 2,
+    "syn": "delicious",
+    "example": "The street food here is cheap and tasty.",
+    "exampleZh": "這裡的街頭小吃又便宜又好吃。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "tray",
+    "en": "tray",
+    "pos": "n.",
+    "zh": "托盤",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Please return your tray after eating.",
+    "exampleZh": "用餐後請歸還托盤。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "buffet",
+    "en": "buffet",
+    "pos": "n.",
+    "zh": "自助餐",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The hotel buffet has food from all over the world.",
+    "exampleZh": "飯店自助餐有世界各地的料理。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "food-court",
+    "en": "food court",
+    "pos": "n.",
+    "zh": "美食街",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The mall has a big food court downstairs.",
+    "exampleZh": "購物中心樓下有一個大型美食街。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "appetizer",
+    "en": "appetizer",
+    "pos": "n.",
+    "zh": "開胃菜",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 3,
+    "syn": "side-dish",
+    "example": "Let's order a few appetizers to share.",
+    "exampleZh": "我們點幾道開胃菜一起吃吧。",
+    "form": "appetizers",
+    "reviewed": true
+  },
+  {
+    "id": "portion",
+    "en": "portion",
+    "pos": "n.",
+    "zh": "份量",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The portions here are huge.",
+    "exampleZh": "這裡的份量很大。",
+    "form": "portions",
+    "reviewed": true
+  },
+  {
+    "id": "rare-adj",
+    "en": "rare",
+    "pos": "adj.",
+    "zh": "三分熟的",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 3,
+    "syn": "doneness",
+    "example": "I'd like my steak rare, please.",
+    "exampleZh": "我的牛排要三分熟，謝謝。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "well-done-adj",
+    "en": "well-done",
+    "pos": "adj.",
+    "zh": "全熟的",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 3,
+    "syn": "doneness",
+    "example": "My dad always orders his steak well-done.",
+    "exampleZh": "我爸點牛排總是要全熟。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "doggy-bag",
+    "en": "doggy bag",
+    "pos": "n.",
+    "zh": "打包袋",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Can I get a doggy bag for this?",
+    "exampleZh": "這個可以給我打包袋嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "leftovers",
+    "en": "leftovers",
+    "pos": "n.",
+    "zh": "剩菜",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We took the leftovers back to the hotel.",
+    "exampleZh": "我們把剩菜帶回飯店。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "cuisine",
+    "en": "cuisine",
+    "pos": "n.",
+    "zh": "料理、菜系",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I love trying the local cuisine when I travel.",
+    "exampleZh": "旅行時我喜歡嘗試當地料理。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "dine-in",
+    "en": "dine in",
+    "pos": "phr.",
+    "zh": "內用",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 3,
+    "syn": "for-here",
+    "example": "Would you like to dine in or take out?",
+    "exampleZh": "您要內用還是外帶？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "complimentary-adj",
+    "en": "complimentary",
+    "pos": "adj.",
+    "zh": "免費的、贈送的",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The restaurant offered us complimentary dessert.",
+    "exampleZh": "餐廳招待我們免費甜點。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "gluten-free-adj",
+    "en": "gluten-free",
+    "pos": "adj.",
+    "zh": "無麩質的",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Is the pasta gluten-free?",
+    "exampleZh": "這義大利麵是無麩質的嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "waitlist",
+    "en": "waitlist",
+    "pos": "n.",
+    "zh": "候位名單",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We're on the waitlist for a table.",
+    "exampleZh": "我們在候位名單上等位子。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "toothpick",
+    "en": "toothpick",
+    "pos": "n.",
+    "zh": "牙籤",
+    "categories": [
+      "restaurant"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "There are toothpicks by the cashier.",
+    "exampleZh": "收銀台旁有牙籤。",
+    "form": "toothpicks",
+    "reviewed": true
+  }
+]

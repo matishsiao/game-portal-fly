@@ -1,0 +1,857 @@
+[
+  {
+    "id": "job",
+    "en": "job",
+    "pos": "n.",
+    "zh": "工作",
+    "categories": [
+      "jobs"
+    ],
+    "level": 1,
+    "syn": "job",
+    "example": "My sister found a new job at the airport.",
+    "exampleZh": "我姊姊在機場找到新工作。",
+    "form": ""
+  },
+  {
+    "id": "work",
+    "en": "work",
+    "pos": "v.",
+    "zh": "工作",
+    "categories": [
+      "jobs"
+    ],
+    "level": 1,
+    "syn": "job",
+    "example": "I work at a hotel near the train station.",
+    "exampleZh": "我在火車站附近的旅館工作。",
+    "form": ""
+  },
+  {
+    "id": "worker",
+    "en": "worker",
+    "pos": "n.",
+    "zh": "工人",
+    "categories": [
+      "jobs"
+    ],
+    "level": 1,
+    "syn": "worker",
+    "example": "The workers are fixing the road outside our hotel.",
+    "exampleZh": "工人們正在修理我們旅館外面的路。",
+    "form": "workers"
+  },
+  {
+    "id": "teacher",
+    "en": "teacher",
+    "pos": "n.",
+    "zh": "老師",
+    "categories": [
+      "jobs",
+      "school"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Our teacher took us on a trip to the museum.",
+    "exampleZh": "我們的老師帶我們去博物館參觀。",
+    "form": ""
+  },
+  {
+    "id": "doctor",
+    "en": "doctor",
+    "pos": "n.",
+    "zh": "醫生",
+    "categories": [
+      "jobs",
+      "health"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "You should see a doctor if the fever continues.",
+    "exampleZh": "如果持續發燒，你應該去看醫生。",
+    "form": ""
+  },
+  {
+    "id": "nurse",
+    "en": "nurse",
+    "pos": "n.",
+    "zh": "護理師、護士",
+    "categories": [
+      "jobs",
+      "health"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The nurse checked my temperature and blood pressure.",
+    "exampleZh": "護理師幫我量了體溫和血壓。",
+    "form": ""
+  },
+  {
+    "id": "cook",
+    "en": "cook",
+    "pos": "n.",
+    "zh": "廚師",
+    "categories": [
+      "jobs"
+    ],
+    "level": 1,
+    "syn": "chef",
+    "example": "My uncle works as a cook in a small restaurant.",
+    "exampleZh": "我叔叔在一家小餐廳當廚師。",
+    "form": ""
+  },
+  {
+    "id": "driver",
+    "en": "driver",
+    "pos": "n.",
+    "zh": "司機",
+    "categories": [
+      "jobs",
+      "transport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The bus driver told us where to get off.",
+    "exampleZh": "公車司機告訴我們在哪裡下車。",
+    "form": ""
+  },
+  {
+    "id": "farmer",
+    "en": "farmer",
+    "pos": "n.",
+    "zh": "農夫、農民",
+    "categories": [
+      "jobs"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We bought fresh strawberries from a local farmer.",
+    "exampleZh": "我們向當地農夫買了新鮮草莓。",
+    "form": ""
+  },
+  {
+    "id": "police-officer",
+    "en": "police officer",
+    "pos": "n.",
+    "zh": "警察",
+    "categories": [
+      "jobs",
+      "emergency"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "A police officer helped us find our hotel.",
+    "exampleZh": "一位警察幫我們找到旅館。",
+    "form": ""
+  },
+  {
+    "id": "firefighter",
+    "en": "firefighter",
+    "pos": "n.",
+    "zh": "消防員",
+    "categories": [
+      "jobs"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The firefighters arrived within five minutes.",
+    "exampleZh": "消防員在五分鐘內就抵達了。",
+    "form": "firefighters"
+  },
+  {
+    "id": "boss",
+    "en": "boss",
+    "pos": "n.",
+    "zh": "老闆、上司",
+    "categories": [
+      "jobs"
+    ],
+    "level": 1,
+    "syn": "boss",
+    "example": "My boss let me leave early on Friday.",
+    "exampleZh": "我老闆讓我星期五提早下班。",
+    "form": ""
+  },
+  {
+    "id": "office",
+    "en": "office",
+    "pos": "n.",
+    "zh": "辦公室",
+    "categories": [
+      "jobs"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Her office is on the tenth floor.",
+    "exampleZh": "她的辦公室在十樓。",
+    "form": ""
+  },
+  {
+    "id": "waiter",
+    "en": "waiter",
+    "pos": "n.",
+    "zh": "服務生",
+    "categories": [
+      "jobs",
+      "restaurant"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Let's ask the waiter for the menu.",
+    "exampleZh": "我們跟服務生要菜單吧。",
+    "form": ""
+  },
+  {
+    "id": "artist",
+    "en": "artist",
+    "pos": "n.",
+    "zh": "藝術家、畫家",
+    "categories": [
+      "jobs"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "A street artist drew a picture of my daughter.",
+    "exampleZh": "一位街頭畫家幫我女兒畫了一張畫像。",
+    "form": ""
+  },
+  {
+    "id": "writer",
+    "en": "writer",
+    "pos": "n.",
+    "zh": "作家",
+    "categories": [
+      "jobs"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The writer signed my copy of her book.",
+    "exampleZh": "這位作家在我買的書上簽名。",
+    "form": ""
+  },
+  {
+    "id": "dentist",
+    "en": "dentist",
+    "pos": "n.",
+    "zh": "牙醫",
+    "categories": [
+      "jobs",
+      "health"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I have an appointment with the dentist tomorrow.",
+    "exampleZh": "我明天跟牙醫有約診。",
+    "form": ""
+  },
+  {
+    "id": "pilot",
+    "en": "pilot",
+    "pos": "n.",
+    "zh": "機師、飛行員",
+    "categories": [
+      "jobs",
+      "airport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The pilot said we would land in twenty minutes.",
+    "exampleZh": "機師說我們二十分鐘後就會降落。",
+    "form": ""
+  },
+  {
+    "id": "baker",
+    "en": "baker",
+    "pos": "n.",
+    "zh": "麵包師傅",
+    "categories": [
+      "jobs"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The baker opens his shop at six every morning.",
+    "exampleZh": "麵包師傅每天早上六點開店。",
+    "form": ""
+  },
+  {
+    "id": "meeting",
+    "en": "meeting",
+    "pos": "n.",
+    "zh": "會議",
+    "categories": [
+      "jobs"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Sorry, I'm in a meeting until three.",
+    "exampleZh": "抱歉，我開會開到三點。",
+    "form": ""
+  },
+  {
+    "id": "busy",
+    "en": "busy",
+    "pos": "adj.",
+    "zh": "忙碌的",
+    "categories": [
+      "jobs"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I'm too busy to have lunch today.",
+    "exampleZh": "我今天忙到沒時間吃午餐。",
+    "form": ""
+  },
+  {
+    "id": "factory",
+    "en": "factory",
+    "pos": "n.",
+    "zh": "工廠",
+    "categories": [
+      "jobs"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My father works at a shoe factory.",
+    "exampleZh": "我爸爸在一家鞋廠工作。",
+    "form": ""
+  },
+  {
+    "id": "tour-guide",
+    "en": "tour guide",
+    "pos": "n.",
+    "zh": "導遊",
+    "categories": [
+      "jobs",
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Our tour guide speaks English and Japanese.",
+    "exampleZh": "我們的導遊會說英文和日文。",
+    "form": ""
+  },
+  {
+    "id": "office-worker",
+    "en": "office worker",
+    "pos": "n.",
+    "zh": "上班族",
+    "categories": [
+      "jobs"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Many office workers eat lunch in this park.",
+    "exampleZh": "很多上班族在這座公園吃午餐。",
+    "form": "office workers"
+  },
+  {
+    "id": "manager",
+    "en": "manager",
+    "pos": "n.",
+    "zh": "經理",
+    "categories": [
+      "jobs"
+    ],
+    "level": 2,
+    "syn": "boss",
+    "example": "I'd like to speak to the manager, please.",
+    "exampleZh": "麻煩請經理過來，我想跟他談一下。",
+    "form": ""
+  },
+  {
+    "id": "chef",
+    "en": "chef",
+    "pos": "n.",
+    "zh": "主廚",
+    "categories": [
+      "jobs",
+      "restaurant"
+    ],
+    "level": 2,
+    "syn": "chef",
+    "example": "The chef recommends the grilled fish tonight.",
+    "exampleZh": "主廚今晚推薦烤魚。",
+    "form": ""
+  },
+  {
+    "id": "engineer",
+    "en": "engineer",
+    "pos": "n.",
+    "zh": "工程師",
+    "categories": [
+      "jobs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "My brother is a software engineer in Taipei.",
+    "exampleZh": "我哥哥在台北當軟體工程師。",
+    "form": ""
+  },
+  {
+    "id": "lawyer",
+    "en": "lawyer",
+    "pos": "n.",
+    "zh": "律師",
+    "categories": [
+      "jobs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "You may need a lawyer to read this contract.",
+    "exampleZh": "你可能需要請律師看這份合約。",
+    "form": ""
+  },
+  {
+    "id": "cashier",
+    "en": "cashier",
+    "pos": "n.",
+    "zh": "收銀員",
+    "categories": [
+      "jobs",
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Please pay the cashier at the front.",
+    "exampleZh": "請到前面跟收銀員結帳。",
+    "form": ""
+  },
+  {
+    "id": "clerk",
+    "en": "clerk",
+    "pos": "n.",
+    "zh": "店員、職員",
+    "categories": [
+      "jobs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The hotel clerk gave us a map of the city.",
+    "exampleZh": "旅館職員給了我們一張市區地圖。",
+    "form": ""
+  },
+  {
+    "id": "secretary",
+    "en": "secretary",
+    "pos": "n.",
+    "zh": "秘書",
+    "categories": [
+      "jobs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Please leave a message with my secretary.",
+    "exampleZh": "請留言給我的秘書。",
+    "form": ""
+  },
+  {
+    "id": "mechanic",
+    "en": "mechanic",
+    "pos": "n.",
+    "zh": "技師、修車師傅",
+    "categories": [
+      "jobs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The mechanic fixed our rental car in an hour.",
+    "exampleZh": "技師一小時就修好我們的租車。",
+    "form": ""
+  },
+  {
+    "id": "hairdresser",
+    "en": "hairdresser",
+    "pos": "n.",
+    "zh": "美髮師",
+    "categories": [
+      "jobs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "My hairdresser always knows the latest styles.",
+    "exampleZh": "我的美髮師總是知道最新的髮型。",
+    "form": ""
+  },
+  {
+    "id": "salary",
+    "en": "salary",
+    "pos": "n.",
+    "zh": "薪水",
+    "categories": [
+      "jobs"
+    ],
+    "level": 2,
+    "syn": "salary",
+    "example": "She saves part of her salary for travel.",
+    "exampleZh": "她把部分薪水存起來旅行用。",
+    "form": ""
+  },
+  {
+    "id": "coworker",
+    "en": "coworker",
+    "pos": "n.",
+    "zh": "同事",
+    "categories": [
+      "jobs"
+    ],
+    "level": 2,
+    "syn": "coworker",
+    "example": "I'm having dinner with my coworkers tonight.",
+    "exampleZh": "我今晚要跟同事吃晚餐。",
+    "form": "coworkers"
+  },
+  {
+    "id": "employee",
+    "en": "employee",
+    "pos": "n.",
+    "zh": "員工",
+    "categories": [
+      "jobs"
+    ],
+    "level": 2,
+    "syn": "worker",
+    "example": "This restaurant has about twenty employees.",
+    "exampleZh": "這家餐廳大約有二十名員工。",
+    "form": "employees"
+  },
+  {
+    "id": "employer",
+    "en": "employer",
+    "pos": "n.",
+    "zh": "雇主",
+    "categories": [
+      "jobs"
+    ],
+    "level": 2,
+    "syn": "boss",
+    "example": "My employer pays for my train ticket to work.",
+    "exampleZh": "我的雇主幫我付上班的火車票錢。",
+    "form": ""
+  },
+  {
+    "id": "interview",
+    "en": "interview",
+    "pos": "n.",
+    "zh": "面試",
+    "categories": [
+      "jobs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I have a job interview tomorrow morning.",
+    "exampleZh": "我明天早上有一場工作面試。",
+    "form": ""
+  },
+  {
+    "id": "resume",
+    "en": "resume",
+    "pos": "n.",
+    "zh": "履歷",
+    "categories": [
+      "jobs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Please send your resume by email.",
+    "exampleZh": "請用電子郵件寄送你的履歷。",
+    "form": ""
+  },
+  {
+    "id": "part-time",
+    "en": "part-time",
+    "pos": "adj.",
+    "zh": "兼職的、打工的",
+    "categories": [
+      "jobs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I have a part-time job at a cafe.",
+    "exampleZh": "我在一家咖啡店打工。",
+    "form": ""
+  },
+  {
+    "id": "full-time",
+    "en": "full-time",
+    "pos": "adj.",
+    "zh": "全職的",
+    "categories": [
+      "jobs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "She found a full-time job at a travel agency.",
+    "exampleZh": "她在一家旅行社找到全職工作。",
+    "form": ""
+  },
+  {
+    "id": "overtime",
+    "en": "overtime",
+    "pos": "adv.",
+    "zh": "加班",
+    "categories": [
+      "jobs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I worked overtime again last night.",
+    "exampleZh": "我昨晚又加班了。",
+    "form": ""
+  },
+  {
+    "id": "day-off",
+    "en": "day off",
+    "pos": "n.",
+    "zh": "休假日、休假",
+    "categories": [
+      "jobs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Tomorrow is my day off, so let's go hiking.",
+    "exampleZh": "明天我休假，所以我們去爬山吧。",
+    "form": ""
+  },
+  {
+    "id": "uniform",
+    "en": "uniform",
+    "pos": "n.",
+    "zh": "制服",
+    "categories": [
+      "jobs",
+      "clothing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Hotel staff must wear a uniform at work.",
+    "exampleZh": "旅館員工上班時必須穿制服。",
+    "form": ""
+  },
+  {
+    "id": "career",
+    "en": "career",
+    "pos": "n.",
+    "zh": "職涯、事業",
+    "categories": [
+      "jobs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "She started her career as a flight attendant.",
+    "exampleZh": "她以空服員的身分開始她的職涯。",
+    "form": ""
+  },
+  {
+    "id": "hire",
+    "en": "hire",
+    "pos": "v.",
+    "zh": "雇用、聘請",
+    "categories": [
+      "jobs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The hotel is hiring summer staff.",
+    "exampleZh": "這家旅館正在招募暑期員工。",
+    "form": "hiring"
+  },
+  {
+    "id": "quit",
+    "en": "quit",
+    "pos": "v.",
+    "zh": "辭職、離職",
+    "categories": [
+      "jobs"
+    ],
+    "level": 2,
+    "syn": "quit",
+    "example": "He quit his job to travel around the world.",
+    "exampleZh": "他辭掉工作去環遊世界。",
+    "form": ""
+  },
+  {
+    "id": "retire",
+    "en": "retire",
+    "pos": "v.",
+    "zh": "退休",
+    "categories": [
+      "jobs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "My parents retired and now travel a lot.",
+    "exampleZh": "我爸媽退休了，現在常常去旅行。",
+    "form": "retired"
+  },
+  {
+    "id": "receptionist",
+    "en": "receptionist",
+    "pos": "n.",
+    "zh": "櫃檯人員",
+    "categories": [
+      "jobs",
+      "hotel"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The receptionist called a taxi for us.",
+    "exampleZh": "櫃檯人員幫我們叫了計程車。",
+    "form": ""
+  },
+  {
+    "id": "colleague",
+    "en": "colleague",
+    "pos": "n.",
+    "zh": "同事",
+    "categories": [
+      "jobs"
+    ],
+    "level": 3,
+    "syn": "coworker",
+    "example": "My colleague recommended this restaurant to me.",
+    "exampleZh": "我同事推薦這家餐廳給我。",
+    "form": ""
+  },
+  {
+    "id": "occupation",
+    "en": "occupation",
+    "pos": "n.",
+    "zh": "職業",
+    "categories": [
+      "jobs",
+      "airport"
+    ],
+    "level": 3,
+    "syn": "job",
+    "example": "Please write your occupation on the arrival card.",
+    "exampleZh": "請在入境卡上填寫您的職業。",
+    "form": ""
+  },
+  {
+    "id": "resign",
+    "en": "resign",
+    "pos": "v.",
+    "zh": "辭職",
+    "categories": [
+      "jobs"
+    ],
+    "level": 3,
+    "syn": "quit",
+    "example": "Our manager decided to resign last month.",
+    "exampleZh": "我們經理上個月決定辭職。",
+    "form": ""
+  },
+  {
+    "id": "promotion",
+    "en": "promotion",
+    "pos": "n.",
+    "zh": "升職、升遷",
+    "categories": [
+      "jobs"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "She got a promotion after two years.",
+    "exampleZh": "她兩年後獲得升遷。",
+    "form": ""
+  },
+  {
+    "id": "deadline",
+    "en": "deadline",
+    "pos": "n.",
+    "zh": "截止期限",
+    "categories": [
+      "jobs"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The deadline for this report is Friday.",
+    "exampleZh": "這份報告的截止期限是星期五。",
+    "form": ""
+  },
+  {
+    "id": "pharmacist",
+    "en": "pharmacist",
+    "pos": "n.",
+    "zh": "藥師",
+    "categories": [
+      "jobs",
+      "health"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Ask the pharmacist which medicine is best for a cold.",
+    "exampleZh": "問問藥師哪種藥最適合治感冒。",
+    "form": ""
+  },
+  {
+    "id": "architect",
+    "en": "architect",
+    "pos": "n.",
+    "zh": "建築師",
+    "categories": [
+      "jobs"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "A famous architect designed this train station.",
+    "exampleZh": "一位知名建築師設計了這座火車站。",
+    "form": ""
+  },
+  {
+    "id": "accountant",
+    "en": "accountant",
+    "pos": "n.",
+    "zh": "會計師",
+    "categories": [
+      "jobs"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Our accountant handles all the company's taxes.",
+    "exampleZh": "我們的會計師處理公司所有的稅務。",
+    "form": ""
+  },
+  {
+    "id": "interpreter",
+    "en": "interpreter",
+    "pos": "n.",
+    "zh": "口譯員",
+    "categories": [
+      "jobs"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We hired an interpreter for the business trip.",
+    "exampleZh": "我們為這趟出差請了一位口譯員。",
+    "form": ""
+  },
+  {
+    "id": "freelancer",
+    "en": "freelancer",
+    "pos": "n.",
+    "zh": "自由工作者",
+    "categories": [
+      "jobs"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "As a freelancer, I can work from anywhere.",
+    "exampleZh": "身為自由工作者，我可以在任何地方工作。",
+    "form": ""
+  },
+  {
+    "id": "wage",
+    "en": "wage",
+    "pos": "n.",
+    "zh": "工資、時薪",
+    "categories": [
+      "jobs"
+    ],
+    "level": 3,
+    "syn": "salary",
+    "example": "The minimum wage went up this year.",
+    "exampleZh": "今年基本工資調漲了。",
+    "form": ""
+  }
+]

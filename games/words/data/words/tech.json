@@ -1,0 +1,904 @@
+[
+  {
+    "id": "phone",
+    "en": "phone",
+    "pos": "n.",
+    "zh": "電話、手機",
+    "categories": [
+      "tech"
+    ],
+    "level": 1,
+    "syn": "phone",
+    "example": "Can I charge my phone here?",
+    "exampleZh": "我可以在這裡幫手機充電嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "computer",
+    "en": "computer",
+    "pos": "n.",
+    "zh": "電腦",
+    "categories": [
+      "tech"
+    ],
+    "level": 1,
+    "syn": "computer",
+    "example": "The hotel has a computer in the lobby.",
+    "exampleZh": "旅館大廳有一台電腦。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "internet",
+    "en": "internet",
+    "pos": "n.",
+    "zh": "網路、網際網路",
+    "categories": [
+      "tech"
+    ],
+    "level": 1,
+    "syn": "internet",
+    "example": "Is the internet free in this hotel?",
+    "exampleZh": "這家旅館的網路免費嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "email",
+    "en": "email",
+    "pos": "n.",
+    "zh": "電子郵件",
+    "categories": [
+      "tech"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I'll send you the photos by email.",
+    "exampleZh": "我會用電子郵件把照片寄給你。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "password",
+    "en": "password",
+    "pos": "n.",
+    "zh": "密碼",
+    "categories": [
+      "tech"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "What's the Wi-Fi password?",
+    "exampleZh": "無線網路密碼是什麼？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "website",
+    "en": "website",
+    "pos": "n.",
+    "zh": "網站",
+    "categories": [
+      "tech"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "You can book tickets on the museum's website.",
+    "exampleZh": "你可以在博物館的網站上訂票。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "app",
+    "en": "app",
+    "pos": "n.",
+    "zh": "應用程式",
+    "categories": [
+      "tech"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "This app shows bus times in real time.",
+    "exampleZh": "這個應用程式會即時顯示公車時刻。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "video",
+    "en": "video",
+    "pos": "n.",
+    "zh": "影片",
+    "categories": [
+      "tech"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "She made a video of our trip.",
+    "exampleZh": "她把我們的旅行拍成影片。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "photo",
+    "en": "photo",
+    "pos": "n.",
+    "zh": "照片",
+    "categories": [
+      "tech"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Could you take a photo of us?",
+    "exampleZh": "可以幫我們拍張照嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "camera",
+    "en": "camera",
+    "pos": "n.",
+    "zh": "相機",
+    "categories": [
+      "tech"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I forgot my camera at the hotel.",
+    "exampleZh": "我把相機忘在旅館了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "screen",
+    "en": "screen",
+    "pos": "n.",
+    "zh": "螢幕",
+    "categories": [
+      "tech"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My phone screen is cracked.",
+    "exampleZh": "我的手機螢幕裂了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "keyboard",
+    "en": "keyboard",
+    "pos": "n.",
+    "zh": "鍵盤",
+    "categories": [
+      "tech"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "This keyboard is too small for my fingers.",
+    "exampleZh": "這個鍵盤對我的手指來說太小了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "mouse-2",
+    "en": "mouse",
+    "pos": "n.",
+    "zh": "滑鼠",
+    "categories": [
+      "tech"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My computer mouse stopped working.",
+    "exampleZh": "我的電腦滑鼠壞了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "click-v",
+    "en": "click",
+    "pos": "v.",
+    "zh": "點擊、按",
+    "categories": [
+      "tech"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Click here to buy your ticket.",
+    "exampleZh": "點這裡購買車票。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "online-adv",
+    "en": "online",
+    "pos": "adv.",
+    "zh": "線上、在網路上",
+    "categories": [
+      "tech"
+    ],
+    "level": 1,
+    "syn": "internet",
+    "example": "We bought our train tickets online.",
+    "exampleZh": "我們在網路上買了火車票。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "battery",
+    "en": "battery",
+    "pos": "n.",
+    "zh": "電池、電量",
+    "categories": [
+      "tech"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My phone battery is almost dead.",
+    "exampleZh": "我的手機快沒電了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "text-v",
+    "en": "text",
+    "pos": "v.",
+    "zh": "傳簡訊",
+    "categories": [
+      "tech"
+    ],
+    "level": 1,
+    "syn": "message",
+    "example": "Text me when you arrive at the hotel.",
+    "exampleZh": "到旅館時傳簡訊給我。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "call-v",
+    "en": "call",
+    "pos": "v.",
+    "zh": "打電話",
+    "categories": [
+      "tech"
+    ],
+    "level": 1,
+    "syn": "phone",
+    "example": "I'll call you when I land.",
+    "exampleZh": "我降落後會打電話給你。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "message",
+    "en": "message",
+    "pos": "n.",
+    "zh": "訊息、簡訊",
+    "categories": [
+      "tech"
+    ],
+    "level": 1,
+    "syn": "message",
+    "example": "I got a message from the airline.",
+    "exampleZh": "我收到航空公司的訊息。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "laptop",
+    "en": "laptop",
+    "pos": "n.",
+    "zh": "筆電、筆記型電腦",
+    "categories": [
+      "tech"
+    ],
+    "level": 1,
+    "syn": "computer",
+    "example": "I always carry my laptop in my backpack.",
+    "exampleZh": "我總是把筆電放在背包裡。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "robot",
+    "en": "robot",
+    "pos": "n.",
+    "zh": "機器人",
+    "categories": [
+      "tech"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "A robot brought towels to our room.",
+    "exampleZh": "一個機器人把毛巾送到我們房間。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "wi-fi",
+    "en": "Wi-Fi",
+    "pos": "n.",
+    "zh": "無線網路",
+    "categories": [
+      "tech"
+    ],
+    "level": 1,
+    "syn": "internet",
+    "example": "Does this cafe have free Wi-Fi?",
+    "exampleZh": "這家咖啡廳有免費無線網路嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "button-2",
+    "en": "button",
+    "pos": "n.",
+    "zh": "按鈕",
+    "categories": [
+      "tech"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Press the red button to stop the machine.",
+    "exampleZh": "按紅色按鈕讓機器停下來。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "turn-on",
+    "en": "turn on",
+    "pos": "phr.",
+    "zh": "打開、開啟",
+    "categories": [
+      "tech"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "How do I turn on the air conditioner?",
+    "exampleZh": "冷氣要怎麼打開？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "cellphone",
+    "en": "cellphone",
+    "pos": "n.",
+    "zh": "手機",
+    "categories": [
+      "tech"
+    ],
+    "level": 2,
+    "syn": "phone",
+    "example": "Please turn off your cellphone during the show.",
+    "exampleZh": "表演期間請關掉手機。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "charger",
+    "en": "charger",
+    "pos": "n.",
+    "zh": "充電器",
+    "categories": [
+      "tech"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I left my charger in the hotel room.",
+    "exampleZh": "我把充電器留在旅館房間了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "printer",
+    "en": "printer",
+    "pos": "n.",
+    "zh": "印表機",
+    "categories": [
+      "tech"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Can I use the printer to print my boarding pass?",
+    "exampleZh": "我可以用印表機印登機證嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "download-v",
+    "en": "download",
+    "pos": "v.",
+    "zh": "下載",
+    "categories": [
+      "tech"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Download the map before you lose signal.",
+    "exampleZh": "在收不到訊號前先下載地圖。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "upload-v",
+    "en": "upload",
+    "pos": "v.",
+    "zh": "上傳",
+    "categories": [
+      "tech"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "She uploaded our beach photos last night.",
+    "exampleZh": "她昨晚上傳了我們的海灘照片。",
+    "form": "uploaded",
+    "reviewed": true
+  },
+  {
+    "id": "search-v",
+    "en": "search",
+    "pos": "v.",
+    "zh": "搜尋",
+    "categories": [
+      "tech"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Search for nearby restaurants on your phone.",
+    "exampleZh": "用手機搜尋附近的餐廳。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "account-2",
+    "en": "account",
+    "pos": "n.",
+    "zh": "帳號",
+    "categories": [
+      "tech"
+    ],
+    "level": 2,
+    "syn": "account",
+    "example": "You need an account to book a ride.",
+    "exampleZh": "你需要一個帳號才能叫車。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "signal",
+    "en": "signal",
+    "pos": "n.",
+    "zh": "訊號",
+    "categories": [
+      "tech"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "There's no signal in the mountains.",
+    "exampleZh": "山裡收不到訊號。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "data",
+    "en": "data",
+    "pos": "n.",
+    "zh": "數據、資料",
+    "categories": [
+      "tech"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I bought a data plan for my trip.",
+    "exampleZh": "我為這趟旅行買了上網方案。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "update-v",
+    "en": "update",
+    "pos": "v.",
+    "zh": "更新",
+    "categories": [
+      "tech"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "My phone needs to update before I can use it.",
+    "exampleZh": "我的手機要先更新才能使用。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "install-v",
+    "en": "install",
+    "pos": "v.",
+    "zh": "安裝",
+    "categories": [
+      "tech"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Install this app to order food easily.",
+    "exampleZh": "安裝這個應用程式就能輕鬆點餐。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "delete-v",
+    "en": "delete",
+    "pos": "v.",
+    "zh": "刪除",
+    "categories": [
+      "tech"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I deleted some photos to save space.",
+    "exampleZh": "我刪掉一些照片來節省空間。",
+    "form": "deleted",
+    "reviewed": true
+  },
+  {
+    "id": "save-v-2",
+    "en": "save",
+    "pos": "v.",
+    "zh": "儲存、存檔",
+    "categories": [
+      "tech"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Don't forget to save your file.",
+    "exampleZh": "別忘了儲存你的檔案。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "file",
+    "en": "file",
+    "pos": "n.",
+    "zh": "檔案",
+    "categories": [
+      "tech"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Can you send me the file by email?",
+    "exampleZh": "你可以用電子郵件把檔案寄給我嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "folder",
+    "en": "folder",
+    "pos": "n.",
+    "zh": "資料夾",
+    "categories": [
+      "tech"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Save the photos in a new folder.",
+    "exampleZh": "把照片存到新的資料夾。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "link",
+    "en": "link",
+    "pos": "n.",
+    "zh": "連結",
+    "categories": [
+      "tech"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I'll send you the link to the hotel.",
+    "exampleZh": "我會把旅館的連結傳給你。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "tablet-2",
+    "en": "tablet",
+    "pos": "n.",
+    "zh": "平板電腦",
+    "categories": [
+      "tech"
+    ],
+    "level": 2,
+    "syn": "computer",
+    "example": "My kids watch cartoons on the tablet during flights.",
+    "exampleZh": "我的孩子搭飛機時用平板看卡通。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "headphones",
+    "en": "headphones",
+    "pos": "n.",
+    "zh": "耳機",
+    "categories": [
+      "tech"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I wear headphones to sleep on the plane.",
+    "exampleZh": "我在飛機上戴耳機睡覺。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "power-bank",
+    "en": "power bank",
+    "pos": "n.",
+    "zh": "行動電源",
+    "categories": [
+      "tech",
+      "airport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Power banks must go in your carry-on bag.",
+    "exampleZh": "行動電源必須放在隨身行李中。",
+    "form": "Power banks",
+    "reviewed": true
+  },
+  {
+    "id": "selfie",
+    "en": "selfie",
+    "pos": "n.",
+    "zh": "自拍",
+    "categories": [
+      "tech"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Let's take a selfie in front of the castle.",
+    "exampleZh": "我們在城堡前自拍一張吧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "social-media",
+    "en": "social media",
+    "pos": "n.",
+    "zh": "社群媒體",
+    "categories": [
+      "tech"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "She shares her travel photos on social media.",
+    "exampleZh": "她在社群媒體上分享旅行照片。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "log-in",
+    "en": "log in",
+    "pos": "phr.",
+    "zh": "登入",
+    "categories": [
+      "tech"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I can't log in to my email account.",
+    "exampleZh": "我無法登入我的電子郵件帳號。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "plug",
+    "en": "plug",
+    "pos": "n.",
+    "zh": "插頭",
+    "categories": [
+      "tech"
+    ],
+    "level": 2,
+    "syn": "plug",
+    "example": "The plug doesn't fit the outlet here.",
+    "exampleZh": "插頭跟這裡的插座不合。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "username",
+    "en": "username",
+    "pos": "n.",
+    "zh": "使用者名稱",
+    "categories": [
+      "tech"
+    ],
+    "level": 2,
+    "syn": "account",
+    "example": "Enter your username and password.",
+    "exampleZh": "輸入你的使用者名稱和密碼。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "adapter",
+    "en": "adapter",
+    "pos": "n.",
+    "zh": "轉接頭",
+    "categories": [
+      "tech"
+    ],
+    "level": 3,
+    "syn": "plug",
+    "example": "You'll need a power adapter in the UK.",
+    "exampleZh": "在英國你會需要電源轉接頭。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "software",
+    "en": "software",
+    "pos": "n.",
+    "zh": "軟體",
+    "categories": [
+      "tech"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The software on this laptop is very old.",
+    "exampleZh": "這台筆電裡的軟體非常舊。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "hardware",
+    "en": "hardware",
+    "pos": "n.",
+    "zh": "硬體",
+    "categories": [
+      "tech"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The store sells computer hardware and cables.",
+    "exampleZh": "這家店販售電腦硬體和線材。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "notification",
+    "en": "notification",
+    "pos": "n.",
+    "zh": "通知",
+    "categories": [
+      "tech"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I got a notification that my flight was delayed.",
+    "exampleZh": "我收到班機延誤的通知。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "privacy",
+    "en": "privacy",
+    "pos": "n.",
+    "zh": "隱私",
+    "categories": [
+      "tech"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Check the privacy settings on your new app.",
+    "exampleZh": "檢查一下你新應用程式的隱私設定。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "virus",
+    "en": "virus",
+    "pos": "n.",
+    "zh": "病毒",
+    "categories": [
+      "tech"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Don't open that file; it may have a virus.",
+    "exampleZh": "別打開那個檔案，可能有病毒。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "hotspot",
+    "en": "hotspot",
+    "pos": "n.",
+    "zh": "熱點、行動熱點",
+    "categories": [
+      "tech"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I used my phone as a hotspot for my laptop.",
+    "exampleZh": "我把手機當作筆電的熱點。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "roaming",
+    "en": "roaming",
+    "pos": "n.",
+    "zh": "漫遊",
+    "categories": [
+      "tech"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Turn off data roaming to avoid big bills.",
+    "exampleZh": "關閉數據漫遊以避免高額帳單。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sim-card",
+    "en": "SIM card",
+    "pos": "n.",
+    "zh": "SIM卡",
+    "categories": [
+      "tech",
+      "airport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I bought a local SIM card at the airport.",
+    "exampleZh": "我在機場買了當地的 SIM 卡。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "qr-code",
+    "en": "QR code",
+    "pos": "n.",
+    "zh": "QR碼、二維條碼",
+    "categories": [
+      "tech"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Scan the QR code to see the menu.",
+    "exampleZh": "掃描 QR 碼查看菜單。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "artificial-intelligence",
+    "en": "artificial intelligence",
+    "pos": "n.",
+    "zh": "人工智慧",
+    "categories": [
+      "tech"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "This translation app uses artificial intelligence.",
+    "exampleZh": "這個翻譯應用程式使用人工智慧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "screenshot",
+    "en": "screenshot",
+    "pos": "n.",
+    "zh": "截圖、螢幕截圖",
+    "categories": [
+      "tech"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Take a screenshot of your ticket just in case.",
+    "exampleZh": "把你的票截圖下來以防萬一。",
+    "form": "",
+    "reviewed": true
+  }
+]

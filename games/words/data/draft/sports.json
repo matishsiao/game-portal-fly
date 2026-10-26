@@ -1,0 +1,846 @@
+[
+  {
+    "id": "sport",
+    "en": "sport",
+    "pos": "n.",
+    "zh": "運動",
+    "categories": [
+      "sports"
+    ],
+    "level": 1,
+    "syn": "exercise",
+    "example": "What's your favorite sport?",
+    "exampleZh": "你最喜歡什麼運動？",
+    "form": ""
+  },
+  {
+    "id": "ball",
+    "en": "ball",
+    "pos": "n.",
+    "zh": "球",
+    "categories": [
+      "sports"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The kids are playing ball on the beach.",
+    "exampleZh": "孩子們在海灘上玩球。",
+    "form": ""
+  },
+  {
+    "id": "game",
+    "en": "game",
+    "pos": "n.",
+    "zh": "比賽、遊戲",
+    "categories": [
+      "sports"
+    ],
+    "level": 1,
+    "syn": "match",
+    "example": "Let's watch the baseball game tonight.",
+    "exampleZh": "我們今晚去看棒球比賽吧。",
+    "form": ""
+  },
+  {
+    "id": "team",
+    "en": "team",
+    "pos": "n.",
+    "zh": "隊伍、球隊",
+    "categories": [
+      "sports"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Which team do you support?",
+    "exampleZh": "你支持哪一隊？",
+    "form": ""
+  },
+  {
+    "id": "player",
+    "en": "player",
+    "pos": "n.",
+    "zh": "選手、球員",
+    "categories": [
+      "sports"
+    ],
+    "level": 1,
+    "syn": "player",
+    "example": "He is the best player on the team.",
+    "exampleZh": "他是隊上最好的球員。",
+    "form": ""
+  },
+  {
+    "id": "run",
+    "en": "run",
+    "pos": "v.",
+    "zh": "跑步、跑",
+    "categories": [
+      "sports"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I run along the river every morning.",
+    "exampleZh": "我每天早上沿著河邊跑步。",
+    "form": ""
+  },
+  {
+    "id": "swim",
+    "en": "swim",
+    "pos": "v.",
+    "zh": "游泳",
+    "categories": [
+      "sports"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Can you swim in the sea here?",
+    "exampleZh": "這裡的海可以游泳嗎？",
+    "form": ""
+  },
+  {
+    "id": "basketball",
+    "en": "basketball",
+    "pos": "n.",
+    "zh": "籃球",
+    "categories": [
+      "sports"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We play basketball after school.",
+    "exampleZh": "我們放學後打籃球。",
+    "form": ""
+  },
+  {
+    "id": "baseball",
+    "en": "baseball",
+    "pos": "n.",
+    "zh": "棒球",
+    "categories": [
+      "sports"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Baseball is very popular in Taiwan.",
+    "exampleZh": "棒球在台灣很受歡迎。",
+    "form": ""
+  },
+  {
+    "id": "soccer",
+    "en": "soccer",
+    "pos": "n.",
+    "zh": "足球",
+    "categories": [
+      "sports"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The boys are playing soccer in the park.",
+    "exampleZh": "男孩們在公園踢足球。",
+    "form": ""
+  },
+  {
+    "id": "tennis",
+    "en": "tennis",
+    "pos": "n.",
+    "zh": "網球",
+    "categories": [
+      "sports"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The hotel has two tennis courts.",
+    "exampleZh": "這家旅館有兩座網球場。",
+    "form": ""
+  },
+  {
+    "id": "badminton",
+    "en": "badminton",
+    "pos": "n.",
+    "zh": "羽毛球、羽球",
+    "categories": [
+      "sports"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Let's play badminton this weekend.",
+    "exampleZh": "我們這個週末去打羽球吧。",
+    "form": ""
+  },
+  {
+    "id": "volleyball",
+    "en": "volleyball",
+    "pos": "n.",
+    "zh": "排球",
+    "categories": [
+      "sports"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We played beach volleyball all afternoon.",
+    "exampleZh": "我們整個下午都在打沙灘排球。",
+    "form": ""
+  },
+  {
+    "id": "bike",
+    "en": "bike",
+    "pos": "n.",
+    "zh": "腳踏車、自行車",
+    "categories": [
+      "sports",
+      "transport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We rented bikes to ride around the lake.",
+    "exampleZh": "我們租了腳踏車環湖騎。",
+    "form": "bikes"
+  },
+  {
+    "id": "win",
+    "en": "win",
+    "pos": "v.",
+    "zh": "贏、獲勝",
+    "categories": [
+      "sports"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Our team won the game last night!",
+    "exampleZh": "我們隊昨晚贏了比賽！",
+    "form": "won"
+  },
+  {
+    "id": "lose",
+    "en": "lose",
+    "pos": "v.",
+    "zh": "輸",
+    "categories": [
+      "sports"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Don't be sad if you lose.",
+    "exampleZh": "輸了也別難過。",
+    "form": ""
+  },
+  {
+    "id": "kick",
+    "en": "kick",
+    "pos": "v.",
+    "zh": "踢",
+    "categories": [
+      "sports"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Kick the ball to me!",
+    "exampleZh": "把球踢給我！",
+    "form": ""
+  },
+  {
+    "id": "exercise",
+    "en": "exercise",
+    "pos": "v.",
+    "zh": "運動、鍛鍊",
+    "categories": [
+      "sports"
+    ],
+    "level": 1,
+    "syn": "exercise",
+    "example": "I try to exercise three times a week.",
+    "exampleZh": "我盡量每週運動三次。",
+    "form": ""
+  },
+  {
+    "id": "picnic",
+    "en": "picnic",
+    "pos": "n.",
+    "zh": "野餐",
+    "categories": [
+      "sports"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We had a picnic by the lake.",
+    "exampleZh": "我們在湖邊野餐。",
+    "form": ""
+  },
+  {
+    "id": "fishing",
+    "en": "fishing",
+    "pos": "n.",
+    "zh": "釣魚",
+    "categories": [
+      "sports"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My dad goes fishing every Sunday.",
+    "exampleZh": "我爸爸每週日都去釣魚。",
+    "form": ""
+  },
+  {
+    "id": "gym",
+    "en": "gym",
+    "pos": "n.",
+    "zh": "健身房",
+    "categories": [
+      "sports",
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The hotel gym is open twenty-four hours.",
+    "exampleZh": "旅館健身房二十四小時開放。",
+    "form": ""
+  },
+  {
+    "id": "hobby",
+    "en": "hobby",
+    "pos": "n.",
+    "zh": "嗜好、興趣",
+    "categories": [
+      "sports"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My hobby is taking photos when I travel.",
+    "exampleZh": "我的嗜好是旅行時拍照。",
+    "form": ""
+  },
+  {
+    "id": "race",
+    "en": "race",
+    "pos": "n.",
+    "zh": "賽跑、競賽",
+    "categories": [
+      "sports"
+    ],
+    "level": 1,
+    "syn": "match",
+    "example": "She finished the race in first place.",
+    "exampleZh": "她以第一名跑完比賽。",
+    "form": ""
+  },
+  {
+    "id": "jump",
+    "en": "jump",
+    "pos": "v.",
+    "zh": "跳",
+    "categories": [
+      "sports"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The kids jumped into the pool.",
+    "exampleZh": "孩子們跳進游泳池。",
+    "form": "jumped"
+  },
+  {
+    "id": "match",
+    "en": "match",
+    "pos": "n.",
+    "zh": "比賽",
+    "categories": [
+      "sports"
+    ],
+    "level": 2,
+    "syn": "match",
+    "example": "The tennis match starts at two.",
+    "exampleZh": "網球比賽兩點開始。",
+    "form": ""
+  },
+  {
+    "id": "coach",
+    "en": "coach",
+    "pos": "n.",
+    "zh": "教練",
+    "categories": [
+      "sports"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Our coach makes us run every day.",
+    "exampleZh": "我們的教練每天都要我們跑步。",
+    "form": ""
+  },
+  {
+    "id": "score",
+    "en": "score",
+    "pos": "n.",
+    "zh": "比數、分數",
+    "categories": [
+      "sports"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "What's the score now?",
+    "exampleZh": "現在比數是多少？",
+    "form": ""
+  },
+  {
+    "id": "jog",
+    "en": "jog",
+    "pos": "v.",
+    "zh": "慢跑",
+    "categories": [
+      "sports"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I like to jog in the park before breakfast.",
+    "exampleZh": "我喜歡早餐前在公園慢跑。",
+    "form": ""
+  },
+  {
+    "id": "hiking",
+    "en": "hiking",
+    "pos": "n.",
+    "zh": "健行、爬山",
+    "categories": [
+      "sports"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We went hiking in the mountains.",
+    "exampleZh": "我們去山上健行。",
+    "form": ""
+  },
+  {
+    "id": "camping",
+    "en": "camping",
+    "pos": "n.",
+    "zh": "露營",
+    "categories": [
+      "sports"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Let's go camping by the river this weekend.",
+    "exampleZh": "這週末我們去河邊露營吧。",
+    "form": ""
+  },
+  {
+    "id": "skiing",
+    "en": "skiing",
+    "pos": "n.",
+    "zh": "滑雪",
+    "categories": [
+      "sports"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We went skiing in Hokkaido last winter.",
+    "exampleZh": "我們去年冬天去北海道滑雪。",
+    "form": ""
+  },
+  {
+    "id": "surfing",
+    "en": "surfing",
+    "pos": "n.",
+    "zh": "衝浪",
+    "categories": [
+      "sports"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Bali is a great place for surfing.",
+    "exampleZh": "峇里島是衝浪的好地方。",
+    "form": ""
+  },
+  {
+    "id": "golf",
+    "en": "golf",
+    "pos": "n.",
+    "zh": "高爾夫球",
+    "categories": [
+      "sports"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "My grandfather plays golf every weekend.",
+    "exampleZh": "我爺爺每個週末都打高爾夫球。",
+    "form": ""
+  },
+  {
+    "id": "yoga",
+    "en": "yoga",
+    "pos": "n.",
+    "zh": "瑜珈",
+    "categories": [
+      "sports"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I do yoga on the beach every morning.",
+    "exampleZh": "我每天早上在海灘上做瑜珈。",
+    "form": ""
+  },
+  {
+    "id": "stadium",
+    "en": "stadium",
+    "pos": "n.",
+    "zh": "體育場、球場",
+    "categories": [
+      "sports",
+      "city"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The stadium was full of excited fans.",
+    "exampleZh": "體育場擠滿了興奮的球迷。",
+    "form": ""
+  },
+  {
+    "id": "referee",
+    "en": "referee",
+    "pos": "n.",
+    "zh": "裁判",
+    "categories": [
+      "sports"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The referee stopped the game.",
+    "exampleZh": "裁判暫停了比賽。",
+    "form": ""
+  },
+  {
+    "id": "champion",
+    "en": "champion",
+    "pos": "n.",
+    "zh": "冠軍",
+    "categories": [
+      "sports"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "She was the national tennis champion.",
+    "exampleZh": "她曾是全國網球冠軍。",
+    "form": ""
+  },
+  {
+    "id": "medal",
+    "en": "medal",
+    "pos": "n.",
+    "zh": "獎牌",
+    "categories": [
+      "sports"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "He won a gold medal at the games.",
+    "exampleZh": "他在運動會上贏得一面金牌。",
+    "form": ""
+  },
+  {
+    "id": "goal",
+    "en": "goal",
+    "pos": "n.",
+    "zh": "進球、球門",
+    "categories": [
+      "sports"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "He scored a goal in the last minute.",
+    "exampleZh": "他在最後一分鐘進了一球。",
+    "form": ""
+  },
+  {
+    "id": "fan",
+    "en": "fan",
+    "pos": "n.",
+    "zh": "球迷、粉絲",
+    "categories": [
+      "sports"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Thousands of fans waited outside the stadium.",
+    "exampleZh": "成千上萬的球迷在體育場外等候。",
+    "form": "fans"
+  },
+  {
+    "id": "helmet",
+    "en": "helmet",
+    "pos": "n.",
+    "zh": "安全帽",
+    "categories": [
+      "sports"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Always wear a helmet when you ride a bike.",
+    "exampleZh": "騎腳踏車時一定要戴安全帽。",
+    "form": ""
+  },
+  {
+    "id": "swimming-pool",
+    "en": "swimming pool",
+    "pos": "n.",
+    "zh": "游泳池",
+    "categories": [
+      "sports",
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Is the swimming pool open in the evening?",
+    "exampleZh": "游泳池晚上有開嗎？",
+    "form": ""
+  },
+  {
+    "id": "table-tennis",
+    "en": "table tennis",
+    "pos": "n.",
+    "zh": "桌球、乒乓球",
+    "categories": [
+      "sports"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We played table tennis in the hotel game room.",
+    "exampleZh": "我們在旅館遊戲室打桌球。",
+    "form": ""
+  },
+  {
+    "id": "marathon",
+    "en": "marathon",
+    "pos": "n.",
+    "zh": "馬拉松",
+    "categories": [
+      "sports"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "He ran a marathon in Tokyo last year.",
+    "exampleZh": "他去年在東京跑了一場馬拉松。",
+    "form": ""
+  },
+  {
+    "id": "skateboard",
+    "en": "skateboard",
+    "pos": "n.",
+    "zh": "滑板",
+    "categories": [
+      "sports"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "My son rides his skateboard to the park.",
+    "exampleZh": "我兒子踩滑板去公園。",
+    "form": ""
+  },
+  {
+    "id": "diving",
+    "en": "diving",
+    "pos": "n.",
+    "zh": "潛水",
+    "categories": [
+      "sports"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The island is famous for diving.",
+    "exampleZh": "這座島以潛水聞名。",
+    "form": ""
+  },
+  {
+    "id": "tie",
+    "en": "tie",
+    "pos": "n.",
+    "zh": "平手",
+    "categories": [
+      "sports"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The game ended in a tie.",
+    "exampleZh": "比賽最後平手。",
+    "form": ""
+  },
+  {
+    "id": "life-jacket",
+    "en": "life jacket",
+    "pos": "n.",
+    "zh": "救生衣",
+    "categories": [
+      "sports"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Please wear a life jacket on the boat.",
+    "exampleZh": "在船上請穿救生衣。",
+    "form": ""
+  },
+  {
+    "id": "tournament",
+    "en": "tournament",
+    "pos": "n.",
+    "zh": "錦標賽",
+    "categories": [
+      "sports"
+    ],
+    "level": 3,
+    "syn": "match",
+    "example": "The tennis tournament lasts two weeks.",
+    "exampleZh": "這場網球錦標賽為期兩週。",
+    "form": ""
+  },
+  {
+    "id": "workout",
+    "en": "workout",
+    "pos": "n.",
+    "zh": "健身、鍛鍊",
+    "categories": [
+      "sports"
+    ],
+    "level": 3,
+    "syn": "exercise",
+    "example": "I do a short workout in my hotel room.",
+    "exampleZh": "我在旅館房間做簡短的健身運動。",
+    "form": ""
+  },
+  {
+    "id": "rock-climbing",
+    "en": "rock climbing",
+    "pos": "n.",
+    "zh": "攀岩",
+    "categories": [
+      "sports"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Rock climbing is popular in this area.",
+    "exampleZh": "攀岩在這一帶很受歡迎。",
+    "form": ""
+  },
+  {
+    "id": "snorkeling",
+    "en": "snorkeling",
+    "pos": "n.",
+    "zh": "浮潛",
+    "categories": [
+      "sports"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We saw colorful fish while snorkeling.",
+    "exampleZh": "我們浮潛時看到色彩繽紛的魚。",
+    "form": ""
+  },
+  {
+    "id": "opponent",
+    "en": "opponent",
+    "pos": "n.",
+    "zh": "對手",
+    "categories": [
+      "sports"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Our opponent this week is very strong.",
+    "exampleZh": "我們這週的對手非常強。",
+    "form": ""
+  },
+  {
+    "id": "athlete",
+    "en": "athlete",
+    "pos": "n.",
+    "zh": "運動員",
+    "categories": [
+      "sports"
+    ],
+    "level": 3,
+    "syn": "player",
+    "example": "Many athletes train at this stadium.",
+    "exampleZh": "很多運動員在這座體育場訓練。",
+    "form": "athletes"
+  },
+  {
+    "id": "stretch",
+    "en": "stretch",
+    "pos": "v.",
+    "zh": "伸展",
+    "categories": [
+      "sports"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Stretch your legs before you run.",
+    "exampleZh": "跑步前先伸展雙腿。",
+    "form": ""
+  },
+  {
+    "id": "olympics",
+    "en": "Olympics",
+    "pos": "n.",
+    "zh": "奧運、奧林匹克",
+    "categories": [
+      "sports"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Would you like to watch the Olympics in person?",
+    "exampleZh": "你想親眼看奧運嗎？",
+    "form": ""
+  },
+  {
+    "id": "kayaking",
+    "en": "kayaking",
+    "pos": "n.",
+    "zh": "划獨木舟",
+    "categories": [
+      "sports"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We went kayaking along the coast.",
+    "exampleZh": "我們沿著海岸划獨木舟。",
+    "form": ""
+  },
+  {
+    "id": "lifeguard",
+    "en": "lifeguard",
+    "pos": "n.",
+    "zh": "救生員",
+    "categories": [
+      "sports"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Swim only where a lifeguard is on duty.",
+    "exampleZh": "只在有救生員值班的地方游泳。",
+    "form": ""
+  },
+  {
+    "id": "spectator",
+    "en": "spectator",
+    "pos": "n.",
+    "zh": "觀眾",
+    "categories": [
+      "sports"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Spectators can't bring drinks into the stadium.",
+    "exampleZh": "觀眾不能帶飲料進體育場。",
+    "form": "Spectators"
+  },
+  {
+    "id": "cycling",
+    "en": "cycling",
+    "pos": "n.",
+    "zh": "騎單車、自行車運動",
+    "categories": [
+      "sports"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Cycling around the island takes about ten days.",
+    "exampleZh": "騎單車環島大約要十天。",
+    "form": ""
+  }
+]

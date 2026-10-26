@@ -1,0 +1,904 @@
+[
+  {
+    "id": "shop",
+    "en": "shop",
+    "pos": "n.",
+    "zh": "店、小店",
+    "categories": [
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "store",
+    "example": "There is a small gift shop near the hotel.",
+    "exampleZh": "飯店附近有一家小禮品店。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "store",
+    "en": "store",
+    "pos": "n.",
+    "zh": "商店",
+    "categories": [
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "store",
+    "example": "The store opens at ten in the morning.",
+    "exampleZh": "這家店早上十點開門。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "buy-v",
+    "en": "buy",
+    "pos": "v.",
+    "zh": "買",
+    "categories": [
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "buy",
+    "example": "I bought a hat at the night market.",
+    "exampleZh": "我在夜市買了一頂帽子。",
+    "form": "bought",
+    "reviewed": true
+  },
+  {
+    "id": "sell-v",
+    "en": "sell",
+    "pos": "v.",
+    "zh": "賣",
+    "categories": [
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Do you sell phone chargers here?",
+    "exampleZh": "你們這裡有賣手機充電器嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "price",
+    "en": "price",
+    "pos": "n.",
+    "zh": "價格、價錢",
+    "categories": [
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The price of this bag is too high.",
+    "exampleZh": "這個包包的價格太高了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "cheap-adj",
+    "en": "cheap",
+    "pos": "adj.",
+    "zh": "便宜的",
+    "categories": [
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "cheap",
+    "example": "Fruit is very cheap at this market.",
+    "exampleZh": "這個市場的水果很便宜。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "expensive-adj",
+    "en": "expensive",
+    "pos": "adj.",
+    "zh": "昂貴的、貴的",
+    "categories": [
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Shoes at the airport are really expensive.",
+    "exampleZh": "機場裡的鞋子真的很貴。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "bag",
+    "en": "bag",
+    "pos": "n.",
+    "zh": "包包、袋子",
+    "categories": [
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Do you need a bag for these?",
+    "exampleZh": "這些東西需要袋子嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "market",
+    "en": "market",
+    "pos": "n.",
+    "zh": "市場",
+    "categories": [
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We bought fresh bread at the market.",
+    "exampleZh": "我們在市場買了新鮮的麵包。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "supermarket",
+    "en": "supermarket",
+    "pos": "n.",
+    "zh": "超市、超級市場",
+    "categories": [
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Let's get some snacks at the supermarket.",
+    "exampleZh": "我們去超市買點零食吧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sale",
+    "en": "sale",
+    "pos": "n.",
+    "zh": "拍賣、特價",
+    "categories": [
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "sale",
+    "example": "The shoe store is having a big sale.",
+    "exampleZh": "那家鞋店正在大拍賣。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "size",
+    "en": "size",
+    "pos": "n.",
+    "zh": "尺寸、大小",
+    "categories": [
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Do you have this in a smaller size?",
+    "exampleZh": "這件有小一點的尺寸嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "gift",
+    "en": "gift",
+    "pos": "n.",
+    "zh": "禮物",
+    "categories": [
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I need a gift for my sister.",
+    "exampleZh": "我需要買一份禮物給我妹妹。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "cart",
+    "en": "cart",
+    "pos": "n.",
+    "zh": "購物車",
+    "categories": [
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Please return the cart after shopping.",
+    "exampleZh": "購物後請把購物車放回去。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "mall",
+    "en": "mall",
+    "pos": "n.",
+    "zh": "購物中心",
+    "categories": [
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "mall",
+    "example": "The mall has a food court on the top floor.",
+    "exampleZh": "這間購物中心頂樓有美食街。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "bookstore",
+    "en": "bookstore",
+    "pos": "n.",
+    "zh": "書店",
+    "categories": [
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I found a travel guide at the bookstore.",
+    "exampleZh": "我在書店找到一本旅遊指南。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "convenience-store",
+    "en": "convenience store",
+    "pos": "n.",
+    "zh": "便利商店",
+    "categories": [
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "You can buy a SIM card at the convenience store.",
+    "exampleZh": "你可以在便利商店買到 SIM 卡。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "open-adj",
+    "en": "open",
+    "pos": "adj.",
+    "zh": "開放的、營業中",
+    "categories": [
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Is the pharmacy still open now?",
+    "exampleZh": "藥局現在還有營業嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "closed-adj",
+    "en": "closed",
+    "pos": "adj.",
+    "zh": "打烊的、關閉的",
+    "categories": [
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Sorry, the shop is closed on Mondays.",
+    "exampleZh": "抱歉，這家店星期一公休。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "try-on",
+    "en": "try on",
+    "pos": "phr.",
+    "zh": "試穿",
+    "categories": [
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Can I try on this jacket?",
+    "exampleZh": "我可以試穿這件外套嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "how-much",
+    "en": "how much",
+    "pos": "phr.",
+    "zh": "多少錢",
+    "categories": [
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "How much is this scarf?",
+    "exampleZh": "這條圍巾多少錢？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "basket",
+    "en": "basket",
+    "pos": "n.",
+    "zh": "籃子、購物籃",
+    "categories": [
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Grab a basket at the entrance.",
+    "exampleZh": "在入口處拿一個購物籃。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "choose-v",
+    "en": "choose",
+    "pos": "v.",
+    "zh": "選擇",
+    "categories": [
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "It's hard to choose just one souvenir.",
+    "exampleZh": "只挑一個紀念品真的很難。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "line-2",
+    "en": "line",
+    "pos": "n.",
+    "zh": "隊伍",
+    "categories": [
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The line for the cashier is very long.",
+    "exampleZh": "結帳的隊伍排得很長。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "customer",
+    "en": "customer",
+    "pos": "n.",
+    "zh": "顧客、客人",
+    "categories": [
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "customer",
+    "example": "The store gives every customer a free sample.",
+    "exampleZh": "這家店送每位顧客一份免費試用品。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "cashier",
+    "en": "cashier",
+    "pos": "n.",
+    "zh": "收銀員",
+    "categories": [
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "clerk",
+    "example": "The cashier gave me my change.",
+    "exampleZh": "收銀員把零錢找給我。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "clerk",
+    "en": "clerk",
+    "pos": "n.",
+    "zh": "店員",
+    "categories": [
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "clerk",
+    "example": "I asked the clerk for help finding my size.",
+    "exampleZh": "我請店員幫我找我的尺寸。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "receipt",
+    "en": "receipt",
+    "pos": "n.",
+    "zh": "收據、發票",
+    "categories": [
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Please keep your receipt in case you need a refund.",
+    "exampleZh": "請保留收據，以便需要退款時使用。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "discount",
+    "en": "discount",
+    "pos": "n.",
+    "zh": "折扣",
+    "categories": [
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "sale",
+    "example": "Students can get a ten percent discount.",
+    "exampleZh": "學生可以打九折。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "bargain",
+    "en": "bargain",
+    "pos": "n.",
+    "zh": "便宜貨、划算的東西",
+    "categories": [
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "cheap",
+    "example": "This coat was a real bargain.",
+    "exampleZh": "這件外套真的很划算。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "fitting-room",
+    "en": "fitting room",
+    "pos": "n.",
+    "zh": "試衣間",
+    "categories": [
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The fitting room is at the back of the store.",
+    "exampleZh": "試衣間在店的後面。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "checkout",
+    "en": "checkout",
+    "pos": "n.",
+    "zh": "結帳處",
+    "categories": [
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "counter",
+    "example": "Please pay at the checkout near the exit.",
+    "exampleZh": "請到出口附近的結帳處付款。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "department-store",
+    "en": "department store",
+    "pos": "n.",
+    "zh": "百貨公司",
+    "categories": [
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "mall",
+    "example": "The department store has seven floors.",
+    "exampleZh": "這間百貨公司有七層樓。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "souvenir",
+    "en": "souvenir",
+    "pos": "n.",
+    "zh": "紀念品",
+    "categories": [
+      "shopping",
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I bought some souvenirs for my coworkers.",
+    "exampleZh": "我買了一些紀念品給同事。",
+    "form": "souvenirs",
+    "reviewed": true
+  },
+  {
+    "id": "brand",
+    "en": "brand",
+    "pos": "n.",
+    "zh": "品牌",
+    "categories": [
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Which brand of sunscreen do you recommend?",
+    "exampleZh": "你推薦哪個品牌的防曬乳？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "aisle",
+    "en": "aisle",
+    "pos": "n.",
+    "zh": "走道",
+    "categories": [
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The rice is in aisle five.",
+    "exampleZh": "米在第五排走道。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "return-v",
+    "en": "return",
+    "pos": "v.",
+    "zh": "退貨",
+    "categories": [
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "return",
+    "example": "Can I return these shoes if they don't fit?",
+    "exampleZh": "如果鞋子不合腳，我可以退貨嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "exchange-v",
+    "en": "exchange",
+    "pos": "v.",
+    "zh": "換貨",
+    "categories": [
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I'd like to exchange this shirt for a larger one.",
+    "exampleZh": "我想把這件襯衫換成大一號的。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "refund",
+    "en": "refund",
+    "pos": "n.",
+    "zh": "退款",
+    "categories": [
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "return",
+    "example": "The shop gave me a full refund.",
+    "exampleZh": "店家全額退款給我。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "coupon",
+    "en": "coupon",
+    "pos": "n.",
+    "zh": "優惠券、折價券",
+    "categories": [
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Use this coupon to get a free drink.",
+    "exampleZh": "用這張優惠券可以免費兌換一杯飲料。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "out-of-stock",
+    "en": "out of stock",
+    "pos": "phr.",
+    "zh": "缺貨",
+    "categories": [
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "sold-out",
+    "example": "Sorry, that color is out of stock.",
+    "exampleZh": "抱歉，那個顏色缺貨了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "counter",
+    "en": "counter",
+    "pos": "n.",
+    "zh": "櫃檯",
+    "categories": [
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "counter",
+    "example": "Please wait at the counter for your order.",
+    "exampleZh": "請在櫃檯等候您的商品。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "duty-free-adj",
+    "en": "duty-free",
+    "pos": "adj.",
+    "zh": "免稅的",
+    "categories": [
+      "shopping",
+      "airport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We bought perfume at the duty-free shop.",
+    "exampleZh": "我們在免稅店買了香水。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "price-tag",
+    "en": "price tag",
+    "pos": "n.",
+    "zh": "價格標籤、標價",
+    "categories": [
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The price tag says twenty dollars.",
+    "exampleZh": "價格標籤上寫著二十美元。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "on-sale",
+    "en": "on sale",
+    "pos": "phr.",
+    "zh": "特價中",
+    "categories": [
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "sale",
+    "example": "These jackets are on sale this week.",
+    "exampleZh": "這些外套這週特價中。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "flea-market",
+    "en": "flea market",
+    "pos": "n.",
+    "zh": "跳蚤市場",
+    "categories": [
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We found old postcards at the flea market.",
+    "exampleZh": "我們在跳蚤市場找到舊明信片。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "browse-v",
+    "en": "browse",
+    "pos": "v.",
+    "zh": "隨意逛逛、瀏覽",
+    "categories": [
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I'm just browsing, thank you.",
+    "exampleZh": "我只是隨便看看，謝謝。",
+    "form": "browsing",
+    "reviewed": true
+  },
+  {
+    "id": "deliver-v",
+    "en": "deliver",
+    "pos": "v.",
+    "zh": "遞送、送貨",
+    "categories": [
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Can you deliver this to my hotel?",
+    "exampleZh": "你們可以把這個送到我的飯店嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sold-out",
+    "en": "sold out",
+    "pos": "phr.",
+    "zh": "賣完、售完",
+    "categories": [
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "sold-out",
+    "example": "The concert T-shirts were sold out by noon.",
+    "exampleZh": "演唱會 T 恤中午前就賣完了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "warranty",
+    "en": "warranty",
+    "pos": "n.",
+    "zh": "保固",
+    "categories": [
+      "shopping"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "This camera comes with a two-year warranty.",
+    "exampleZh": "這台相機有兩年保固。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "purchase-v",
+    "en": "purchase",
+    "pos": "v.",
+    "zh": "購買",
+    "categories": [
+      "shopping"
+    ],
+    "level": 3,
+    "syn": "buy",
+    "example": "You can purchase tickets online.",
+    "exampleZh": "你可以在網路上購買票券。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "merchandise",
+    "en": "merchandise",
+    "pos": "n.",
+    "zh": "商品",
+    "categories": [
+      "shopping"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "All merchandise on this shelf is half price.",
+    "exampleZh": "這個架上的所有商品都半價。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "wholesale-adj",
+    "en": "wholesale",
+    "pos": "adj.",
+    "zh": "批發的",
+    "categories": [
+      "shopping"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The wholesale market opens very early.",
+    "exampleZh": "批發市場很早就開門了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "vendor",
+    "en": "vendor",
+    "pos": "n.",
+    "zh": "攤販、小販",
+    "categories": [
+      "shopping"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "A street vendor was selling grilled corn.",
+    "exampleZh": "有個街頭攤販在賣烤玉米。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "consumer",
+    "en": "consumer",
+    "pos": "n.",
+    "zh": "消費者",
+    "categories": [
+      "shopping"
+    ],
+    "level": 3,
+    "syn": "customer",
+    "example": "Consumers can return items within seven days.",
+    "exampleZh": "消費者可以在七天內退貨。",
+    "form": "Consumers",
+    "reviewed": true
+  },
+  {
+    "id": "outlet-2",
+    "en": "outlet",
+    "pos": "n.",
+    "zh": "暢貨中心",
+    "categories": [
+      "shopping"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We spent the afternoon at an outlet mall.",
+    "exampleZh": "我們在暢貨中心逛了一下午。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "loyalty-card",
+    "en": "loyalty card",
+    "pos": "n.",
+    "zh": "會員集點卡",
+    "categories": [
+      "shopping"
+    ],
+    "level": 3,
+    "syn": "membership",
+    "example": "Do you have a loyalty card with us?",
+    "exampleZh": "您有我們的會員集點卡嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "membership",
+    "en": "membership",
+    "pos": "n.",
+    "zh": "會員資格",
+    "categories": [
+      "shopping"
+    ],
+    "level": 3,
+    "syn": "membership",
+    "example": "You need a membership to shop here.",
+    "exampleZh": "你必須是會員才能在這裡購物。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "haggle-v",
+    "en": "haggle",
+    "pos": "v.",
+    "zh": "討價還價、殺價",
+    "categories": [
+      "shopping"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Tourists often haggle at the night market.",
+    "exampleZh": "觀光客常在夜市殺價。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "complimentary-adj",
+    "en": "complimentary",
+    "pos": "adj.",
+    "zh": "免費的、贈送的",
+    "categories": [
+      "shopping"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Each customer gets a complimentary tote bag.",
+    "exampleZh": "每位顧客可獲贈一個免費托特包。",
+    "form": "",
+    "reviewed": true
+  }
+]

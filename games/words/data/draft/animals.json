@@ -1,0 +1,843 @@
+[
+  {
+    "id": "dog",
+    "en": "dog",
+    "pos": "n.",
+    "zh": "狗",
+    "categories": [
+      "animals"
+    ],
+    "level": 1,
+    "syn": "dog",
+    "example": "Our neighbor walks her dog every evening.",
+    "exampleZh": "我們的鄰居每天傍晚遛狗。",
+    "form": ""
+  },
+  {
+    "id": "cat",
+    "en": "cat",
+    "pos": "n.",
+    "zh": "貓",
+    "categories": [
+      "animals"
+    ],
+    "level": 1,
+    "syn": "cat",
+    "example": "A black cat was sleeping on the wall.",
+    "exampleZh": "一隻黑貓在牆上睡覺。",
+    "form": ""
+  },
+  {
+    "id": "bird",
+    "en": "bird",
+    "pos": "n.",
+    "zh": "鳥",
+    "categories": [
+      "animals"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We heard birds singing in the morning.",
+    "exampleZh": "我們早上聽到鳥在唱歌。",
+    "form": "birds"
+  },
+  {
+    "id": "fish",
+    "en": "fish",
+    "pos": "n.",
+    "zh": "魚",
+    "categories": [
+      "animals"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "You can see colorful fish while snorkeling.",
+    "exampleZh": "浮潛時可以看到五彩繽紛的魚。",
+    "form": ""
+  },
+  {
+    "id": "horse",
+    "en": "horse",
+    "pos": "n.",
+    "zh": "馬",
+    "categories": [
+      "animals"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We rode a horse along the beach.",
+    "exampleZh": "我們沿著海灘騎馬。",
+    "form": ""
+  },
+  {
+    "id": "cow",
+    "en": "cow",
+    "pos": "n.",
+    "zh": "牛、乳牛",
+    "categories": [
+      "animals"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Cows were eating grass on the farm.",
+    "exampleZh": "牛在農場上吃草。",
+    "form": "cows"
+  },
+  {
+    "id": "pig",
+    "en": "pig",
+    "pos": "n.",
+    "zh": "豬",
+    "categories": [
+      "animals"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The farm has pigs, ducks, and goats.",
+    "exampleZh": "這座農場有豬、鴨子和山羊。",
+    "form": "pigs"
+  },
+  {
+    "id": "chicken",
+    "en": "chicken",
+    "pos": "n.",
+    "zh": "雞",
+    "categories": [
+      "animals"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Chickens walked freely around the village.",
+    "exampleZh": "雞在村子裡到處走來走去。",
+    "form": "chickens"
+  },
+  {
+    "id": "duck",
+    "en": "duck",
+    "pos": "n.",
+    "zh": "鴨子",
+    "categories": [
+      "animals"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The kids fed the ducks at the pond.",
+    "exampleZh": "孩子們在池塘邊餵鴨子。",
+    "form": "ducks"
+  },
+  {
+    "id": "rabbit",
+    "en": "rabbit",
+    "pos": "n.",
+    "zh": "兔子",
+    "categories": [
+      "animals"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "This island is famous for its wild rabbits.",
+    "exampleZh": "這座島以野兔聞名。",
+    "form": "rabbits"
+  },
+  {
+    "id": "mouse",
+    "en": "mouse",
+    "pos": "n.",
+    "zh": "老鼠",
+    "categories": [
+      "animals"
+    ],
+    "level": 1,
+    "syn": "mouse",
+    "example": "I saw a mouse in the hotel kitchen.",
+    "exampleZh": "我在旅館廚房看到一隻老鼠。",
+    "form": ""
+  },
+  {
+    "id": "monkey",
+    "en": "monkey",
+    "pos": "n.",
+    "zh": "猴子",
+    "categories": [
+      "animals"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Watch out, the monkeys may take your food.",
+    "exampleZh": "小心，猴子可能會搶你的食物。",
+    "form": "monkeys"
+  },
+  {
+    "id": "tiger",
+    "en": "tiger",
+    "pos": "n.",
+    "zh": "老虎",
+    "categories": [
+      "animals"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The tiger at the zoo was sleeping.",
+    "exampleZh": "動物園裡的老虎在睡覺。",
+    "form": ""
+  },
+  {
+    "id": "lion",
+    "en": "lion",
+    "pos": "n.",
+    "zh": "獅子",
+    "categories": [
+      "animals"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We saw a lion on our safari.",
+    "exampleZh": "我們在野生動物之旅中看到一頭獅子。",
+    "form": ""
+  },
+  {
+    "id": "elephant",
+    "en": "elephant",
+    "pos": "n.",
+    "zh": "大象",
+    "categories": [
+      "animals"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "In Thailand, we fed an elephant bananas.",
+    "exampleZh": "在泰國，我們餵大象吃香蕉。",
+    "form": ""
+  },
+  {
+    "id": "bear",
+    "en": "bear",
+    "pos": "n.",
+    "zh": "熊",
+    "categories": [
+      "animals"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Keep food away from bears when camping.",
+    "exampleZh": "露營時要讓食物遠離熊。",
+    "form": "bears"
+  },
+  {
+    "id": "sheep",
+    "en": "sheep",
+    "pos": "n.",
+    "zh": "綿羊",
+    "categories": [
+      "animals"
+    ],
+    "level": 1,
+    "syn": "sheep",
+    "example": "There are more sheep than people here.",
+    "exampleZh": "這裡的羊比人還多。",
+    "form": ""
+  },
+  {
+    "id": "goat",
+    "en": "goat",
+    "pos": "n.",
+    "zh": "山羊",
+    "categories": [
+      "animals"
+    ],
+    "level": 1,
+    "syn": "sheep",
+    "example": "A goat climbed onto the rocks.",
+    "exampleZh": "一隻山羊爬上了岩石。",
+    "form": ""
+  },
+  {
+    "id": "snake",
+    "en": "snake",
+    "pos": "n.",
+    "zh": "蛇",
+    "categories": [
+      "animals"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Stay on the trail and watch for snakes.",
+    "exampleZh": "待在步道上，小心蛇。",
+    "form": "snakes"
+  },
+  {
+    "id": "frog",
+    "en": "frog",
+    "pos": "n.",
+    "zh": "青蛙",
+    "categories": [
+      "animals"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We heard frogs near the rice fields.",
+    "exampleZh": "我們在稻田附近聽到青蛙叫。",
+    "form": "frogs"
+  },
+  {
+    "id": "bee",
+    "en": "bee",
+    "pos": "n.",
+    "zh": "蜜蜂",
+    "categories": [
+      "animals"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "A bee landed on my ice cream.",
+    "exampleZh": "一隻蜜蜂停在我的冰淇淋上。",
+    "form": ""
+  },
+  {
+    "id": "ant",
+    "en": "ant",
+    "pos": "n.",
+    "zh": "螞蟻",
+    "categories": [
+      "animals"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Close the snacks, or ants will find them.",
+    "exampleZh": "把零食封好，不然螞蟻會找上門。",
+    "form": "ants"
+  },
+  {
+    "id": "panda",
+    "en": "panda",
+    "pos": "n.",
+    "zh": "貓熊",
+    "categories": [
+      "animals"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The baby panda was eating bamboo.",
+    "exampleZh": "貓熊寶寶正在吃竹子。",
+    "form": ""
+  },
+  {
+    "id": "pet",
+    "en": "pet",
+    "pos": "n.",
+    "zh": "寵物",
+    "categories": [
+      "animals"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Are pets allowed in this hotel?",
+    "exampleZh": "這間旅館可以帶寵物嗎？",
+    "form": "pets"
+  },
+  {
+    "id": "rat",
+    "en": "rat",
+    "pos": "n.",
+    "zh": "大老鼠",
+    "categories": [
+      "animals"
+    ],
+    "level": 2,
+    "syn": "mouse",
+    "example": "A rat ran across the subway tracks.",
+    "exampleZh": "一隻大老鼠跑過地鐵軌道。",
+    "form": ""
+  },
+  {
+    "id": "giraffe",
+    "en": "giraffe",
+    "pos": "n.",
+    "zh": "長頸鹿",
+    "categories": [
+      "animals"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The giraffe ate leaves from the tall tree.",
+    "exampleZh": "長頸鹿吃著高樹上的葉子。",
+    "form": ""
+  },
+  {
+    "id": "zebra",
+    "en": "zebra",
+    "pos": "n.",
+    "zh": "斑馬",
+    "categories": [
+      "animals"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We took photos of zebras at the zoo.",
+    "exampleZh": "我們在動物園拍了斑馬的照片。",
+    "form": "zebras"
+  },
+  {
+    "id": "kangaroo",
+    "en": "kangaroo",
+    "pos": "n.",
+    "zh": "袋鼠",
+    "categories": [
+      "animals"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I saw a kangaroo in Australia.",
+    "exampleZh": "我在澳洲看到了袋鼠。",
+    "form": ""
+  },
+  {
+    "id": "koala",
+    "en": "koala",
+    "pos": "n.",
+    "zh": "無尾熊",
+    "categories": [
+      "animals"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The koala slept in the tree all day.",
+    "exampleZh": "無尾熊在樹上睡了一整天。",
+    "form": ""
+  },
+  {
+    "id": "dolphin",
+    "en": "dolphin",
+    "pos": "n.",
+    "zh": "海豚",
+    "categories": [
+      "animals"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Dolphins swam next to our boat.",
+    "exampleZh": "海豚在我們的船旁邊游泳。",
+    "form": "dolphins"
+  },
+  {
+    "id": "whale",
+    "en": "whale",
+    "pos": "n.",
+    "zh": "鯨魚",
+    "categories": [
+      "animals"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We went whale watching off the coast.",
+    "exampleZh": "我們到外海去賞鯨。",
+    "form": ""
+  },
+  {
+    "id": "shark",
+    "en": "shark",
+    "pos": "n.",
+    "zh": "鯊魚",
+    "categories": [
+      "animals"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The aquarium has a huge shark tank.",
+    "exampleZh": "水族館有一個巨大的鯊魚缸。",
+    "form": ""
+  },
+  {
+    "id": "turtle",
+    "en": "turtle",
+    "pos": "n.",
+    "zh": "烏龜、海龜",
+    "categories": [
+      "animals"
+    ],
+    "level": 2,
+    "syn": "turtle",
+    "example": "A sea turtle swam past us.",
+    "exampleZh": "一隻海龜從我們旁邊游過。",
+    "form": ""
+  },
+  {
+    "id": "crab",
+    "en": "crab",
+    "pos": "n.",
+    "zh": "螃蟹",
+    "categories": [
+      "animals"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Small crabs ran across the sand.",
+    "exampleZh": "小螃蟹在沙灘上跑來跑去。",
+    "form": "crabs"
+  },
+  {
+    "id": "butterfly",
+    "en": "butterfly",
+    "pos": "n.",
+    "zh": "蝴蝶",
+    "categories": [
+      "animals"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "A butterfly landed on my hand.",
+    "exampleZh": "一隻蝴蝶停在我的手上。",
+    "form": ""
+  },
+  {
+    "id": "mosquito",
+    "en": "mosquito",
+    "pos": "n.",
+    "zh": "蚊子",
+    "categories": [
+      "animals"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Use spray to keep mosquitoes away.",
+    "exampleZh": "用防蚊液讓蚊子遠離。",
+    "form": "mosquitoes"
+  },
+  {
+    "id": "spider",
+    "en": "spider",
+    "pos": "n.",
+    "zh": "蜘蛛",
+    "categories": [
+      "animals"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "There is a big spider in the shower.",
+    "exampleZh": "淋浴間裡有一隻大蜘蛛。",
+    "form": ""
+  },
+  {
+    "id": "deer",
+    "en": "deer",
+    "pos": "n.",
+    "zh": "鹿",
+    "categories": [
+      "animals"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "In Nara, deer walk around the park.",
+    "exampleZh": "在奈良，鹿在公園裡走來走去。",
+    "form": ""
+  },
+  {
+    "id": "wolf",
+    "en": "wolf",
+    "pos": "n.",
+    "zh": "狼",
+    "categories": [
+      "animals"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We heard a wolf howling at night.",
+    "exampleZh": "我們晚上聽到狼在嚎叫。",
+    "form": ""
+  },
+  {
+    "id": "fox",
+    "en": "fox",
+    "pos": "n.",
+    "zh": "狐狸",
+    "categories": [
+      "animals"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "A red fox crossed the road in front of us.",
+    "exampleZh": "一隻紅狐狸從我們面前穿越馬路。",
+    "form": ""
+  },
+  {
+    "id": "squirrel",
+    "en": "squirrel",
+    "pos": "n.",
+    "zh": "松鼠",
+    "categories": [
+      "animals"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "A squirrel took a nut from my hand.",
+    "exampleZh": "一隻松鼠從我手上拿走堅果。",
+    "form": ""
+  },
+  {
+    "id": "owl",
+    "en": "owl",
+    "pos": "n.",
+    "zh": "貓頭鷹",
+    "categories": [
+      "animals"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "An owl was sitting on the branch.",
+    "exampleZh": "一隻貓頭鷹停在樹枝上。",
+    "form": ""
+  },
+  {
+    "id": "eagle",
+    "en": "eagle",
+    "pos": "n.",
+    "zh": "老鷹",
+    "categories": [
+      "animals"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "An eagle flew high above the cliffs.",
+    "exampleZh": "一隻老鷹在懸崖上空高飛。",
+    "form": ""
+  },
+  {
+    "id": "parrot",
+    "en": "parrot",
+    "pos": "n.",
+    "zh": "鸚鵡",
+    "categories": [
+      "animals"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The parrot can say hello in English.",
+    "exampleZh": "這隻鸚鵡會用英文說哈囉。",
+    "form": ""
+  },
+  {
+    "id": "penguin",
+    "en": "penguin",
+    "pos": "n.",
+    "zh": "企鵝",
+    "categories": [
+      "animals"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The penguins at the aquarium are so cute.",
+    "exampleZh": "水族館的企鵝好可愛。",
+    "form": "penguins"
+  },
+  {
+    "id": "camel",
+    "en": "camel",
+    "pos": "n.",
+    "zh": "駱駝",
+    "categories": [
+      "animals"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We rode camels in the desert.",
+    "exampleZh": "我們在沙漠裡騎駱駝。",
+    "form": "camels"
+  },
+  {
+    "id": "puppy",
+    "en": "puppy",
+    "pos": "n.",
+    "zh": "小狗",
+    "categories": [
+      "animals"
+    ],
+    "level": 2,
+    "syn": "dog",
+    "example": "The little puppy followed us home.",
+    "exampleZh": "那隻小狗跟著我們回家。",
+    "form": ""
+  },
+  {
+    "id": "kitten",
+    "en": "kitten",
+    "pos": "n.",
+    "zh": "小貓",
+    "categories": [
+      "animals"
+    ],
+    "level": 2,
+    "syn": "cat",
+    "example": "The cafe has three kittens you can play with.",
+    "exampleZh": "這間咖啡廳有三隻小貓可以陪你玩。",
+    "form": "kittens"
+  },
+  {
+    "id": "tortoise",
+    "en": "tortoise",
+    "pos": "n.",
+    "zh": "陸龜",
+    "categories": [
+      "animals"
+    ],
+    "level": 3,
+    "syn": "turtle",
+    "example": "The old tortoise moved very slowly.",
+    "exampleZh": "那隻老陸龜移動得非常慢。",
+    "form": ""
+  },
+  {
+    "id": "jellyfish",
+    "en": "jellyfish",
+    "pos": "n.",
+    "zh": "水母",
+    "categories": [
+      "animals"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Watch out for jellyfish when you swim.",
+    "exampleZh": "游泳時要小心水母。",
+    "form": ""
+  },
+  {
+    "id": "octopus",
+    "en": "octopus",
+    "pos": "n.",
+    "zh": "章魚",
+    "categories": [
+      "animals"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We saw an octopus hiding under a rock.",
+    "exampleZh": "我們看到一隻章魚躲在岩石下。",
+    "form": ""
+  },
+  {
+    "id": "cockroach",
+    "en": "cockroach",
+    "pos": "n.",
+    "zh": "蟑螂",
+    "categories": [
+      "animals"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I found a cockroach in the bathroom.",
+    "exampleZh": "我在浴室發現一隻蟑螂。",
+    "form": ""
+  },
+  {
+    "id": "lizard",
+    "en": "lizard",
+    "pos": "n.",
+    "zh": "蜥蜴",
+    "categories": [
+      "animals"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "A small lizard ran up the wall.",
+    "exampleZh": "一隻小蜥蜴爬上了牆。",
+    "form": ""
+  },
+  {
+    "id": "crocodile",
+    "en": "crocodile",
+    "pos": "n.",
+    "zh": "鱷魚",
+    "categories": [
+      "animals"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Do not swim here, there are crocodiles.",
+    "exampleZh": "別在這裡游泳，這裡有鱷魚。",
+    "form": "crocodiles"
+  },
+  {
+    "id": "hippo",
+    "en": "hippo",
+    "pos": "n.",
+    "zh": "河馬",
+    "categories": [
+      "animals"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The hippo opened its huge mouth.",
+    "exampleZh": "河馬張開了牠的大嘴巴。",
+    "form": ""
+  },
+  {
+    "id": "peacock",
+    "en": "peacock",
+    "pos": "n.",
+    "zh": "孔雀",
+    "categories": [
+      "animals"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "A peacock showed its beautiful feathers.",
+    "exampleZh": "一隻孔雀展示牠美麗的羽毛。",
+    "form": ""
+  },
+  {
+    "id": "seagull",
+    "en": "seagull",
+    "pos": "n.",
+    "zh": "海鷗",
+    "categories": [
+      "animals"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "A seagull stole my sandwich at the pier.",
+    "exampleZh": "一隻海鷗在碼頭搶走我的三明治。",
+    "form": ""
+  },
+  {
+    "id": "bat",
+    "en": "bat",
+    "pos": "n.",
+    "zh": "蝙蝠",
+    "categories": [
+      "animals"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Bats fly out of the cave at sunset.",
+    "exampleZh": "日落時蝙蝠會飛出洞穴。",
+    "form": "bats"
+  },
+  {
+    "id": "leopard",
+    "en": "leopard",
+    "pos": "n.",
+    "zh": "豹",
+    "categories": [
+      "animals"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Our guide spotted a leopard in the tree.",
+    "exampleZh": "我們的導遊發現樹上有一隻豹。",
+    "form": ""
+  },
+  {
+    "id": "wildlife",
+    "en": "wildlife",
+    "pos": "n.",
+    "zh": "野生動物",
+    "categories": [
+      "animals",
+      "nature"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The national park is full of wildlife.",
+    "exampleZh": "國家公園裡有很多野生動物。",
+    "form": ""
+  }
+]

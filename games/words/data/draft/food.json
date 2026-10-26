@@ -1,0 +1,847 @@
+[
+  {
+    "id": "bread",
+    "en": "bread",
+    "pos": "n.",
+    "zh": "麵包",
+    "categories": [
+      "food"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I buy fresh bread from the bakery every morning.",
+    "exampleZh": "我每天早上都在麵包店買新鮮麵包。",
+    "form": ""
+  },
+  {
+    "id": "rice",
+    "en": "rice",
+    "pos": "n.",
+    "zh": "米飯、米",
+    "categories": [
+      "food"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Would you like rice or noodles with your chicken?",
+    "exampleZh": "你的雞肉要配飯還是麵？",
+    "form": ""
+  },
+  {
+    "id": "noodles",
+    "en": "noodles",
+    "pos": "n.",
+    "zh": "麵、麵條",
+    "categories": [
+      "food"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We had beef noodles at the night market.",
+    "exampleZh": "我們在夜市吃了牛肉麵。",
+    "form": ""
+  },
+  {
+    "id": "egg",
+    "en": "egg",
+    "pos": "n.",
+    "zh": "蛋、雞蛋",
+    "categories": [
+      "food"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I'd like two fried eggs for breakfast, please.",
+    "exampleZh": "早餐我想要兩顆荷包蛋，謝謝。",
+    "form": "eggs"
+  },
+  {
+    "id": "meat",
+    "en": "meat",
+    "pos": "n.",
+    "zh": "肉",
+    "categories": [
+      "food"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I don't eat meat, so I ordered a salad.",
+    "exampleZh": "我不吃肉，所以點了沙拉。",
+    "form": ""
+  },
+  {
+    "id": "chicken",
+    "en": "chicken",
+    "pos": "n.",
+    "zh": "雞肉",
+    "categories": [
+      "food"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The chicken in this soup is really tender.",
+    "exampleZh": "這碗湯裡的雞肉很嫩。",
+    "form": ""
+  },
+  {
+    "id": "beef",
+    "en": "beef",
+    "pos": "n.",
+    "zh": "牛肉",
+    "categories": [
+      "food"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "This beef comes from a local farm.",
+    "exampleZh": "這牛肉來自當地的農場。",
+    "form": ""
+  },
+  {
+    "id": "pork",
+    "en": "pork",
+    "pos": "n.",
+    "zh": "豬肉",
+    "categories": [
+      "food"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Sorry, I can't eat pork.",
+    "exampleZh": "抱歉，我不能吃豬肉。",
+    "form": ""
+  },
+  {
+    "id": "fish",
+    "en": "fish",
+    "pos": "n.",
+    "zh": "魚、魚肉",
+    "categories": [
+      "food"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The fish here is caught fresh every day.",
+    "exampleZh": "這裡的魚每天都是新鮮捕撈的。",
+    "form": ""
+  },
+  {
+    "id": "soup",
+    "en": "soup",
+    "pos": "n.",
+    "zh": "湯",
+    "categories": [
+      "food",
+      "restaurant"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "A bowl of hot soup is perfect on a cold day.",
+    "exampleZh": "冷天喝一碗熱湯最棒了。",
+    "form": ""
+  },
+  {
+    "id": "cake",
+    "en": "cake",
+    "pos": "n.",
+    "zh": "蛋糕",
+    "categories": [
+      "food"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We bought a cake for my sister's birthday.",
+    "exampleZh": "我們買了一個蛋糕幫妹妹慶生。",
+    "form": ""
+  },
+  {
+    "id": "cookie",
+    "en": "cookie",
+    "pos": "n.",
+    "zh": "餅乾",
+    "categories": [
+      "food"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "These cookies make a great gift from Japan.",
+    "exampleZh": "這些餅乾是很棒的日本伴手禮。",
+    "form": "cookies"
+  },
+  {
+    "id": "candy",
+    "en": "candy",
+    "pos": "n.",
+    "zh": "糖果",
+    "categories": [
+      "food"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The kids bought candy at the airport shop.",
+    "exampleZh": "孩子們在機場商店買了糖果。",
+    "form": ""
+  },
+  {
+    "id": "cheese",
+    "en": "cheese",
+    "pos": "n.",
+    "zh": "起司",
+    "categories": [
+      "food"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Can I get extra cheese on my burger?",
+    "exampleZh": "我的漢堡可以多加起司嗎？",
+    "form": ""
+  },
+  {
+    "id": "butter",
+    "en": "butter",
+    "pos": "n.",
+    "zh": "奶油",
+    "categories": [
+      "food"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Spread some butter on the toast while it's warm.",
+    "exampleZh": "趁吐司還熱時抹一點奶油。",
+    "form": ""
+  },
+  {
+    "id": "sandwich",
+    "en": "sandwich",
+    "pos": "n.",
+    "zh": "三明治",
+    "categories": [
+      "food"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I'll grab a sandwich at the train station.",
+    "exampleZh": "我會在火車站買個三明治。",
+    "form": ""
+  },
+  {
+    "id": "hamburger",
+    "en": "hamburger",
+    "pos": "n.",
+    "zh": "漢堡",
+    "categories": [
+      "food"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "He ordered a hamburger and a large soda.",
+    "exampleZh": "他點了一個漢堡和一杯大杯汽水。",
+    "form": ""
+  },
+  {
+    "id": "pizza",
+    "en": "pizza",
+    "pos": "n.",
+    "zh": "披薩",
+    "categories": [
+      "food"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Let's order a pizza and stay in tonight.",
+    "exampleZh": "今晚我們叫個披薩待在家吧。",
+    "form": ""
+  },
+  {
+    "id": "ice-cream",
+    "en": "ice cream",
+    "pos": "n.",
+    "zh": "冰淇淋",
+    "categories": [
+      "food"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "It's so hot. Let's get some ice cream!",
+    "exampleZh": "好熱喔，我們去買冰淇淋吧！",
+    "form": ""
+  },
+  {
+    "id": "chocolate",
+    "en": "chocolate",
+    "pos": "n.",
+    "zh": "巧克力",
+    "categories": [
+      "food"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Belgian chocolate is a popular souvenir.",
+    "exampleZh": "比利時巧克力是很受歡迎的紀念品。",
+    "form": ""
+  },
+  {
+    "id": "breakfast",
+    "en": "breakfast",
+    "pos": "n.",
+    "zh": "早餐",
+    "categories": [
+      "food",
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Breakfast is included with the room.",
+    "exampleZh": "房價含早餐。",
+    "form": ""
+  },
+  {
+    "id": "lunch",
+    "en": "lunch",
+    "pos": "n.",
+    "zh": "午餐",
+    "categories": [
+      "food"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Where should we have lunch today?",
+    "exampleZh": "我們今天午餐要去哪裡吃？",
+    "form": ""
+  },
+  {
+    "id": "dinner",
+    "en": "dinner",
+    "pos": "n.",
+    "zh": "晚餐",
+    "categories": [
+      "food"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We booked a table for dinner at seven.",
+    "exampleZh": "我們訂了七點的晚餐位子。",
+    "form": ""
+  },
+  {
+    "id": "snack",
+    "en": "snack",
+    "pos": "n.",
+    "zh": "點心、零食",
+    "categories": [
+      "food"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I always pack a snack for long bus rides.",
+    "exampleZh": "搭長途巴士時我總會帶點零食。",
+    "form": ""
+  },
+  {
+    "id": "seafood",
+    "en": "seafood",
+    "pos": "n.",
+    "zh": "海鮮",
+    "categories": [
+      "food"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "This town is famous for its fresh seafood.",
+    "exampleZh": "這個小鎮以新鮮海鮮聞名。",
+    "form": ""
+  },
+  {
+    "id": "shrimp",
+    "en": "shrimp",
+    "pos": "n.",
+    "zh": "蝦子",
+    "categories": [
+      "food"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I'm allergic to shrimp, so please leave it out.",
+    "exampleZh": "我對蝦子過敏，請不要放。",
+    "form": ""
+  },
+  {
+    "id": "steak",
+    "en": "steak",
+    "pos": "n.",
+    "zh": "牛排",
+    "categories": [
+      "food",
+      "restaurant"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "How would you like your steak cooked?",
+    "exampleZh": "您的牛排要幾分熟？",
+    "form": ""
+  },
+  {
+    "id": "sausage",
+    "en": "sausage",
+    "pos": "n.",
+    "zh": "香腸",
+    "categories": [
+      "food"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The grilled sausage at the night market smells amazing.",
+    "exampleZh": "夜市的烤香腸聞起來好香。",
+    "form": ""
+  },
+  {
+    "id": "bacon",
+    "en": "bacon",
+    "pos": "n.",
+    "zh": "培根",
+    "categories": [
+      "food"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I'll have bacon and eggs, please.",
+    "exampleZh": "我要培根加蛋，謝謝。",
+    "form": ""
+  },
+  {
+    "id": "ham",
+    "en": "ham",
+    "pos": "n.",
+    "zh": "火腿",
+    "categories": [
+      "food"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "She made a ham and cheese sandwich for the trip.",
+    "exampleZh": "她為旅行做了火腿起司三明治。",
+    "form": ""
+  },
+  {
+    "id": "dumpling",
+    "en": "dumpling",
+    "pos": "n.",
+    "zh": "餃子",
+    "categories": [
+      "food"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We ordered twenty pork dumplings to share.",
+    "exampleZh": "我們點了二十顆豬肉餃子一起吃。",
+    "form": "dumplings"
+  },
+  {
+    "id": "pancake",
+    "en": "pancake",
+    "pos": "n.",
+    "zh": "鬆餅",
+    "categories": [
+      "food"
+    ],
+    "level": 2,
+    "syn": "pancake",
+    "example": "The hotel serves pancakes with maple syrup.",
+    "exampleZh": "飯店供應淋上楓糖漿的鬆餅。",
+    "form": "pancakes"
+  },
+  {
+    "id": "toast",
+    "en": "toast",
+    "pos": "n.",
+    "zh": "吐司",
+    "categories": [
+      "food"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I usually have toast and coffee for breakfast.",
+    "exampleZh": "我早餐通常吃吐司配咖啡。",
+    "form": ""
+  },
+  {
+    "id": "cereal",
+    "en": "cereal",
+    "pos": "n.",
+    "zh": "穀片",
+    "categories": [
+      "food"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The kids want cereal with cold milk.",
+    "exampleZh": "孩子們想吃穀片配冰牛奶。",
+    "form": ""
+  },
+  {
+    "id": "yogurt",
+    "en": "yogurt",
+    "pos": "n.",
+    "zh": "優格",
+    "categories": [
+      "food"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I bought some yogurt at the convenience store.",
+    "exampleZh": "我在便利商店買了一些優格。",
+    "form": ""
+  },
+  {
+    "id": "pasta",
+    "en": "pasta",
+    "pos": "n.",
+    "zh": "義大利麵",
+    "categories": [
+      "food"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "This restaurant makes its own pasta by hand.",
+    "exampleZh": "這家餐廳的義大利麵是手工自製的。",
+    "form": ""
+  },
+  {
+    "id": "french-fries",
+    "en": "French fries",
+    "pos": "n.",
+    "zh": "薯條",
+    "categories": [
+      "food"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Do you want French fries with that?",
+    "exampleZh": "要不要搭配薯條？",
+    "form": ""
+  },
+  {
+    "id": "hot-dog",
+    "en": "hot dog",
+    "pos": "n.",
+    "zh": "熱狗",
+    "categories": [
+      "food"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We grabbed hot dogs at the baseball game.",
+    "exampleZh": "我們在棒球賽買了熱狗。",
+    "form": "hot dogs"
+  },
+  {
+    "id": "fried-chicken",
+    "en": "fried chicken",
+    "pos": "n.",
+    "zh": "炸雞",
+    "categories": [
+      "food"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Taiwanese fried chicken is crispy and a little spicy.",
+    "exampleZh": "台灣炸雞酥脆又帶點辣。",
+    "form": ""
+  },
+  {
+    "id": "tofu",
+    "en": "tofu",
+    "pos": "n.",
+    "zh": "豆腐",
+    "categories": [
+      "food"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Stinky tofu tastes better than it smells.",
+    "exampleZh": "臭豆腐吃起來比聞起來好。",
+    "form": ""
+  },
+  {
+    "id": "lamb",
+    "en": "lamb",
+    "pos": "n.",
+    "zh": "羊肉",
+    "categories": [
+      "food"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The lamb curry here is very popular.",
+    "exampleZh": "這裡的羊肉咖哩很受歡迎。",
+    "form": ""
+  },
+  {
+    "id": "crab",
+    "en": "crab",
+    "pos": "n.",
+    "zh": "螃蟹",
+    "categories": [
+      "food"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We ate fresh crab by the harbor.",
+    "exampleZh": "我們在港邊吃了新鮮螃蟹。",
+    "form": ""
+  },
+  {
+    "id": "pie",
+    "en": "pie",
+    "pos": "n.",
+    "zh": "派",
+    "categories": [
+      "food"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Would you like a slice of apple pie?",
+    "exampleZh": "要來一片蘋果派嗎？",
+    "form": ""
+  },
+  {
+    "id": "donut",
+    "en": "donut",
+    "pos": "n.",
+    "zh": "甜甜圈",
+    "categories": [
+      "food"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I picked up a box of donuts for the office.",
+    "exampleZh": "我買了一盒甜甜圈帶去辦公室。",
+    "form": "donuts"
+  },
+  {
+    "id": "jam",
+    "en": "jam",
+    "pos": "n.",
+    "zh": "果醬",
+    "categories": [
+      "food"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Strawberry jam goes well with warm bread.",
+    "exampleZh": "草莓果醬配溫熱的麵包很搭。",
+    "form": ""
+  },
+  {
+    "id": "honey",
+    "en": "honey",
+    "pos": "n.",
+    "zh": "蜂蜜",
+    "categories": [
+      "food"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Add a little honey to your tea.",
+    "exampleZh": "在你的茶裡加一點蜂蜜。",
+    "form": ""
+  },
+  {
+    "id": "dessert",
+    "en": "dessert",
+    "pos": "n.",
+    "zh": "甜點",
+    "categories": [
+      "food",
+      "restaurant"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Let's save room for dessert.",
+    "exampleZh": "我們留點胃吃甜點吧。",
+    "form": ""
+  },
+  {
+    "id": "meal",
+    "en": "meal",
+    "pos": "n.",
+    "zh": "一餐、餐點",
+    "categories": [
+      "food",
+      "airport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The flight includes two hot meals.",
+    "exampleZh": "這班飛機提供兩份熱食餐點。",
+    "form": "meals"
+  },
+  {
+    "id": "oyster",
+    "en": "oyster",
+    "pos": "n.",
+    "zh": "牡蠣、蚵仔",
+    "categories": [
+      "food"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Oyster omelets are a classic night market snack.",
+    "exampleZh": "蚵仔煎是經典的夜市小吃。",
+    "form": ""
+  },
+  {
+    "id": "lobster",
+    "en": "lobster",
+    "pos": "n.",
+    "zh": "龍蝦",
+    "categories": [
+      "food"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We treated ourselves to a lobster dinner.",
+    "exampleZh": "我們犒賞自己吃了一頓龍蝦晚餐。",
+    "form": ""
+  },
+  {
+    "id": "salmon",
+    "en": "salmon",
+    "pos": "n.",
+    "zh": "鮭魚",
+    "categories": [
+      "food"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The grilled salmon comes with rice and salad.",
+    "exampleZh": "烤鮭魚附白飯和沙拉。",
+    "form": ""
+  },
+  {
+    "id": "sushi",
+    "en": "sushi",
+    "pos": "n.",
+    "zh": "壽司",
+    "categories": [
+      "food"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We had sushi at the fish market in Tokyo.",
+    "exampleZh": "我們在東京的魚市場吃了壽司。",
+    "form": ""
+  },
+  {
+    "id": "curry",
+    "en": "curry",
+    "pos": "n.",
+    "zh": "咖哩",
+    "categories": [
+      "food"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "This curry is too spicy for me.",
+    "exampleZh": "這個咖哩對我來說太辣了。",
+    "form": ""
+  },
+  {
+    "id": "omelet",
+    "en": "omelet",
+    "pos": "n.",
+    "zh": "歐姆蛋",
+    "categories": [
+      "food"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The chef makes omelets to order at the buffet.",
+    "exampleZh": "自助餐的廚師會現點現做歐姆蛋。",
+    "form": "omelets"
+  },
+  {
+    "id": "waffle",
+    "en": "waffle",
+    "pos": "n.",
+    "zh": "格子鬆餅",
+    "categories": [
+      "food"
+    ],
+    "level": 3,
+    "syn": "pancake",
+    "example": "We shared a waffle with ice cream on top.",
+    "exampleZh": "我們分吃一份加了冰淇淋的格子鬆餅。",
+    "form": ""
+  },
+  {
+    "id": "muffin",
+    "en": "muffin",
+    "pos": "n.",
+    "zh": "瑪芬",
+    "categories": [
+      "food"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I grabbed a blueberry muffin from the cafe.",
+    "exampleZh": "我在咖啡廳買了一個藍莓瑪芬。",
+    "form": ""
+  },
+  {
+    "id": "brunch",
+    "en": "brunch",
+    "pos": "n.",
+    "zh": "早午餐",
+    "categories": [
+      "food"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Let's meet for brunch on Sunday.",
+    "exampleZh": "我們星期天約吃早午餐吧。",
+    "form": ""
+  },
+  {
+    "id": "barbecue",
+    "en": "barbecue",
+    "pos": "n.",
+    "zh": "烤肉",
+    "categories": [
+      "food"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We're having a barbecue by the river tonight.",
+    "exampleZh": "我們今晚要在河邊烤肉。",
+    "form": ""
+  },
+  {
+    "id": "stew",
+    "en": "stew",
+    "pos": "n.",
+    "zh": "燉菜、燉肉",
+    "categories": [
+      "food"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Beef stew is perfect for a cold winter night.",
+    "exampleZh": "寒冷的冬夜最適合吃燉牛肉。",
+    "form": ""
+  },
+  {
+    "id": "porridge",
+    "en": "porridge",
+    "pos": "n.",
+    "zh": "粥、稀飯",
+    "categories": [
+      "food"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Rice porridge is easy on the stomach.",
+    "exampleZh": "稀飯對胃很溫和。",
+    "form": ""
+  }
+]

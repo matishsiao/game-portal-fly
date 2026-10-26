@@ -1,0 +1,846 @@
+[
+  {
+    "id": "bed",
+    "en": "bed",
+    "pos": "n.",
+    "zh": "床",
+    "categories": [
+      "home"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I was so tired that I went to bed early.",
+    "exampleZh": "我太累了，所以很早就上床睡覺。",
+    "form": ""
+  },
+  {
+    "id": "chair",
+    "en": "chair",
+    "pos": "n.",
+    "zh": "椅子",
+    "categories": [
+      "home"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Can I borrow this chair for a minute?",
+    "exampleZh": "我可以借用這張椅子一下嗎？",
+    "form": ""
+  },
+  {
+    "id": "table",
+    "en": "table",
+    "pos": "n.",
+    "zh": "桌子",
+    "categories": [
+      "home"
+    ],
+    "level": 1,
+    "syn": "table",
+    "example": "Please put the plates on the table.",
+    "exampleZh": "請把盤子放在桌上。",
+    "form": ""
+  },
+  {
+    "id": "sofa",
+    "en": "sofa",
+    "pos": "n.",
+    "zh": "沙發",
+    "categories": [
+      "home"
+    ],
+    "level": 1,
+    "syn": "sofa",
+    "example": "The hotel room has a small sofa by the window.",
+    "exampleZh": "飯店房間的窗邊有一張小沙發。",
+    "form": ""
+  },
+  {
+    "id": "couch",
+    "en": "couch",
+    "pos": "n.",
+    "zh": "沙發",
+    "categories": [
+      "home"
+    ],
+    "level": 1,
+    "syn": "sofa",
+    "example": "My brother fell asleep on the couch again.",
+    "exampleZh": "我弟弟又在沙發上睡著了。",
+    "form": ""
+  },
+  {
+    "id": "door",
+    "en": "door",
+    "pos": "n.",
+    "zh": "門",
+    "categories": [
+      "home"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Don't forget to lock the door when you leave.",
+    "exampleZh": "離開時別忘了鎖門。",
+    "form": ""
+  },
+  {
+    "id": "window",
+    "en": "window",
+    "pos": "n.",
+    "zh": "窗戶",
+    "categories": [
+      "home"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Could you open the window? It's hot in here.",
+    "exampleZh": "可以打開窗戶嗎？這裡好熱。",
+    "form": ""
+  },
+  {
+    "id": "lamp",
+    "en": "lamp",
+    "pos": "n.",
+    "zh": "檯燈、燈",
+    "categories": [
+      "home"
+    ],
+    "level": 1,
+    "syn": "light",
+    "example": "Turn on the lamp if you want to read.",
+    "exampleZh": "想看書的話就打開檯燈。",
+    "form": ""
+  },
+  {
+    "id": "light",
+    "en": "light",
+    "pos": "n.",
+    "zh": "燈、電燈",
+    "categories": [
+      "home"
+    ],
+    "level": 1,
+    "syn": "light",
+    "example": "Please turn off the lights before you go to sleep.",
+    "exampleZh": "睡覺前請把燈關掉。",
+    "form": "lights"
+  },
+  {
+    "id": "clock",
+    "en": "clock",
+    "pos": "n.",
+    "zh": "時鐘",
+    "categories": [
+      "home",
+      "time"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The clock in the living room is five minutes fast.",
+    "exampleZh": "客廳的時鐘快了五分鐘。",
+    "form": ""
+  },
+  {
+    "id": "cup",
+    "en": "cup",
+    "pos": "n.",
+    "zh": "杯子",
+    "categories": [
+      "home"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I'd like a cup of hot tea, please.",
+    "exampleZh": "請給我一杯熱茶。",
+    "form": ""
+  },
+  {
+    "id": "towel",
+    "en": "towel",
+    "pos": "n.",
+    "zh": "毛巾",
+    "categories": [
+      "home",
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Can we get two more towels for our room?",
+    "exampleZh": "我們房間可以再多兩條毛巾嗎？",
+    "form": "towels"
+  },
+  {
+    "id": "pillow",
+    "en": "pillow",
+    "pos": "n.",
+    "zh": "枕頭",
+    "categories": [
+      "home"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "This pillow is too soft for me.",
+    "exampleZh": "這個枕頭對我來說太軟了。",
+    "form": ""
+  },
+  {
+    "id": "blanket",
+    "en": "blanket",
+    "pos": "n.",
+    "zh": "毯子",
+    "categories": [
+      "home"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "It's cold tonight, so I need an extra blanket.",
+    "exampleZh": "今晚很冷，所以我需要多一條毯子。",
+    "form": ""
+  },
+  {
+    "id": "key",
+    "en": "key",
+    "pos": "n.",
+    "zh": "鑰匙",
+    "categories": [
+      "home"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I can't find my house key anywhere.",
+    "exampleZh": "我到處都找不到家裡的鑰匙。",
+    "form": ""
+  },
+  {
+    "id": "tv",
+    "en": "TV",
+    "pos": "n.",
+    "zh": "電視",
+    "categories": [
+      "home"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We watched a movie on TV last night.",
+    "exampleZh": "我們昨晚看了電視上的一部電影。",
+    "form": ""
+  },
+  {
+    "id": "desk",
+    "en": "desk",
+    "pos": "n.",
+    "zh": "書桌",
+    "categories": [
+      "home"
+    ],
+    "level": 1,
+    "syn": "table",
+    "example": "I keep my laptop on the desk in my bedroom.",
+    "exampleZh": "我把筆電放在臥室的書桌上。",
+    "form": ""
+  },
+  {
+    "id": "mirror",
+    "en": "mirror",
+    "pos": "n.",
+    "zh": "鏡子",
+    "categories": [
+      "home"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "She checked her hair in the mirror before going out.",
+    "exampleZh": "她出門前照鏡子看了看頭髮。",
+    "form": ""
+  },
+  {
+    "id": "floor",
+    "en": "floor",
+    "pos": "n.",
+    "zh": "地板、樓層",
+    "categories": [
+      "home"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Please take off your shoes before walking on the floor.",
+    "exampleZh": "走上地板前請先脫鞋。",
+    "form": ""
+  },
+  {
+    "id": "wall",
+    "en": "wall",
+    "pos": "n.",
+    "zh": "牆壁",
+    "categories": [
+      "home"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "There is a family photo on the wall.",
+    "exampleZh": "牆上有一張全家福照片。",
+    "form": ""
+  },
+  {
+    "id": "bathroom",
+    "en": "bathroom",
+    "pos": "n.",
+    "zh": "浴室、廁所",
+    "categories": [
+      "home"
+    ],
+    "level": 1,
+    "syn": "bathroom",
+    "example": "Excuse me, where is the bathroom?",
+    "exampleZh": "不好意思，請問廁所在哪裡？",
+    "form": ""
+  },
+  {
+    "id": "bedroom",
+    "en": "bedroom",
+    "pos": "n.",
+    "zh": "臥室",
+    "categories": [
+      "home"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Our apartment has two bedrooms and one bathroom.",
+    "exampleZh": "我們的公寓有兩間臥室和一間浴室。",
+    "form": "bedrooms"
+  },
+  {
+    "id": "soap",
+    "en": "soap",
+    "pos": "n.",
+    "zh": "肥皂",
+    "categories": [
+      "home"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "There is no soap in the bathroom.",
+    "exampleZh": "浴室裡沒有肥皂。",
+    "form": ""
+  },
+  {
+    "id": "toilet",
+    "en": "toilet",
+    "pos": "n.",
+    "zh": "馬桶、廁所",
+    "categories": [
+      "home"
+    ],
+    "level": 1,
+    "syn": "bathroom",
+    "example": "The toilet in our room won't flush.",
+    "exampleZh": "我們房間的馬桶不能沖水。",
+    "form": ""
+  },
+  {
+    "id": "closet",
+    "en": "closet",
+    "pos": "n.",
+    "zh": "衣櫥",
+    "categories": [
+      "home"
+    ],
+    "level": 2,
+    "syn": "closet",
+    "example": "Hang your coat in the closet by the door.",
+    "exampleZh": "把你的外套掛在門邊的衣櫥裡。",
+    "form": ""
+  },
+  {
+    "id": "drawer",
+    "en": "drawer",
+    "pos": "n.",
+    "zh": "抽屜",
+    "categories": [
+      "home"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The spoons are in the top drawer.",
+    "exampleZh": "湯匙在最上面的抽屜裡。",
+    "form": ""
+  },
+  {
+    "id": "curtain",
+    "en": "curtain",
+    "pos": "n.",
+    "zh": "窗簾",
+    "categories": [
+      "home"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Please close the curtains, the sun is too bright.",
+    "exampleZh": "請把窗簾拉上，陽光太刺眼了。",
+    "form": "curtains"
+  },
+  {
+    "id": "carpet",
+    "en": "carpet",
+    "pos": "n.",
+    "zh": "地毯",
+    "categories": [
+      "home"
+    ],
+    "level": 2,
+    "syn": "carpet",
+    "example": "Don't spill your coffee on the new carpet.",
+    "exampleZh": "別把咖啡灑在新地毯上。",
+    "form": ""
+  },
+  {
+    "id": "rug",
+    "en": "rug",
+    "pos": "n.",
+    "zh": "小地毯",
+    "categories": [
+      "home"
+    ],
+    "level": 2,
+    "syn": "carpet",
+    "example": "We put a soft rug next to the bed.",
+    "exampleZh": "我們在床邊放了一塊柔軟的小地毯。",
+    "form": ""
+  },
+  {
+    "id": "shelf",
+    "en": "shelf",
+    "pos": "n.",
+    "zh": "架子、層架",
+    "categories": [
+      "home"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The books on the top shelf are hard to reach.",
+    "exampleZh": "最上層架子的書很難拿到。",
+    "form": ""
+  },
+  {
+    "id": "hanger",
+    "en": "hanger",
+    "pos": "n.",
+    "zh": "衣架",
+    "categories": [
+      "home"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Are there any hangers in the closet?",
+    "exampleZh": "衣櫥裡有衣架嗎？",
+    "form": "hangers"
+  },
+  {
+    "id": "fan",
+    "en": "fan",
+    "pos": "n.",
+    "zh": "電扇",
+    "categories": [
+      "home"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Turn on the fan if you feel hot.",
+    "exampleZh": "如果覺得熱就打開電扇。",
+    "form": ""
+  },
+  {
+    "id": "air-conditioner",
+    "en": "air conditioner",
+    "pos": "n.",
+    "zh": "冷氣機",
+    "categories": [
+      "home"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The air conditioner in my room is too loud.",
+    "exampleZh": "我房間的冷氣機太吵了。",
+    "form": ""
+  },
+  {
+    "id": "heater",
+    "en": "heater",
+    "pos": "n.",
+    "zh": "暖氣機、電暖器",
+    "categories": [
+      "home"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Is there a heater in the room? I'm freezing.",
+    "exampleZh": "房間裡有暖氣機嗎？我快冷死了。",
+    "form": ""
+  },
+  {
+    "id": "washing-machine",
+    "en": "washing machine",
+    "pos": "n.",
+    "zh": "洗衣機",
+    "categories": [
+      "home"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Is there a washing machine I can use?",
+    "exampleZh": "有洗衣機可以讓我用嗎？",
+    "form": ""
+  },
+  {
+    "id": "trash-can",
+    "en": "trash can",
+    "pos": "n.",
+    "zh": "垃圾桶",
+    "categories": [
+      "home"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Please throw the bottle in the trash can.",
+    "exampleZh": "請把瓶子丟進垃圾桶。",
+    "form": ""
+  },
+  {
+    "id": "broom",
+    "en": "broom",
+    "pos": "n.",
+    "zh": "掃把",
+    "categories": [
+      "home"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I need a broom to clean up the broken glass.",
+    "exampleZh": "我需要一支掃把來清理碎玻璃。",
+    "form": ""
+  },
+  {
+    "id": "mop",
+    "en": "mop",
+    "pos": "n.",
+    "zh": "拖把",
+    "categories": [
+      "home"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Use the mop to clean the kitchen floor.",
+    "exampleZh": "用拖把擦廚房的地板。",
+    "form": ""
+  },
+  {
+    "id": "sheet",
+    "en": "sheet",
+    "pos": "n.",
+    "zh": "床單",
+    "categories": [
+      "home",
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The hotel changes the sheets every two days.",
+    "exampleZh": "飯店每兩天換一次床單。",
+    "form": "sheets"
+  },
+  {
+    "id": "stairs",
+    "en": "stairs",
+    "pos": "n.",
+    "zh": "樓梯",
+    "categories": [
+      "home"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Take the stairs if the elevator is too slow.",
+    "exampleZh": "如果電梯太慢就走樓梯。",
+    "form": ""
+  },
+  {
+    "id": "balcony",
+    "en": "balcony",
+    "pos": "n.",
+    "zh": "陽台",
+    "categories": [
+      "home"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We had breakfast on the balcony this morning.",
+    "exampleZh": "我們今天早上在陽台吃早餐。",
+    "form": ""
+  },
+  {
+    "id": "ceiling",
+    "en": "ceiling",
+    "pos": "n.",
+    "zh": "天花板",
+    "categories": [
+      "home"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "There is a small spider on the ceiling.",
+    "exampleZh": "天花板上有一隻小蜘蛛。",
+    "form": ""
+  },
+  {
+    "id": "faucet",
+    "en": "faucet",
+    "pos": "n.",
+    "zh": "水龍頭",
+    "categories": [
+      "home"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The faucet in the bathroom keeps dripping.",
+    "exampleZh": "浴室的水龍頭一直在滴水。",
+    "form": ""
+  },
+  {
+    "id": "sink",
+    "en": "sink",
+    "pos": "n.",
+    "zh": "水槽、洗手台",
+    "categories": [
+      "home"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Just leave the dirty dishes in the sink.",
+    "exampleZh": "把髒碗盤放在水槽裡就好。",
+    "form": ""
+  },
+  {
+    "id": "bathtub",
+    "en": "bathtub",
+    "pos": "n.",
+    "zh": "浴缸",
+    "categories": [
+      "home"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Our hotel room has a big bathtub.",
+    "exampleZh": "我們的飯店房間有一個大浴缸。",
+    "form": ""
+  },
+  {
+    "id": "shower",
+    "en": "shower",
+    "pos": "n.",
+    "zh": "淋浴、蓮蓬頭",
+    "categories": [
+      "home"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I usually take a shower before bed.",
+    "exampleZh": "我通常睡前淋浴。",
+    "form": ""
+  },
+  {
+    "id": "hair-dryer",
+    "en": "hair dryer",
+    "pos": "n.",
+    "zh": "吹風機",
+    "categories": [
+      "home",
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Can I borrow a hair dryer from the front desk?",
+    "exampleZh": "我可以向櫃檯借吹風機嗎？",
+    "form": ""
+  },
+  {
+    "id": "remote-control",
+    "en": "remote control",
+    "pos": "n.",
+    "zh": "遙控器",
+    "categories": [
+      "home"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Where did you put the remote control?",
+    "exampleZh": "你把遙控器放到哪裡了？",
+    "form": ""
+  },
+  {
+    "id": "mattress",
+    "en": "mattress",
+    "pos": "n.",
+    "zh": "床墊",
+    "categories": [
+      "home"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "This mattress is too hard for my back.",
+    "exampleZh": "這張床墊對我的背來說太硬了。",
+    "form": ""
+  },
+  {
+    "id": "wardrobe",
+    "en": "wardrobe",
+    "pos": "n.",
+    "zh": "衣櫃",
+    "categories": [
+      "home"
+    ],
+    "level": 3,
+    "syn": "closet",
+    "example": "There are extra pillows in the wardrobe.",
+    "exampleZh": "衣櫃裡有多的枕頭。",
+    "form": ""
+  },
+  {
+    "id": "dehumidifier",
+    "en": "dehumidifier",
+    "pos": "n.",
+    "zh": "除濕機",
+    "categories": [
+      "home"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Taiwan summers are humid, so we use a dehumidifier.",
+    "exampleZh": "台灣的夏天很潮濕，所以我們用除濕機。",
+    "form": ""
+  },
+  {
+    "id": "extension-cord",
+    "en": "extension cord",
+    "pos": "n.",
+    "zh": "延長線",
+    "categories": [
+      "home"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Do you have an extension cord for my laptop?",
+    "exampleZh": "你有延長線可以給我的筆電用嗎？",
+    "form": ""
+  },
+  {
+    "id": "outlet",
+    "en": "outlet",
+    "pos": "n.",
+    "zh": "插座",
+    "categories": [
+      "home"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Is there an outlet near the bed?",
+    "exampleZh": "床邊有插座嗎？",
+    "form": ""
+  },
+  {
+    "id": "doormat",
+    "en": "doormat",
+    "pos": "n.",
+    "zh": "腳踏墊",
+    "categories": [
+      "home"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Please wipe your shoes on the doormat.",
+    "exampleZh": "請在腳踏墊上把鞋子擦乾淨。",
+    "form": ""
+  },
+  {
+    "id": "laundry-basket",
+    "en": "laundry basket",
+    "pos": "n.",
+    "zh": "洗衣籃",
+    "categories": [
+      "home"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Put your dirty clothes in the laundry basket.",
+    "exampleZh": "把你的髒衣服放進洗衣籃。",
+    "form": ""
+  },
+  {
+    "id": "light-bulb",
+    "en": "light bulb",
+    "pos": "n.",
+    "zh": "燈泡",
+    "categories": [
+      "home"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The light bulb in the hallway just burned out.",
+    "exampleZh": "走廊的燈泡剛剛燒壞了。",
+    "form": ""
+  },
+  {
+    "id": "smoke-detector",
+    "en": "smoke detector",
+    "pos": "n.",
+    "zh": "煙霧偵測器",
+    "categories": [
+      "home"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The smoke detector beeps when I cook fish.",
+    "exampleZh": "我煎魚的時候，煙霧偵測器就會嗶嗶叫。",
+    "form": ""
+  },
+  {
+    "id": "dustpan",
+    "en": "dustpan",
+    "pos": "n.",
+    "zh": "畚箕",
+    "categories": [
+      "home"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Sweep the dust into the dustpan.",
+    "exampleZh": "把灰塵掃進畚箕裡。",
+    "form": ""
+  },
+  {
+    "id": "air-purifier",
+    "en": "air purifier",
+    "pos": "n.",
+    "zh": "空氣清淨機",
+    "categories": [
+      "home"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We bought an air purifier for the bedroom.",
+    "exampleZh": "我們為臥室買了一台空氣清淨機。",
+    "form": ""
+  },
+  {
+    "id": "cushion",
+    "en": "cushion",
+    "pos": "n.",
+    "zh": "坐墊、抱枕",
+    "categories": [
+      "home"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "She put a soft cushion on the chair.",
+    "exampleZh": "她在椅子上放了一個柔軟的坐墊。",
+    "form": ""
+  }
+]

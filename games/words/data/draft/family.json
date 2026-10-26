@@ -1,0 +1,843 @@
+[
+  {
+    "id": "family",
+    "en": "family",
+    "pos": "n.",
+    "zh": "家人、家庭",
+    "categories": [
+      "family"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I'm traveling with my family this summer.",
+    "exampleZh": "這個夏天我要和家人一起旅行。",
+    "form": ""
+  },
+  {
+    "id": "father",
+    "en": "father",
+    "pos": "n.",
+    "zh": "父親、爸爸",
+    "categories": [
+      "family"
+    ],
+    "level": 1,
+    "syn": "father",
+    "example": "My father works at a bank in Taipei.",
+    "exampleZh": "我父親在台北的一家銀行工作。",
+    "form": ""
+  },
+  {
+    "id": "mother",
+    "en": "mother",
+    "pos": "n.",
+    "zh": "母親、媽媽",
+    "categories": [
+      "family"
+    ],
+    "level": 1,
+    "syn": "mother",
+    "example": "My mother cooks dinner for us every night.",
+    "exampleZh": "我母親每天晚上幫我們煮晚餐。",
+    "form": ""
+  },
+  {
+    "id": "dad",
+    "en": "dad",
+    "pos": "n.",
+    "zh": "爸爸",
+    "categories": [
+      "family"
+    ],
+    "level": 1,
+    "syn": "father",
+    "example": "Dad, can you pick me up at the station?",
+    "exampleZh": "爸，你可以來車站接我嗎？",
+    "form": ""
+  },
+  {
+    "id": "mom",
+    "en": "mom",
+    "pos": "n.",
+    "zh": "媽媽",
+    "categories": [
+      "family"
+    ],
+    "level": 1,
+    "syn": "mother",
+    "example": "I called my mom as soon as I landed.",
+    "exampleZh": "我一降落就打電話給我媽媽。",
+    "form": ""
+  },
+  {
+    "id": "parent",
+    "en": "parent",
+    "pos": "n.",
+    "zh": "家長、父母",
+    "categories": [
+      "family"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Children under ten must stay with a parent.",
+    "exampleZh": "十歲以下的孩子必須有家長陪同。",
+    "form": ""
+  },
+  {
+    "id": "brother",
+    "en": "brother",
+    "pos": "n.",
+    "zh": "兄弟、哥哥",
+    "categories": [
+      "family"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My older brother lives in Canada.",
+    "exampleZh": "我哥哥住在加拿大。",
+    "form": ""
+  },
+  {
+    "id": "sister",
+    "en": "sister",
+    "pos": "n.",
+    "zh": "姊妹、妹妹",
+    "categories": [
+      "family"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My little sister loves taking photos.",
+    "exampleZh": "我妹妹很喜歡拍照。",
+    "form": ""
+  },
+  {
+    "id": "son",
+    "en": "son",
+    "pos": "n.",
+    "zh": "兒子",
+    "categories": [
+      "family"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Their son is studying in Japan.",
+    "exampleZh": "他們的兒子在日本讀書。",
+    "form": ""
+  },
+  {
+    "id": "daughter",
+    "en": "daughter",
+    "pos": "n.",
+    "zh": "女兒",
+    "categories": [
+      "family"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My daughter wants to visit the zoo.",
+    "exampleZh": "我女兒想去動物園。",
+    "form": ""
+  },
+  {
+    "id": "baby",
+    "en": "baby",
+    "pos": "n.",
+    "zh": "嬰兒、寶寶",
+    "categories": [
+      "family"
+    ],
+    "level": 1,
+    "syn": "baby",
+    "example": "The baby is sleeping, so please be quiet.",
+    "exampleZh": "寶寶在睡覺，請安靜一點。",
+    "form": ""
+  },
+  {
+    "id": "child",
+    "en": "child",
+    "pos": "n.",
+    "zh": "小孩、孩子",
+    "categories": [
+      "family"
+    ],
+    "level": 1,
+    "syn": "child",
+    "example": "Is there a discount for a child under six?",
+    "exampleZh": "六歲以下的小孩有折扣嗎？",
+    "form": ""
+  },
+  {
+    "id": "kid",
+    "en": "kid",
+    "pos": "n.",
+    "zh": "小孩",
+    "categories": [
+      "family"
+    ],
+    "level": 1,
+    "syn": "child",
+    "example": "The kids are playing in the hotel pool.",
+    "exampleZh": "孩子們在飯店的泳池裡玩。",
+    "form": "kids"
+  },
+  {
+    "id": "boy",
+    "en": "boy",
+    "pos": "n.",
+    "zh": "男孩",
+    "categories": [
+      "family"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The boy in the red hat is my nephew.",
+    "exampleZh": "戴紅帽子的男孩是我姪子。",
+    "form": ""
+  },
+  {
+    "id": "girl",
+    "en": "girl",
+    "pos": "n.",
+    "zh": "女孩",
+    "categories": [
+      "family"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "That little girl lost her mom at the mall.",
+    "exampleZh": "那個小女孩在購物中心和媽媽走散了。",
+    "form": ""
+  },
+  {
+    "id": "man",
+    "en": "man",
+    "pos": "n.",
+    "zh": "男人、男士",
+    "categories": [
+      "family"
+    ],
+    "level": 1,
+    "syn": "man",
+    "example": "A man at the desk gave us the keys.",
+    "exampleZh": "櫃檯的一位男士給了我們鑰匙。",
+    "form": ""
+  },
+  {
+    "id": "woman",
+    "en": "woman",
+    "pos": "n.",
+    "zh": "女人、女士",
+    "categories": [
+      "family"
+    ],
+    "level": 1,
+    "syn": "woman",
+    "example": "The woman next to me helped with my bag.",
+    "exampleZh": "我旁邊的女士幫我拿了包包。",
+    "form": ""
+  },
+  {
+    "id": "friend",
+    "en": "friend",
+    "pos": "n.",
+    "zh": "朋友",
+    "categories": [
+      "family"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I'm meeting a friend for lunch tomorrow.",
+    "exampleZh": "我明天要和一位朋友吃午餐。",
+    "form": ""
+  },
+  {
+    "id": "grandfather",
+    "en": "grandfather",
+    "pos": "n.",
+    "zh": "祖父、外公",
+    "categories": [
+      "family"
+    ],
+    "level": 1,
+    "syn": "grandfather",
+    "example": "My grandfather is eighty years old.",
+    "exampleZh": "我祖父八十歲了。",
+    "form": ""
+  },
+  {
+    "id": "grandmother",
+    "en": "grandmother",
+    "pos": "n.",
+    "zh": "祖母、外婆",
+    "categories": [
+      "family"
+    ],
+    "level": 1,
+    "syn": "grandmother",
+    "example": "My grandmother makes the best dumplings.",
+    "exampleZh": "我外婆包的水餃最好吃。",
+    "form": ""
+  },
+  {
+    "id": "husband",
+    "en": "husband",
+    "pos": "n.",
+    "zh": "丈夫、老公",
+    "categories": [
+      "family"
+    ],
+    "level": 1,
+    "syn": "spouse",
+    "example": "My husband is waiting for me at the airport.",
+    "exampleZh": "我先生在機場等我。",
+    "form": ""
+  },
+  {
+    "id": "wife",
+    "en": "wife",
+    "pos": "n.",
+    "zh": "妻子、太太",
+    "categories": [
+      "family"
+    ],
+    "level": 1,
+    "syn": "spouse",
+    "example": "He bought a necklace for his wife.",
+    "exampleZh": "他買了一條項鍊給他太太。",
+    "form": ""
+  },
+  {
+    "id": "uncle",
+    "en": "uncle",
+    "pos": "n.",
+    "zh": "叔叔、舅舅",
+    "categories": [
+      "family"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My uncle will drive us to the beach.",
+    "exampleZh": "我舅舅會開車載我們去海邊。",
+    "form": ""
+  },
+  {
+    "id": "aunt",
+    "en": "aunt",
+    "pos": "n.",
+    "zh": "阿姨、姑姑",
+    "categories": [
+      "family"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My aunt lives near the night market.",
+    "exampleZh": "我阿姨住在夜市附近。",
+    "form": ""
+  },
+  {
+    "id": "cousin",
+    "en": "cousin",
+    "pos": "n.",
+    "zh": "堂表兄弟姊妹",
+    "categories": [
+      "family"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "My cousin is getting married next month.",
+    "exampleZh": "我表姊下個月要結婚了。",
+    "form": ""
+  },
+  {
+    "id": "grandparent",
+    "en": "grandparent",
+    "pos": "n.",
+    "zh": "祖父母",
+    "categories": [
+      "family"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We visit my grandparents every Lunar New Year.",
+    "exampleZh": "我們每年農曆新年都去看祖父母。",
+    "form": "grandparents"
+  },
+  {
+    "id": "grandchild",
+    "en": "grandchild",
+    "pos": "n.",
+    "zh": "孫子、孫女",
+    "categories": [
+      "family"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "She loves spending weekends with her three grandchildren.",
+    "exampleZh": "她喜歡和三個孫子女一起過週末。",
+    "form": "grandchildren"
+  },
+  {
+    "id": "nephew",
+    "en": "nephew",
+    "pos": "n.",
+    "zh": "姪子、外甥",
+    "categories": [
+      "family"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I bought a toy car for my nephew.",
+    "exampleZh": "我買了一台玩具車給我姪子。",
+    "form": ""
+  },
+  {
+    "id": "niece",
+    "en": "niece",
+    "pos": "n.",
+    "zh": "姪女、外甥女",
+    "categories": [
+      "family"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "My niece just started elementary school.",
+    "exampleZh": "我姪女剛上小學。",
+    "form": ""
+  },
+  {
+    "id": "teenager",
+    "en": "teenager",
+    "pos": "n.",
+    "zh": "青少年",
+    "categories": [
+      "family"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "This hostel is popular with teenagers and students.",
+    "exampleZh": "這間青年旅館很受青少年和學生歡迎。",
+    "form": "teenagers"
+  },
+  {
+    "id": "adult",
+    "en": "adult",
+    "pos": "n.",
+    "zh": "成人、大人",
+    "categories": [
+      "family"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "One adult ticket and one child ticket, please.",
+    "exampleZh": "請給我一張成人票和一張兒童票。",
+    "form": ""
+  },
+  {
+    "id": "neighbor",
+    "en": "neighbor",
+    "pos": "n.",
+    "zh": "鄰居",
+    "categories": [
+      "family"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Our neighbor watered our plants while we were away.",
+    "exampleZh": "我們不在時，鄰居幫我們澆花。",
+    "form": ""
+  },
+  {
+    "id": "guest",
+    "en": "guest",
+    "pos": "n.",
+    "zh": "客人",
+    "categories": [
+      "family"
+    ],
+    "level": 2,
+    "syn": "guest",
+    "example": "Guests can use the gym for free.",
+    "exampleZh": "客人可以免費使用健身房。",
+    "form": "guests"
+  },
+  {
+    "id": "visitor",
+    "en": "visitor",
+    "pos": "n.",
+    "zh": "訪客、遊客",
+    "categories": [
+      "family"
+    ],
+    "level": 2,
+    "syn": "guest",
+    "example": "Visitors must sign in at the front desk.",
+    "exampleZh": "訪客必須在櫃檯登記。",
+    "form": "visitors"
+  },
+  {
+    "id": "couple",
+    "en": "couple",
+    "pos": "n.",
+    "zh": "夫妻、情侶",
+    "categories": [
+      "family"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "A young couple sat next to us on the train.",
+    "exampleZh": "一對年輕夫妻在火車上坐在我們旁邊。",
+    "form": ""
+  },
+  {
+    "id": "twin",
+    "en": "twin",
+    "pos": "n.",
+    "zh": "雙胞胎",
+    "categories": [
+      "family"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Are those two girls twins?",
+    "exampleZh": "那兩個女孩是雙胞胎嗎？",
+    "form": "twins"
+  },
+  {
+    "id": "relative",
+    "en": "relative",
+    "pos": "n.",
+    "zh": "親戚",
+    "categories": [
+      "family"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We have many relatives in southern Taiwan.",
+    "exampleZh": "我們在南台灣有很多親戚。",
+    "form": "relatives"
+  },
+  {
+    "id": "person",
+    "en": "person",
+    "pos": "n.",
+    "zh": "人",
+    "categories": [
+      "family"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The tour costs fifty dollars per person.",
+    "exampleZh": "這個行程每人五十美元。",
+    "form": ""
+  },
+  {
+    "id": "gentleman",
+    "en": "gentleman",
+    "pos": "n.",
+    "zh": "紳士、先生",
+    "categories": [
+      "family"
+    ],
+    "level": 2,
+    "syn": "man",
+    "example": "This gentleman was here before me.",
+    "exampleZh": "這位先生比我先到。",
+    "form": ""
+  },
+  {
+    "id": "lady",
+    "en": "lady",
+    "pos": "n.",
+    "zh": "女士、小姐",
+    "categories": [
+      "family"
+    ],
+    "level": 2,
+    "syn": "woman",
+    "example": "Could you help that lady with her suitcase?",
+    "exampleZh": "你可以幫那位女士拿行李箱嗎？",
+    "form": ""
+  },
+  {
+    "id": "boyfriend",
+    "en": "boyfriend",
+    "pos": "n.",
+    "zh": "男朋友",
+    "categories": [
+      "family"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Her boyfriend planned a trip to Kyoto.",
+    "exampleZh": "她男朋友規劃了一趟京都之旅。",
+    "form": ""
+  },
+  {
+    "id": "girlfriend",
+    "en": "girlfriend",
+    "pos": "n.",
+    "zh": "女朋友",
+    "categories": [
+      "family"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I'm buying flowers for my girlfriend.",
+    "exampleZh": "我要買花給我女朋友。",
+    "form": ""
+  },
+  {
+    "id": "partner",
+    "en": "partner",
+    "pos": "n.",
+    "zh": "伴侶",
+    "categories": [
+      "family"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "You can bring your partner to the party.",
+    "exampleZh": "你可以帶你的伴侶來派對。",
+    "form": ""
+  },
+  {
+    "id": "stranger",
+    "en": "stranger",
+    "pos": "n.",
+    "zh": "陌生人",
+    "categories": [
+      "family"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Don't get into a car with a stranger.",
+    "exampleZh": "不要上陌生人的車。",
+    "form": ""
+  },
+  {
+    "id": "roommate",
+    "en": "roommate",
+    "pos": "n.",
+    "zh": "室友",
+    "categories": [
+      "family"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "My roommate and I share the kitchen.",
+    "exampleZh": "我和室友共用廚房。",
+    "form": ""
+  },
+  {
+    "id": "classmate",
+    "en": "classmate",
+    "pos": "n.",
+    "zh": "同學",
+    "categories": [
+      "family",
+      "school"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I ran into an old classmate in Tokyo.",
+    "exampleZh": "我在東京巧遇一位老同學。",
+    "form": ""
+  },
+  {
+    "id": "grandpa",
+    "en": "grandpa",
+    "pos": "n.",
+    "zh": "爺爺、外公",
+    "categories": [
+      "family"
+    ],
+    "level": 2,
+    "syn": "grandfather",
+    "example": "Grandpa tells us stories after dinner.",
+    "exampleZh": "爺爺晚餐後會講故事給我們聽。",
+    "form": ""
+  },
+  {
+    "id": "grandma",
+    "en": "grandma",
+    "pos": "n.",
+    "zh": "奶奶、外婆",
+    "categories": [
+      "family"
+    ],
+    "level": 2,
+    "syn": "grandmother",
+    "example": "Grandma always gives us snacks.",
+    "exampleZh": "奶奶總是給我們零食。",
+    "form": ""
+  },
+  {
+    "id": "stepmother",
+    "en": "stepmother",
+    "pos": "n.",
+    "zh": "繼母",
+    "categories": [
+      "family"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "She gets along well with her stepmother.",
+    "exampleZh": "她和繼母相處得很好。",
+    "form": ""
+  },
+  {
+    "id": "stepfather",
+    "en": "stepfather",
+    "pos": "n.",
+    "zh": "繼父",
+    "categories": [
+      "family"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "My stepfather taught me how to ride a bike.",
+    "exampleZh": "我繼父教我騎腳踏車。",
+    "form": ""
+  },
+  {
+    "id": "mother-in-law",
+    "en": "mother-in-law",
+    "pos": "n.",
+    "zh": "岳母、婆婆",
+    "categories": [
+      "family"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "My mother-in-law is visiting us this weekend.",
+    "exampleZh": "我婆婆這個週末要來看我們。",
+    "form": ""
+  },
+  {
+    "id": "father-in-law",
+    "en": "father-in-law",
+    "pos": "n.",
+    "zh": "岳父、公公",
+    "categories": [
+      "family"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "His father-in-law owns a small restaurant.",
+    "exampleZh": "他岳父開了一家小餐廳。",
+    "form": ""
+  },
+  {
+    "id": "sibling",
+    "en": "sibling",
+    "pos": "n.",
+    "zh": "兄弟姊妹",
+    "categories": [
+      "family"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Do you have any siblings?",
+    "exampleZh": "你有兄弟姊妹嗎？",
+    "form": "siblings"
+  },
+  {
+    "id": "spouse",
+    "en": "spouse",
+    "pos": "n.",
+    "zh": "配偶",
+    "categories": [
+      "family"
+    ],
+    "level": 3,
+    "syn": "spouse",
+    "example": "You and your spouse need to fill out this form.",
+    "exampleZh": "您和您的配偶需要填寫這份表格。",
+    "form": ""
+  },
+  {
+    "id": "infant",
+    "en": "infant",
+    "pos": "n.",
+    "zh": "嬰兒",
+    "categories": [
+      "family"
+    ],
+    "level": 3,
+    "syn": "baby",
+    "example": "Infants under two can sit on a parent's lap.",
+    "exampleZh": "兩歲以下的嬰兒可以坐在家長腿上。",
+    "form": "infants"
+  },
+  {
+    "id": "toddler",
+    "en": "toddler",
+    "pos": "n.",
+    "zh": "幼兒",
+    "categories": [
+      "family"
+    ],
+    "level": 3,
+    "syn": "baby",
+    "example": "The playground has a safe area for toddlers.",
+    "exampleZh": "遊樂場有一塊給幼兒的安全區域。",
+    "form": "toddlers"
+  },
+  {
+    "id": "only-child",
+    "en": "only child",
+    "pos": "n.",
+    "zh": "獨生子女",
+    "categories": [
+      "family"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "As an only child, I never had to share toys.",
+    "exampleZh": "身為獨生子女，我從來不用跟人分享玩具。",
+    "form": ""
+  },
+  {
+    "id": "generation",
+    "en": "generation",
+    "pos": "n.",
+    "zh": "世代、一代",
+    "categories": [
+      "family"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Three generations of my family live together.",
+    "exampleZh": "我們家三代同堂。",
+    "form": "generations"
+  },
+  {
+    "id": "senior-citizen",
+    "en": "senior citizen",
+    "pos": "n.",
+    "zh": "年長者",
+    "categories": [
+      "family"
+    ],
+    "level": 3,
+    "syn": "senior",
+    "example": "Senior citizens get a discount on the MRT.",
+    "exampleZh": "年長者搭捷運有優惠。",
+    "form": "senior citizens"
+  },
+  {
+    "id": "elderly",
+    "en": "elderly",
+    "pos": "adj.",
+    "zh": "年長的",
+    "categories": [
+      "family"
+    ],
+    "level": 3,
+    "syn": "senior",
+    "example": "The bus has priority seats for elderly people.",
+    "exampleZh": "公車上有給年長者的博愛座。",
+    "form": ""
+  }
+]

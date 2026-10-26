@@ -1,0 +1,843 @@
+[
+  {
+    "id": "red",
+    "en": "red",
+    "pos": "adj.",
+    "zh": "紅色的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Turn left at the red building.",
+    "exampleZh": "在紅色建築物那裡左轉。",
+    "form": ""
+  },
+  {
+    "id": "blue",
+    "en": "blue",
+    "pos": "adj.",
+    "zh": "藍色的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Take the blue line to the airport.",
+    "exampleZh": "搭藍線到機場。",
+    "form": ""
+  },
+  {
+    "id": "green",
+    "en": "green",
+    "pos": "adj.",
+    "zh": "綠色的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Wait until the light turns green.",
+    "exampleZh": "等燈號變綠再走。",
+    "form": ""
+  },
+  {
+    "id": "yellow",
+    "en": "yellow",
+    "pos": "adj.",
+    "zh": "黃色的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Taxis in New York are yellow.",
+    "exampleZh": "紐約的計程車是黃色的。",
+    "form": ""
+  },
+  {
+    "id": "black",
+    "en": "black",
+    "pos": "adj.",
+    "zh": "黑色的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My suitcase is the black one.",
+    "exampleZh": "我的行李箱是黑色那個。",
+    "form": ""
+  },
+  {
+    "id": "white",
+    "en": "white",
+    "pos": "adj.",
+    "zh": "白色的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The hotel has white sheets and towels.",
+    "exampleZh": "飯店的床單和毛巾都是白色的。",
+    "form": ""
+  },
+  {
+    "id": "orange",
+    "en": "orange",
+    "pos": "adj.",
+    "zh": "橘色的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Look for the orange sign at the exit.",
+    "exampleZh": "在出口找橘色的標誌。",
+    "form": ""
+  },
+  {
+    "id": "purple",
+    "en": "purple",
+    "pos": "adj.",
+    "zh": "紫色的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "She dyed her hair purple.",
+    "exampleZh": "她把頭髮染成紫色。",
+    "form": ""
+  },
+  {
+    "id": "pink",
+    "en": "pink",
+    "pos": "adj.",
+    "zh": "粉紅色的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The cherry trees are pink in spring.",
+    "exampleZh": "春天櫻花樹是粉紅色的。",
+    "form": ""
+  },
+  {
+    "id": "brown",
+    "en": "brown",
+    "pos": "adj.",
+    "zh": "棕色的、咖啡色的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I'm looking for brown leather shoes.",
+    "exampleZh": "我在找咖啡色的皮鞋。",
+    "form": ""
+  },
+  {
+    "id": "gray",
+    "en": "gray",
+    "pos": "adj.",
+    "zh": "灰色的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The sky looks gray today.",
+    "exampleZh": "今天的天空看起來灰灰的。",
+    "form": ""
+  },
+  {
+    "id": "color",
+    "en": "color",
+    "pos": "n.",
+    "zh": "顏色",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "What color do you want?",
+    "exampleZh": "你想要什麼顏色？",
+    "form": ""
+  },
+  {
+    "id": "shape",
+    "en": "shape",
+    "pos": "n.",
+    "zh": "形狀",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "These cookies come in different shapes.",
+    "exampleZh": "這些餅乾有不同的形狀。",
+    "form": "shapes"
+  },
+  {
+    "id": "circle",
+    "en": "circle",
+    "pos": "n.",
+    "zh": "圓形、圓圈",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Draw a circle around the right answer.",
+    "exampleZh": "把正確答案圈起來。",
+    "form": ""
+  },
+  {
+    "id": "square",
+    "en": "square",
+    "pos": "n.",
+    "zh": "正方形",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Cut the paper into small squares.",
+    "exampleZh": "把紙剪成小正方形。",
+    "form": "squares"
+  },
+  {
+    "id": "triangle",
+    "en": "triangle",
+    "pos": "n.",
+    "zh": "三角形",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The sign is a red triangle.",
+    "exampleZh": "那個標誌是紅色三角形。",
+    "form": ""
+  },
+  {
+    "id": "star",
+    "en": "star",
+    "pos": "n.",
+    "zh": "星形、星星",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The hotel has a gold star on its sign.",
+    "exampleZh": "飯店的招牌上有一顆金色星星。",
+    "form": ""
+  },
+  {
+    "id": "heart",
+    "en": "heart",
+    "pos": "n.",
+    "zh": "心形",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The waiter drew a heart on my latte.",
+    "exampleZh": "服務生在我的拿鐵上畫了一顆愛心。",
+    "form": ""
+  },
+  {
+    "id": "line",
+    "en": "line",
+    "pos": "n.",
+    "zh": "線、線條",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Stand behind the yellow line.",
+    "exampleZh": "請站在黃線後方。",
+    "form": ""
+  },
+  {
+    "id": "round",
+    "en": "round",
+    "pos": "adj.",
+    "zh": "圓的、圓形的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We sat at a round table.",
+    "exampleZh": "我們坐在一張圓桌旁。",
+    "form": ""
+  },
+  {
+    "id": "dark",
+    "en": "dark",
+    "pos": "adj.",
+    "zh": "深色的、暗的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "He wore a dark blue suit.",
+    "exampleZh": "他穿了一套深藍色西裝。",
+    "form": ""
+  },
+  {
+    "id": "light",
+    "en": "light",
+    "pos": "adj.",
+    "zh": "淺色的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 1,
+    "syn": "pale",
+    "example": "I prefer light colors in summer.",
+    "exampleZh": "夏天我比較喜歡淺色。",
+    "form": ""
+  },
+  {
+    "id": "dot",
+    "en": "dot",
+    "pos": "n.",
+    "zh": "點、圓點",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 1,
+    "syn": "dot",
+    "example": "The red dot shows where we are.",
+    "exampleZh": "紅點表示我們所在的位置。",
+    "form": ""
+  },
+  {
+    "id": "straight",
+    "en": "straight",
+    "pos": "adj.",
+    "zh": "直的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Draw a straight line under your name.",
+    "exampleZh": "在你的名字下面畫一條直線。",
+    "form": ""
+  },
+  {
+    "id": "gold",
+    "en": "gold",
+    "pos": "adj.",
+    "zh": "金色的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "She wore a gold dress to the party.",
+    "exampleZh": "她穿了一件金色洋裝去派對。",
+    "form": ""
+  },
+  {
+    "id": "silver",
+    "en": "silver",
+    "pos": "adj.",
+    "zh": "銀色的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I rented a small silver car.",
+    "exampleZh": "我租了一台銀色小車。",
+    "form": ""
+  },
+  {
+    "id": "beige",
+    "en": "beige",
+    "pos": "adj.",
+    "zh": "米色的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The room has beige walls.",
+    "exampleZh": "這個房間的牆是米色的。",
+    "form": ""
+  },
+  {
+    "id": "navy-blue",
+    "en": "navy blue",
+    "pos": "adj.",
+    "zh": "海軍藍的、深藍色的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I want this sweater in navy blue.",
+    "exampleZh": "這件毛衣我要深藍色的。",
+    "form": ""
+  },
+  {
+    "id": "light-blue",
+    "en": "light blue",
+    "pos": "adj.",
+    "zh": "淺藍色的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The sea is light blue near the beach.",
+    "exampleZh": "靠近沙灘的海水是淺藍色的。",
+    "form": ""
+  },
+  {
+    "id": "rectangle",
+    "en": "rectangle",
+    "pos": "n.",
+    "zh": "長方形",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The table is a long rectangle.",
+    "exampleZh": "這張桌子是長方形的。",
+    "form": ""
+  },
+  {
+    "id": "oval",
+    "en": "oval",
+    "pos": "n.",
+    "zh": "橢圓形",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The mirror is shaped like an oval.",
+    "exampleZh": "這面鏡子是橢圓形的。",
+    "form": ""
+  },
+  {
+    "id": "diamond",
+    "en": "diamond",
+    "pos": "n.",
+    "zh": "菱形",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The road sign is a yellow diamond.",
+    "exampleZh": "那個路標是黃色菱形。",
+    "form": ""
+  },
+  {
+    "id": "cube",
+    "en": "cube",
+    "pos": "n.",
+    "zh": "立方體、方塊",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Cut the tofu into small cubes.",
+    "exampleZh": "把豆腐切成小塊。",
+    "form": "cubes"
+  },
+  {
+    "id": "arrow",
+    "en": "arrow",
+    "pos": "n.",
+    "zh": "箭頭",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Follow the arrows to the exit.",
+    "exampleZh": "跟著箭頭走到出口。",
+    "form": "arrows"
+  },
+  {
+    "id": "curve",
+    "en": "curve",
+    "pos": "n.",
+    "zh": "曲線、彎道",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The road has many sharp curves.",
+    "exampleZh": "這條路有很多急轉彎。",
+    "form": "curves"
+  },
+  {
+    "id": "edge",
+    "en": "edge",
+    "pos": "n.",
+    "zh": "邊緣、邊",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Don't stand too close to the edge.",
+    "exampleZh": "不要站得太靠近邊緣。",
+    "form": ""
+  },
+  {
+    "id": "corner",
+    "en": "corner",
+    "pos": "n.",
+    "zh": "角、轉角",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The café is on the corner.",
+    "exampleZh": "咖啡店就在轉角。",
+    "form": ""
+  },
+  {
+    "id": "pattern",
+    "en": "pattern",
+    "pos": "n.",
+    "zh": "圖案、花樣",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I like the flower pattern on this shirt.",
+    "exampleZh": "我喜歡這件襯衫上的花朵圖案。",
+    "form": ""
+  },
+  {
+    "id": "striped",
+    "en": "striped",
+    "pos": "adj.",
+    "zh": "條紋的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "He wore a blue striped shirt.",
+    "exampleZh": "他穿了一件藍色條紋襯衫。",
+    "form": ""
+  },
+  {
+    "id": "polka-dot",
+    "en": "polka dot",
+    "pos": "adj.",
+    "zh": "圓點花紋的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 2,
+    "syn": "dot",
+    "example": "She bought a polka dot umbrella.",
+    "exampleZh": "她買了一把圓點花紋的傘。",
+    "form": ""
+  },
+  {
+    "id": "bright",
+    "en": "bright",
+    "pos": "adj.",
+    "zh": "鮮豔的、明亮的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The market is full of bright colors.",
+    "exampleZh": "市場裡到處都是鮮豔的顏色。",
+    "form": ""
+  },
+  {
+    "id": "pale",
+    "en": "pale",
+    "pos": "adj.",
+    "zh": "淡的、蒼白的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 2,
+    "syn": "pale",
+    "example": "The walls are painted pale yellow.",
+    "exampleZh": "牆壁漆成淡黃色。",
+    "form": ""
+  },
+  {
+    "id": "colorful",
+    "en": "colorful",
+    "pos": "adj.",
+    "zh": "色彩繽紛的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The old town has colorful houses.",
+    "exampleZh": "老城區有色彩繽紛的房子。",
+    "form": ""
+  },
+  {
+    "id": "shade",
+    "en": "shade",
+    "pos": "n.",
+    "zh": "色調、深淺",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Do you have this in a darker shade?",
+    "exampleZh": "這個有深一點的色調嗎？",
+    "form": ""
+  },
+  {
+    "id": "flat",
+    "en": "flat",
+    "pos": "adj.",
+    "zh": "平的、扁平的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Put your bag on a flat surface.",
+    "exampleZh": "把你的包包放在平面上。",
+    "form": ""
+  },
+  {
+    "id": "sharp",
+    "en": "sharp",
+    "pos": "adj.",
+    "zh": "尖的、鋒利的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Be careful, the corner is sharp.",
+    "exampleZh": "小心，那個角很尖。",
+    "form": ""
+  },
+  {
+    "id": "cross",
+    "en": "cross",
+    "pos": "n.",
+    "zh": "十字形、叉號",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Put a cross next to the wrong answer.",
+    "exampleZh": "在錯的答案旁邊打叉。",
+    "form": ""
+  },
+  {
+    "id": "check-mark",
+    "en": "check mark",
+    "pos": "n.",
+    "zh": "勾號、打勾",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Put a check mark in the box.",
+    "exampleZh": "在方格裡打勾。",
+    "form": ""
+  },
+  {
+    "id": "pyramid",
+    "en": "pyramid",
+    "pos": "n.",
+    "zh": "金字塔、角錐",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The hotel lobby has a glass pyramid.",
+    "exampleZh": "飯店大廳有一座玻璃金字塔。",
+    "form": ""
+  },
+  {
+    "id": "cylinder",
+    "en": "cylinder",
+    "pos": "n.",
+    "zh": "圓柱體",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The tea comes in a metal cylinder.",
+    "exampleZh": "茶葉裝在金屬圓筒裡。",
+    "form": ""
+  },
+  {
+    "id": "cone",
+    "en": "cone",
+    "pos": "n.",
+    "zh": "圓錐形、甜筒",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I'll have vanilla ice cream in a cone.",
+    "exampleZh": "我要一支香草甜筒冰淇淋。",
+    "form": ""
+  },
+  {
+    "id": "sphere",
+    "en": "sphere",
+    "pos": "n.",
+    "zh": "球體",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The science museum has a huge sphere outside.",
+    "exampleZh": "科學博物館外面有一顆巨大的球體。",
+    "form": ""
+  },
+  {
+    "id": "hexagon",
+    "en": "hexagon",
+    "pos": "n.",
+    "zh": "六角形",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The tiles on the floor are hexagons.",
+    "exampleZh": "地上的磁磚是六角形的。",
+    "form": "hexagons"
+  },
+  {
+    "id": "pentagon",
+    "en": "pentagon",
+    "pos": "n.",
+    "zh": "五角形、五邊形",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The garden is shaped like a pentagon.",
+    "exampleZh": "這座花園是五角形的。",
+    "form": ""
+  },
+  {
+    "id": "spiral",
+    "en": "spiral",
+    "pos": "n.",
+    "zh": "螺旋形",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We climbed a spiral staircase to the top.",
+    "exampleZh": "我們爬螺旋樓梯到頂端。",
+    "form": ""
+  },
+  {
+    "id": "transparent",
+    "en": "transparent",
+    "pos": "adj.",
+    "zh": "透明的",
+    "categories": [
+      "colors-shapes",
+      "airport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Put your liquids in a transparent bag.",
+    "exampleZh": "把液體放進透明袋子裡。",
+    "form": ""
+  },
+  {
+    "id": "plaid",
+    "en": "plaid",
+    "pos": "adj.",
+    "zh": "格子花紋的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "He wore a red plaid shirt.",
+    "exampleZh": "他穿了一件紅色格子襯衫。",
+    "form": ""
+  },
+  {
+    "id": "turquoise",
+    "en": "turquoise",
+    "pos": "adj.",
+    "zh": "土耳其藍的、藍綠色的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The water in the bay is turquoise.",
+    "exampleZh": "海灣的海水是藍綠色的。",
+    "form": ""
+  },
+  {
+    "id": "khaki",
+    "en": "khaki",
+    "pos": "adj.",
+    "zh": "卡其色的",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "He packed khaki pants for the safari.",
+    "exampleZh": "他帶了卡其褲去野生動物之旅。",
+    "form": ""
+  },
+  {
+    "id": "crescent",
+    "en": "crescent",
+    "pos": "n.",
+    "zh": "新月形、彎月形",
+    "categories": [
+      "colors-shapes"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The bread is shaped like a crescent.",
+    "exampleZh": "這個麵包是新月形的。",
+    "form": ""
+  }
+]

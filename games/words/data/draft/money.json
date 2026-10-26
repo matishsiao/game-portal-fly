@@ -1,0 +1,850 @@
+[
+  {
+    "id": "money",
+    "en": "money",
+    "pos": "n.",
+    "zh": "錢",
+    "categories": [
+      "money"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I need to get some money before we leave.",
+    "exampleZh": "出發前我得去領點錢。",
+    "form": ""
+  },
+  {
+    "id": "cash",
+    "en": "cash",
+    "pos": "n.",
+    "zh": "現金",
+    "categories": [
+      "money"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Does this taxi accept cash only?",
+    "exampleZh": "這輛計程車只收現金嗎？",
+    "form": ""
+  },
+  {
+    "id": "coin",
+    "en": "coin",
+    "pos": "n.",
+    "zh": "硬幣、銅板",
+    "categories": [
+      "money"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The bus machine only takes coins.",
+    "exampleZh": "公車的機器只收硬幣。",
+    "form": "coins"
+  },
+  {
+    "id": "dollar",
+    "en": "dollar",
+    "pos": "n.",
+    "zh": "元、美元",
+    "categories": [
+      "money"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "This T-shirt costs fifteen dollars.",
+    "exampleZh": "這件 T 恤要十五美元。",
+    "form": "dollars"
+  },
+  {
+    "id": "cent",
+    "en": "cent",
+    "pos": "n.",
+    "zh": "分、美分",
+    "categories": [
+      "money"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "A bottle of water is ninety-nine cents.",
+    "exampleZh": "一瓶水九十九美分。",
+    "form": "cents"
+  },
+  {
+    "id": "pay",
+    "en": "pay",
+    "pos": "v.",
+    "zh": "付錢、支付",
+    "categories": [
+      "money"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Can I pay by card here?",
+    "exampleZh": "這裡可以刷卡付款嗎？",
+    "form": ""
+  },
+  {
+    "id": "cost",
+    "en": "cost",
+    "pos": "v.",
+    "zh": "價錢為、花費",
+    "categories": [
+      "money"
+    ],
+    "level": 1,
+    "syn": "spend",
+    "example": "How much does a subway ticket cost?",
+    "exampleZh": "一張地鐵票多少錢？",
+    "form": ""
+  },
+  {
+    "id": "change",
+    "en": "change",
+    "pos": "n.",
+    "zh": "零錢、找零",
+    "categories": [
+      "money"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Keep the change, thank you.",
+    "exampleZh": "不用找了，謝謝。",
+    "form": ""
+  },
+  {
+    "id": "bank",
+    "en": "bank",
+    "pos": "n.",
+    "zh": "銀行",
+    "categories": [
+      "money"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The bank closes at three thirty.",
+    "exampleZh": "銀行三點半關門。",
+    "form": ""
+  },
+  {
+    "id": "free",
+    "en": "free",
+    "pos": "adj.",
+    "zh": "免費的",
+    "categories": [
+      "money"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Museum entry is free on Sundays.",
+    "exampleZh": "博物館星期天免費入場。",
+    "form": ""
+  },
+  {
+    "id": "spend",
+    "en": "spend",
+    "pos": "v.",
+    "zh": "花、花費",
+    "categories": [
+      "money"
+    ],
+    "level": 1,
+    "syn": "spend",
+    "example": "We spent too much money on souvenirs.",
+    "exampleZh": "我們在紀念品上花了太多錢。",
+    "form": "spent"
+  },
+  {
+    "id": "save",
+    "en": "save",
+    "pos": "v.",
+    "zh": "存錢、省錢",
+    "categories": [
+      "money"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I'm saving money for a trip to Japan.",
+    "exampleZh": "我在存錢準備去日本旅行。",
+    "form": "saving"
+  },
+  {
+    "id": "wallet",
+    "en": "wallet",
+    "pos": "n.",
+    "zh": "皮夾、錢包",
+    "categories": [
+      "money"
+    ],
+    "level": 1,
+    "syn": "wallet",
+    "example": "I left my wallet in the taxi.",
+    "exampleZh": "我把皮夾忘在計程車上了。",
+    "form": ""
+  },
+  {
+    "id": "bill",
+    "en": "bill",
+    "pos": "n.",
+    "zh": "帳單、紙鈔",
+    "categories": [
+      "money",
+      "restaurant"
+    ],
+    "level": 1,
+    "syn": "bill",
+    "example": "Could we have the bill, please?",
+    "exampleZh": "可以給我們帳單嗎？",
+    "form": ""
+  },
+  {
+    "id": "atm",
+    "en": "ATM",
+    "pos": "n.",
+    "zh": "提款機",
+    "categories": [
+      "money"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Is there an ATM near the station?",
+    "exampleZh": "車站附近有提款機嗎？",
+    "form": ""
+  },
+  {
+    "id": "credit-card",
+    "en": "credit card",
+    "pos": "n.",
+    "zh": "信用卡",
+    "categories": [
+      "money"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Do you take credit cards?",
+    "exampleZh": "你們收信用卡嗎？",
+    "form": "credit cards"
+  },
+  {
+    "id": "borrow",
+    "en": "borrow",
+    "pos": "v.",
+    "zh": "借入、向人借",
+    "categories": [
+      "money"
+    ],
+    "level": 1,
+    "syn": "borrow",
+    "example": "Can I borrow ten dollars for the bus?",
+    "exampleZh": "可以借我十美元搭公車嗎？",
+    "form": ""
+  },
+  {
+    "id": "lend",
+    "en": "lend",
+    "pos": "v.",
+    "zh": "借出、借給",
+    "categories": [
+      "money"
+    ],
+    "level": 1,
+    "syn": "borrow",
+    "example": "My friend lent me some cash for lunch.",
+    "exampleZh": "我朋友借我一些現金吃午餐。",
+    "form": "lent"
+  },
+  {
+    "id": "rich",
+    "en": "rich",
+    "pos": "adj.",
+    "zh": "有錢的、富有的",
+    "categories": [
+      "money"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "He became rich after opening three cafes.",
+    "exampleZh": "他開了三家咖啡店後變得很有錢。",
+    "form": ""
+  },
+  {
+    "id": "count",
+    "en": "count",
+    "pos": "v.",
+    "zh": "數、計算",
+    "categories": [
+      "money"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Please count your change before you leave.",
+    "exampleZh": "離開前請先點清找的零錢。",
+    "form": ""
+  },
+  {
+    "id": "earn",
+    "en": "earn",
+    "pos": "v.",
+    "zh": "賺、賺取",
+    "categories": [
+      "money"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "She earns extra money by teaching English.",
+    "exampleZh": "她靠教英文賺外快。",
+    "form": "earns"
+  },
+  {
+    "id": "pay-back",
+    "en": "pay back",
+    "pos": "phr.",
+    "zh": "還錢",
+    "categories": [
+      "money"
+    ],
+    "level": 1,
+    "syn": "repay",
+    "example": "I can pay back the money on Friday.",
+    "exampleZh": "我星期五可以把錢還你。",
+    "form": ""
+  },
+  {
+    "id": "total",
+    "en": "total",
+    "pos": "n.",
+    "zh": "總額、總計",
+    "categories": [
+      "money"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The total comes to fifty dollars.",
+    "exampleZh": "總共是五十美元。",
+    "form": ""
+  },
+  {
+    "id": "tip",
+    "en": "tip",
+    "pos": "n.",
+    "zh": "小費",
+    "categories": [
+      "money",
+      "restaurant"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Is a tip included in the price?",
+    "exampleZh": "價格裡有含小費嗎？",
+    "form": ""
+  },
+  {
+    "id": "currency",
+    "en": "currency",
+    "pos": "n.",
+    "zh": "貨幣",
+    "categories": [
+      "money"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "What currency do they use in Thailand?",
+    "exampleZh": "泰國使用什麼貨幣？",
+    "form": ""
+  },
+  {
+    "id": "exchange-rate",
+    "en": "exchange rate",
+    "pos": "n.",
+    "zh": "匯率",
+    "categories": [
+      "money"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The exchange rate is better at the bank.",
+    "exampleZh": "銀行的匯率比較好。",
+    "form": ""
+  },
+  {
+    "id": "debit-card",
+    "en": "debit card",
+    "pos": "n.",
+    "zh": "金融卡、簽帳卡",
+    "categories": [
+      "money"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I use my debit card for small purchases.",
+    "exampleZh": "我用金融卡支付小額消費。",
+    "form": ""
+  },
+  {
+    "id": "pin",
+    "en": "PIN",
+    "pos": "n.",
+    "zh": "密碼、個人識別碼",
+    "categories": [
+      "money"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Please enter your PIN.",
+    "exampleZh": "請輸入您的密碼。",
+    "form": ""
+  },
+  {
+    "id": "balance",
+    "en": "balance",
+    "pos": "n.",
+    "zh": "餘額",
+    "categories": [
+      "money"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Check your balance before you withdraw money.",
+    "exampleZh": "領錢前先查一下餘額。",
+    "form": ""
+  },
+  {
+    "id": "deposit",
+    "en": "deposit",
+    "pos": "n.",
+    "zh": "押金、訂金",
+    "categories": [
+      "money",
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The hotel asks for a deposit at check-in.",
+    "exampleZh": "飯店在入住時要求付押金。",
+    "form": ""
+  },
+  {
+    "id": "withdraw",
+    "en": "withdraw",
+    "pos": "v.",
+    "zh": "提款、領錢",
+    "categories": [
+      "money"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I need to withdraw cash at the ATM.",
+    "exampleZh": "我需要去提款機領現金。",
+    "form": ""
+  },
+  {
+    "id": "budget",
+    "en": "budget",
+    "pos": "n.",
+    "zh": "預算",
+    "categories": [
+      "money"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Our travel budget is about two thousand dollars.",
+    "exampleZh": "我們的旅行預算大約兩千美元。",
+    "form": ""
+  },
+  {
+    "id": "fee",
+    "en": "fee",
+    "pos": "n.",
+    "zh": "費用",
+    "categories": [
+      "money"
+    ],
+    "level": 2,
+    "syn": "fee",
+    "example": "There is a small fee for using this card abroad.",
+    "exampleZh": "在國外使用這張卡要付一點手續費。",
+    "form": ""
+  },
+  {
+    "id": "charge",
+    "en": "charge",
+    "pos": "n.",
+    "zh": "收費、索價",
+    "categories": [
+      "money"
+    ],
+    "level": 2,
+    "syn": "fee",
+    "example": "Is there a charge for extra bags?",
+    "exampleZh": "多帶行李要另外收費嗎？",
+    "form": ""
+  },
+  {
+    "id": "tax",
+    "en": "tax",
+    "pos": "n.",
+    "zh": "稅、稅金",
+    "categories": [
+      "money"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Is tax included in this price?",
+    "exampleZh": "這個價格含稅嗎？",
+    "form": ""
+  },
+  {
+    "id": "loan",
+    "en": "loan",
+    "pos": "n.",
+    "zh": "貸款、借款",
+    "categories": [
+      "money"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "They took out a loan to buy a car.",
+    "exampleZh": "他們貸款買了一輛車。",
+    "form": ""
+  },
+  {
+    "id": "banknote",
+    "en": "banknote",
+    "pos": "n.",
+    "zh": "紙鈔、鈔票",
+    "categories": [
+      "money"
+    ],
+    "level": 2,
+    "syn": "bill",
+    "example": "This machine doesn't accept old banknotes.",
+    "exampleZh": "這台機器不收舊版紙鈔。",
+    "form": "banknotes"
+  },
+  {
+    "id": "euro",
+    "en": "euro",
+    "pos": "n.",
+    "zh": "歐元",
+    "categories": [
+      "money"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "A coffee in Paris costs about three euros.",
+    "exampleZh": "在巴黎一杯咖啡大約三歐元。",
+    "form": "euros"
+  },
+  {
+    "id": "currency-exchange",
+    "en": "currency exchange",
+    "pos": "n.",
+    "zh": "外幣兌換處、換匯",
+    "categories": [
+      "money",
+      "airport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The currency exchange is next to gate five.",
+    "exampleZh": "外幣兌換處在五號登機門旁邊。",
+    "form": ""
+  },
+  {
+    "id": "transfer",
+    "en": "transfer",
+    "pos": "v.",
+    "zh": "轉帳、匯款",
+    "categories": [
+      "money"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I transferred the money to your account.",
+    "exampleZh": "我已經把錢轉到你的帳戶了。",
+    "form": "transferred"
+  },
+  {
+    "id": "account",
+    "en": "account",
+    "pos": "n.",
+    "zh": "帳戶",
+    "categories": [
+      "money"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I opened a bank account last week.",
+    "exampleZh": "我上週開了一個銀行帳戶。",
+    "form": ""
+  },
+  {
+    "id": "interest",
+    "en": "interest",
+    "pos": "n.",
+    "zh": "利息",
+    "categories": [
+      "money"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "This savings account pays very little interest.",
+    "exampleZh": "這個儲蓄帳戶的利息很少。",
+    "form": ""
+  },
+  {
+    "id": "service-charge",
+    "en": "service charge",
+    "pos": "n.",
+    "zh": "服務費",
+    "categories": [
+      "money",
+      "restaurant"
+    ],
+    "level": 2,
+    "syn": "fee",
+    "example": "The bill includes a ten percent service charge.",
+    "exampleZh": "帳單包含一成的服務費。",
+    "form": ""
+  },
+  {
+    "id": "afford",
+    "en": "afford",
+    "pos": "v.",
+    "zh": "負擔得起、買得起",
+    "categories": [
+      "money"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We can't afford a five-star hotel this time.",
+    "exampleZh": "這次我們住不起五星級飯店。",
+    "form": ""
+  },
+  {
+    "id": "owe",
+    "en": "owe",
+    "pos": "v.",
+    "zh": "欠",
+    "categories": [
+      "money"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "How much do I owe you for dinner?",
+    "exampleZh": "晚餐我該給你多少錢？",
+    "form": ""
+  },
+  {
+    "id": "split-the-bill",
+    "en": "split the bill",
+    "pos": "phr.",
+    "zh": "分攤帳單、各付各的",
+    "categories": [
+      "money"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Let's split the bill tonight.",
+    "exampleZh": "今晚我們分攤帳單吧。",
+    "form": ""
+  },
+  {
+    "id": "mobile-payment",
+    "en": "mobile payment",
+    "pos": "n.",
+    "zh": "行動支付",
+    "categories": [
+      "money",
+      "tech"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Many shops in Taipei accept mobile payment.",
+    "exampleZh": "台北很多店家接受行動支付。",
+    "form": ""
+  },
+  {
+    "id": "salary",
+    "en": "salary",
+    "pos": "n.",
+    "zh": "薪水",
+    "categories": [
+      "money",
+      "jobs"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "She gets her salary at the end of each month.",
+    "exampleZh": "她每個月底領薪水。",
+    "form": ""
+  },
+  {
+    "id": "installment",
+    "en": "installment",
+    "pos": "n.",
+    "zh": "分期付款",
+    "categories": [
+      "money"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "You can pay for the laptop in six installments.",
+    "exampleZh": "這台筆電可以分六期付款。",
+    "form": "installments"
+  },
+  {
+    "id": "repay",
+    "en": "repay",
+    "pos": "v.",
+    "zh": "償還、歸還",
+    "categories": [
+      "money"
+    ],
+    "level": 3,
+    "syn": "repay",
+    "example": "He promised to repay the loan next year.",
+    "exampleZh": "他答應明年償還貸款。",
+    "form": ""
+  },
+  {
+    "id": "invoice",
+    "en": "invoice",
+    "pos": "n.",
+    "zh": "請款單、發票",
+    "categories": [
+      "money"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Please send the invoice to my email.",
+    "exampleZh": "請把請款單寄到我的電子信箱。",
+    "form": ""
+  },
+  {
+    "id": "counterfeit",
+    "en": "counterfeit",
+    "pos": "adj.",
+    "zh": "偽造的、假的",
+    "categories": [
+      "money"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Be careful of counterfeit bills at the market.",
+    "exampleZh": "在市場要小心假鈔。",
+    "form": ""
+  },
+  {
+    "id": "commission",
+    "en": "commission",
+    "pos": "n.",
+    "zh": "手續費、佣金",
+    "categories": [
+      "money"
+    ],
+    "level": 3,
+    "syn": "fee",
+    "example": "This exchange booth charges no commission.",
+    "exampleZh": "這個換匯櫃台不收手續費。",
+    "form": ""
+  },
+  {
+    "id": "transaction",
+    "en": "transaction",
+    "pos": "n.",
+    "zh": "交易",
+    "categories": [
+      "money"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The card machine declined the transaction.",
+    "exampleZh": "刷卡機拒絕了這筆交易。",
+    "form": ""
+  },
+  {
+    "id": "tax-refund",
+    "en": "tax refund",
+    "pos": "n.",
+    "zh": "退稅",
+    "categories": [
+      "money",
+      "airport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Tourists can get a tax refund at the airport.",
+    "exampleZh": "觀光客可以在機場辦理退稅。",
+    "form": ""
+  },
+  {
+    "id": "cashback",
+    "en": "cashback",
+    "pos": "n.",
+    "zh": "現金回饋",
+    "categories": [
+      "money"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "This credit card gives two percent cashback.",
+    "exampleZh": "這張信用卡有百分之二的現金回饋。",
+    "form": ""
+  },
+  {
+    "id": "contactless-payment",
+    "en": "contactless payment",
+    "pos": "n.",
+    "zh": "感應支付",
+    "categories": [
+      "money"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Contactless payment is faster than using cash.",
+    "exampleZh": "感應支付比用現金快。",
+    "form": ""
+  },
+  {
+    "id": "denomination",
+    "en": "denomination",
+    "pos": "n.",
+    "zh": "面額",
+    "categories": [
+      "money"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The ATM gives bills in large denominations.",
+    "exampleZh": "提款機吐出的都是大面額紙鈔。",
+    "form": "denominations"
+  },
+  {
+    "id": "expense",
+    "en": "expense",
+    "pos": "n.",
+    "zh": "開銷、支出",
+    "categories": [
+      "money"
+    ],
+    "level": 3,
+    "syn": "spend",
+    "example": "Hotels are our biggest travel expense.",
+    "exampleZh": "住宿是我們旅行中最大的開銷。",
+    "form": ""
+  },
+  {
+    "id": "savings",
+    "en": "savings",
+    "pos": "n.",
+    "zh": "存款、積蓄",
+    "categories": [
+      "money"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "She used her savings to travel around Europe.",
+    "exampleZh": "她用積蓄去環遊歐洲。",
+    "form": ""
+  }
+]

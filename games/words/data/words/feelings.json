@@ -1,0 +1,902 @@
+[
+  {
+    "id": "happy-adj",
+    "en": "happy",
+    "pos": "adj.",
+    "zh": "快樂的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 1,
+    "syn": "happy",
+    "example": "The kids were happy to see the ocean.",
+    "exampleZh": "孩子們看到大海很開心。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "glad-adj",
+    "en": "glad",
+    "pos": "adj.",
+    "zh": "高興的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 1,
+    "syn": "happy",
+    "example": "I'm glad you enjoyed the trip.",
+    "exampleZh": "很高興你喜歡這趟旅行。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sad-adj",
+    "en": "sad",
+    "pos": "adj.",
+    "zh": "難過的、傷心的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 1,
+    "syn": "sad",
+    "example": "She was sad to leave Japan.",
+    "exampleZh": "她要離開日本時很難過。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "angry-adj",
+    "en": "angry",
+    "pos": "adj.",
+    "zh": "生氣的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 1,
+    "syn": "angry",
+    "example": "He got angry when the flight was delayed.",
+    "exampleZh": "班機延誤時他很生氣。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "tired-adj",
+    "en": "tired",
+    "pos": "adj.",
+    "zh": "累的、疲倦的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I'm tired after walking all day.",
+    "exampleZh": "走了一整天，我好累。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "hungry-adj",
+    "en": "hungry",
+    "pos": "adj.",
+    "zh": "餓的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Let's eat. I'm really hungry.",
+    "exampleZh": "我們去吃東西吧，我好餓。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "thirsty-adj",
+    "en": "thirsty",
+    "pos": "adj.",
+    "zh": "口渴的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Hiking in the sun made me thirsty.",
+    "exampleZh": "在大太陽下健行讓我很口渴。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "afraid-adj",
+    "en": "afraid",
+    "pos": "adj.",
+    "zh": "害怕的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 1,
+    "syn": "afraid",
+    "example": "My sister is afraid of big dogs.",
+    "exampleZh": "我妹妹很怕大狗。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "scared-adj",
+    "en": "scared",
+    "pos": "adj.",
+    "zh": "害怕的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 1,
+    "syn": "afraid",
+    "example": "I was scared during the bumpy flight.",
+    "exampleZh": "飛機一路顛簸，我好害怕。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "kind-adj",
+    "en": "kind",
+    "pos": "adj.",
+    "zh": "親切的、好心的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 1,
+    "syn": "kind",
+    "example": "The hotel staff were very kind to us.",
+    "exampleZh": "旅館員工對我們非常親切。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "friendly-adj",
+    "en": "friendly",
+    "pos": "adj.",
+    "zh": "友善的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 1,
+    "syn": "kind",
+    "example": "People in this town are very friendly.",
+    "exampleZh": "這個小鎮的人非常友善。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "funny-adj",
+    "en": "funny",
+    "pos": "adj.",
+    "zh": "好笑的、有趣的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Our tour guide told funny stories.",
+    "exampleZh": "我們的導遊講了很多好笑的故事。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "shy-adj",
+    "en": "shy",
+    "pos": "adj.",
+    "zh": "害羞的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "He is too shy to ask for directions.",
+    "exampleZh": "他太害羞了，不敢問路。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "bored-adj",
+    "en": "bored",
+    "pos": "adj.",
+    "zh": "感到無聊的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The kids got bored on the long bus ride.",
+    "exampleZh": "搭長途巴士時孩子們覺得很無聊。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "lazy-adj",
+    "en": "lazy",
+    "pos": "adj.",
+    "zh": "懶惰的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I felt lazy and stayed in bed all morning.",
+    "exampleZh": "我覺得懶懶的，整個早上都賴在床上。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "love-v",
+    "en": "love",
+    "pos": "v.",
+    "zh": "愛、熱愛",
+    "categories": [
+      "feelings"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I love the food in this city.",
+    "exampleZh": "我超愛這個城市的食物。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "hate-v",
+    "en": "hate",
+    "pos": "v.",
+    "zh": "討厭、恨",
+    "categories": [
+      "feelings"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I hate waiting in long lines.",
+    "exampleZh": "我討厭排很長的隊。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "smile-v",
+    "en": "smile",
+    "pos": "v.",
+    "zh": "微笑",
+    "categories": [
+      "feelings"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The waiter smiled and said hello.",
+    "exampleZh": "服務生微笑著打招呼。",
+    "form": "smiled",
+    "reviewed": true
+  },
+  {
+    "id": "laugh-v",
+    "en": "laugh",
+    "pos": "v.",
+    "zh": "笑、大笑",
+    "categories": [
+      "feelings"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We laughed all the way home.",
+    "exampleZh": "我們一路笑著回家。",
+    "form": "laughed",
+    "reviewed": true
+  },
+  {
+    "id": "cry-v",
+    "en": "cry",
+    "pos": "v.",
+    "zh": "哭",
+    "categories": [
+      "feelings"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The baby cried during the whole flight.",
+    "exampleZh": "那個嬰兒在整趟飛行中一直哭。",
+    "form": "cried",
+    "reviewed": true
+  },
+  {
+    "id": "worry-v",
+    "en": "worry",
+    "pos": "v.",
+    "zh": "擔心",
+    "categories": [
+      "feelings"
+    ],
+    "level": 1,
+    "syn": "worry",
+    "example": "Don't worry, the bus will come soon.",
+    "exampleZh": "別擔心，公車很快就來了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "hope-v",
+    "en": "hope",
+    "pos": "v.",
+    "zh": "希望",
+    "categories": [
+      "feelings"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I hope it will be sunny tomorrow.",
+    "exampleZh": "我希望明天是晴天。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "excited-adj",
+    "en": "excited",
+    "pos": "adj.",
+    "zh": "興奮的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We're so excited about our trip to Korea.",
+    "exampleZh": "我們對韓國之旅感到非常興奮。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "brave-adj",
+    "en": "brave",
+    "pos": "adj.",
+    "zh": "勇敢的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "She was brave enough to try bungee jumping.",
+    "exampleZh": "她勇敢地嘗試了高空彈跳。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "nervous-adj",
+    "en": "nervous",
+    "pos": "adj.",
+    "zh": "緊張的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 2,
+    "syn": "nervous",
+    "example": "I always feel nervous before a flight.",
+    "exampleZh": "我搭飛機前總是很緊張。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "worried-adj",
+    "en": "worried",
+    "pos": "adj.",
+    "zh": "擔憂的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 2,
+    "syn": "worry",
+    "example": "Mom was worried because I missed the train.",
+    "exampleZh": "因為我錯過火車，媽媽很擔憂。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "upset-adj",
+    "en": "upset",
+    "pos": "adj.",
+    "zh": "心煩的、不高興的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 2,
+    "syn": "sad",
+    "example": "He was upset about his lost luggage.",
+    "exampleZh": "他因為行李遺失而心煩。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "surprised-adj",
+    "en": "surprised",
+    "pos": "adj.",
+    "zh": "驚訝的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I was surprised by how cheap the food was.",
+    "exampleZh": "食物這麼便宜，讓我很驚訝。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "lonely-adj",
+    "en": "lonely",
+    "pos": "adj.",
+    "zh": "寂寞的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Traveling alone can feel lonely sometimes.",
+    "exampleZh": "一個人旅行有時會覺得寂寞。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "proud-adj",
+    "en": "proud",
+    "pos": "adj.",
+    "zh": "驕傲的、自豪的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I am proud of my English progress.",
+    "exampleZh": "我對自己英文的進步感到自豪。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "jealous-adj",
+    "en": "jealous",
+    "pos": "adj.",
+    "zh": "嫉妒的、羨慕的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I'm jealous of your trip to Paris.",
+    "exampleZh": "我好羨慕你去巴黎旅行。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "calm-adj",
+    "en": "calm",
+    "pos": "adj.",
+    "zh": "冷靜的、平靜的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Stay calm and follow the staff.",
+    "exampleZh": "保持冷靜，跟著工作人員走。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "relaxed-adj",
+    "en": "relaxed",
+    "pos": "adj.",
+    "zh": "放鬆的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I felt relaxed after the hot spring.",
+    "exampleZh": "泡完溫泉後我覺得很放鬆。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "polite-adj",
+    "en": "polite",
+    "pos": "adj.",
+    "zh": "有禮貌的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The students were polite to the visitors.",
+    "exampleZh": "學生們對訪客很有禮貌。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "rude-adj",
+    "en": "rude",
+    "pos": "adj.",
+    "zh": "沒禮貌的、無禮的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "It is rude to cut in line.",
+    "exampleZh": "插隊是很沒禮貌的。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "honest-adj",
+    "en": "honest",
+    "pos": "adj.",
+    "zh": "誠實的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The honest driver returned my wallet.",
+    "exampleZh": "那位誠實的司機把錢包還給我。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "patient-adj",
+    "en": "patient",
+    "pos": "adj.",
+    "zh": "有耐心的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Please be patient, your food is coming.",
+    "exampleZh": "請耐心等候，您的餐點馬上就來。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "careful-adj",
+    "en": "careful",
+    "pos": "adj.",
+    "zh": "小心的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Be careful on the icy road.",
+    "exampleZh": "在結冰的路上要小心。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "confident-adj",
+    "en": "confident",
+    "pos": "adj.",
+    "zh": "有自信的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "She feels confident speaking English now.",
+    "exampleZh": "她現在說英文很有自信。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "curious-adj",
+    "en": "curious",
+    "pos": "adj.",
+    "zh": "好奇的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I was curious about the local snacks.",
+    "exampleZh": "我對當地的小吃很好奇。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "embarrassed-adj",
+    "en": "embarrassed",
+    "pos": "adj.",
+    "zh": "尷尬的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I felt embarrassed when I forgot his name.",
+    "exampleZh": "我忘了他的名字，覺得很尷尬。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "disappointed-adj",
+    "en": "disappointed",
+    "pos": "adj.",
+    "zh": "失望的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We were disappointed the museum was closed.",
+    "exampleZh": "博物館沒開，我們很失望。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "satisfied-adj",
+    "en": "satisfied",
+    "pos": "adj.",
+    "zh": "滿意的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Are you satisfied with your room?",
+    "exampleZh": "您對房間滿意嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "thankful-adj",
+    "en": "thankful",
+    "pos": "adj.",
+    "zh": "感謝的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 2,
+    "syn": "thankful",
+    "example": "I'm thankful for your help today.",
+    "exampleZh": "我很感謝你今天的幫忙。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "generous-adj",
+    "en": "generous",
+    "pos": "adj.",
+    "zh": "慷慨的、大方的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Our host was generous and paid for dinner.",
+    "exampleZh": "我們的主人很大方，請我們吃晚餐。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "selfish-adj",
+    "en": "selfish",
+    "pos": "adj.",
+    "zh": "自私的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Taking two seats on the bus is selfish.",
+    "exampleZh": "在公車上占兩個座位很自私。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "cheerful-adj",
+    "en": "cheerful",
+    "pos": "adj.",
+    "zh": "開朗的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The cheerful guide made everyone smile.",
+    "exampleZh": "開朗的導遊讓大家都笑了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "homesick-adj",
+    "en": "homesick",
+    "pos": "adj.",
+    "zh": "想家的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "After two weeks abroad, I felt homesick.",
+    "exampleZh": "出國兩個星期後，我開始想家了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "anxious-adj",
+    "en": "anxious",
+    "pos": "adj.",
+    "zh": "焦慮的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 3,
+    "syn": "nervous",
+    "example": "I was anxious when my phone died abroad.",
+    "exampleZh": "在國外手機沒電時，我很焦慮。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "grateful-adj",
+    "en": "grateful",
+    "pos": "adj.",
+    "zh": "感激的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 3,
+    "syn": "thankful",
+    "example": "We're grateful for your warm welcome.",
+    "exampleZh": "我們很感激你們熱情的招待。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "frustrated-adj",
+    "en": "frustrated",
+    "pos": "adj.",
+    "zh": "沮喪的、受挫的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I got frustrated with the ticket machine.",
+    "exampleZh": "那台售票機讓我很挫折。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "annoyed-adj",
+    "en": "annoyed",
+    "pos": "adj.",
+    "zh": "惱火的、不耐煩的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 3,
+    "syn": "angry",
+    "example": "He was annoyed by the loud music.",
+    "exampleZh": "吵雜的音樂讓他很惱火。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "delighted-adj",
+    "en": "delighted",
+    "pos": "adj.",
+    "zh": "非常高興的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "She was delighted with the ocean view room.",
+    "exampleZh": "她對海景房感到非常高興。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "exhausted-adj",
+    "en": "exhausted",
+    "pos": "adj.",
+    "zh": "筋疲力盡的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We were exhausted after the long hike.",
+    "exampleZh": "長途健行後我們筋疲力盡。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "terrified-adj",
+    "en": "terrified",
+    "pos": "adj.",
+    "zh": "嚇壞的、驚恐的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I was terrified on the roller coaster.",
+    "exampleZh": "坐雲霄飛車時我嚇壞了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "ashamed-adj",
+    "en": "ashamed",
+    "pos": "adj.",
+    "zh": "羞愧的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "He felt ashamed of his rude words.",
+    "exampleZh": "他對自己無禮的話感到羞愧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "stubborn-adj",
+    "en": "stubborn",
+    "pos": "adj.",
+    "zh": "固執的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "My dad is too stubborn to use a map app.",
+    "exampleZh": "我爸太固執，不肯用地圖應用程式。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "optimistic-adj",
+    "en": "optimistic",
+    "pos": "adj.",
+    "zh": "樂觀的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Stay optimistic, the rain may stop soon.",
+    "exampleZh": "保持樂觀，雨可能很快就停了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sensitive-adj",
+    "en": "sensitive",
+    "pos": "adj.",
+    "zh": "敏感的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "He is very sensitive, so choose your words carefully.",
+    "exampleZh": "他很敏感，所以說話要小心。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "considerate-adj",
+    "en": "considerate",
+    "pos": "adj.",
+    "zh": "體貼的",
+    "categories": [
+      "feelings"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "It was considerate of you to save me a seat.",
+    "exampleZh": "你幫我留位子，真是體貼。",
+    "form": "",
+    "reviewed": true
+  }
+]

@@ -1,0 +1,845 @@
+[
+  {
+    "id": "kitchen",
+    "en": "kitchen",
+    "pos": "n.",
+    "zh": "廚房",
+    "categories": [
+      "kitchen",
+      "home"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Our apartment has a small kitchen.",
+    "exampleZh": "我們的公寓有一個小廚房。",
+    "form": ""
+  },
+  {
+    "id": "cook",
+    "en": "cook",
+    "pos": "v.",
+    "zh": "煮、烹飪",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Let's cook dinner at the hostel tonight.",
+    "exampleZh": "今晚我們在青年旅館煮晚餐吧。",
+    "form": ""
+  },
+  {
+    "id": "pot",
+    "en": "pot",
+    "pos": "n.",
+    "zh": "鍋子",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "pot",
+    "example": "Boil the water in a big pot.",
+    "exampleZh": "用大鍋子把水煮滾。",
+    "form": ""
+  },
+  {
+    "id": "pan",
+    "en": "pan",
+    "pos": "n.",
+    "zh": "平底鍋",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "pot",
+    "example": "Heat some oil in the pan.",
+    "exampleZh": "在平底鍋裡熱一點油。",
+    "form": ""
+  },
+  {
+    "id": "fridge",
+    "en": "fridge",
+    "pos": "n.",
+    "zh": "冰箱",
+    "categories": [
+      "kitchen",
+      "home"
+    ],
+    "level": 1,
+    "syn": "fridge",
+    "example": "Put the milk back in the fridge.",
+    "exampleZh": "把牛奶放回冰箱。",
+    "form": ""
+  },
+  {
+    "id": "salt",
+    "en": "salt",
+    "pos": "n.",
+    "zh": "鹽",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "This soup needs a little more salt.",
+    "exampleZh": "這湯需要再多一點鹽。",
+    "form": ""
+  },
+  {
+    "id": "sugar",
+    "en": "sugar",
+    "pos": "n.",
+    "zh": "糖",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Do you take sugar in your coffee?",
+    "exampleZh": "你的咖啡要加糖嗎？",
+    "form": ""
+  },
+  {
+    "id": "oil",
+    "en": "oil",
+    "pos": "n.",
+    "zh": "油",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Don't use too much oil when you fry eggs.",
+    "exampleZh": "煎蛋時別用太多油。",
+    "form": ""
+  },
+  {
+    "id": "pepper",
+    "en": "pepper",
+    "pos": "n.",
+    "zh": "胡椒",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Add salt and pepper to taste.",
+    "exampleZh": "依個人口味加鹽和胡椒。",
+    "form": ""
+  },
+  {
+    "id": "sauce",
+    "en": "sauce",
+    "pos": "n.",
+    "zh": "醬汁、醬",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "sauce",
+    "example": "The sauce is a little too sweet.",
+    "exampleZh": "這醬汁有點太甜了。",
+    "form": ""
+  },
+  {
+    "id": "sweet",
+    "en": "sweet",
+    "pos": "adj.",
+    "zh": "甜的",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "These cookies are too sweet for me.",
+    "exampleZh": "這些餅乾對我來說太甜了。",
+    "form": ""
+  },
+  {
+    "id": "salty",
+    "en": "salty",
+    "pos": "adj.",
+    "zh": "鹹的",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The soup is too salty.",
+    "exampleZh": "這湯太鹹了。",
+    "form": ""
+  },
+  {
+    "id": "sour",
+    "en": "sour",
+    "pos": "adj.",
+    "zh": "酸的",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Lemons taste sour.",
+    "exampleZh": "檸檬吃起來是酸的。",
+    "form": ""
+  },
+  {
+    "id": "bitter",
+    "en": "bitter",
+    "pos": "adj.",
+    "zh": "苦的",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "This coffee is too bitter without sugar.",
+    "exampleZh": "這咖啡不加糖太苦了。",
+    "form": ""
+  },
+  {
+    "id": "spicy",
+    "en": "spicy",
+    "pos": "adj.",
+    "zh": "辣的",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I can't eat spicy food.",
+    "exampleZh": "我不能吃辣。",
+    "form": ""
+  },
+  {
+    "id": "taste",
+    "en": "taste",
+    "pos": "v.",
+    "zh": "嚐、嚐起來",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Taste the soup before you add more salt.",
+    "exampleZh": "加鹽之前先嚐一下湯。",
+    "form": ""
+  },
+  {
+    "id": "wash",
+    "en": "wash",
+    "pos": "v.",
+    "zh": "洗",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "wash",
+    "example": "Wash the vegetables before cooking.",
+    "exampleZh": "煮之前先把蔬菜洗乾淨。",
+    "form": ""
+  },
+  {
+    "id": "clean",
+    "en": "clean",
+    "pos": "v.",
+    "zh": "清潔、打掃",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "wash",
+    "example": "Please clean the kitchen after you use it.",
+    "exampleZh": "使用廚房後請清理乾淨。",
+    "form": ""
+  },
+  {
+    "id": "cut",
+    "en": "cut",
+    "pos": "v.",
+    "zh": "切",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "cut",
+    "example": "Cut the apple into small pieces.",
+    "exampleZh": "把蘋果切成小塊。",
+    "form": ""
+  },
+  {
+    "id": "boil",
+    "en": "boil",
+    "pos": "v.",
+    "zh": "煮沸、水煮",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "boil",
+    "example": "Boil the eggs for eight minutes.",
+    "exampleZh": "把蛋煮八分鐘。",
+    "form": ""
+  },
+  {
+    "id": "fry",
+    "en": "fry",
+    "pos": "v.",
+    "zh": "煎、炸",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "fry",
+    "example": "My mom fried some fish for dinner.",
+    "exampleZh": "我媽媽晚餐煎了魚。",
+    "form": "fried"
+  },
+  {
+    "id": "bake",
+    "en": "bake",
+    "pos": "v.",
+    "zh": "烘焙、烤",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "bake",
+    "example": "We baked cookies together on Sunday.",
+    "exampleZh": "我們星期天一起烤餅乾。",
+    "form": "baked"
+  },
+  {
+    "id": "mix",
+    "en": "mix",
+    "pos": "v.",
+    "zh": "混合、攪拌",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "mix",
+    "example": "Mix the eggs and flour in a bowl.",
+    "exampleZh": "把蛋和麵粉在碗裡混合。",
+    "form": ""
+  },
+  {
+    "id": "bowl",
+    "en": "bowl",
+    "pos": "n.",
+    "zh": "碗",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Put the rice in a bowl.",
+    "exampleZh": "把飯盛到碗裡。",
+    "form": ""
+  },
+  {
+    "id": "oven",
+    "en": "oven",
+    "pos": "n.",
+    "zh": "烤箱",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 2,
+    "syn": "oven",
+    "example": "Preheat the oven before baking the bread.",
+    "exampleZh": "烤麵包前先預熱烤箱。",
+    "form": ""
+  },
+  {
+    "id": "microwave",
+    "en": "microwave",
+    "pos": "n.",
+    "zh": "微波爐",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 2,
+    "syn": "oven",
+    "example": "You can heat your lunch in the microwave.",
+    "exampleZh": "你可以用微波爐加熱午餐。",
+    "form": ""
+  },
+  {
+    "id": "stove",
+    "en": "stove",
+    "pos": "n.",
+    "zh": "爐子、瓦斯爐",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Don't leave the stove on when you go out.",
+    "exampleZh": "出門時別讓爐子開著。",
+    "form": ""
+  },
+  {
+    "id": "sink",
+    "en": "sink",
+    "pos": "n.",
+    "zh": "水槽",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Put the dirty dishes in the sink.",
+    "exampleZh": "把髒碗盤放進水槽。",
+    "form": ""
+  },
+  {
+    "id": "refrigerator",
+    "en": "refrigerator",
+    "pos": "n.",
+    "zh": "冰箱",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 2,
+    "syn": "fridge",
+    "example": "The hotel room has a small refrigerator.",
+    "exampleZh": "飯店房間有一台小冰箱。",
+    "form": ""
+  },
+  {
+    "id": "freezer",
+    "en": "freezer",
+    "pos": "n.",
+    "zh": "冷凍庫",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 2,
+    "syn": "fridge",
+    "example": "Keep the ice cream in the freezer.",
+    "exampleZh": "把冰淇淋放在冷凍庫。",
+    "form": ""
+  },
+  {
+    "id": "rice-cooker",
+    "en": "rice cooker",
+    "pos": "n.",
+    "zh": "電鍋",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Many Taiwanese families cook with a rice cooker.",
+    "exampleZh": "許多台灣家庭用電鍋煮飯。",
+    "form": ""
+  },
+  {
+    "id": "kettle",
+    "en": "kettle",
+    "pos": "n.",
+    "zh": "熱水壺",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "There's an electric kettle in the room for tea.",
+    "exampleZh": "房間裡有電熱水壺可以泡茶。",
+    "form": ""
+  },
+  {
+    "id": "cutting-board",
+    "en": "cutting board",
+    "pos": "n.",
+    "zh": "砧板",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Use a different cutting board for raw meat.",
+    "exampleZh": "生肉要用另一塊砧板。",
+    "form": ""
+  },
+  {
+    "id": "apron",
+    "en": "apron",
+    "pos": "n.",
+    "zh": "圍裙",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Wear an apron so you don't get dirty.",
+    "exampleZh": "穿上圍裙才不會弄髒。",
+    "form": ""
+  },
+  {
+    "id": "recipe",
+    "en": "recipe",
+    "pos": "n.",
+    "zh": "食譜",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Can you share your recipe for this cake?",
+    "exampleZh": "可以分享你這個蛋糕的食譜嗎？",
+    "form": ""
+  },
+  {
+    "id": "flour",
+    "en": "flour",
+    "pos": "n.",
+    "zh": "麵粉",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We need more flour to make dumplings.",
+    "exampleZh": "我們需要更多麵粉來包餃子。",
+    "form": ""
+  },
+  {
+    "id": "soy-sauce",
+    "en": "soy sauce",
+    "pos": "n.",
+    "zh": "醬油",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Dip the sushi lightly in soy sauce.",
+    "exampleZh": "壽司輕輕沾一點醬油。",
+    "form": ""
+  },
+  {
+    "id": "vinegar",
+    "en": "vinegar",
+    "pos": "n.",
+    "zh": "醋",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Add a little vinegar to the dumpling sauce.",
+    "exampleZh": "在餃子沾醬裡加一點醋。",
+    "form": ""
+  },
+  {
+    "id": "chop",
+    "en": "chop",
+    "pos": "v.",
+    "zh": "切碎、剁",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 2,
+    "syn": "cut",
+    "example": "Chop the green onions finely.",
+    "exampleZh": "把蔥切碎。",
+    "form": ""
+  },
+  {
+    "id": "peel",
+    "en": "peel",
+    "pos": "v.",
+    "zh": "削皮、剝皮",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Peel the potatoes before you boil them.",
+    "exampleZh": "水煮前先把馬鈴薯削皮。",
+    "form": ""
+  },
+  {
+    "id": "stir",
+    "en": "stir",
+    "pos": "v.",
+    "zh": "攪拌",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 2,
+    "syn": "mix",
+    "example": "Stir the soup so it doesn't burn.",
+    "exampleZh": "攪拌一下湯才不會燒焦。",
+    "form": ""
+  },
+  {
+    "id": "pour",
+    "en": "pour",
+    "pos": "v.",
+    "zh": "倒",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Pour the hot water into the cup slowly.",
+    "exampleZh": "慢慢把熱水倒進杯子裡。",
+    "form": ""
+  },
+  {
+    "id": "heat",
+    "en": "heat",
+    "pos": "v.",
+    "zh": "加熱",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Heat the leftovers for two minutes.",
+    "exampleZh": "把剩菜加熱兩分鐘。",
+    "form": ""
+  },
+  {
+    "id": "steam",
+    "en": "steam",
+    "pos": "v.",
+    "zh": "蒸",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We steamed the fish with ginger.",
+    "exampleZh": "我們用薑蒸魚。",
+    "form": "steamed"
+  },
+  {
+    "id": "grill",
+    "en": "grill",
+    "pos": "v.",
+    "zh": "烤、燒烤",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 2,
+    "syn": "bake",
+    "example": "Let's grill some meat in the backyard.",
+    "exampleZh": "我們在後院烤點肉吧。",
+    "form": ""
+  },
+  {
+    "id": "burn",
+    "en": "burn",
+    "pos": "v.",
+    "zh": "燒焦",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I burned the toast again.",
+    "exampleZh": "我又把吐司烤焦了。",
+    "form": "burned"
+  },
+  {
+    "id": "dish-soap",
+    "en": "dish soap",
+    "pos": "n.",
+    "zh": "洗碗精",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We're out of dish soap.",
+    "exampleZh": "我們的洗碗精用完了。",
+    "form": ""
+  },
+  {
+    "id": "lid",
+    "en": "lid",
+    "pos": "n.",
+    "zh": "蓋子、鍋蓋",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Put the lid on the pot and wait.",
+    "exampleZh": "蓋上鍋蓋，然後等一下。",
+    "form": ""
+  },
+  {
+    "id": "ingredient",
+    "en": "ingredient",
+    "pos": "n.",
+    "zh": "食材、材料",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Fresh ingredients make all the difference.",
+    "exampleZh": "新鮮的食材是關鍵。",
+    "form": "ingredients"
+  },
+  {
+    "id": "seasoning",
+    "en": "seasoning",
+    "pos": "n.",
+    "zh": "調味料",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 3,
+    "syn": "sauce",
+    "example": "This seasoning makes everything taste better.",
+    "exampleZh": "這調味料讓什麼都變得更好吃。",
+    "form": ""
+  },
+  {
+    "id": "blender",
+    "en": "blender",
+    "pos": "n.",
+    "zh": "果汁機",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I make smoothies in the blender every morning.",
+    "exampleZh": "我每天早上用果汁機打冰沙。",
+    "form": ""
+  },
+  {
+    "id": "spatula",
+    "en": "spatula",
+    "pos": "n.",
+    "zh": "鍋鏟",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 3,
+    "syn": "spatula",
+    "example": "Flip the pancake with a spatula.",
+    "exampleZh": "用鍋鏟把鬆餅翻面。",
+    "form": ""
+  },
+  {
+    "id": "ladle",
+    "en": "ladle",
+    "pos": "n.",
+    "zh": "湯勺",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 3,
+    "syn": "spatula",
+    "example": "Use the ladle to serve the soup.",
+    "exampleZh": "用湯勺盛湯。",
+    "form": ""
+  },
+  {
+    "id": "wok",
+    "en": "wok",
+    "pos": "n.",
+    "zh": "炒鍋",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 3,
+    "syn": "pot",
+    "example": "A wok is perfect for stir-frying vegetables.",
+    "exampleZh": "炒鍋最適合用來快炒青菜。",
+    "form": ""
+  },
+  {
+    "id": "stir-fry",
+    "en": "stir-fry",
+    "pos": "v.",
+    "zh": "快炒、炒",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 3,
+    "syn": "fry",
+    "example": "Stir-fry the vegetables over high heat.",
+    "exampleZh": "用大火快炒青菜。",
+    "form": ""
+  },
+  {
+    "id": "simmer",
+    "en": "simmer",
+    "pos": "v.",
+    "zh": "燉煮、小火慢煮",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 3,
+    "syn": "boil",
+    "example": "Let the soup simmer for an hour.",
+    "exampleZh": "讓湯用小火慢燉一小時。",
+    "form": ""
+  },
+  {
+    "id": "marinate",
+    "en": "marinate",
+    "pos": "v.",
+    "zh": "醃",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Marinate the chicken overnight.",
+    "exampleZh": "把雞肉醃一個晚上。",
+    "form": ""
+  },
+  {
+    "id": "thaw",
+    "en": "thaw",
+    "pos": "v.",
+    "zh": "解凍",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Thaw the meat in the fridge.",
+    "exampleZh": "把肉放在冰箱裡解凍。",
+    "form": ""
+  },
+  {
+    "id": "dishwasher",
+    "en": "dishwasher",
+    "pos": "n.",
+    "zh": "洗碗機",
+    "categories": [
+      "kitchen",
+      "home"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Put the plates in the dishwasher.",
+    "exampleZh": "把盤子放進洗碗機。",
+    "form": ""
+  },
+  {
+    "id": "measuring-cup",
+    "en": "measuring cup",
+    "pos": "n.",
+    "zh": "量杯",
+    "categories": [
+      "kitchen"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Use a measuring cup for the flour.",
+    "exampleZh": "用量杯量麵粉。",
+    "form": ""
+  }
+]

@@ -1,0 +1,843 @@
+[
+  {
+    "id": "head",
+    "en": "head",
+    "pos": "n.",
+    "zh": "頭",
+    "categories": [
+      "body"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I hit my head on the shelf.",
+    "exampleZh": "我的頭撞到架子了。",
+    "form": ""
+  },
+  {
+    "id": "hair",
+    "en": "hair",
+    "pos": "n.",
+    "zh": "頭髮",
+    "categories": [
+      "body"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I need to dry my hair before going out.",
+    "exampleZh": "出門前我需要把頭髮吹乾。",
+    "form": ""
+  },
+  {
+    "id": "face",
+    "en": "face",
+    "pos": "n.",
+    "zh": "臉",
+    "categories": [
+      "body"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Wash your face with cold water to wake up.",
+    "exampleZh": "用冷水洗臉讓自己清醒。",
+    "form": ""
+  },
+  {
+    "id": "eye",
+    "en": "eye",
+    "pos": "n.",
+    "zh": "眼睛",
+    "categories": [
+      "body"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Close your eyes and make a wish.",
+    "exampleZh": "閉上眼睛許個願。",
+    "form": "eyes"
+  },
+  {
+    "id": "ear",
+    "en": "ear",
+    "pos": "n.",
+    "zh": "耳朵",
+    "categories": [
+      "body"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My ears hurt when the plane landed.",
+    "exampleZh": "飛機降落時我的耳朵好痛。",
+    "form": "ears"
+  },
+  {
+    "id": "nose",
+    "en": "nose",
+    "pos": "n.",
+    "zh": "鼻子",
+    "categories": [
+      "body"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My nose is red because of the cold wind.",
+    "exampleZh": "冷風吹得我的鼻子都紅了。",
+    "form": ""
+  },
+  {
+    "id": "mouth",
+    "en": "mouth",
+    "pos": "n.",
+    "zh": "嘴巴",
+    "categories": [
+      "body"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Don't talk with your mouth full.",
+    "exampleZh": "嘴裡有食物時不要說話。",
+    "form": ""
+  },
+  {
+    "id": "tooth",
+    "en": "tooth",
+    "pos": "n.",
+    "zh": "牙齒",
+    "categories": [
+      "body"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I brush my teeth after every meal.",
+    "exampleZh": "我每餐飯後都刷牙。",
+    "form": "teeth"
+  },
+  {
+    "id": "hand",
+    "en": "hand",
+    "pos": "n.",
+    "zh": "手",
+    "categories": [
+      "body"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Please wash your hands before eating.",
+    "exampleZh": "吃飯前請洗手。",
+    "form": "hands"
+  },
+  {
+    "id": "finger",
+    "en": "finger",
+    "pos": "n.",
+    "zh": "手指",
+    "categories": [
+      "body"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I cut my finger while cooking.",
+    "exampleZh": "我煮飯時切到手指。",
+    "form": ""
+  },
+  {
+    "id": "arm",
+    "en": "arm",
+    "pos": "n.",
+    "zh": "手臂",
+    "categories": [
+      "body"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "He broke his arm skiing in Hokkaido.",
+    "exampleZh": "他在北海道滑雪時摔斷了手臂。",
+    "form": ""
+  },
+  {
+    "id": "leg",
+    "en": "leg",
+    "pos": "n.",
+    "zh": "腿",
+    "categories": [
+      "body"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My legs are tired after hiking all day.",
+    "exampleZh": "健行一整天後，我的腿好痠。",
+    "form": "legs"
+  },
+  {
+    "id": "foot",
+    "en": "foot",
+    "pos": "n.",
+    "zh": "腳",
+    "categories": [
+      "body"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My feet hurt from walking around the city.",
+    "exampleZh": "在城市裡走來走去讓我的腳好痛。",
+    "form": "feet"
+  },
+  {
+    "id": "knee",
+    "en": "knee",
+    "pos": "n.",
+    "zh": "膝蓋",
+    "categories": [
+      "body"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "She hurt her knee on the stairs.",
+    "exampleZh": "她在樓梯上弄傷了膝蓋。",
+    "form": ""
+  },
+  {
+    "id": "back",
+    "en": "back",
+    "pos": "n.",
+    "zh": "背",
+    "categories": [
+      "body"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Sleeping on this bed hurts my back.",
+    "exampleZh": "睡這張床讓我的背好痛。",
+    "form": ""
+  },
+  {
+    "id": "neck",
+    "en": "neck",
+    "pos": "n.",
+    "zh": "脖子",
+    "categories": [
+      "body"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Wear a scarf around your neck, it's windy.",
+    "exampleZh": "在脖子上圍條圍巾吧，風很大。",
+    "form": ""
+  },
+  {
+    "id": "shoulder",
+    "en": "shoulder",
+    "pos": "n.",
+    "zh": "肩膀",
+    "categories": [
+      "body"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Carrying a heavy bag hurts my shoulder.",
+    "exampleZh": "背重的包包讓我的肩膀很痛。",
+    "form": ""
+  },
+  {
+    "id": "stomach",
+    "en": "stomach",
+    "pos": "n.",
+    "zh": "胃、肚子",
+    "categories": [
+      "body"
+    ],
+    "level": 1,
+    "syn": "stomach",
+    "example": "I ate too much and my stomach hurts.",
+    "exampleZh": "我吃太多了，肚子好痛。",
+    "form": ""
+  },
+  {
+    "id": "body",
+    "en": "body",
+    "pos": "n.",
+    "zh": "身體",
+    "categories": [
+      "body"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Stretching is good for your body.",
+    "exampleZh": "伸展對身體很好。",
+    "form": ""
+  },
+  {
+    "id": "lip",
+    "en": "lip",
+    "pos": "n.",
+    "zh": "嘴唇",
+    "categories": [
+      "body"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My lips get dry on long flights.",
+    "exampleZh": "長途飛行時我的嘴唇會變乾。",
+    "form": "lips"
+  },
+  {
+    "id": "toe",
+    "en": "toe",
+    "pos": "n.",
+    "zh": "腳趾",
+    "categories": [
+      "body"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I hit my toe on the door.",
+    "exampleZh": "我的腳趾撞到門了。",
+    "form": ""
+  },
+  {
+    "id": "heart",
+    "en": "heart",
+    "pos": "n.",
+    "zh": "心臟",
+    "categories": [
+      "body"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My heart was beating fast before the show.",
+    "exampleZh": "表演開始前我的心跳得很快。",
+    "form": ""
+  },
+  {
+    "id": "skin",
+    "en": "skin",
+    "pos": "n.",
+    "zh": "皮膚",
+    "categories": [
+      "body"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Use sunscreen to protect your skin.",
+    "exampleZh": "擦防曬乳來保護你的皮膚。",
+    "form": ""
+  },
+  {
+    "id": "belly",
+    "en": "belly",
+    "pos": "n.",
+    "zh": "肚子",
+    "categories": [
+      "body"
+    ],
+    "level": 1,
+    "syn": "stomach",
+    "example": "The baby laughed when I touched his belly.",
+    "exampleZh": "我摸寶寶的肚子時他笑了。",
+    "form": ""
+  },
+  {
+    "id": "chin",
+    "en": "chin",
+    "pos": "n.",
+    "zh": "下巴",
+    "categories": [
+      "body"
+    ],
+    "level": 2,
+    "syn": "chin",
+    "example": "He has a small cut on his chin.",
+    "exampleZh": "他的下巴有一個小傷口。",
+    "form": ""
+  },
+  {
+    "id": "cheek",
+    "en": "cheek",
+    "pos": "n.",
+    "zh": "臉頰",
+    "categories": [
+      "body"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "She kissed her grandma on the cheek.",
+    "exampleZh": "她在奶奶的臉頰上親了一下。",
+    "form": ""
+  },
+  {
+    "id": "forehead",
+    "en": "forehead",
+    "pos": "n.",
+    "zh": "額頭",
+    "categories": [
+      "body"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Your forehead feels hot, maybe you have a fever.",
+    "exampleZh": "你的額頭摸起來很燙，可能發燒了。",
+    "form": ""
+  },
+  {
+    "id": "eyebrow",
+    "en": "eyebrow",
+    "pos": "n.",
+    "zh": "眉毛",
+    "categories": [
+      "body"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "She raised her eyebrows in surprise.",
+    "exampleZh": "她驚訝地揚起眉毛。",
+    "form": "eyebrows"
+  },
+  {
+    "id": "throat",
+    "en": "throat",
+    "pos": "n.",
+    "zh": "喉嚨",
+    "categories": [
+      "body",
+      "health"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "My throat is sore from the dry air.",
+    "exampleZh": "乾燥的空氣讓我的喉嚨好痛。",
+    "form": ""
+  },
+  {
+    "id": "chest",
+    "en": "chest",
+    "pos": "n.",
+    "zh": "胸部、胸口",
+    "categories": [
+      "body"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I feel a pain in my chest when I breathe.",
+    "exampleZh": "我呼吸時胸口會痛。",
+    "form": ""
+  },
+  {
+    "id": "elbow",
+    "en": "elbow",
+    "pos": "n.",
+    "zh": "手肘",
+    "categories": [
+      "body"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Please keep your elbows off the table.",
+    "exampleZh": "請不要把手肘靠在桌上。",
+    "form": "elbows"
+  },
+  {
+    "id": "wrist",
+    "en": "wrist",
+    "pos": "n.",
+    "zh": "手腕",
+    "categories": [
+      "body"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I wear my watch on my left wrist.",
+    "exampleZh": "我把手錶戴在左手腕上。",
+    "form": ""
+  },
+  {
+    "id": "ankle",
+    "en": "ankle",
+    "pos": "n.",
+    "zh": "腳踝",
+    "categories": [
+      "body"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I twisted my ankle on the hiking trail.",
+    "exampleZh": "我在登山步道上扭到腳踝。",
+    "form": ""
+  },
+  {
+    "id": "thumb",
+    "en": "thumb",
+    "pos": "n.",
+    "zh": "大拇指",
+    "categories": [
+      "body"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I hurt my thumb opening the jar.",
+    "exampleZh": "我開罐子時弄傷了大拇指。",
+    "form": ""
+  },
+  {
+    "id": "fingernail",
+    "en": "fingernail",
+    "pos": "n.",
+    "zh": "指甲",
+    "categories": [
+      "body"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "My fingernails are too long, I need to cut them.",
+    "exampleZh": "我的指甲太長了，需要剪一剪。",
+    "form": "fingernails"
+  },
+  {
+    "id": "tongue",
+    "en": "tongue",
+    "pos": "n.",
+    "zh": "舌頭",
+    "categories": [
+      "body"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I burned my tongue on the hot soup.",
+    "exampleZh": "熱湯燙到我的舌頭了。",
+    "form": ""
+  },
+  {
+    "id": "waist",
+    "en": "waist",
+    "pos": "n.",
+    "zh": "腰",
+    "categories": [
+      "body"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "These pants are too big around the waist.",
+    "exampleZh": "這條褲子的腰圍太大了。",
+    "form": ""
+  },
+  {
+    "id": "hip",
+    "en": "hip",
+    "pos": "n.",
+    "zh": "臀部、髖部",
+    "categories": [
+      "body"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "My grandma had surgery on her hip.",
+    "exampleZh": "我奶奶的髖部動過手術。",
+    "form": ""
+  },
+  {
+    "id": "heel",
+    "en": "heel",
+    "pos": "n.",
+    "zh": "腳跟",
+    "categories": [
+      "body"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "My new shoes hurt my heels.",
+    "exampleZh": "新鞋子磨得我腳跟好痛。",
+    "form": "heels"
+  },
+  {
+    "id": "brain",
+    "en": "brain",
+    "pos": "n.",
+    "zh": "大腦",
+    "categories": [
+      "body"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Sleep helps your brain rest.",
+    "exampleZh": "睡眠能讓大腦休息。",
+    "form": ""
+  },
+  {
+    "id": "bone",
+    "en": "bone",
+    "pos": "n.",
+    "zh": "骨頭",
+    "categories": [
+      "body"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The doctor said no bones were broken.",
+    "exampleZh": "醫生說沒有骨頭斷掉。",
+    "form": "bones"
+  },
+  {
+    "id": "blood",
+    "en": "blood",
+    "pos": "n.",
+    "zh": "血、血液",
+    "categories": [
+      "body"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "There's a little blood on your sleeve.",
+    "exampleZh": "你的袖子上有一點血。",
+    "form": ""
+  },
+  {
+    "id": "muscle",
+    "en": "muscle",
+    "pos": "n.",
+    "zh": "肌肉",
+    "categories": [
+      "body"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "My muscles are sore after yoga class.",
+    "exampleZh": "上完瑜伽課後我的肌肉好痠。",
+    "form": "muscles"
+  },
+  {
+    "id": "lung",
+    "en": "lung",
+    "pos": "n.",
+    "zh": "肺",
+    "categories": [
+      "body"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Smoking is bad for your lungs.",
+    "exampleZh": "抽菸對肺不好。",
+    "form": "lungs"
+  },
+  {
+    "id": "palm",
+    "en": "palm",
+    "pos": "n.",
+    "zh": "手掌、手心",
+    "categories": [
+      "body"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "She held the coin in her palm.",
+    "exampleZh": "她把硬幣握在手心裡。",
+    "form": ""
+  },
+  {
+    "id": "beard",
+    "en": "beard",
+    "pos": "n.",
+    "zh": "鬍子",
+    "categories": [
+      "body"
+    ],
+    "level": 2,
+    "syn": "beard",
+    "example": "My dad has a long gray beard.",
+    "exampleZh": "我爸爸留著灰白的長鬍子。",
+    "form": ""
+  },
+  {
+    "id": "thigh",
+    "en": "thigh",
+    "pos": "n.",
+    "zh": "大腿",
+    "categories": [
+      "body"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Running uphill makes my thighs burn.",
+    "exampleZh": "跑上坡讓我的大腿好痠。",
+    "form": "thighs"
+  },
+  {
+    "id": "jaw",
+    "en": "jaw",
+    "pos": "n.",
+    "zh": "下顎",
+    "categories": [
+      "body"
+    ],
+    "level": 2,
+    "syn": "chin",
+    "example": "My jaw hurts when I chew.",
+    "exampleZh": "我咀嚼時下顎會痛。",
+    "form": ""
+  },
+  {
+    "id": "liver",
+    "en": "liver",
+    "pos": "n.",
+    "zh": "肝臟",
+    "categories": [
+      "body"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Drinking too much alcohol can hurt your liver.",
+    "exampleZh": "喝太多酒會傷害你的肝臟。",
+    "form": ""
+  },
+  {
+    "id": "kidney",
+    "en": "kidney",
+    "pos": "n.",
+    "zh": "腎臟",
+    "categories": [
+      "body"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Drink plenty of water to keep your kidneys healthy.",
+    "exampleZh": "多喝水讓腎臟保持健康。",
+    "form": "kidneys"
+  },
+  {
+    "id": "spine",
+    "en": "spine",
+    "pos": "n.",
+    "zh": "脊椎",
+    "categories": [
+      "body"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Sit up straight to protect your spine.",
+    "exampleZh": "坐直來保護你的脊椎。",
+    "form": ""
+  },
+  {
+    "id": "joint",
+    "en": "joint",
+    "pos": "n.",
+    "zh": "關節",
+    "categories": [
+      "body"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "My joints ache when it rains.",
+    "exampleZh": "下雨時我的關節會痠痛。",
+    "form": "joints"
+  },
+  {
+    "id": "calf",
+    "en": "calf",
+    "pos": "n.",
+    "zh": "小腿",
+    "categories": [
+      "body"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I got a cramp in my calf while swimming.",
+    "exampleZh": "我游泳時小腿抽筋了。",
+    "form": ""
+  },
+  {
+    "id": "nostril",
+    "en": "nostril",
+    "pos": "n.",
+    "zh": "鼻孔",
+    "categories": [
+      "body"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Breathe in slowly through your nostrils.",
+    "exampleZh": "用鼻孔慢慢吸氣。",
+    "form": "nostrils"
+  },
+  {
+    "id": "eyelid",
+    "en": "eyelid",
+    "pos": "n.",
+    "zh": "眼皮",
+    "categories": [
+      "body"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "My eyelid keeps twitching when I'm tired.",
+    "exampleZh": "我累的時候眼皮一直跳。",
+    "form": ""
+  },
+  {
+    "id": "intestine",
+    "en": "intestine",
+    "pos": "n.",
+    "zh": "腸、腸子",
+    "categories": [
+      "body"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Food passes from the stomach into the intestines.",
+    "exampleZh": "食物從胃進入腸子。",
+    "form": "intestines"
+  },
+  {
+    "id": "rib",
+    "en": "rib",
+    "pos": "n.",
+    "zh": "肋骨",
+    "categories": [
+      "body"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "He hurt his ribs when he fell off his bike.",
+    "exampleZh": "他騎腳踏車摔倒時傷到了肋骨。",
+    "form": "ribs"
+  },
+  {
+    "id": "mustache",
+    "en": "mustache",
+    "pos": "n.",
+    "zh": "八字鬍",
+    "categories": [
+      "body"
+    ],
+    "level": 3,
+    "syn": "beard",
+    "example": "The man with the mustache is our tour guide.",
+    "exampleZh": "留八字鬍的那個人是我們的導遊。",
+    "form": ""
+  },
+  {
+    "id": "knuckle",
+    "en": "knuckle",
+    "pos": "n.",
+    "zh": "指關節",
+    "categories": [
+      "body"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I scraped my knuckles on the wall.",
+    "exampleZh": "我的指關節在牆上擦傷了。",
+    "form": "knuckles"
+  },
+  {
+    "id": "vein",
+    "en": "vein",
+    "pos": "n.",
+    "zh": "靜脈、血管",
+    "categories": [
+      "body"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The nurse found a vein in my arm.",
+    "exampleZh": "護理師在我的手臂上找到了血管。",
+    "form": ""
+  }
+]

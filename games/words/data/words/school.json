@@ -1,0 +1,905 @@
+[
+  {
+    "id": "school",
+    "en": "school",
+    "pos": "n.",
+    "zh": "學校",
+    "categories": [
+      "school"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The kids walk to school every morning.",
+    "exampleZh": "孩子們每天早上走路上學。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "class",
+    "en": "class",
+    "pos": "n.",
+    "zh": "課、班級",
+    "categories": [
+      "school"
+    ],
+    "level": 1,
+    "syn": "lesson",
+    "example": "My English class starts at nine.",
+    "exampleZh": "我的英文課九點開始。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "classroom",
+    "en": "classroom",
+    "pos": "n.",
+    "zh": "教室",
+    "categories": [
+      "school"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Please don't eat in the classroom.",
+    "exampleZh": "請不要在教室裡吃東西。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "student",
+    "en": "student",
+    "pos": "n.",
+    "zh": "學生",
+    "categories": [
+      "school",
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Students can get a discount on museum tickets.",
+    "exampleZh": "學生買博物館門票可以打折。",
+    "form": "Students",
+    "reviewed": true
+  },
+  {
+    "id": "homework",
+    "en": "homework",
+    "pos": "n.",
+    "zh": "功課、作業",
+    "categories": [
+      "school"
+    ],
+    "level": 1,
+    "syn": "homework",
+    "example": "I finished my homework before dinner.",
+    "exampleZh": "我在晚餐前寫完功課。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "book",
+    "en": "book",
+    "pos": "n.",
+    "zh": "書",
+    "categories": [
+      "school"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I always bring a book on long flights.",
+    "exampleZh": "搭長途飛機時我總會帶一本書。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "pen",
+    "en": "pen",
+    "pos": "n.",
+    "zh": "筆、原子筆",
+    "categories": [
+      "school"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Can I borrow a pen to fill out this form?",
+    "exampleZh": "我可以借支筆填這張表格嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "pencil",
+    "en": "pencil",
+    "pos": "n.",
+    "zh": "鉛筆",
+    "categories": [
+      "school"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Write your name in pencil first.",
+    "exampleZh": "先用鉛筆寫上你的名字。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "eraser",
+    "en": "eraser",
+    "pos": "n.",
+    "zh": "橡皮擦",
+    "categories": [
+      "school"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Can I use your eraser for a second?",
+    "exampleZh": "我可以借用一下你的橡皮擦嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "desk",
+    "en": "desk",
+    "pos": "n.",
+    "zh": "書桌",
+    "categories": [
+      "school",
+      "home"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My desk is next to the window.",
+    "exampleZh": "我的書桌在窗戶旁邊。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "ruler",
+    "en": "ruler",
+    "pos": "n.",
+    "zh": "尺",
+    "categories": [
+      "school"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Use a ruler to draw a straight line.",
+    "exampleZh": "用尺畫一條直線。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "schoolbag",
+    "en": "schoolbag",
+    "pos": "n.",
+    "zh": "書包",
+    "categories": [
+      "school"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "His schoolbag is full of books.",
+    "exampleZh": "他的書包裝滿了書。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "test",
+    "en": "test",
+    "pos": "n.",
+    "zh": "考試、測驗",
+    "categories": [
+      "school"
+    ],
+    "level": 1,
+    "syn": "test",
+    "example": "We have a math test on Monday.",
+    "exampleZh": "我們星期一有數學考試。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "lesson",
+    "en": "lesson",
+    "pos": "n.",
+    "zh": "課程、一堂課",
+    "categories": [
+      "school"
+    ],
+    "level": 1,
+    "syn": "lesson",
+    "example": "I'm taking surfing lessons this summer.",
+    "exampleZh": "我這個暑假要上衝浪課。",
+    "form": "lessons",
+    "reviewed": true
+  },
+  {
+    "id": "learn-v",
+    "en": "learn",
+    "pos": "v.",
+    "zh": "學習、學會",
+    "categories": [
+      "school"
+    ],
+    "level": 1,
+    "syn": "learn",
+    "example": "I want to learn some Japanese before my trip.",
+    "exampleZh": "我想在旅行前學一點日文。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "study-v",
+    "en": "study",
+    "pos": "v.",
+    "zh": "讀書、念書",
+    "categories": [
+      "school"
+    ],
+    "level": 1,
+    "syn": "learn",
+    "example": "She studies at the library after school.",
+    "exampleZh": "她放學後在圖書館讀書。",
+    "form": "studies",
+    "reviewed": true
+  },
+  {
+    "id": "english",
+    "en": "English",
+    "pos": "n.",
+    "zh": "英文、英語",
+    "categories": [
+      "school"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Do you speak English?",
+    "exampleZh": "你會說英文嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "math",
+    "en": "math",
+    "pos": "n.",
+    "zh": "數學",
+    "categories": [
+      "school"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Math is my favorite subject.",
+    "exampleZh": "數學是我最喜歡的科目。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "music",
+    "en": "music",
+    "pos": "n.",
+    "zh": "音樂",
+    "categories": [
+      "school"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We sing songs in music class.",
+    "exampleZh": "我們在音樂課唱歌。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "library",
+    "en": "library",
+    "pos": "n.",
+    "zh": "圖書館",
+    "categories": [
+      "school",
+      "city"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The library is quiet and has free Wi-Fi.",
+    "exampleZh": "圖書館很安靜，而且有免費無線網路。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "question",
+    "en": "question",
+    "pos": "n.",
+    "zh": "問題",
+    "categories": [
+      "school"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "May I ask a question?",
+    "exampleZh": "我可以問個問題嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "answer",
+    "en": "answer",
+    "pos": "n.",
+    "zh": "答案、回答",
+    "categories": [
+      "school"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Write your answers on the back of the paper.",
+    "exampleZh": "把答案寫在紙的背面。",
+    "form": "answers",
+    "reviewed": true
+  },
+  {
+    "id": "notebook",
+    "en": "notebook",
+    "pos": "n.",
+    "zh": "筆記本",
+    "categories": [
+      "school"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I write new words in my notebook.",
+    "exampleZh": "我把新單字寫在筆記本上。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "word",
+    "en": "word",
+    "pos": "n.",
+    "zh": "單字、字",
+    "categories": [
+      "school"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "How do you say this word in English?",
+    "exampleZh": "這個字用英文怎麼說？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "exam",
+    "en": "exam",
+    "pos": "n.",
+    "zh": "考試",
+    "categories": [
+      "school"
+    ],
+    "level": 2,
+    "syn": "test",
+    "example": "Good luck on your final exam!",
+    "exampleZh": "祝你期末考順利！",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "quiz",
+    "en": "quiz",
+    "pos": "n.",
+    "zh": "小考",
+    "categories": [
+      "school"
+    ],
+    "level": 2,
+    "syn": "test",
+    "example": "The teacher gave us a short quiz today.",
+    "exampleZh": "老師今天給我們一個小考。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "grade",
+    "en": "grade",
+    "pos": "n.",
+    "zh": "成績、年級",
+    "categories": [
+      "school"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "She got good grades this semester.",
+    "exampleZh": "她這學期成績很好。",
+    "form": "grades",
+    "reviewed": true
+  },
+  {
+    "id": "subject",
+    "en": "subject",
+    "pos": "n.",
+    "zh": "科目",
+    "categories": [
+      "school"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Which subject do you like best?",
+    "exampleZh": "你最喜歡哪個科目？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "history",
+    "en": "history",
+    "pos": "n.",
+    "zh": "歷史",
+    "categories": [
+      "school"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We learned about Taiwan's history at the museum.",
+    "exampleZh": "我們在博物館認識了台灣的歷史。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "science",
+    "en": "science",
+    "pos": "n.",
+    "zh": "科學",
+    "categories": [
+      "school"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The science museum is great for kids.",
+    "exampleZh": "科學博物館很適合小孩。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "geography",
+    "en": "geography",
+    "pos": "n.",
+    "zh": "地理",
+    "categories": [
+      "school"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Geography class helped me read maps.",
+    "exampleZh": "地理課讓我學會看地圖。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "dictionary",
+    "en": "dictionary",
+    "pos": "n.",
+    "zh": "字典、辭典",
+    "categories": [
+      "school"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I use a dictionary app when I travel.",
+    "exampleZh": "我旅行時會用字典應用程式。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "textbook",
+    "en": "textbook",
+    "pos": "n.",
+    "zh": "課本、教科書",
+    "categories": [
+      "school"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Open your textbook to page twenty.",
+    "exampleZh": "把課本翻到第二十頁。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "semester",
+    "en": "semester",
+    "pos": "n.",
+    "zh": "學期",
+    "categories": [
+      "school"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The new semester starts in September.",
+    "exampleZh": "新學期九月開始。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "principal",
+    "en": "principal",
+    "pos": "n.",
+    "zh": "校長",
+    "categories": [
+      "school"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The principal gave a speech at graduation.",
+    "exampleZh": "校長在畢業典禮上致詞。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "classmate",
+    "en": "classmate",
+    "pos": "n.",
+    "zh": "同學",
+    "categories": [
+      "school"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I met an old classmate at the airport.",
+    "exampleZh": "我在機場遇到一位老同學。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "university",
+    "en": "university",
+    "pos": "n.",
+    "zh": "大學",
+    "categories": [
+      "school"
+    ],
+    "level": 2,
+    "syn": "college",
+    "example": "My cousin studies at a university in Tokyo.",
+    "exampleZh": "我表哥在東京一所大學讀書。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "college",
+    "en": "college",
+    "pos": "n.",
+    "zh": "學院、大學",
+    "categories": [
+      "school"
+    ],
+    "level": 2,
+    "syn": "college",
+    "example": "She went to college in California.",
+    "exampleZh": "她在加州念大學。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "vocabulary",
+    "en": "vocabulary",
+    "pos": "n.",
+    "zh": "字彙、詞彙",
+    "categories": [
+      "school"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Reading helps you build your vocabulary.",
+    "exampleZh": "閱讀能幫你增加字彙量。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "practice-v",
+    "en": "practice",
+    "pos": "v.",
+    "zh": "練習",
+    "categories": [
+      "school"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I practice English with my friends every week.",
+    "exampleZh": "我每週和朋友練習英文。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "mistake",
+    "en": "mistake",
+    "pos": "n.",
+    "zh": "錯誤",
+    "categories": [
+      "school"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Don't worry about making mistakes.",
+    "exampleZh": "別擔心犯錯。",
+    "form": "mistakes",
+    "reviewed": true
+  },
+  {
+    "id": "explain-v",
+    "en": "explain",
+    "pos": "v.",
+    "zh": "解釋、說明",
+    "categories": [
+      "school"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Could you explain that again, please?",
+    "exampleZh": "可以請你再解釋一次嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "review-v",
+    "en": "review",
+    "pos": "v.",
+    "zh": "複習",
+    "categories": [
+      "school"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Let's review the new words before the quiz.",
+    "exampleZh": "小考前我們來複習新單字吧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "course",
+    "en": "course",
+    "pos": "n.",
+    "zh": "課程",
+    "categories": [
+      "school"
+    ],
+    "level": 2,
+    "syn": "lesson",
+    "example": "I signed up for a cooking course in Bangkok.",
+    "exampleZh": "我在曼谷報名了一個烹飪課程。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "graduate-v",
+    "en": "graduate",
+    "pos": "v.",
+    "zh": "畢業",
+    "categories": [
+      "school"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "He will graduate from high school next year.",
+    "exampleZh": "他明年將從高中畢業。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "essay",
+    "en": "essay",
+    "pos": "n.",
+    "zh": "作文、短文",
+    "categories": [
+      "school"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I wrote an essay about my trip to Japan.",
+    "exampleZh": "我寫了一篇關於日本之旅的作文。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "whiteboard",
+    "en": "whiteboard",
+    "pos": "n.",
+    "zh": "白板",
+    "categories": [
+      "school"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The teacher wrote the date on the whiteboard.",
+    "exampleZh": "老師在白板上寫下日期。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "calculator",
+    "en": "calculator",
+    "pos": "n.",
+    "zh": "計算機",
+    "categories": [
+      "school"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "You can use a calculator on this test.",
+    "exampleZh": "這次考試可以用計算機。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "scholarship",
+    "en": "scholarship",
+    "pos": "n.",
+    "zh": "獎學金",
+    "categories": [
+      "school"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "She got a scholarship to study in London.",
+    "exampleZh": "她獲得獎學金去倫敦念書。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "degree",
+    "en": "degree",
+    "pos": "n.",
+    "zh": "學位",
+    "categories": [
+      "school"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "He has a degree in hotel management.",
+    "exampleZh": "他擁有旅館管理的學位。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "pronunciation",
+    "en": "pronunciation",
+    "pos": "n.",
+    "zh": "發音",
+    "categories": [
+      "school"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Your English pronunciation is very clear.",
+    "exampleZh": "你的英文發音很清楚。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "grammar",
+    "en": "grammar",
+    "pos": "n.",
+    "zh": "文法",
+    "categories": [
+      "school"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Don't worry too much about grammar when speaking.",
+    "exampleZh": "說話時別太擔心文法。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "lecture",
+    "en": "lecture",
+    "pos": "n.",
+    "zh": "講座、演講",
+    "categories": [
+      "school"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "There's a free lecture on Japanese art tonight.",
+    "exampleZh": "今晚有一場關於日本藝術的免費講座。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "tuition",
+    "en": "tuition",
+    "pos": "n.",
+    "zh": "學費",
+    "categories": [
+      "school"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Tuition is cheaper at public universities.",
+    "exampleZh": "公立大學的學費比較便宜。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "dormitory",
+    "en": "dormitory",
+    "pos": "n.",
+    "zh": "宿舍",
+    "categories": [
+      "school"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "International students can live in the dormitory.",
+    "exampleZh": "國際學生可以住在宿舍。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "exchange-student",
+    "en": "exchange student",
+    "pos": "n.",
+    "zh": "交換學生",
+    "categories": [
+      "school"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We hosted an exchange student from France.",
+    "exampleZh": "我們接待了一位來自法國的交換學生。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "campus",
+    "en": "campus",
+    "pos": "n.",
+    "zh": "校園",
+    "categories": [
+      "school"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The campus has a nice cafe and a big library.",
+    "exampleZh": "校園裡有一家不錯的咖啡廳和一座大圖書館。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "assignment",
+    "en": "assignment",
+    "pos": "n.",
+    "zh": "作業",
+    "categories": [
+      "school"
+    ],
+    "level": 3,
+    "syn": "homework",
+    "example": "The assignment is due next Monday.",
+    "exampleZh": "這份作業下週一要交。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "professor",
+    "en": "professor",
+    "pos": "n.",
+    "zh": "教授",
+    "categories": [
+      "school"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Our professor is very friendly.",
+    "exampleZh": "我們的教授非常親切。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "language-school",
+    "en": "language school",
+    "pos": "n.",
+    "zh": "語言學校",
+    "categories": [
+      "school"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I studied Spanish at a language school in Madrid.",
+    "exampleZh": "我在馬德里的語言學校學西班牙文。",
+    "form": "",
+    "reviewed": true
+  }
+]

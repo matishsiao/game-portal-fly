@@ -12,6 +12,7 @@
 | 數字連線 | <https://matishsiao.github.io/game-portal-fly/numberlink/> |
 | 成語填字 | <https://matishsiao.github.io/game-portal-fly/idiom/> |
 | 滾滾解謎 | <https://matishsiao.github.io/game-portal-fly/roll/> |
+| 英文單字連線 | <https://matishsiao.github.io/game-portal-fly/words/> |
 | 密碼偵探 | <https://matishsiao.github.io/game-portal-fly/codebreaker/> |
 
 用手機開啟大廳並加入主畫面，連網時會自動下載所有遊戲，之後沒有網路也能玩。

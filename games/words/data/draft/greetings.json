@@ -1,0 +1,843 @@
+[
+  {
+    "id": "hello",
+    "en": "hello",
+    "pos": "interj.",
+    "zh": "你好、哈囉",
+    "categories": [
+      "greetings"
+    ],
+    "level": 1,
+    "syn": "hello",
+    "example": "Hello, I have a reservation under Chen.",
+    "exampleZh": "你好，我有用陳的名字訂位。",
+    "form": ""
+  },
+  {
+    "id": "hi",
+    "en": "hi",
+    "pos": "interj.",
+    "zh": "嗨",
+    "categories": [
+      "greetings"
+    ],
+    "level": 1,
+    "syn": "hello",
+    "example": "Hi, can I get a table for two?",
+    "exampleZh": "嗨，可以給我一張兩人桌嗎？",
+    "form": ""
+  },
+  {
+    "id": "goodbye",
+    "en": "goodbye",
+    "pos": "interj.",
+    "zh": "再見",
+    "categories": [
+      "greetings"
+    ],
+    "level": 1,
+    "syn": "goodbye",
+    "example": "We said goodbye at the airport.",
+    "exampleZh": "我們在機場道別。",
+    "form": ""
+  },
+  {
+    "id": "bye",
+    "en": "bye",
+    "pos": "interj.",
+    "zh": "拜拜",
+    "categories": [
+      "greetings"
+    ],
+    "level": 1,
+    "syn": "goodbye",
+    "example": "Bye, see you next summer!",
+    "exampleZh": "拜拜，明年夏天見！",
+    "form": ""
+  },
+  {
+    "id": "please",
+    "en": "please",
+    "pos": "adv.",
+    "zh": "請",
+    "categories": [
+      "greetings"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Two coffees, please.",
+    "exampleZh": "請給我兩杯咖啡。",
+    "form": ""
+  },
+  {
+    "id": "thank-you",
+    "en": "thank you",
+    "pos": "phr.",
+    "zh": "謝謝你",
+    "categories": [
+      "greetings"
+    ],
+    "level": 1,
+    "syn": "thank-you",
+    "example": "Thank you for showing me the way.",
+    "exampleZh": "謝謝你幫我指路。",
+    "form": ""
+  },
+  {
+    "id": "thanks",
+    "en": "thanks",
+    "pos": "interj.",
+    "zh": "謝謝",
+    "categories": [
+      "greetings"
+    ],
+    "level": 1,
+    "syn": "thank-you",
+    "example": "Thanks, that was very helpful.",
+    "exampleZh": "謝謝，這真的很有幫助。",
+    "form": ""
+  },
+  {
+    "id": "sorry",
+    "en": "sorry",
+    "pos": "adj.",
+    "zh": "對不起、抱歉",
+    "categories": [
+      "greetings"
+    ],
+    "level": 1,
+    "syn": "sorry",
+    "example": "Sorry, I don't understand.",
+    "exampleZh": "抱歉，我聽不懂。",
+    "form": ""
+  },
+  {
+    "id": "excuse-me",
+    "en": "excuse me",
+    "pos": "phr.",
+    "zh": "不好意思",
+    "categories": [
+      "greetings"
+    ],
+    "level": 1,
+    "syn": "sorry",
+    "example": "Excuse me, where is the restroom?",
+    "exampleZh": "不好意思，請問洗手間在哪裡？",
+    "form": ""
+  },
+  {
+    "id": "yes",
+    "en": "yes",
+    "pos": "adv.",
+    "zh": "是、對",
+    "categories": [
+      "greetings"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Yes, this seat is free.",
+    "exampleZh": "對，這個座位沒有人坐。",
+    "form": ""
+  },
+  {
+    "id": "no",
+    "en": "no",
+    "pos": "adv.",
+    "zh": "不、不是",
+    "categories": [
+      "greetings"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "No, thanks. I am just looking.",
+    "exampleZh": "不用了，謝謝。我只是看看。",
+    "form": ""
+  },
+  {
+    "id": "okay",
+    "en": "okay",
+    "pos": "interj.",
+    "zh": "好的、可以",
+    "categories": [
+      "greetings"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Okay, I will meet you in the lobby.",
+    "exampleZh": "好的，我在大廳跟你碰面。",
+    "form": ""
+  },
+  {
+    "id": "good-morning",
+    "en": "good morning",
+    "pos": "phr.",
+    "zh": "早安",
+    "categories": [
+      "greetings"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Good morning! Did you sleep well?",
+    "exampleZh": "早安！你睡得好嗎？",
+    "form": ""
+  },
+  {
+    "id": "good-afternoon",
+    "en": "good afternoon",
+    "pos": "phr.",
+    "zh": "午安",
+    "categories": [
+      "greetings"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Good afternoon, how can I help you?",
+    "exampleZh": "午安，有什麼能為您服務的嗎？",
+    "form": ""
+  },
+  {
+    "id": "good-evening",
+    "en": "good evening",
+    "pos": "phr.",
+    "zh": "晚上好",
+    "categories": [
+      "greetings"
+    ],
+    "level": 1,
+    "syn": "good-evening",
+    "example": "Good evening and welcome to our restaurant.",
+    "exampleZh": "晚上好，歡迎光臨本餐廳。",
+    "form": ""
+  },
+  {
+    "id": "good-night",
+    "en": "good night",
+    "pos": "phr.",
+    "zh": "晚安",
+    "categories": [
+      "greetings"
+    ],
+    "level": 1,
+    "syn": "good-evening",
+    "example": "Good night, see you at breakfast.",
+    "exampleZh": "晚安，早餐時見。",
+    "form": ""
+  },
+  {
+    "id": "welcome",
+    "en": "welcome",
+    "pos": "interj.",
+    "zh": "歡迎",
+    "categories": [
+      "greetings"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Welcome to Taipei! Enjoy your stay.",
+    "exampleZh": "歡迎來到台北！祝您住得愉快。",
+    "form": ""
+  },
+  {
+    "id": "nice-to-meet-you",
+    "en": "nice to meet you",
+    "pos": "phr.",
+    "zh": "很高興認識你",
+    "categories": [
+      "greetings"
+    ],
+    "level": 1,
+    "syn": "nice-to-meet-you",
+    "example": "I'm Amy. Nice to meet you.",
+    "exampleZh": "我是艾咪，很高興認識你。",
+    "form": ""
+  },
+  {
+    "id": "how-are-you",
+    "en": "how are you",
+    "pos": "phr.",
+    "zh": "你好嗎",
+    "categories": [
+      "greetings"
+    ],
+    "level": 1,
+    "syn": "how-are-you",
+    "example": "Hi Tom, how are you today?",
+    "exampleZh": "嗨，湯姆，你今天好嗎？",
+    "form": ""
+  },
+  {
+    "id": "see-you",
+    "en": "see you",
+    "pos": "phr.",
+    "zh": "回頭見",
+    "categories": [
+      "greetings"
+    ],
+    "level": 1,
+    "syn": "goodbye",
+    "example": "See you at the hotel tonight.",
+    "exampleZh": "今晚旅館見。",
+    "form": ""
+  },
+  {
+    "id": "youre-welcome",
+    "en": "you're welcome",
+    "pos": "phr.",
+    "zh": "不客氣",
+    "categories": [
+      "greetings"
+    ],
+    "level": 1,
+    "syn": "youre-welcome",
+    "example": "You're welcome. Have a good trip!",
+    "exampleZh": "不客氣，祝你旅途愉快！",
+    "form": ""
+  },
+  {
+    "id": "no-problem",
+    "en": "no problem",
+    "pos": "phr.",
+    "zh": "沒問題",
+    "categories": [
+      "greetings"
+    ],
+    "level": 1,
+    "syn": "youre-welcome",
+    "example": "No problem, I can wait a few minutes.",
+    "exampleZh": "沒問題，我可以等幾分鐘。",
+    "form": ""
+  },
+  {
+    "id": "name",
+    "en": "name",
+    "pos": "n.",
+    "zh": "名字",
+    "categories": [
+      "greetings"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "May I have your name, please?",
+    "exampleZh": "請問您貴姓大名？",
+    "form": ""
+  },
+  {
+    "id": "fine",
+    "en": "fine",
+    "pos": "adj.",
+    "zh": "很好的、不錯的",
+    "categories": [
+      "greetings"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I'm fine, thank you. And you?",
+    "exampleZh": "我很好，謝謝。你呢？",
+    "form": ""
+  },
+  {
+    "id": "see-you-later",
+    "en": "see you later",
+    "pos": "phr.",
+    "zh": "待會見",
+    "categories": [
+      "greetings"
+    ],
+    "level": 2,
+    "syn": "goodbye",
+    "example": "I'm going to the shop. See you later!",
+    "exampleZh": "我要去商店，待會見！",
+    "form": ""
+  },
+  {
+    "id": "take-care",
+    "en": "take care",
+    "pos": "phr.",
+    "zh": "保重",
+    "categories": [
+      "greetings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Take care and call me when you land.",
+    "exampleZh": "保重，降落後打電話給我。",
+    "form": ""
+  },
+  {
+    "id": "have-a-nice-day",
+    "en": "have a nice day",
+    "pos": "phr.",
+    "zh": "祝你有美好的一天",
+    "categories": [
+      "greetings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Here is your receipt. Have a nice day!",
+    "exampleZh": "這是您的收據，祝您有美好的一天！",
+    "form": ""
+  },
+  {
+    "id": "my-pleasure",
+    "en": "my pleasure",
+    "pos": "phr.",
+    "zh": "我的榮幸",
+    "categories": [
+      "greetings"
+    ],
+    "level": 2,
+    "syn": "youre-welcome",
+    "example": "My pleasure. Let me know if you need anything.",
+    "exampleZh": "我的榮幸，有需要請告訴我。",
+    "form": ""
+  },
+  {
+    "id": "pardon",
+    "en": "pardon",
+    "pos": "interj.",
+    "zh": "請再說一次",
+    "categories": [
+      "greetings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Pardon? I didn't catch your name.",
+    "exampleZh": "請再說一次好嗎？我沒聽清楚您的名字。",
+    "form": ""
+  },
+  {
+    "id": "good-luck",
+    "en": "good luck",
+    "pos": "phr.",
+    "zh": "祝好運",
+    "categories": [
+      "greetings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Good luck with your job interview!",
+    "exampleZh": "祝你面試好運！",
+    "form": ""
+  },
+  {
+    "id": "congratulations",
+    "en": "congratulations",
+    "pos": "interj.",
+    "zh": "恭喜",
+    "categories": [
+      "greetings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Congratulations on your new baby!",
+    "exampleZh": "恭喜你們的寶寶出生！",
+    "form": ""
+  },
+  {
+    "id": "cheers",
+    "en": "cheers",
+    "pos": "interj.",
+    "zh": "乾杯",
+    "categories": [
+      "greetings",
+      "drinks"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Cheers to a great vacation!",
+    "exampleZh": "為美好的假期乾杯！",
+    "form": ""
+  },
+  {
+    "id": "happy-birthday",
+    "en": "happy birthday",
+    "pos": "phr.",
+    "zh": "生日快樂",
+    "categories": [
+      "greetings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Happy birthday! This gift is for you.",
+    "exampleZh": "生日快樂！這份禮物送給你。",
+    "form": ""
+  },
+  {
+    "id": "hows-it-going",
+    "en": "how's it going",
+    "pos": "phr.",
+    "zh": "最近好嗎",
+    "categories": [
+      "greetings"
+    ],
+    "level": 2,
+    "syn": "how-are-you",
+    "example": "Hey Ben, how's it going?",
+    "exampleZh": "嘿，班，最近好嗎？",
+    "form": ""
+  },
+  {
+    "id": "long-time-no-see",
+    "en": "long time no see",
+    "pos": "phr.",
+    "zh": "好久不見",
+    "categories": [
+      "greetings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Long time no see! You look great.",
+    "exampleZh": "好久不見！你看起來氣色很好。",
+    "form": ""
+  },
+  {
+    "id": "nice-to-see-you",
+    "en": "nice to see you",
+    "pos": "phr.",
+    "zh": "很高興見到你",
+    "categories": [
+      "greetings"
+    ],
+    "level": 2,
+    "syn": "nice-to-meet-you",
+    "example": "Nice to see you again, Lisa.",
+    "exampleZh": "麗莎，很高興再見到你。",
+    "form": ""
+  },
+  {
+    "id": "sir",
+    "en": "sir",
+    "pos": "n.",
+    "zh": "先生",
+    "categories": [
+      "greetings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Excuse me, sir, you dropped your ticket.",
+    "exampleZh": "先生，不好意思，您的票掉了。",
+    "form": ""
+  },
+  {
+    "id": "madam",
+    "en": "madam",
+    "pos": "n.",
+    "zh": "女士",
+    "categories": [
+      "greetings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "This way, madam. Your table is ready.",
+    "exampleZh": "女士，這邊請，您的座位準備好了。",
+    "form": ""
+  },
+  {
+    "id": "thanks-a-lot",
+    "en": "thanks a lot",
+    "pos": "phr.",
+    "zh": "多謝",
+    "categories": [
+      "greetings"
+    ],
+    "level": 2,
+    "syn": "thank-you",
+    "example": "Thanks a lot for the ride.",
+    "exampleZh": "多謝你載我一程。",
+    "form": ""
+  },
+  {
+    "id": "introduce",
+    "en": "introduce",
+    "pos": "v.",
+    "zh": "介紹",
+    "categories": [
+      "greetings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Let me introduce my friend, Kevin.",
+    "exampleZh": "讓我介紹一下我的朋友凱文。",
+    "form": ""
+  },
+  {
+    "id": "greet",
+    "en": "greet",
+    "pos": "v.",
+    "zh": "打招呼、迎接",
+    "categories": [
+      "greetings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The owner greeted us at the door.",
+    "exampleZh": "老闆在門口迎接我們。",
+    "form": "greeted"
+  },
+  {
+    "id": "manners",
+    "en": "manners",
+    "pos": "n.",
+    "zh": "禮貌",
+    "categories": [
+      "greetings"
+    ],
+    "level": 2,
+    "syn": "manners",
+    "example": "Good manners are important everywhere.",
+    "exampleZh": "良好的禮貌在哪裡都很重要。",
+    "form": ""
+  },
+  {
+    "id": "hug",
+    "en": "hug",
+    "pos": "n.",
+    "zh": "擁抱",
+    "categories": [
+      "greetings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "She gave her grandma a big hug.",
+    "exampleZh": "她給奶奶一個大大的擁抱。",
+    "form": ""
+  },
+  {
+    "id": "handshake",
+    "en": "handshake",
+    "pos": "n.",
+    "zh": "握手",
+    "categories": [
+      "greetings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "He greeted me with a firm handshake.",
+    "exampleZh": "他用有力的握手跟我打招呼。",
+    "form": ""
+  },
+  {
+    "id": "wave",
+    "en": "wave",
+    "pos": "v.",
+    "zh": "揮手",
+    "categories": [
+      "greetings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The kids waved at the passing train.",
+    "exampleZh": "孩子們對經過的火車揮手。",
+    "form": "waved"
+  },
+  {
+    "id": "bow",
+    "en": "bow",
+    "pos": "v.",
+    "zh": "鞠躬",
+    "categories": [
+      "greetings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "In Japan, people often bow to say thanks.",
+    "exampleZh": "在日本，人們常鞠躬表示感謝。",
+    "form": ""
+  },
+  {
+    "id": "after-you",
+    "en": "after you",
+    "pos": "phr.",
+    "zh": "您先請",
+    "categories": [
+      "greetings"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "After you. Please go ahead.",
+    "exampleZh": "您先請，請進。",
+    "form": ""
+  },
+  {
+    "id": "sorry-to-bother-you",
+    "en": "sorry to bother you",
+    "pos": "phr.",
+    "zh": "抱歉打擾了",
+    "categories": [
+      "greetings"
+    ],
+    "level": 2,
+    "syn": "sorry",
+    "example": "Sorry to bother you, but is this seat taken?",
+    "exampleZh": "抱歉打擾了，請問這個位子有人坐嗎？",
+    "form": ""
+  },
+  {
+    "id": "apology",
+    "en": "apology",
+    "pos": "n.",
+    "zh": "道歉",
+    "categories": [
+      "greetings"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Please accept our apology for the delay.",
+    "exampleZh": "對於延誤，請接受我們的道歉。",
+    "form": ""
+  },
+  {
+    "id": "appreciate",
+    "en": "appreciate",
+    "pos": "v.",
+    "zh": "感謝、感激",
+    "categories": [
+      "greetings"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I really appreciate your help.",
+    "exampleZh": "我真的很感謝你的幫忙。",
+    "form": ""
+  },
+  {
+    "id": "courtesy",
+    "en": "courtesy",
+    "pos": "n.",
+    "zh": "禮節、客氣",
+    "categories": [
+      "greetings"
+    ],
+    "level": 3,
+    "syn": "manners",
+    "example": "It is common courtesy to hold the door.",
+    "exampleZh": "幫人扶門是基本的禮節。",
+    "form": ""
+  },
+  {
+    "id": "farewell",
+    "en": "farewell",
+    "pos": "n.",
+    "zh": "告別、道別",
+    "categories": [
+      "greetings"
+    ],
+    "level": 3,
+    "syn": "goodbye",
+    "example": "We had a farewell dinner on the last night.",
+    "exampleZh": "最後一晚我們吃了一頓告別晚餐。",
+    "form": ""
+  },
+  {
+    "id": "regards",
+    "en": "regards",
+    "pos": "n.",
+    "zh": "問候、致意",
+    "categories": [
+      "greetings"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Please give my regards to your parents.",
+    "exampleZh": "請代我向你的父母問好。",
+    "form": ""
+  },
+  {
+    "id": "best-wishes",
+    "en": "best wishes",
+    "pos": "phr.",
+    "zh": "祝福、祝一切順利",
+    "categories": [
+      "greetings"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Best wishes for your new home.",
+    "exampleZh": "祝福你們喬遷順利。",
+    "form": ""
+  },
+  {
+    "id": "how-do-you-do",
+    "en": "how do you do",
+    "pos": "phr.",
+    "zh": "您好",
+    "categories": [
+      "greetings"
+    ],
+    "level": 3,
+    "syn": "hello",
+    "example": "How do you do? I am the hotel manager.",
+    "exampleZh": "您好，我是旅館經理。",
+    "form": ""
+  },
+  {
+    "id": "pleased-to-meet-you",
+    "en": "pleased to meet you",
+    "pos": "phr.",
+    "zh": "幸會",
+    "categories": [
+      "greetings"
+    ],
+    "level": 3,
+    "syn": "nice-to-meet-you",
+    "example": "Pleased to meet you, Mr. Lin.",
+    "exampleZh": "林先生，幸會。",
+    "form": ""
+  },
+  {
+    "id": "no-worries",
+    "en": "no worries",
+    "pos": "phr.",
+    "zh": "別在意、沒關係",
+    "categories": [
+      "greetings"
+    ],
+    "level": 3,
+    "syn": "youre-welcome",
+    "example": "No worries, these things happen.",
+    "exampleZh": "沒關係，這種事難免會發生。",
+    "form": ""
+  },
+  {
+    "id": "take-your-time",
+    "en": "take your time",
+    "pos": "phr.",
+    "zh": "慢慢來",
+    "categories": [
+      "greetings"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Take your time, there is no rush.",
+    "exampleZh": "慢慢來，不用急。",
+    "form": ""
+  },
+  {
+    "id": "have-a-safe-trip",
+    "en": "have a safe trip",
+    "pos": "phr.",
+    "zh": "一路平安",
+    "categories": [
+      "greetings"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Goodbye, and have a safe trip home!",
+    "exampleZh": "再見，祝你回家一路平安！",
+    "form": ""
+  },
+  {
+    "id": "welcome-back",
+    "en": "welcome back",
+    "pos": "phr.",
+    "zh": "歡迎回來",
+    "categories": [
+      "greetings"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Welcome back! How was your vacation?",
+    "exampleZh": "歡迎回來！你的假期過得怎麼樣？",
+    "form": ""
+  }
+]

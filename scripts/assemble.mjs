@@ -19,6 +19,7 @@ const GAMES = {
   numberlink: 'games/numberlink',
   idiom: 'games/idiom',
   roll: 'games/roll',
+  words: 'games/words',
   codebreaker: 'games/codebreaker',
 };
 

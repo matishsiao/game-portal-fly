@@ -24,6 +24,8 @@
   --idiom-2: #174433;
   --roll-1: #4fb3e8;
   --roll-2: #3f9a4a;
+  --words-1: #3aa7e0;
+  --words-2: #22b39a;
   --codebreaker-1: #4b5058;
   --codebreaker-2: #1f2226;
   color-scheme: light;
@@ -56,6 +58,8 @@
     --idiom-2: #123628;
     --roll-1: #1f5f8f;
     --roll-2: #2b6b34;
+    --words-1: #1d5f86;
+    --words-2: #157564;
     --codebreaker-1: #454a52;
     --codebreaker-2: #17191c;
     color-scheme: dark;
@@ -342,6 +346,11 @@ summary:focus-visible {
 
 .game-card[data-theme="idiom"] {
   background: linear-gradient(135deg, var(--idiom-1), var(--idiom-2));
+}
+
+/* 英文單字連線：天藍到湖水綠。 */
+.game-card[data-theme="words"] {
+  background: linear-gradient(135deg, var(--words-1), var(--words-2));
 }
 
 /* 滾滾解謎：上方天空藍、下方草地綠。 */

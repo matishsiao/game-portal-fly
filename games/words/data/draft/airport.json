@@ -1,0 +1,842 @@
+[
+  {
+    "id": "airport",
+    "en": "airport",
+    "pos": "n.",
+    "zh": "機場",
+    "categories": [
+      "airport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We need to get to the airport by six.",
+    "exampleZh": "我們得在六點前到機場。",
+    "form": ""
+  },
+  {
+    "id": "plane",
+    "en": "plane",
+    "pos": "n.",
+    "zh": "飛機",
+    "categories": [
+      "airport"
+    ],
+    "level": 1,
+    "syn": "plane",
+    "example": "The plane is ready to take off.",
+    "exampleZh": "飛機準備要起飛了。",
+    "form": ""
+  },
+  {
+    "id": "airplane",
+    "en": "airplane",
+    "pos": "n.",
+    "zh": "飛機",
+    "categories": [
+      "airport"
+    ],
+    "level": 1,
+    "syn": "plane",
+    "example": "My son loves watching airplanes from the window.",
+    "exampleZh": "我兒子很喜歡從窗戶看飛機。",
+    "form": "airplanes"
+  },
+  {
+    "id": "flight",
+    "en": "flight",
+    "pos": "n.",
+    "zh": "班機、航班",
+    "categories": [
+      "airport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Our flight leaves at nine tonight.",
+    "exampleZh": "我們的班機今晚九點出發。",
+    "form": ""
+  },
+  {
+    "id": "ticket",
+    "en": "ticket",
+    "pos": "n.",
+    "zh": "票、機票",
+    "categories": [
+      "airport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I bought my ticket online last week.",
+    "exampleZh": "我上週在網路上買了機票。",
+    "form": ""
+  },
+  {
+    "id": "seat",
+    "en": "seat",
+    "pos": "n.",
+    "zh": "座位",
+    "categories": [
+      "airport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Could I change to a window seat?",
+    "exampleZh": "我可以換到靠窗的座位嗎？",
+    "form": ""
+  },
+  {
+    "id": "bag",
+    "en": "bag",
+    "pos": "n.",
+    "zh": "包包、袋子",
+    "categories": [
+      "airport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Put your bag under the seat in front of you.",
+    "exampleZh": "請把包包放在前方座位底下。",
+    "form": ""
+  },
+  {
+    "id": "fly",
+    "en": "fly",
+    "pos": "v.",
+    "zh": "飛、搭飛機",
+    "categories": [
+      "airport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We fly to Tokyo tomorrow morning.",
+    "exampleZh": "我們明天早上飛東京。",
+    "form": ""
+  },
+  {
+    "id": "pilot",
+    "en": "pilot",
+    "pos": "n.",
+    "zh": "飛行員、機師",
+    "categories": [
+      "airport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The pilot welcomed everyone on board.",
+    "exampleZh": "機長歡迎大家登機。",
+    "form": ""
+  },
+  {
+    "id": "gate",
+    "en": "gate",
+    "pos": "n.",
+    "zh": "登機門",
+    "categories": [
+      "airport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Please go to gate twelve now.",
+    "exampleZh": "請現在前往十二號登機門。",
+    "form": ""
+  },
+  {
+    "id": "window",
+    "en": "window",
+    "pos": "n.",
+    "zh": "窗戶",
+    "categories": [
+      "airport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I like to sit by the window.",
+    "exampleZh": "我喜歡坐在窗戶旁邊。",
+    "form": ""
+  },
+  {
+    "id": "passport",
+    "en": "passport",
+    "pos": "n.",
+    "zh": "護照",
+    "categories": [
+      "airport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Don't forget your passport!",
+    "exampleZh": "別忘了帶護照！",
+    "form": ""
+  },
+  {
+    "id": "late",
+    "en": "late",
+    "pos": "adj.",
+    "zh": "遲到的、晚的",
+    "categories": [
+      "airport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Sorry, we are late for check-in.",
+    "exampleZh": "抱歉，我們報到遲到了。",
+    "form": ""
+  },
+  {
+    "id": "wait",
+    "en": "wait",
+    "pos": "v.",
+    "zh": "等待",
+    "categories": [
+      "airport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We waited two hours for our flight.",
+    "exampleZh": "我們等班機等了兩個小時。",
+    "form": "waited"
+  },
+  {
+    "id": "land",
+    "en": "land",
+    "pos": "v.",
+    "zh": "降落",
+    "categories": [
+      "airport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The plane will land in ten minutes.",
+    "exampleZh": "飛機將在十分鐘後降落。",
+    "form": ""
+  },
+  {
+    "id": "trip",
+    "en": "trip",
+    "pos": "n.",
+    "zh": "旅行、旅程",
+    "categories": [
+      "airport"
+    ],
+    "level": 1,
+    "syn": "trip",
+    "example": "How was your trip to Japan?",
+    "exampleZh": "你的日本之旅如何？",
+    "form": ""
+  },
+  {
+    "id": "travel",
+    "en": "travel",
+    "pos": "v.",
+    "zh": "旅行、旅遊",
+    "categories": [
+      "airport"
+    ],
+    "level": 1,
+    "syn": "trip",
+    "example": "I love to travel with my family.",
+    "exampleZh": "我喜歡和家人一起旅行。",
+    "form": ""
+  },
+  {
+    "id": "arrive",
+    "en": "arrive",
+    "pos": "v.",
+    "zh": "抵達、到達",
+    "categories": [
+      "airport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We arrived in Seoul at midnight.",
+    "exampleZh": "我們半夜抵達首爾。",
+    "form": "arrived"
+  },
+  {
+    "id": "leave",
+    "en": "leave",
+    "pos": "v.",
+    "zh": "離開、出發",
+    "categories": [
+      "airport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The airport bus leaves every hour.",
+    "exampleZh": "機場巴士每小時發一班車。",
+    "form": "leaves"
+  },
+  {
+    "id": "early",
+    "en": "early",
+    "pos": "adj.",
+    "zh": "早的",
+    "categories": [
+      "airport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Let's get to the airport early.",
+    "exampleZh": "我們早點到機場吧。",
+    "form": ""
+  },
+  {
+    "id": "line",
+    "en": "line",
+    "pos": "n.",
+    "zh": "隊伍",
+    "categories": [
+      "airport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The line at security is very long.",
+    "exampleZh": "安檢的隊伍很長。",
+    "form": ""
+  },
+  {
+    "id": "toilet",
+    "en": "toilet",
+    "pos": "n.",
+    "zh": "廁所",
+    "categories": [
+      "airport"
+    ],
+    "level": 1,
+    "syn": "toilet",
+    "example": "Is the toilet free now?",
+    "exampleZh": "廁所現在沒人嗎？",
+    "form": ""
+  },
+  {
+    "id": "meal",
+    "en": "meal",
+    "pos": "n.",
+    "zh": "餐點",
+    "categories": [
+      "airport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The meal on this flight is chicken or fish.",
+    "exampleZh": "這班飛機的餐點是雞肉或魚。",
+    "form": ""
+  },
+  {
+    "id": "drink",
+    "en": "drink",
+    "pos": "n.",
+    "zh": "飲料",
+    "categories": [
+      "airport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Would you like a drink?",
+    "exampleZh": "您想喝點飲料嗎？",
+    "form": ""
+  },
+  {
+    "id": "luggage",
+    "en": "luggage",
+    "pos": "n.",
+    "zh": "行李",
+    "categories": [
+      "airport"
+    ],
+    "level": 2,
+    "syn": "luggage",
+    "example": "How much luggage do you have?",
+    "exampleZh": "你有多少行李？",
+    "form": ""
+  },
+  {
+    "id": "baggage",
+    "en": "baggage",
+    "pos": "n.",
+    "zh": "行李",
+    "categories": [
+      "airport"
+    ],
+    "level": 2,
+    "syn": "luggage",
+    "example": "Pick up your baggage at carousel three.",
+    "exampleZh": "請到三號轉盤領取行李。",
+    "form": ""
+  },
+  {
+    "id": "suitcase",
+    "en": "suitcase",
+    "pos": "n.",
+    "zh": "行李箱",
+    "categories": [
+      "airport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "My suitcase is too heavy.",
+    "exampleZh": "我的行李箱太重了。",
+    "form": ""
+  },
+  {
+    "id": "boarding-pass",
+    "en": "boarding pass",
+    "pos": "n.",
+    "zh": "登機證",
+    "categories": [
+      "airport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Please show your boarding pass at the gate.",
+    "exampleZh": "請在登機門出示您的登機證。",
+    "form": ""
+  },
+  {
+    "id": "board",
+    "en": "board",
+    "pos": "v.",
+    "zh": "登機、上車",
+    "categories": [
+      "airport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Passengers may now board the plane.",
+    "exampleZh": "旅客現在可以登機了。",
+    "form": ""
+  },
+  {
+    "id": "take-off",
+    "en": "take off",
+    "pos": "phr.",
+    "zh": "起飛",
+    "categories": [
+      "airport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The plane will take off soon.",
+    "exampleZh": "飛機很快就要起飛了。",
+    "form": ""
+  },
+  {
+    "id": "passenger",
+    "en": "passenger",
+    "pos": "n.",
+    "zh": "乘客、旅客",
+    "categories": [
+      "airport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "All passengers must stay in their seats.",
+    "exampleZh": "所有乘客都必須留在座位上。",
+    "form": "passengers"
+  },
+  {
+    "id": "check-in",
+    "en": "check in",
+    "pos": "phr.",
+    "zh": "報到、辦理登機",
+    "categories": [
+      "airport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We need to check in two hours early.",
+    "exampleZh": "我們需要提早兩小時辦理登機。",
+    "form": ""
+  },
+  {
+    "id": "departure",
+    "en": "departure",
+    "pos": "n.",
+    "zh": "出發、離境",
+    "categories": [
+      "airport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Check the departure time on the screen.",
+    "exampleZh": "請看螢幕上的出發時間。",
+    "form": ""
+  },
+  {
+    "id": "arrival",
+    "en": "arrival",
+    "pos": "n.",
+    "zh": "抵達、入境",
+    "categories": [
+      "airport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The arrival hall is on the first floor.",
+    "exampleZh": "入境大廳在一樓。",
+    "form": ""
+  },
+  {
+    "id": "delay",
+    "en": "delay",
+    "pos": "n.",
+    "zh": "延誤",
+    "categories": [
+      "airport"
+    ],
+    "level": 2,
+    "syn": "delay",
+    "example": "There is a two-hour delay because of the storm.",
+    "exampleZh": "因為暴風雨延誤了兩小時。",
+    "form": ""
+  },
+  {
+    "id": "delayed",
+    "en": "delayed",
+    "pos": "adj.",
+    "zh": "延誤的、誤點的",
+    "categories": [
+      "airport"
+    ],
+    "level": 2,
+    "syn": "delay",
+    "example": "Our flight is delayed again.",
+    "exampleZh": "我們的班機又延誤了。",
+    "form": ""
+  },
+  {
+    "id": "cancel",
+    "en": "cancel",
+    "pos": "v.",
+    "zh": "取消",
+    "categories": [
+      "airport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The airline canceled our flight.",
+    "exampleZh": "航空公司取消了我們的班機。",
+    "form": "canceled"
+  },
+  {
+    "id": "airline",
+    "en": "airline",
+    "pos": "n.",
+    "zh": "航空公司",
+    "categories": [
+      "airport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Which airline are you flying with?",
+    "exampleZh": "你搭哪一家航空公司？",
+    "form": ""
+  },
+  {
+    "id": "flight-attendant",
+    "en": "flight attendant",
+    "pos": "n.",
+    "zh": "空服員",
+    "categories": [
+      "airport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The flight attendant brought me some water.",
+    "exampleZh": "空服員幫我拿了一些水。",
+    "form": ""
+  },
+  {
+    "id": "aisle",
+    "en": "aisle",
+    "pos": "n.",
+    "zh": "走道",
+    "categories": [
+      "airport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I prefer an aisle seat.",
+    "exampleZh": "我比較喜歡靠走道的座位。",
+    "form": ""
+  },
+  {
+    "id": "seat-belt",
+    "en": "seat belt",
+    "pos": "n.",
+    "zh": "安全帶",
+    "categories": [
+      "airport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Please fasten your seat belt.",
+    "exampleZh": "請繫好安全帶。",
+    "form": ""
+  },
+  {
+    "id": "security",
+    "en": "security",
+    "pos": "n.",
+    "zh": "安檢",
+    "categories": [
+      "airport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Take your laptop out at security.",
+    "exampleZh": "安檢時請把筆電拿出來。",
+    "form": ""
+  },
+  {
+    "id": "terminal",
+    "en": "terminal",
+    "pos": "n.",
+    "zh": "航廈",
+    "categories": [
+      "airport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Our flight leaves from Terminal 2.",
+    "exampleZh": "我們的班機從第二航廈出發。",
+    "form": ""
+  },
+  {
+    "id": "carry-on",
+    "en": "carry-on",
+    "pos": "n.",
+    "zh": "隨身行李",
+    "categories": [
+      "airport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "This carry-on is small enough for the cabin.",
+    "exampleZh": "這件隨身行李夠小，可以帶上飛機。",
+    "form": ""
+  },
+  {
+    "id": "domestic",
+    "en": "domestic",
+    "pos": "adj.",
+    "zh": "國內的",
+    "categories": [
+      "airport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Domestic flights leave from this terminal.",
+    "exampleZh": "國內航班從這個航廈出發。",
+    "form": ""
+  },
+  {
+    "id": "international",
+    "en": "international",
+    "pos": "adj.",
+    "zh": "國際的",
+    "categories": [
+      "airport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Is this the international terminal?",
+    "exampleZh": "這裡是國際航廈嗎？",
+    "form": ""
+  },
+  {
+    "id": "round-trip",
+    "en": "round-trip",
+    "pos": "adj.",
+    "zh": "來回的",
+    "categories": [
+      "airport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "A round-trip ticket is cheaper.",
+    "exampleZh": "來回票比較便宜。",
+    "form": ""
+  },
+  {
+    "id": "one-way",
+    "en": "one-way",
+    "pos": "adj.",
+    "zh": "單程的",
+    "categories": [
+      "airport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I need a one-way ticket to Bangkok.",
+    "exampleZh": "我需要一張到曼谷的單程票。",
+    "form": ""
+  },
+  {
+    "id": "customs",
+    "en": "customs",
+    "pos": "n.",
+    "zh": "海關",
+    "categories": [
+      "airport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We went through customs quickly.",
+    "exampleZh": "我們很快就通過海關了。",
+    "form": ""
+  },
+  {
+    "id": "immigration",
+    "en": "immigration",
+    "pos": "n.",
+    "zh": "入境審查",
+    "categories": [
+      "airport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The line at immigration was very long.",
+    "exampleZh": "入境審查的隊伍很長。",
+    "form": ""
+  },
+  {
+    "id": "customs-declaration",
+    "en": "customs declaration",
+    "pos": "n.",
+    "zh": "海關申報單",
+    "categories": [
+      "airport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Fill out the customs declaration before landing.",
+    "exampleZh": "降落前請填好海關申報單。",
+    "form": ""
+  },
+  {
+    "id": "itinerary",
+    "en": "itinerary",
+    "pos": "n.",
+    "zh": "行程表",
+    "categories": [
+      "airport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Please email me your itinerary.",
+    "exampleZh": "請把你的行程表寄給我。",
+    "form": ""
+  },
+  {
+    "id": "layover",
+    "en": "layover",
+    "pos": "n.",
+    "zh": "轉機停留",
+    "categories": [
+      "airport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We have a three-hour layover in Dubai.",
+    "exampleZh": "我們在杜拜轉機要停留三小時。",
+    "form": ""
+  },
+  {
+    "id": "connecting-flight",
+    "en": "connecting flight",
+    "pos": "n.",
+    "zh": "轉機航班",
+    "categories": [
+      "airport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I might miss my connecting flight.",
+    "exampleZh": "我可能會趕不上轉機航班。",
+    "form": ""
+  },
+  {
+    "id": "turbulence",
+    "en": "turbulence",
+    "pos": "n.",
+    "zh": "亂流",
+    "categories": [
+      "airport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Please stay seated during turbulence.",
+    "exampleZh": "遇到亂流時請留在座位上。",
+    "form": ""
+  },
+  {
+    "id": "overhead-bin",
+    "en": "overhead bin",
+    "pos": "n.",
+    "zh": "頭頂置物櫃",
+    "categories": [
+      "airport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Put your jacket in the overhead bin.",
+    "exampleZh": "把你的外套放進頭頂置物櫃。",
+    "form": ""
+  },
+  {
+    "id": "baggage-claim",
+    "en": "baggage claim",
+    "pos": "n.",
+    "zh": "行李提領處",
+    "categories": [
+      "airport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Let's meet at baggage claim.",
+    "exampleZh": "我們在行李提領處碰面吧。",
+    "form": ""
+  },
+  {
+    "id": "jet-lag",
+    "en": "jet lag",
+    "pos": "n.",
+    "zh": "時差",
+    "categories": [
+      "airport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I still have jet lag after two days.",
+    "exampleZh": "過了兩天我還在調時差。",
+    "form": ""
+  },
+  {
+    "id": "lavatory",
+    "en": "lavatory",
+    "pos": "n.",
+    "zh": "洗手間",
+    "categories": [
+      "airport"
+    ],
+    "level": 3,
+    "syn": "toilet",
+    "example": "The lavatory is at the back of the plane.",
+    "exampleZh": "洗手間在飛機後方。",
+    "form": ""
+  },
+  {
+    "id": "duty-free",
+    "en": "duty-free",
+    "pos": "adj.",
+    "zh": "免稅的",
+    "categories": [
+      "airport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I bought perfume at the duty-free shop.",
+    "exampleZh": "我在免稅店買了香水。",
+    "form": ""
+  }
+]

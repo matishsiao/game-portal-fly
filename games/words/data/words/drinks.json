@@ -1,0 +1,904 @@
+[
+  {
+    "id": "drink",
+    "en": "drink",
+    "pos": "n.",
+    "zh": "飲料",
+    "categories": [
+      "drinks",
+      "restaurant"
+    ],
+    "level": 1,
+    "syn": "drink",
+    "example": "Can I get you something to drink first?",
+    "exampleZh": "要先幫您點飲料嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "drink-v",
+    "en": "drink",
+    "pos": "v.",
+    "zh": "喝",
+    "categories": [
+      "drinks"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Don't drink the tap water here.",
+    "exampleZh": "這裡的自來水別直接喝。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "water",
+    "en": "water",
+    "pos": "n.",
+    "zh": "水",
+    "categories": [
+      "drinks"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Can I have a glass of water, please?",
+    "exampleZh": "可以給我一杯水嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "milk",
+    "en": "milk",
+    "pos": "n.",
+    "zh": "牛奶",
+    "categories": [
+      "drinks"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I like my coffee with a little milk.",
+    "exampleZh": "我喜歡咖啡加一點牛奶。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "juice",
+    "en": "juice",
+    "pos": "n.",
+    "zh": "果汁",
+    "categories": [
+      "drinks"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "This juice is freshly squeezed.",
+    "exampleZh": "這果汁是現榨的。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "tea",
+    "en": "tea",
+    "pos": "n.",
+    "zh": "茶",
+    "categories": [
+      "drinks"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Taiwan is famous for its high mountain tea.",
+    "exampleZh": "台灣以高山茶聞名。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "coffee",
+    "en": "coffee",
+    "pos": "n.",
+    "zh": "咖啡",
+    "categories": [
+      "drinks"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I need a cup of coffee to wake up.",
+    "exampleZh": "我需要一杯咖啡來提神。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "soda",
+    "en": "soda",
+    "pos": "n.",
+    "zh": "汽水",
+    "categories": [
+      "drinks"
+    ],
+    "level": 1,
+    "syn": "soda",
+    "example": "Too much soda is bad for your teeth.",
+    "exampleZh": "喝太多汽水對牙齒不好。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "cup",
+    "en": "cup",
+    "pos": "n.",
+    "zh": "杯子",
+    "categories": [
+      "drinks"
+    ],
+    "level": 1,
+    "syn": "cup",
+    "example": "Two cups of hot tea, please.",
+    "exampleZh": "請給我兩杯熱茶。",
+    "form": "cups",
+    "reviewed": true
+  },
+  {
+    "id": "glass",
+    "en": "glass",
+    "pos": "n.",
+    "zh": "玻璃杯",
+    "categories": [
+      "drinks"
+    ],
+    "level": 1,
+    "syn": "cup",
+    "example": "Be careful, that glass is full of hot water.",
+    "exampleZh": "小心，那個玻璃杯裝滿了熱水。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "bottle",
+    "en": "bottle",
+    "pos": "n.",
+    "zh": "瓶子",
+    "categories": [
+      "drinks"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I'll take a bottle of water for the train.",
+    "exampleZh": "我要買一瓶水在火車上喝。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "ice",
+    "en": "ice",
+    "pos": "n.",
+    "zh": "冰塊",
+    "categories": [
+      "drinks"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "No ice in my drink, please.",
+    "exampleZh": "我的飲料請不要加冰塊。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "orange-juice",
+    "en": "orange juice",
+    "pos": "n.",
+    "zh": "柳橙汁",
+    "categories": [
+      "drinks"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "A large orange juice, please.",
+    "exampleZh": "請給我一杯大杯柳橙汁。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "apple-juice",
+    "en": "apple juice",
+    "pos": "n.",
+    "zh": "蘋果汁",
+    "categories": [
+      "drinks"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My son always orders apple juice.",
+    "exampleZh": "我兒子總是點蘋果汁。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "green-tea",
+    "en": "green tea",
+    "pos": "n.",
+    "zh": "綠茶",
+    "categories": [
+      "drinks"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Green tea is free at many sushi restaurants.",
+    "exampleZh": "很多壽司店免費供應綠茶。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "black-tea",
+    "en": "black tea",
+    "pos": "n.",
+    "zh": "紅茶",
+    "categories": [
+      "drinks"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "In Taiwan, black tea is often served with ice.",
+    "exampleZh": "在台灣，紅茶常常加冰飲用。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "milk-tea",
+    "en": "milk tea",
+    "pos": "n.",
+    "zh": "奶茶",
+    "categories": [
+      "drinks"
+    ],
+    "level": 1,
+    "syn": "milk-tea",
+    "example": "I'd like a milk tea with less sugar.",
+    "exampleZh": "我想要一杯奶茶，少糖。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "hot-chocolate",
+    "en": "hot chocolate",
+    "pos": "n.",
+    "zh": "熱可可",
+    "categories": [
+      "drinks"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "A hot chocolate warms you up after skiing.",
+    "exampleZh": "滑完雪喝杯熱可可很暖和。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "beer",
+    "en": "beer",
+    "pos": "n.",
+    "zh": "啤酒",
+    "categories": [
+      "drinks"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Let's have a cold beer after the hike.",
+    "exampleZh": "健行完來喝杯冰啤酒吧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "wine",
+    "en": "wine",
+    "pos": "n.",
+    "zh": "葡萄酒",
+    "categories": [
+      "drinks"
+    ],
+    "level": 1,
+    "syn": "wine",
+    "example": "This region produces excellent wine.",
+    "exampleZh": "這個地區出產很棒的葡萄酒。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "straw",
+    "en": "straw",
+    "pos": "n.",
+    "zh": "吸管",
+    "categories": [
+      "drinks"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Many cafes now use paper straws.",
+    "exampleZh": "現在很多咖啡廳改用紙吸管。",
+    "form": "straws",
+    "reviewed": true
+  },
+  {
+    "id": "can",
+    "en": "can",
+    "pos": "n.",
+    "zh": "罐子、罐",
+    "categories": [
+      "drinks"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I bought a can of iced coffee from the vending machine.",
+    "exampleZh": "我在販賣機買了一罐冰咖啡。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "thirsty-adj",
+    "en": "thirsty",
+    "pos": "adj.",
+    "zh": "口渴的",
+    "categories": [
+      "drinks"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I'm so thirsty after walking all day.",
+    "exampleZh": "走了一整天，我好渴。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sweet-adj",
+    "en": "sweet",
+    "pos": "adj.",
+    "zh": "甜的",
+    "categories": [
+      "drinks"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "This lemonade is too sweet for me.",
+    "exampleZh": "這杯檸檬水對我來說太甜了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "bubble-tea",
+    "en": "bubble tea",
+    "pos": "n.",
+    "zh": "珍珠奶茶",
+    "categories": [
+      "drinks"
+    ],
+    "level": 2,
+    "syn": "milk-tea",
+    "example": "You have to try bubble tea in Taipei.",
+    "exampleZh": "來台北一定要喝珍珠奶茶。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "lemonade",
+    "en": "lemonade",
+    "pos": "n.",
+    "zh": "檸檬水",
+    "categories": [
+      "drinks"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Fresh lemonade is great on a hot day.",
+    "exampleZh": "大熱天喝新鮮檸檬水很棒。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "smoothie",
+    "en": "smoothie",
+    "pos": "n.",
+    "zh": "冰沙",
+    "categories": [
+      "drinks"
+    ],
+    "level": 2,
+    "syn": "smoothie",
+    "example": "I'll have a mango smoothie, please.",
+    "exampleZh": "我要一杯芒果冰沙，謝謝。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "milkshake",
+    "en": "milkshake",
+    "pos": "n.",
+    "zh": "奶昔",
+    "categories": [
+      "drinks"
+    ],
+    "level": 2,
+    "syn": "smoothie",
+    "example": "The diner is known for its chocolate milkshakes.",
+    "exampleZh": "這家餐館以巧克力奶昔出名。",
+    "form": "milkshakes",
+    "reviewed": true
+  },
+  {
+    "id": "latte",
+    "en": "latte",
+    "pos": "n.",
+    "zh": "拿鐵",
+    "categories": [
+      "drinks"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Can I get an iced latte with oat milk?",
+    "exampleZh": "可以給我一杯冰拿鐵換燕麥奶嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "iced-coffee",
+    "en": "iced coffee",
+    "pos": "n.",
+    "zh": "冰咖啡",
+    "categories": [
+      "drinks"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Iced coffee is my favorite summer drink.",
+    "exampleZh": "冰咖啡是我夏天最愛的飲料。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "mineral-water",
+    "en": "mineral water",
+    "pos": "n.",
+    "zh": "礦泉水",
+    "categories": [
+      "drinks"
+    ],
+    "level": 2,
+    "syn": "bottled-water",
+    "example": "Two bottles of mineral water, please.",
+    "exampleZh": "請給我兩瓶礦泉水。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "bottled-water",
+    "en": "bottled water",
+    "pos": "n.",
+    "zh": "瓶裝水",
+    "categories": [
+      "drinks"
+    ],
+    "level": 2,
+    "syn": "bottled-water",
+    "example": "Bring bottled water when you go hiking.",
+    "exampleZh": "去爬山時要帶瓶裝水。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sparkling-water",
+    "en": "sparkling water",
+    "pos": "n.",
+    "zh": "氣泡水",
+    "categories": [
+      "drinks"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Would you like still or sparkling water?",
+    "exampleZh": "您要一般的水還是氣泡水？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "soft-drink",
+    "en": "soft drink",
+    "pos": "n.",
+    "zh": "汽水、碳酸飲料",
+    "categories": [
+      "drinks"
+    ],
+    "level": 2,
+    "syn": "soda",
+    "example": "The meal comes with a free soft drink.",
+    "exampleZh": "這份餐附一杯免費汽水。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "energy-drink",
+    "en": "energy drink",
+    "pos": "n.",
+    "zh": "能量飲料",
+    "categories": [
+      "drinks"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "He had an energy drink before the long drive.",
+    "exampleZh": "他長途開車前喝了一罐能量飲料。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sports-drink",
+    "en": "sports drink",
+    "pos": "n.",
+    "zh": "運動飲料",
+    "categories": [
+      "drinks"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "A sports drink helps after a long run.",
+    "exampleZh": "長跑後喝運動飲料有幫助。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "soy-milk",
+    "en": "soy milk",
+    "pos": "n.",
+    "zh": "豆漿",
+    "categories": [
+      "drinks"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Warm soy milk is a classic Taiwanese breakfast drink.",
+    "exampleZh": "溫豆漿是經典的台式早餐飲品。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sip-v",
+    "en": "sip",
+    "pos": "v.",
+    "zh": "啜飲、小口喝",
+    "categories": [
+      "drinks"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We sipped coffee while watching the sunrise.",
+    "exampleZh": "我們一邊看日出一邊啜飲咖啡。",
+    "form": "sipped",
+    "reviewed": true
+  },
+  {
+    "id": "mug",
+    "en": "mug",
+    "pos": "n.",
+    "zh": "馬克杯",
+    "categories": [
+      "drinks"
+    ],
+    "level": 2,
+    "syn": "cup",
+    "example": "I bought a coffee mug as a souvenir.",
+    "exampleZh": "我買了一個咖啡馬克杯當紀念品。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "refill",
+    "en": "refill",
+    "pos": "n.",
+    "zh": "續杯",
+    "categories": [
+      "drinks",
+      "restaurant"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Refills are free at this cafe.",
+    "exampleZh": "這家咖啡廳可以免費續杯。",
+    "form": "refills",
+    "reviewed": true
+  },
+  {
+    "id": "sugar-free-adj",
+    "en": "sugar-free",
+    "pos": "adj.",
+    "zh": "無糖的",
+    "categories": [
+      "drinks"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Do you have any sugar-free drinks?",
+    "exampleZh": "你們有無糖飲料嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "cocktail",
+    "en": "cocktail",
+    "pos": "n.",
+    "zh": "雞尾酒",
+    "categories": [
+      "drinks"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We had cocktails on the hotel rooftop.",
+    "exampleZh": "我們在飯店頂樓喝了雞尾酒。",
+    "form": "cocktails",
+    "reviewed": true
+  },
+  {
+    "id": "whiskey",
+    "en": "whiskey",
+    "pos": "n.",
+    "zh": "威士忌",
+    "categories": [
+      "drinks"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "He brought back a bottle of Japanese whiskey.",
+    "exampleZh": "他帶回一瓶日本威士忌。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "red-wine",
+    "en": "red wine",
+    "pos": "n.",
+    "zh": "紅酒",
+    "categories": [
+      "drinks"
+    ],
+    "level": 2,
+    "syn": "wine",
+    "example": "Red wine goes well with steak.",
+    "exampleZh": "紅酒和牛排很搭。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "alcohol",
+    "en": "alcohol",
+    "pos": "n.",
+    "zh": "酒、酒精",
+    "categories": [
+      "drinks"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I don't drink alcohol, so I'll have juice.",
+    "exampleZh": "我不喝酒，所以我要果汁。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "tap-water",
+    "en": "tap water",
+    "pos": "n.",
+    "zh": "自來水",
+    "categories": [
+      "drinks"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Is the tap water safe to drink here?",
+    "exampleZh": "這裡的自來水可以直接喝嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "iced-adj",
+    "en": "iced",
+    "pos": "adj.",
+    "zh": "冰的、加冰的",
+    "categories": [
+      "drinks"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I'd like an iced black tea, please.",
+    "exampleZh": "我想要一杯冰紅茶，謝謝。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "beverage",
+    "en": "beverage",
+    "pos": "n.",
+    "zh": "飲料",
+    "categories": [
+      "drinks"
+    ],
+    "level": 2,
+    "syn": "drink",
+    "example": "Outside beverages are not allowed in the theater.",
+    "exampleZh": "戲院內禁止自行攜帶飲料。",
+    "form": "beverages",
+    "reviewed": true
+  },
+  {
+    "id": "espresso",
+    "en": "espresso",
+    "pos": "n.",
+    "zh": "義式濃縮咖啡",
+    "categories": [
+      "drinks"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "A double espresso keeps me awake all afternoon.",
+    "exampleZh": "一杯雙份濃縮咖啡讓我整個下午都很清醒。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "cappuccino",
+    "en": "cappuccino",
+    "pos": "n.",
+    "zh": "卡布奇諾",
+    "categories": [
+      "drinks"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Italians usually drink cappuccino only in the morning.",
+    "exampleZh": "義大利人通常只在早上喝卡布奇諾。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "decaf-adj",
+    "en": "decaf",
+    "pos": "adj.",
+    "zh": "低咖啡因的",
+    "categories": [
+      "drinks"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Can I have a decaf latte, please?",
+    "exampleZh": "可以給我一杯低咖啡因拿鐵嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "caffeine",
+    "en": "caffeine",
+    "pos": "n.",
+    "zh": "咖啡因",
+    "categories": [
+      "drinks"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Green tea has less caffeine than coffee.",
+    "exampleZh": "綠茶的咖啡因比咖啡少。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "herbal-tea",
+    "en": "herbal tea",
+    "pos": "n.",
+    "zh": "花草茶",
+    "categories": [
+      "drinks"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Herbal tea helps me sleep on long trips.",
+    "exampleZh": "長途旅行時花草茶幫助我入睡。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "oolong-tea",
+    "en": "oolong tea",
+    "pos": "n.",
+    "zh": "烏龍茶",
+    "categories": [
+      "drinks"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Alishan oolong tea makes a great gift.",
+    "exampleZh": "阿里山烏龍茶是很棒的禮物。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "coconut-water",
+    "en": "coconut water",
+    "pos": "n.",
+    "zh": "椰子水",
+    "categories": [
+      "drinks"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Fresh coconut water is sold on the beach.",
+    "exampleZh": "海灘上有賣新鮮椰子水。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "champagne",
+    "en": "champagne",
+    "pos": "n.",
+    "zh": "香檳",
+    "categories": [
+      "drinks"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We opened champagne to celebrate our anniversary.",
+    "exampleZh": "我們開了香檳慶祝週年紀念。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "draft-beer",
+    "en": "draft beer",
+    "pos": "n.",
+    "zh": "生啤酒",
+    "categories": [
+      "drinks"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Two draft beers, please.",
+    "exampleZh": "請給我兩杯生啤酒。",
+    "form": "draft beers",
+    "reviewed": true
+  },
+  {
+    "id": "non-alcoholic-adj",
+    "en": "non-alcoholic",
+    "pos": "adj.",
+    "zh": "無酒精的",
+    "categories": [
+      "drinks"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Do you have any non-alcoholic cocktails?",
+    "exampleZh": "你們有無酒精的雞尾酒嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "carbonated-adj",
+    "en": "carbonated",
+    "pos": "adj.",
+    "zh": "含氣泡的",
+    "categories": [
+      "drinks"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I avoid carbonated drinks before a long flight.",
+    "exampleZh": "長途飛行前我會避免喝氣泡飲料。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "thermos",
+    "en": "thermos",
+    "pos": "n.",
+    "zh": "保溫瓶",
+    "categories": [
+      "drinks"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I fill my thermos with hot tea every morning.",
+    "exampleZh": "我每天早上把保溫瓶裝滿熱茶。",
+    "form": "",
+    "reviewed": true
+  }
+]

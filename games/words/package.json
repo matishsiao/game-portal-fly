@@ -1,0 +1,20 @@
+{
+  "name": "offline-words",
+  "version": "1.0.0",
+  "private": true,
+  "description": "可離線遊玩的英文單字連線 PWA",
+  "type": "module",
+  "engines": {
+    "node": ">=16.17"
+  },
+  "scripts": {
+    "dev": "node scripts/build-words.mjs && node scripts/serve.mjs",
+    "words": "node scripts/build-words.mjs",
+    "build": "node scripts/build-words.mjs && node scripts/build.mjs",
+    "preview": "node scripts/build-words.mjs && node scripts/build.mjs && node scripts/serve.mjs --dist",
+    "test": "node --test tests/",
+    "validate": "node scripts/validate-words.mjs",
+    "check:puzzles": "node scripts/check-rounds.mjs",
+    "icons": "node scripts/make-icons.mjs"
+  }
+}

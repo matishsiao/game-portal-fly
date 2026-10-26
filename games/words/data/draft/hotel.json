@@ -1,0 +1,842 @@
+[
+  {
+    "id": "hotel",
+    "en": "hotel",
+    "pos": "n.",
+    "zh": "飯店、旅館",
+    "categories": [
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We stayed at a small hotel near the beach.",
+    "exampleZh": "我們住在海邊附近的一間小旅館。",
+    "form": ""
+  },
+  {
+    "id": "room",
+    "en": "room",
+    "pos": "n.",
+    "zh": "房間",
+    "categories": [
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Our room has a great view.",
+    "exampleZh": "我們的房間景色很棒。",
+    "form": ""
+  },
+  {
+    "id": "bed",
+    "en": "bed",
+    "pos": "n.",
+    "zh": "床",
+    "categories": [
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The bed in this room is very soft.",
+    "exampleZh": "這間房間的床很軟。",
+    "form": ""
+  },
+  {
+    "id": "key",
+    "en": "key",
+    "pos": "n.",
+    "zh": "鑰匙",
+    "categories": [
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I left my room key inside.",
+    "exampleZh": "我把房間鑰匙忘在房裡了。",
+    "form": ""
+  },
+  {
+    "id": "door",
+    "en": "door",
+    "pos": "n.",
+    "zh": "門",
+    "categories": [
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Please lock the door at night.",
+    "exampleZh": "晚上請把門鎖好。",
+    "form": ""
+  },
+  {
+    "id": "floor",
+    "en": "floor",
+    "pos": "n.",
+    "zh": "樓層",
+    "categories": [
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Our room is on the tenth floor.",
+    "exampleZh": "我們的房間在十樓。",
+    "form": ""
+  },
+  {
+    "id": "stay",
+    "en": "stay",
+    "pos": "v.",
+    "zh": "住、停留",
+    "categories": [
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "How many nights will you stay?",
+    "exampleZh": "您要住幾晚？",
+    "form": ""
+  },
+  {
+    "id": "night",
+    "en": "night",
+    "pos": "n.",
+    "zh": "晚、夜",
+    "categories": [
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "One night here costs two hundred dollars.",
+    "exampleZh": "這裡住一晚要兩百美元。",
+    "form": ""
+  },
+  {
+    "id": "towel",
+    "en": "towel",
+    "pos": "n.",
+    "zh": "毛巾",
+    "categories": [
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Could we have two more towels?",
+    "exampleZh": "可以再給我們兩條毛巾嗎？",
+    "form": "towels"
+  },
+  {
+    "id": "shower",
+    "en": "shower",
+    "pos": "n.",
+    "zh": "淋浴、淋浴間",
+    "categories": [
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The shower is not very hot.",
+    "exampleZh": "淋浴的水不太熱。",
+    "form": ""
+  },
+  {
+    "id": "bath",
+    "en": "bath",
+    "pos": "n.",
+    "zh": "泡澡、浴缸",
+    "categories": [
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I like to take a hot bath after a long day.",
+    "exampleZh": "忙了一整天後，我喜歡泡個熱水澡。",
+    "form": ""
+  },
+  {
+    "id": "breakfast",
+    "en": "breakfast",
+    "pos": "n.",
+    "zh": "早餐",
+    "categories": [
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Breakfast is served from seven to ten.",
+    "exampleZh": "早餐供應時間是七點到十點。",
+    "form": ""
+  },
+  {
+    "id": "clean",
+    "en": "clean",
+    "pos": "adj.",
+    "zh": "乾淨的",
+    "categories": [
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The room is clean and bright.",
+    "exampleZh": "房間乾淨又明亮。",
+    "form": ""
+  },
+  {
+    "id": "dirty",
+    "en": "dirty",
+    "pos": "adj.",
+    "zh": "髒的",
+    "categories": [
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "These sheets look dirty.",
+    "exampleZh": "這些床單看起來很髒。",
+    "form": ""
+  },
+  {
+    "id": "quiet",
+    "en": "quiet",
+    "pos": "adj.",
+    "zh": "安靜的",
+    "categories": [
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Can I have a quiet room, please?",
+    "exampleZh": "可以給我一間安靜的房間嗎？",
+    "form": ""
+  },
+  {
+    "id": "noisy",
+    "en": "noisy",
+    "pos": "adj.",
+    "zh": "吵鬧的",
+    "categories": [
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The room next to ours is very noisy.",
+    "exampleZh": "我們隔壁的房間很吵。",
+    "form": ""
+  },
+  {
+    "id": "pool",
+    "en": "pool",
+    "pos": "n.",
+    "zh": "游泳池",
+    "categories": [
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The pool is open until nine.",
+    "exampleZh": "游泳池開放到九點。",
+    "form": ""
+  },
+  {
+    "id": "elevator",
+    "en": "elevator",
+    "pos": "n.",
+    "zh": "電梯",
+    "categories": [
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Take the elevator to the fifth floor.",
+    "exampleZh": "搭電梯到五樓。",
+    "form": ""
+  },
+  {
+    "id": "stairs",
+    "en": "stairs",
+    "pos": "n.",
+    "zh": "樓梯",
+    "categories": [
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The stairs are next to the elevator.",
+    "exampleZh": "樓梯在電梯旁邊。",
+    "form": ""
+  },
+  {
+    "id": "bathroom",
+    "en": "bathroom",
+    "pos": "n.",
+    "zh": "浴室",
+    "categories": [
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The bathroom has a big mirror.",
+    "exampleZh": "浴室裡有一面大鏡子。",
+    "form": ""
+  },
+  {
+    "id": "pillow",
+    "en": "pillow",
+    "pos": "n.",
+    "zh": "枕頭",
+    "categories": [
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "This pillow is too hard for me.",
+    "exampleZh": "這個枕頭對我來說太硬了。",
+    "form": ""
+  },
+  {
+    "id": "soap",
+    "en": "soap",
+    "pos": "n.",
+    "zh": "肥皂",
+    "categories": [
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "There is no soap in the bathroom.",
+    "exampleZh": "浴室裡沒有肥皂。",
+    "form": ""
+  },
+  {
+    "id": "hot-water",
+    "en": "hot water",
+    "pos": "n.",
+    "zh": "熱水",
+    "categories": [
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "There is no hot water in my room.",
+    "exampleZh": "我的房間沒有熱水。",
+    "form": ""
+  },
+  {
+    "id": "light",
+    "en": "light",
+    "pos": "n.",
+    "zh": "燈",
+    "categories": [
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "How do I turn on the light?",
+    "exampleZh": "燈要怎麼打開？",
+    "form": ""
+  },
+  {
+    "id": "front-desk",
+    "en": "front desk",
+    "pos": "n.",
+    "zh": "櫃檯",
+    "categories": [
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "front-desk",
+    "example": "Leave your key at the front desk.",
+    "exampleZh": "請把鑰匙留在櫃檯。",
+    "form": ""
+  },
+  {
+    "id": "reception",
+    "en": "reception",
+    "pos": "n.",
+    "zh": "接待處",
+    "categories": [
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "front-desk",
+    "example": "Please call reception if you need anything.",
+    "exampleZh": "需要任何東西請打電話到接待處。",
+    "form": ""
+  },
+  {
+    "id": "reservation",
+    "en": "reservation",
+    "pos": "n.",
+    "zh": "預訂、訂房",
+    "categories": [
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "book",
+    "example": "I have a reservation under the name Chen.",
+    "exampleZh": "我用陳的名字訂了房。",
+    "form": ""
+  },
+  {
+    "id": "book",
+    "en": "book",
+    "pos": "v.",
+    "zh": "預訂",
+    "categories": [
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "book",
+    "example": "I booked a room for three nights.",
+    "exampleZh": "我訂了三晚的房間。",
+    "form": "booked"
+  },
+  {
+    "id": "check-out",
+    "en": "check out",
+    "pos": "phr.",
+    "zh": "退房",
+    "categories": [
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "What time do we need to check out?",
+    "exampleZh": "我們需要幾點退房？",
+    "form": ""
+  },
+  {
+    "id": "check-in",
+    "en": "check in",
+    "pos": "phr.",
+    "zh": "入住登記",
+    "categories": [
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "You can check in after three o'clock.",
+    "exampleZh": "三點以後可以辦理入住。",
+    "form": ""
+  },
+  {
+    "id": "guest",
+    "en": "guest",
+    "pos": "n.",
+    "zh": "房客、客人",
+    "categories": [
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Breakfast is free for all guests.",
+    "exampleZh": "所有房客都可以免費吃早餐。",
+    "form": "guests"
+  },
+  {
+    "id": "single-room",
+    "en": "single room",
+    "pos": "n.",
+    "zh": "單人房",
+    "categories": [
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "A single room is enough for me.",
+    "exampleZh": "我住單人房就夠了。",
+    "form": ""
+  },
+  {
+    "id": "double-room",
+    "en": "double room",
+    "pos": "n.",
+    "zh": "雙人房",
+    "categories": [
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "double-room",
+    "example": "We'd like a double room with a view.",
+    "exampleZh": "我們想要一間有景觀的雙人房。",
+    "form": ""
+  },
+  {
+    "id": "twin-room",
+    "en": "twin room",
+    "pos": "n.",
+    "zh": "雙床房",
+    "categories": [
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "double-room",
+    "example": "A twin room has two separate beds.",
+    "exampleZh": "雙床房有兩張分開的床。",
+    "form": ""
+  },
+  {
+    "id": "blanket",
+    "en": "blanket",
+    "pos": "n.",
+    "zh": "毯子",
+    "categories": [
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Could I get an extra blanket?",
+    "exampleZh": "可以多給我一條毯子嗎？",
+    "form": ""
+  },
+  {
+    "id": "hair-dryer",
+    "en": "hair dryer",
+    "pos": "n.",
+    "zh": "吹風機",
+    "categories": [
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The hair dryer is in the drawer.",
+    "exampleZh": "吹風機在抽屜裡。",
+    "form": ""
+  },
+  {
+    "id": "toothbrush",
+    "en": "toothbrush",
+    "pos": "n.",
+    "zh": "牙刷",
+    "categories": [
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Does the hotel provide a toothbrush?",
+    "exampleZh": "飯店有提供牙刷嗎？",
+    "form": ""
+  },
+  {
+    "id": "slippers",
+    "en": "slippers",
+    "pos": "n.",
+    "zh": "拖鞋",
+    "categories": [
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "You can wear the slippers in your room.",
+    "exampleZh": "你可以在房間裡穿拖鞋。",
+    "form": ""
+  },
+  {
+    "id": "air-conditioner",
+    "en": "air conditioner",
+    "pos": "n.",
+    "zh": "冷氣",
+    "categories": [
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The air conditioner is too loud.",
+    "exampleZh": "冷氣太吵了。",
+    "form": ""
+  },
+  {
+    "id": "heater",
+    "en": "heater",
+    "pos": "n.",
+    "zh": "暖氣",
+    "categories": [
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Can you show me how to use the heater?",
+    "exampleZh": "可以教我怎麼用暖氣嗎？",
+    "form": ""
+  },
+  {
+    "id": "safe",
+    "en": "safe",
+    "pos": "n.",
+    "zh": "保險箱",
+    "categories": [
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Keep your passport in the safe.",
+    "exampleZh": "把護照放在保險箱裡。",
+    "form": ""
+  },
+  {
+    "id": "wake-up-call",
+    "en": "wake-up call",
+    "pos": "n.",
+    "zh": "晨喚服務",
+    "categories": [
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Can I have a wake-up call at six?",
+    "exampleZh": "可以六點叫我起床嗎？",
+    "form": ""
+  },
+  {
+    "id": "room-service",
+    "en": "room service",
+    "pos": "n.",
+    "zh": "客房服務",
+    "categories": [
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Let's order room service tonight.",
+    "exampleZh": "我們今晚叫客房服務吧。",
+    "form": ""
+  },
+  {
+    "id": "lobby",
+    "en": "lobby",
+    "pos": "n.",
+    "zh": "大廳",
+    "categories": [
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I'll meet you in the lobby at eight.",
+    "exampleZh": "我八點在大廳跟你碰面。",
+    "form": ""
+  },
+  {
+    "id": "receptionist",
+    "en": "receptionist",
+    "pos": "n.",
+    "zh": "櫃檯人員",
+    "categories": [
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The receptionist gave us a city map.",
+    "exampleZh": "櫃檯人員給了我們一張城市地圖。",
+    "form": ""
+  },
+  {
+    "id": "deposit",
+    "en": "deposit",
+    "pos": "n.",
+    "zh": "押金",
+    "categories": [
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "You will get your deposit back when you leave.",
+    "exampleZh": "離開時押金會退還給您。",
+    "form": ""
+  },
+  {
+    "id": "password",
+    "en": "password",
+    "pos": "n.",
+    "zh": "密碼",
+    "categories": [
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "What is the Wi-Fi password?",
+    "exampleZh": "無線網路密碼是什麼？",
+    "form": ""
+  },
+  {
+    "id": "laundry",
+    "en": "laundry",
+    "pos": "n.",
+    "zh": "洗衣、送洗衣物",
+    "categories": [
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Is there a laundry service here?",
+    "exampleZh": "這裡有洗衣服務嗎？",
+    "form": ""
+  },
+  {
+    "id": "suite",
+    "en": "suite",
+    "pos": "n.",
+    "zh": "套房",
+    "categories": [
+      "hotel"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The suite has a living room and a kitchen.",
+    "exampleZh": "這間套房有客廳和廚房。",
+    "form": ""
+  },
+  {
+    "id": "vacancy",
+    "en": "vacancy",
+    "pos": "n.",
+    "zh": "空房",
+    "categories": [
+      "hotel"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Sorry, we have no vacancy tonight.",
+    "exampleZh": "抱歉，我們今晚沒有空房。",
+    "form": ""
+  },
+  {
+    "id": "amenities",
+    "en": "amenities",
+    "pos": "n.",
+    "zh": "設施、備品",
+    "categories": [
+      "hotel"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The hotel amenities include a gym and a spa.",
+    "exampleZh": "飯店設施包括健身房和水療中心。",
+    "form": ""
+  },
+  {
+    "id": "concierge",
+    "en": "concierge",
+    "pos": "n.",
+    "zh": "禮賓服務員",
+    "categories": [
+      "hotel"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The concierge booked a taxi for us.",
+    "exampleZh": "禮賓服務員幫我們叫了計程車。",
+    "form": ""
+  },
+  {
+    "id": "housekeeping",
+    "en": "housekeeping",
+    "pos": "n.",
+    "zh": "房務部",
+    "categories": [
+      "hotel"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Housekeeping will clean your room at noon.",
+    "exampleZh": "房務人員中午會打掃您的房間。",
+    "form": ""
+  },
+  {
+    "id": "hostel",
+    "en": "hostel",
+    "pos": "n.",
+    "zh": "青年旅館",
+    "categories": [
+      "hotel"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The hostel is cheap and friendly.",
+    "exampleZh": "這間青年旅館便宜又友善。",
+    "form": ""
+  },
+  {
+    "id": "bellhop",
+    "en": "bellhop",
+    "pos": "n.",
+    "zh": "行李員",
+    "categories": [
+      "hotel"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The bellhop carried our bags upstairs.",
+    "exampleZh": "行李員幫我們把行李搬上樓。",
+    "form": ""
+  },
+  {
+    "id": "minibar",
+    "en": "minibar",
+    "pos": "n.",
+    "zh": "迷你吧",
+    "categories": [
+      "hotel"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Drinks from the minibar are not free.",
+    "exampleZh": "迷你吧的飲料不是免費的。",
+    "form": ""
+  },
+  {
+    "id": "complimentary",
+    "en": "complimentary",
+    "pos": "adj.",
+    "zh": "免費的、贈送的",
+    "categories": [
+      "hotel"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We got a complimentary bottle of wine.",
+    "exampleZh": "我們獲贈一瓶免費的葡萄酒。",
+    "form": ""
+  },
+  {
+    "id": "late-checkout",
+    "en": "late checkout",
+    "pos": "n.",
+    "zh": "延遲退房",
+    "categories": [
+      "hotel"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Can I ask for a late checkout?",
+    "exampleZh": "我可以申請延遲退房嗎？",
+    "form": ""
+  },
+  {
+    "id": "accommodation",
+    "en": "accommodation",
+    "pos": "n.",
+    "zh": "住宿",
+    "categories": [
+      "hotel"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We found cheap accommodation near the station.",
+    "exampleZh": "我們在車站附近找到便宜的住宿。",
+    "form": ""
+  },
+  {
+    "id": "do-not-disturb",
+    "en": "do not disturb",
+    "pos": "phr.",
+    "zh": "請勿打擾",
+    "categories": [
+      "hotel"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I hung the do not disturb sign on the door.",
+    "exampleZh": "我把請勿打擾的牌子掛在門上。",
+    "form": ""
+  }
+]

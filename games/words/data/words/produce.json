@@ -1,0 +1,902 @@
+[
+  {
+    "id": "fruit",
+    "en": "fruit",
+    "pos": "n.",
+    "zh": "水果",
+    "categories": [
+      "produce"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Taiwan has delicious fruit all year round.",
+    "exampleZh": "台灣一年四季都有好吃的水果。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "vegetable",
+    "en": "vegetable",
+    "pos": "n.",
+    "zh": "蔬菜",
+    "categories": [
+      "produce"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Eat more vegetables and less meat.",
+    "exampleZh": "多吃蔬菜，少吃肉。",
+    "form": "vegetables",
+    "reviewed": true
+  },
+  {
+    "id": "apple",
+    "en": "apple",
+    "pos": "n.",
+    "zh": "蘋果",
+    "categories": [
+      "produce"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I packed two apples for the train ride.",
+    "exampleZh": "我帶了兩顆蘋果在火車上吃。",
+    "form": "apples",
+    "reviewed": true
+  },
+  {
+    "id": "banana",
+    "en": "banana",
+    "pos": "n.",
+    "zh": "香蕉",
+    "categories": [
+      "produce"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Bananas are cheap at the morning market.",
+    "exampleZh": "早市的香蕉很便宜。",
+    "form": "bananas",
+    "reviewed": true
+  },
+  {
+    "id": "orange",
+    "en": "orange",
+    "pos": "n.",
+    "zh": "柳橙",
+    "categories": [
+      "produce"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "These oranges are sweet and juicy.",
+    "exampleZh": "這些柳橙又甜又多汁。",
+    "form": "oranges",
+    "reviewed": true
+  },
+  {
+    "id": "grape",
+    "en": "grape",
+    "pos": "n.",
+    "zh": "葡萄",
+    "categories": [
+      "produce"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We picked grapes at a farm in the countryside.",
+    "exampleZh": "我們在鄉下的農場採葡萄。",
+    "form": "grapes",
+    "reviewed": true
+  },
+  {
+    "id": "strawberry",
+    "en": "strawberry",
+    "pos": "n.",
+    "zh": "草莓",
+    "categories": [
+      "produce"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Strawberry picking is popular in winter.",
+    "exampleZh": "冬天很流行採草莓。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "watermelon",
+    "en": "watermelon",
+    "pos": "n.",
+    "zh": "西瓜",
+    "categories": [
+      "produce"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Nothing beats cold watermelon in summer.",
+    "exampleZh": "夏天吃冰西瓜最棒了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "lemon",
+    "en": "lemon",
+    "pos": "n.",
+    "zh": "檸檬",
+    "categories": [
+      "produce"
+    ],
+    "level": 1,
+    "syn": "lemon",
+    "example": "Add a slice of lemon to your water.",
+    "exampleZh": "在水裡加一片檸檬。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "pear",
+    "en": "pear",
+    "pos": "n.",
+    "zh": "梨子、水梨",
+    "categories": [
+      "produce"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Asian pears are crisp and sweet.",
+    "exampleZh": "亞洲水梨又脆又甜。",
+    "form": "pears",
+    "reviewed": true
+  },
+  {
+    "id": "peach",
+    "en": "peach",
+    "pos": "n.",
+    "zh": "桃子",
+    "categories": [
+      "produce"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "These peaches are soft, so handle them gently.",
+    "exampleZh": "這些桃子很軟，拿的時候要輕一點。",
+    "form": "peaches",
+    "reviewed": true
+  },
+  {
+    "id": "mango",
+    "en": "mango",
+    "pos": "n.",
+    "zh": "芒果",
+    "categories": [
+      "produce"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Mango shaved ice is a must in Taiwan.",
+    "exampleZh": "來台灣一定要吃芒果冰。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "pineapple",
+    "en": "pineapple",
+    "pos": "n.",
+    "zh": "鳳梨",
+    "categories": [
+      "produce"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Pineapple cakes are a popular gift from Taiwan.",
+    "exampleZh": "鳳梨酥是很受歡迎的台灣伴手禮。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "cherry",
+    "en": "cherry",
+    "pos": "n.",
+    "zh": "櫻桃",
+    "categories": [
+      "produce"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Cherries are expensive but delicious.",
+    "exampleZh": "櫻桃很貴但很好吃。",
+    "form": "cherries",
+    "reviewed": true
+  },
+  {
+    "id": "kiwi",
+    "en": "kiwi",
+    "pos": "n.",
+    "zh": "奇異果",
+    "categories": [
+      "produce"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Kiwis are full of vitamin C.",
+    "exampleZh": "奇異果富含維他命C。",
+    "form": "kiwis",
+    "reviewed": true
+  },
+  {
+    "id": "tomato",
+    "en": "tomato",
+    "pos": "n.",
+    "zh": "番茄",
+    "categories": [
+      "produce"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Can I have my burger without tomato?",
+    "exampleZh": "我的漢堡可以不要番茄嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "potato",
+    "en": "potato",
+    "pos": "n.",
+    "zh": "馬鈴薯",
+    "categories": [
+      "produce"
+    ],
+    "level": 1,
+    "syn": "potato",
+    "example": "Mashed potatoes come with the steak.",
+    "exampleZh": "牛排附馬鈴薯泥。",
+    "form": "potatoes",
+    "reviewed": true
+  },
+  {
+    "id": "carrot",
+    "en": "carrot",
+    "pos": "n.",
+    "zh": "紅蘿蔔",
+    "categories": [
+      "produce"
+    ],
+    "level": 1,
+    "syn": "carrot",
+    "example": "I don't like carrots in my fried rice.",
+    "exampleZh": "我不喜歡炒飯裡有紅蘿蔔。",
+    "form": "carrots",
+    "reviewed": true
+  },
+  {
+    "id": "onion",
+    "en": "onion",
+    "pos": "n.",
+    "zh": "洋蔥",
+    "categories": [
+      "produce"
+    ],
+    "level": 1,
+    "syn": "onion",
+    "example": "No onions on my sandwich, please.",
+    "exampleZh": "我的三明治不要洋蔥，謝謝。",
+    "form": "onions",
+    "reviewed": true
+  },
+  {
+    "id": "corn",
+    "en": "corn",
+    "pos": "n.",
+    "zh": "玉米",
+    "categories": [
+      "produce"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Grilled corn is a tasty street snack.",
+    "exampleZh": "烤玉米是好吃的街頭小吃。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "bean",
+    "en": "bean",
+    "pos": "n.",
+    "zh": "豆子",
+    "categories": [
+      "produce"
+    ],
+    "level": 1,
+    "syn": "bean",
+    "example": "This sweet soup is made with red beans.",
+    "exampleZh": "這碗甜湯是用紅豆煮的。",
+    "form": "beans",
+    "reviewed": true
+  },
+  {
+    "id": "pumpkin",
+    "en": "pumpkin",
+    "pos": "n.",
+    "zh": "南瓜",
+    "categories": [
+      "produce"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Pumpkin soup is creamy and sweet.",
+    "exampleZh": "南瓜湯濃郁又香甜。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "mushroom",
+    "en": "mushroom",
+    "pos": "n.",
+    "zh": "蘑菇、香菇",
+    "categories": [
+      "produce"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I'd like a pizza with mushrooms and cheese.",
+    "exampleZh": "我想要一份蘑菇起司披薩。",
+    "form": "mushrooms",
+    "reviewed": true
+  },
+  {
+    "id": "fresh-adj",
+    "en": "fresh",
+    "pos": "adj.",
+    "zh": "新鮮的",
+    "categories": [
+      "produce"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The fruit at this market is very fresh.",
+    "exampleZh": "這個市場的水果很新鮮。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "papaya",
+    "en": "papaya",
+    "pos": "n.",
+    "zh": "木瓜",
+    "categories": [
+      "produce"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Papaya milk is a famous drink in Kaohsiung.",
+    "exampleZh": "木瓜牛奶是高雄有名的飲料。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "guava",
+    "en": "guava",
+    "pos": "n.",
+    "zh": "芭樂",
+    "categories": [
+      "produce"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Guava with plum powder is a Taiwanese favorite.",
+    "exampleZh": "芭樂沾梅粉是台灣人的最愛。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "coconut",
+    "en": "coconut",
+    "pos": "n.",
+    "zh": "椰子",
+    "categories": [
+      "produce"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We drank from a fresh coconut on the beach.",
+    "exampleZh": "我們在海灘上喝了新鮮椰子。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "lime",
+    "en": "lime",
+    "pos": "n.",
+    "zh": "萊姆",
+    "categories": [
+      "produce"
+    ],
+    "level": 2,
+    "syn": "lemon",
+    "example": "Squeeze some lime over the tacos.",
+    "exampleZh": "在塔可上擠一些萊姆汁。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "blueberry",
+    "en": "blueberry",
+    "pos": "n.",
+    "zh": "藍莓",
+    "categories": [
+      "produce"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I added blueberries to my yogurt.",
+    "exampleZh": "我在優格裡加了藍莓。",
+    "form": "blueberries",
+    "reviewed": true
+  },
+  {
+    "id": "avocado",
+    "en": "avocado",
+    "pos": "n.",
+    "zh": "酪梨",
+    "categories": [
+      "produce"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Avocado toast is popular at brunch cafes.",
+    "exampleZh": "酪梨吐司在早午餐店很受歡迎。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "plum",
+    "en": "plum",
+    "pos": "n.",
+    "zh": "李子",
+    "categories": [
+      "produce"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "These plums are a little sour.",
+    "exampleZh": "這些李子有點酸。",
+    "form": "plums",
+    "reviewed": true
+  },
+  {
+    "id": "grapefruit",
+    "en": "grapefruit",
+    "pos": "n.",
+    "zh": "葡萄柚",
+    "categories": [
+      "produce"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Grapefruit juice is great for breakfast.",
+    "exampleZh": "早餐喝葡萄柚汁很棒。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "lychee",
+    "en": "lychee",
+    "pos": "n.",
+    "zh": "荔枝",
+    "categories": [
+      "produce"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Lychees are in season in early summer.",
+    "exampleZh": "荔枝的產季在初夏。",
+    "form": "lychees",
+    "reviewed": true
+  },
+  {
+    "id": "sweet-potato",
+    "en": "sweet potato",
+    "pos": "n.",
+    "zh": "地瓜",
+    "categories": [
+      "produce"
+    ],
+    "level": 2,
+    "syn": "potato",
+    "example": "Roasted sweet potatoes are sold at convenience stores.",
+    "exampleZh": "便利商店有賣烤地瓜。",
+    "form": "sweet potatoes",
+    "reviewed": true
+  },
+  {
+    "id": "cabbage",
+    "en": "cabbage",
+    "pos": "n.",
+    "zh": "高麗菜",
+    "categories": [
+      "produce"
+    ],
+    "level": 2,
+    "syn": "cabbage",
+    "example": "Stir-fried cabbage is a simple, tasty dish.",
+    "exampleZh": "炒高麗菜是簡單又好吃的菜。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "lettuce",
+    "en": "lettuce",
+    "pos": "n.",
+    "zh": "萵苣、生菜",
+    "categories": [
+      "produce"
+    ],
+    "level": 2,
+    "syn": "cabbage",
+    "example": "Can I get extra lettuce in my wrap?",
+    "exampleZh": "我的捲餅可以多加生菜嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "cucumber",
+    "en": "cucumber",
+    "pos": "n.",
+    "zh": "小黃瓜",
+    "categories": [
+      "produce"
+    ],
+    "level": 2,
+    "syn": "cucumber",
+    "example": "Cucumber salad is cool and refreshing.",
+    "exampleZh": "涼拌小黃瓜清涼又爽口。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "garlic",
+    "en": "garlic",
+    "pos": "n.",
+    "zh": "大蒜",
+    "categories": [
+      "produce"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "This dish has a lot of garlic.",
+    "exampleZh": "這道菜加了很多大蒜。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "ginger",
+    "en": "ginger",
+    "pos": "n.",
+    "zh": "薑",
+    "categories": [
+      "produce"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Ginger tea is good when you have a cold.",
+    "exampleZh": "感冒時喝薑茶很好。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "spinach",
+    "en": "spinach",
+    "pos": "n.",
+    "zh": "菠菜",
+    "categories": [
+      "produce"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The spinach is fresh from the farm.",
+    "exampleZh": "這菠菜是農場直送的。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "broccoli",
+    "en": "broccoli",
+    "pos": "n.",
+    "zh": "綠花椰菜",
+    "categories": [
+      "produce"
+    ],
+    "level": 2,
+    "syn": "broccoli",
+    "example": "Steamed broccoli comes with the chicken.",
+    "exampleZh": "雞肉附蒸綠花椰菜。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "eggplant",
+    "en": "eggplant",
+    "pos": "n.",
+    "zh": "茄子",
+    "categories": [
+      "produce"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "This eggplant dish is soft and full of flavor.",
+    "exampleZh": "這道茄子料理軟嫩又入味。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "bell-pepper",
+    "en": "bell pepper",
+    "pos": "n.",
+    "zh": "甜椒",
+    "categories": [
+      "produce"
+    ],
+    "level": 2,
+    "syn": "pepper",
+    "example": "Red bell peppers are sweeter than green ones.",
+    "exampleZh": "紅甜椒比綠甜椒甜。",
+    "form": "bell peppers",
+    "reviewed": true
+  },
+  {
+    "id": "green-onion",
+    "en": "green onion",
+    "pos": "n.",
+    "zh": "蔥",
+    "categories": [
+      "produce"
+    ],
+    "level": 2,
+    "syn": "onion",
+    "example": "Green onion pancakes are a popular street snack.",
+    "exampleZh": "蔥油餅是很受歡迎的街頭小吃。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "pea",
+    "en": "pea",
+    "pos": "n.",
+    "zh": "豌豆",
+    "categories": [
+      "produce"
+    ],
+    "level": 2,
+    "syn": "bean",
+    "example": "My son always leaves his peas on the plate.",
+    "exampleZh": "我兒子總是把豌豆剩在盤子上。",
+    "form": "peas",
+    "reviewed": true
+  },
+  {
+    "id": "ripe-adj",
+    "en": "ripe",
+    "pos": "adj.",
+    "zh": "成熟的、熟的",
+    "categories": [
+      "produce"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "These bananas aren't ripe yet.",
+    "exampleZh": "這些香蕉還沒熟。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "juicy-adj",
+    "en": "juicy",
+    "pos": "adj.",
+    "zh": "多汁的",
+    "categories": [
+      "produce"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "This peach is so juicy!",
+    "exampleZh": "這顆桃子好多汁！",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "seed",
+    "en": "seed",
+    "pos": "n.",
+    "zh": "種子",
+    "categories": [
+      "produce"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Watermelon without seeds is easier to eat.",
+    "exampleZh": "無籽西瓜吃起來比較方便。",
+    "form": "seeds",
+    "reviewed": true
+  },
+  {
+    "id": "durian",
+    "en": "durian",
+    "pos": "n.",
+    "zh": "榴槤",
+    "categories": [
+      "produce"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Many hotels don't allow durian in the rooms.",
+    "exampleZh": "很多飯店禁止把榴槤帶進房間。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "dragon-fruit",
+    "en": "dragon fruit",
+    "pos": "n.",
+    "zh": "火龍果",
+    "categories": [
+      "produce"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Red dragon fruit can turn your tongue pink.",
+    "exampleZh": "紅肉火龍果會讓舌頭變成粉紅色。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "passion-fruit",
+    "en": "passion fruit",
+    "pos": "n.",
+    "zh": "百香果",
+    "categories": [
+      "produce"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Passion fruit green tea is sweet and sour.",
+    "exampleZh": "百香果綠茶酸酸甜甜的。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "persimmon",
+    "en": "persimmon",
+    "pos": "n.",
+    "zh": "柿子",
+    "categories": [
+      "produce"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Dried persimmons are a popular autumn snack.",
+    "exampleZh": "柿餅是很受歡迎的秋季零食。",
+    "form": "persimmons",
+    "reviewed": true
+  },
+  {
+    "id": "cauliflower",
+    "en": "cauliflower",
+    "pos": "n.",
+    "zh": "白花椰菜",
+    "categories": [
+      "produce"
+    ],
+    "level": 3,
+    "syn": "broccoli",
+    "example": "Roasted cauliflower is a healthy side dish.",
+    "exampleZh": "烤白花椰菜是健康的配菜。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "celery",
+    "en": "celery",
+    "pos": "n.",
+    "zh": "芹菜",
+    "categories": [
+      "produce"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Please take the celery out of my soup.",
+    "exampleZh": "請把我湯裡的芹菜拿掉。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "asparagus",
+    "en": "asparagus",
+    "pos": "n.",
+    "zh": "蘆筍",
+    "categories": [
+      "produce"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Grilled asparagus goes well with steak.",
+    "exampleZh": "烤蘆筍和牛排很搭。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "zucchini",
+    "en": "zucchini",
+    "pos": "n.",
+    "zh": "櫛瓜",
+    "categories": [
+      "produce"
+    ],
+    "level": 3,
+    "syn": "cucumber",
+    "example": "This pasta comes with grilled zucchini.",
+    "exampleZh": "這道義大利麵附烤櫛瓜。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "bean-sprouts",
+    "en": "bean sprouts",
+    "pos": "n.",
+    "zh": "豆芽菜",
+    "categories": [
+      "produce"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Add some bean sprouts to the noodle soup.",
+    "exampleZh": "在湯麵裡加一些豆芽菜。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "chili-pepper",
+    "en": "chili pepper",
+    "pos": "n.",
+    "zh": "辣椒",
+    "categories": [
+      "produce"
+    ],
+    "level": 3,
+    "syn": "pepper",
+    "example": "Be careful, that chili pepper is very hot.",
+    "exampleZh": "小心，那根辣椒很辣。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "radish",
+    "en": "radish",
+    "pos": "n.",
+    "zh": "白蘿蔔",
+    "categories": [
+      "produce"
+    ],
+    "level": 3,
+    "syn": "carrot",
+    "example": "Radish cake is a common dim sum dish.",
+    "exampleZh": "蘿蔔糕是常見的港式點心。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "organic-adj",
+    "en": "organic",
+    "pos": "adj.",
+    "zh": "有機的",
+    "categories": [
+      "produce"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "This farm grows only organic vegetables.",
+    "exampleZh": "這座農場只種有機蔬菜。",
+    "form": "",
+    "reviewed": true
+  }
+]

@@ -1,0 +1,842 @@
+[
+  {
+    "id": "museum",
+    "en": "museum",
+    "pos": "n.",
+    "zh": "博物館",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The museum is closed on Mondays.",
+    "exampleZh": "博物館星期一休館。",
+    "form": ""
+  },
+  {
+    "id": "park",
+    "en": "park",
+    "pos": "n.",
+    "zh": "公園",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Let's have a picnic in the park.",
+    "exampleZh": "我們去公園野餐吧。",
+    "form": ""
+  },
+  {
+    "id": "zoo",
+    "en": "zoo",
+    "pos": "n.",
+    "zh": "動物園",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The kids want to see pandas at the zoo.",
+    "exampleZh": "孩子們想去動物園看貓熊。",
+    "form": ""
+  },
+  {
+    "id": "beach",
+    "en": "beach",
+    "pos": "n.",
+    "zh": "海灘",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We spent the afternoon at the beach.",
+    "exampleZh": "我們在海灘度過了下午。",
+    "form": ""
+  },
+  {
+    "id": "mountain",
+    "en": "mountain",
+    "pos": "n.",
+    "zh": "山",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We climbed the mountain to see the sunrise.",
+    "exampleZh": "我們爬上山看日出。",
+    "form": ""
+  },
+  {
+    "id": "lake",
+    "en": "lake",
+    "pos": "n.",
+    "zh": "湖",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "You can rent a boat on the lake.",
+    "exampleZh": "你可以在湖上租船。",
+    "form": ""
+  },
+  {
+    "id": "river",
+    "en": "river",
+    "pos": "n.",
+    "zh": "河",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "There is a nice path along the river.",
+    "exampleZh": "河邊有一條很棒的步道。",
+    "form": ""
+  },
+  {
+    "id": "temple",
+    "en": "temple",
+    "pos": "n.",
+    "zh": "寺廟",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "This temple is over three hundred years old.",
+    "exampleZh": "這座寺廟有三百多年歷史。",
+    "form": ""
+  },
+  {
+    "id": "photo",
+    "en": "photo",
+    "pos": "n.",
+    "zh": "照片",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "photo",
+    "example": "Could you take a photo of us?",
+    "exampleZh": "可以幫我們拍張照嗎？",
+    "form": ""
+  },
+  {
+    "id": "picture",
+    "en": "picture",
+    "pos": "n.",
+    "zh": "照片、圖片",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "photo",
+    "example": "Can I take pictures inside?",
+    "exampleZh": "裡面可以拍照嗎？",
+    "form": "pictures"
+  },
+  {
+    "id": "camera",
+    "en": "camera",
+    "pos": "n.",
+    "zh": "相機",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I forgot my camera at the hotel.",
+    "exampleZh": "我把相機忘在飯店了。",
+    "form": ""
+  },
+  {
+    "id": "tour",
+    "en": "tour",
+    "pos": "n.",
+    "zh": "旅遊、導覽",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We joined a walking tour of the old town.",
+    "exampleZh": "我們參加了老城區的徒步導覽。",
+    "form": ""
+  },
+  {
+    "id": "visit",
+    "en": "visit",
+    "pos": "v.",
+    "zh": "參觀、拜訪",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We visited three museums in one day.",
+    "exampleZh": "我們一天參觀了三間博物館。",
+    "form": "visited"
+  },
+  {
+    "id": "tower",
+    "en": "tower",
+    "pos": "n.",
+    "zh": "塔",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "You can see the whole city from the tower.",
+    "exampleZh": "從塔上可以看到整座城市。",
+    "form": ""
+  },
+  {
+    "id": "castle",
+    "en": "castle",
+    "pos": "n.",
+    "zh": "城堡",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The old castle sits on a hill.",
+    "exampleZh": "那座古老的城堡坐落在山丘上。",
+    "form": ""
+  },
+  {
+    "id": "garden",
+    "en": "garden",
+    "pos": "n.",
+    "zh": "花園",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The flowers in this garden are beautiful.",
+    "exampleZh": "這座花園裡的花很漂亮。",
+    "form": ""
+  },
+  {
+    "id": "market",
+    "en": "market",
+    "pos": "n.",
+    "zh": "市場",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The market is busy in the morning.",
+    "exampleZh": "市場早上很熱鬧。",
+    "form": ""
+  },
+  {
+    "id": "night-market",
+    "en": "night market",
+    "pos": "n.",
+    "zh": "夜市",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Let's try some snacks at the night market.",
+    "exampleZh": "我們去夜市吃點小吃吧。",
+    "form": ""
+  },
+  {
+    "id": "famous",
+    "en": "famous",
+    "pos": "adj.",
+    "zh": "有名的",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "This street is famous for its food.",
+    "exampleZh": "這條街以美食聞名。",
+    "form": ""
+  },
+  {
+    "id": "old",
+    "en": "old",
+    "pos": "adj.",
+    "zh": "古老的、舊的",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We walked around the old part of town.",
+    "exampleZh": "我們在老城區四處逛逛。",
+    "form": ""
+  },
+  {
+    "id": "beautiful",
+    "en": "beautiful",
+    "pos": "adj.",
+    "zh": "美麗的",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "What a beautiful sunset!",
+    "exampleZh": "好美的夕陽！",
+    "form": ""
+  },
+  {
+    "id": "view",
+    "en": "view",
+    "pos": "n.",
+    "zh": "景色、風景",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "view",
+    "example": "The view from the top is amazing.",
+    "exampleZh": "從頂端看出去的景色很棒。",
+    "form": ""
+  },
+  {
+    "id": "open",
+    "en": "open",
+    "pos": "adj.",
+    "zh": "開放的、營業中",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Is the palace open today?",
+    "exampleZh": "宮殿今天有開放嗎？",
+    "form": ""
+  },
+  {
+    "id": "guide",
+    "en": "guide",
+    "pos": "n.",
+    "zh": "導遊",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "guide",
+    "example": "Our guide spoke very good English.",
+    "exampleZh": "我們的導遊英文說得很好。",
+    "form": ""
+  },
+  {
+    "id": "tourist",
+    "en": "tourist",
+    "pos": "n.",
+    "zh": "觀光客",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The square is full of tourists in summer.",
+    "exampleZh": "夏天廣場上擠滿了觀光客。",
+    "form": "tourists"
+  },
+  {
+    "id": "souvenir",
+    "en": "souvenir",
+    "pos": "n.",
+    "zh": "紀念品",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I bought a souvenir for my mom.",
+    "exampleZh": "我買了一個紀念品給我媽媽。",
+    "form": ""
+  },
+  {
+    "id": "attraction",
+    "en": "attraction",
+    "pos": "n.",
+    "zh": "景點",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "What is the most popular attraction here?",
+    "exampleZh": "這裡最熱門的景點是什麼？",
+    "form": ""
+  },
+  {
+    "id": "scenery",
+    "en": "scenery",
+    "pos": "n.",
+    "zh": "風景、景色",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "view",
+    "example": "The scenery along the coast is stunning.",
+    "exampleZh": "沿海的風景美極了。",
+    "form": ""
+  },
+  {
+    "id": "gallery",
+    "en": "gallery",
+    "pos": "n.",
+    "zh": "美術館、畫廊",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The gallery has many modern paintings.",
+    "exampleZh": "這間美術館有許多現代畫作。",
+    "form": ""
+  },
+  {
+    "id": "palace",
+    "en": "palace",
+    "pos": "n.",
+    "zh": "宮殿",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We took a tour of the old palace.",
+    "exampleZh": "我們參觀了那座古老的宮殿。",
+    "form": ""
+  },
+  {
+    "id": "statue",
+    "en": "statue",
+    "pos": "n.",
+    "zh": "雕像",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Let's take a photo with the statue.",
+    "exampleZh": "我們和雕像拍張照吧。",
+    "form": ""
+  },
+  {
+    "id": "tour-guide",
+    "en": "tour guide",
+    "pos": "n.",
+    "zh": "導遊",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "guide",
+    "example": "The tour guide told us funny stories.",
+    "exampleZh": "導遊跟我們講了好笑的故事。",
+    "form": ""
+  },
+  {
+    "id": "entrance-fee",
+    "en": "entrance fee",
+    "pos": "n.",
+    "zh": "入場費",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The entrance fee is ten dollars.",
+    "exampleZh": "入場費是十美元。",
+    "form": ""
+  },
+  {
+    "id": "hot-spring",
+    "en": "hot spring",
+    "pos": "n.",
+    "zh": "溫泉",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We relaxed in a hot spring after hiking.",
+    "exampleZh": "健行後我們泡溫泉放鬆一下。",
+    "form": ""
+  },
+  {
+    "id": "aquarium",
+    "en": "aquarium",
+    "pos": "n.",
+    "zh": "水族館",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The kids loved the sharks at the aquarium.",
+    "exampleZh": "孩子們很喜歡水族館裡的鯊魚。",
+    "form": ""
+  },
+  {
+    "id": "theme-park",
+    "en": "theme park",
+    "pos": "n.",
+    "zh": "主題樂園",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "theme-park",
+    "example": "We spent all day at the theme park.",
+    "exampleZh": "我們在主題樂園玩了一整天。",
+    "form": ""
+  },
+  {
+    "id": "amusement-park",
+    "en": "amusement park",
+    "pos": "n.",
+    "zh": "遊樂園",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "theme-park",
+    "example": "The amusement park has a huge roller coaster.",
+    "exampleZh": "那座遊樂園有一個超大的雲霄飛車。",
+    "form": ""
+  },
+  {
+    "id": "waterfall",
+    "en": "waterfall",
+    "pos": "n.",
+    "zh": "瀑布",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "It's a short walk to the waterfall.",
+    "exampleZh": "走一小段路就到瀑布了。",
+    "form": ""
+  },
+  {
+    "id": "festival",
+    "en": "festival",
+    "pos": "n.",
+    "zh": "節慶、慶典",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The lantern festival is in February.",
+    "exampleZh": "燈節在二月。",
+    "form": ""
+  },
+  {
+    "id": "sunset",
+    "en": "sunset",
+    "pos": "n.",
+    "zh": "夕陽、日落",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Let's watch the sunset from the beach.",
+    "exampleZh": "我們在海邊看夕陽吧。",
+    "form": ""
+  },
+  {
+    "id": "sunrise",
+    "en": "sunrise",
+    "pos": "n.",
+    "zh": "日出",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We got up early to see the sunrise.",
+    "exampleZh": "我們早起去看日出。",
+    "form": ""
+  },
+  {
+    "id": "sightseeing",
+    "en": "sightseeing",
+    "pos": "n.",
+    "zh": "觀光",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We went sightseeing all day.",
+    "exampleZh": "我們觀光了一整天。",
+    "form": ""
+  },
+  {
+    "id": "visitor-center",
+    "en": "visitor center",
+    "pos": "n.",
+    "zh": "遊客中心",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Get a free map at the visitor center.",
+    "exampleZh": "在遊客中心拿一份免費地圖。",
+    "form": ""
+  },
+  {
+    "id": "selfie",
+    "en": "selfie",
+    "pos": "n.",
+    "zh": "自拍",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Let's take a selfie in front of the tower.",
+    "exampleZh": "我們在塔前面自拍吧。",
+    "form": ""
+  },
+  {
+    "id": "opening-hours",
+    "en": "opening hours",
+    "pos": "n.",
+    "zh": "開放時間",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Check the opening hours before you go.",
+    "exampleZh": "出發前先查開放時間。",
+    "form": ""
+  },
+  {
+    "id": "crowded",
+    "en": "crowded",
+    "pos": "adj.",
+    "zh": "擁擠的",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The temple is crowded on weekends.",
+    "exampleZh": "那座寺廟週末很擁擠。",
+    "form": ""
+  },
+  {
+    "id": "historic",
+    "en": "historic",
+    "pos": "adj.",
+    "zh": "歷史悠久的",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "This historic street is over a hundred years old.",
+    "exampleZh": "這條老街已有一百多年歷史。",
+    "form": ""
+  },
+  {
+    "id": "local",
+    "en": "local",
+    "pos": "adj.",
+    "zh": "當地的",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We tried some local food near the harbor.",
+    "exampleZh": "我們在港口附近吃了些當地美食。",
+    "form": ""
+  },
+  {
+    "id": "monument",
+    "en": "monument",
+    "pos": "n.",
+    "zh": "紀念碑",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The monument stands in the middle of the square.",
+    "exampleZh": "紀念碑立在廣場中央。",
+    "form": ""
+  },
+  {
+    "id": "cathedral",
+    "en": "cathedral",
+    "pos": "n.",
+    "zh": "大教堂",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The cathedral has beautiful glass windows.",
+    "exampleZh": "這座大教堂有漂亮的彩繪玻璃窗。",
+    "form": ""
+  },
+  {
+    "id": "ruins",
+    "en": "ruins",
+    "pos": "n.",
+    "zh": "遺跡、廢墟",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We walked through the ancient ruins.",
+    "exampleZh": "我們走過古老的遺跡。",
+    "form": ""
+  },
+  {
+    "id": "heritage",
+    "en": "heritage",
+    "pos": "n.",
+    "zh": "遺產、文化資產",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "This old town is part of our cultural heritage.",
+    "exampleZh": "這個古鎮是我們文化資產的一部分。",
+    "form": ""
+  },
+  {
+    "id": "brochure",
+    "en": "brochure",
+    "pos": "n.",
+    "zh": "宣傳手冊",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The hotel gave us a brochure about local tours.",
+    "exampleZh": "飯店給了我們一本當地旅遊的手冊。",
+    "form": ""
+  },
+  {
+    "id": "observation-deck",
+    "en": "observation deck",
+    "pos": "n.",
+    "zh": "觀景台",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The observation deck is on the 89th floor.",
+    "exampleZh": "觀景台在八十九樓。",
+    "form": ""
+  },
+  {
+    "id": "exhibition",
+    "en": "exhibition",
+    "pos": "n.",
+    "zh": "展覽",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "There is a new photo exhibition this month.",
+    "exampleZh": "這個月有一個新的攝影展。",
+    "form": ""
+  },
+  {
+    "id": "panorama",
+    "en": "panorama",
+    "pos": "n.",
+    "zh": "全景",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The hill offers a panorama of the whole bay.",
+    "exampleZh": "從山丘上可以看到整個海灣的全景。",
+    "form": ""
+  },
+  {
+    "id": "scenic",
+    "en": "scenic",
+    "pos": "adj.",
+    "zh": "風景優美的",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We took the scenic route along the coast.",
+    "exampleZh": "我們走沿海那條風景優美的路線。",
+    "form": ""
+  },
+  {
+    "id": "excursion",
+    "en": "excursion",
+    "pos": "n.",
+    "zh": "短程旅行、遠足",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We booked a day excursion to the islands.",
+    "exampleZh": "我們訂了一趟去離島的一日遊。",
+    "form": ""
+  },
+  {
+    "id": "audio-guide",
+    "en": "audio guide",
+    "pos": "n.",
+    "zh": "語音導覽",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "You can rent an audio guide at the entrance.",
+    "exampleZh": "你可以在入口租語音導覽。",
+    "form": ""
+  },
+  {
+    "id": "pagoda",
+    "en": "pagoda",
+    "pos": "n.",
+    "zh": "寶塔",
+    "categories": [
+      "sightseeing"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "There is a tall pagoda by the lake.",
+    "exampleZh": "湖邊有一座高高的寶塔。",
+    "form": ""
+  }
+]

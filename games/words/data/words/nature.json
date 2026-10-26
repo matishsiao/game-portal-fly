@@ -1,0 +1,910 @@
+[
+  {
+    "id": "tree",
+    "en": "tree",
+    "pos": "n.",
+    "zh": "樹",
+    "categories": [
+      "nature"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We had a picnic under a big tree.",
+    "exampleZh": "我們在一棵大樹下野餐。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "flower",
+    "en": "flower",
+    "pos": "n.",
+    "zh": "花",
+    "categories": [
+      "nature"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The park is full of spring flowers.",
+    "exampleZh": "公園裡開滿了春天的花。",
+    "form": "flowers",
+    "reviewed": true
+  },
+  {
+    "id": "grass",
+    "en": "grass",
+    "pos": "n.",
+    "zh": "草、草地",
+    "categories": [
+      "nature"
+    ],
+    "level": 1,
+    "syn": "grass",
+    "example": "Please do not walk on the grass.",
+    "exampleZh": "請勿踐踏草地。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sky",
+    "en": "sky",
+    "pos": "n.",
+    "zh": "天空",
+    "categories": [
+      "nature"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The sky is clear and blue today.",
+    "exampleZh": "今天的天空晴朗湛藍。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sun",
+    "en": "sun",
+    "pos": "n.",
+    "zh": "太陽",
+    "categories": [
+      "nature"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The sun is strong, so wear a hat.",
+    "exampleZh": "太陽很大，記得戴帽子。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "moon",
+    "en": "moon",
+    "pos": "n.",
+    "zh": "月亮",
+    "categories": [
+      "nature"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The moon was bright over the lake.",
+    "exampleZh": "湖面上的月亮好明亮。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "star-3",
+    "en": "star",
+    "pos": "n.",
+    "zh": "星星",
+    "categories": [
+      "nature"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "You can see many stars in the countryside.",
+    "exampleZh": "在鄉下可以看到很多星星。",
+    "form": "stars",
+    "reviewed": true
+  },
+  {
+    "id": "sea",
+    "en": "sea",
+    "pos": "n.",
+    "zh": "海",
+    "categories": [
+      "nature"
+    ],
+    "level": 1,
+    "syn": "sea",
+    "example": "Our room has a view of the sea.",
+    "exampleZh": "我們的房間看得到海。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "river",
+    "en": "river",
+    "pos": "n.",
+    "zh": "河",
+    "categories": [
+      "nature"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We took a boat down the river.",
+    "exampleZh": "我們搭船順流而下。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "lake",
+    "en": "lake",
+    "pos": "n.",
+    "zh": "湖",
+    "categories": [
+      "nature"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We rented bikes and rode around the lake.",
+    "exampleZh": "我們租了腳踏車環湖騎。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "mountain",
+    "en": "mountain",
+    "pos": "n.",
+    "zh": "山",
+    "categories": [
+      "nature"
+    ],
+    "level": 1,
+    "syn": "mountain",
+    "example": "We watched the sunrise from the mountain.",
+    "exampleZh": "我們在山上看日出。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "hill",
+    "en": "hill",
+    "pos": "n.",
+    "zh": "山丘、小山",
+    "categories": [
+      "nature"
+    ],
+    "level": 1,
+    "syn": "mountain",
+    "example": "The temple is on top of the hill.",
+    "exampleZh": "寺廟在山丘頂上。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "rock",
+    "en": "rock",
+    "pos": "n.",
+    "zh": "岩石",
+    "categories": [
+      "nature"
+    ],
+    "level": 1,
+    "syn": "rock",
+    "example": "We sat on a rock by the river.",
+    "exampleZh": "我們坐在河邊的一塊岩石上。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "stone",
+    "en": "stone",
+    "pos": "n.",
+    "zh": "石頭",
+    "categories": [
+      "nature"
+    ],
+    "level": 1,
+    "syn": "rock",
+    "example": "The old bridge is made of stone.",
+    "exampleZh": "那座老橋是用石頭建的。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "beach",
+    "en": "beach",
+    "pos": "n.",
+    "zh": "海灘",
+    "categories": [
+      "nature",
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Let's go to the beach this afternoon.",
+    "exampleZh": "我們今天下午去海灘吧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "island",
+    "en": "island",
+    "pos": "n.",
+    "zh": "島",
+    "categories": [
+      "nature"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We took a ferry to a small island.",
+    "exampleZh": "我們搭渡輪去一座小島。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sand",
+    "en": "sand",
+    "pos": "n.",
+    "zh": "沙子",
+    "categories": [
+      "nature"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The sand on this beach is very white.",
+    "exampleZh": "這片海灘的沙子非常白。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "leaf",
+    "en": "leaf",
+    "pos": "n.",
+    "zh": "葉子",
+    "categories": [
+      "nature"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The leaves turn red in the fall.",
+    "exampleZh": "秋天時葉子會變紅。",
+    "form": "leaves",
+    "reviewed": true
+  },
+  {
+    "id": "forest",
+    "en": "forest",
+    "pos": "n.",
+    "zh": "森林",
+    "categories": [
+      "nature"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "There is a quiet trail through the forest.",
+    "exampleZh": "有一條安靜的步道穿過森林。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "cloud",
+    "en": "cloud",
+    "pos": "n.",
+    "zh": "雲",
+    "categories": [
+      "nature",
+      "weather"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Dark clouds are coming from the west.",
+    "exampleZh": "烏雲正從西邊飄過來。",
+    "form": "clouds",
+    "reviewed": true
+  },
+  {
+    "id": "snow",
+    "en": "snow",
+    "pos": "n.",
+    "zh": "雪",
+    "categories": [
+      "nature",
+      "weather"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The mountains are covered with snow.",
+    "exampleZh": "群山被白雪覆蓋。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "wind",
+    "en": "wind",
+    "pos": "n.",
+    "zh": "風",
+    "categories": [
+      "nature",
+      "weather"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The wind is very strong on the bridge.",
+    "exampleZh": "橋上的風非常強。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "rain",
+    "en": "rain",
+    "pos": "n.",
+    "zh": "雨",
+    "categories": [
+      "nature",
+      "weather"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We waited for the rain to stop.",
+    "exampleZh": "我們等雨停。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "water",
+    "en": "water",
+    "pos": "n.",
+    "zh": "水",
+    "categories": [
+      "nature"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The water in the lake is so clear.",
+    "exampleZh": "湖水好清澈。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "ocean",
+    "en": "ocean",
+    "pos": "n.",
+    "zh": "海洋",
+    "categories": [
+      "nature"
+    ],
+    "level": 2,
+    "syn": "sea",
+    "example": "We flew over the Pacific Ocean.",
+    "exampleZh": "我們飛越了太平洋。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "waterfall",
+    "en": "waterfall",
+    "pos": "n.",
+    "zh": "瀑布",
+    "categories": [
+      "nature",
+      "sightseeing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We hiked an hour to see the waterfall.",
+    "exampleZh": "我們健行了一小時去看瀑布。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "valley",
+    "en": "valley",
+    "pos": "n.",
+    "zh": "山谷",
+    "categories": [
+      "nature"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "A small village sits in the valley.",
+    "exampleZh": "一座小村莊坐落在山谷中。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "desert",
+    "en": "desert",
+    "pos": "n.",
+    "zh": "沙漠",
+    "categories": [
+      "nature"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "It is very hot in the desert during the day.",
+    "exampleZh": "沙漠白天非常熱。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "jungle",
+    "en": "jungle",
+    "pos": "n.",
+    "zh": "叢林",
+    "categories": [
+      "nature"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We took a jungle tour by boat.",
+    "exampleZh": "我們搭船參加叢林之旅。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "coast",
+    "en": "coast",
+    "pos": "n.",
+    "zh": "海岸",
+    "categories": [
+      "nature"
+    ],
+    "level": 2,
+    "syn": "coast",
+    "example": "We drove along the east coast.",
+    "exampleZh": "我們沿著東海岸開車。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "wave",
+    "en": "wave",
+    "pos": "n.",
+    "zh": "海浪、波浪",
+    "categories": [
+      "nature"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The waves are too big for swimming today.",
+    "exampleZh": "今天海浪太大，不適合游泳。",
+    "form": "waves",
+    "reviewed": true
+  },
+  {
+    "id": "cave",
+    "en": "cave",
+    "pos": "n.",
+    "zh": "洞穴",
+    "categories": [
+      "nature"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "It was cool and dark inside the cave.",
+    "exampleZh": "洞穴裡又涼又暗。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "volcano",
+    "en": "volcano",
+    "pos": "n.",
+    "zh": "火山",
+    "categories": [
+      "nature"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "You can hike to the top of the volcano.",
+    "exampleZh": "你可以健行到火山頂上。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "field",
+    "en": "field",
+    "pos": "n.",
+    "zh": "田野、原野",
+    "categories": [
+      "nature"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The train passed green rice fields.",
+    "exampleZh": "火車經過一片片綠色稻田。",
+    "form": "fields",
+    "reviewed": true
+  },
+  {
+    "id": "plant",
+    "en": "plant",
+    "pos": "n.",
+    "zh": "植物",
+    "categories": [
+      "nature"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The garden has many tropical plants.",
+    "exampleZh": "這座花園有很多熱帶植物。",
+    "form": "plants",
+    "reviewed": true
+  },
+  {
+    "id": "seed",
+    "en": "seed",
+    "pos": "n.",
+    "zh": "種子",
+    "categories": [
+      "nature"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We planted sunflower seeds in the garden.",
+    "exampleZh": "我們在花園裡種了向日葵種子。",
+    "form": "seeds",
+    "reviewed": true
+  },
+  {
+    "id": "root",
+    "en": "root",
+    "pos": "n.",
+    "zh": "根",
+    "categories": [
+      "nature"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The old tree has huge roots.",
+    "exampleZh": "那棵老樹有很粗大的根。",
+    "form": "roots",
+    "reviewed": true
+  },
+  {
+    "id": "branch",
+    "en": "branch",
+    "pos": "n.",
+    "zh": "樹枝",
+    "categories": [
+      "nature"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "A bird is sitting on the branch.",
+    "exampleZh": "一隻鳥停在樹枝上。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "earth",
+    "en": "earth",
+    "pos": "n.",
+    "zh": "地球、土地",
+    "categories": [
+      "nature"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We should take good care of the earth.",
+    "exampleZh": "我們應該好好愛護地球。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "pond",
+    "en": "pond",
+    "pos": "n.",
+    "zh": "池塘",
+    "categories": [
+      "nature"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "There are fish in the garden pond.",
+    "exampleZh": "花園的池塘裡有魚。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "stream",
+    "en": "stream",
+    "pos": "n.",
+    "zh": "小溪",
+    "categories": [
+      "nature"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We crossed a small stream on the trail.",
+    "exampleZh": "我們在步道上越過一條小溪。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sunrise",
+    "en": "sunrise",
+    "pos": "n.",
+    "zh": "日出",
+    "categories": [
+      "nature"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We woke up early to watch the sunrise.",
+    "exampleZh": "我們早起看日出。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sunset",
+    "en": "sunset",
+    "pos": "n.",
+    "zh": "夕陽、日落",
+    "categories": [
+      "nature"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The sunset at the beach was amazing.",
+    "exampleZh": "海灘上的夕陽美極了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "rainbow",
+    "en": "rainbow",
+    "pos": "n.",
+    "zh": "彩虹",
+    "categories": [
+      "nature"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "A rainbow appeared after the rain.",
+    "exampleZh": "雨後出現了一道彩虹。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "nature",
+    "en": "nature",
+    "pos": "n.",
+    "zh": "大自然",
+    "categories": [
+      "nature"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I love being close to nature.",
+    "exampleZh": "我喜歡親近大自然。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "air",
+    "en": "air",
+    "pos": "n.",
+    "zh": "空氣",
+    "categories": [
+      "nature"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The mountain air is so fresh.",
+    "exampleZh": "山上的空氣好新鮮。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "soil",
+    "en": "soil",
+    "pos": "n.",
+    "zh": "土壤、泥土",
+    "categories": [
+      "nature"
+    ],
+    "level": 2,
+    "syn": "soil",
+    "example": "Tea grows well in this soil.",
+    "exampleZh": "茶樹在這種土壤裡長得很好。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "mud",
+    "en": "mud",
+    "pos": "n.",
+    "zh": "泥巴",
+    "categories": [
+      "nature"
+    ],
+    "level": 2,
+    "syn": "soil",
+    "example": "My shoes were covered in mud after the hike.",
+    "exampleZh": "健行後我的鞋子沾滿了泥巴。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "shore",
+    "en": "shore",
+    "pos": "n.",
+    "zh": "岸邊",
+    "categories": [
+      "nature"
+    ],
+    "level": 3,
+    "syn": "coast",
+    "example": "We walked along the shore at sunset.",
+    "exampleZh": "我們在日落時沿著岸邊散步。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "glacier",
+    "en": "glacier",
+    "pos": "n.",
+    "zh": "冰河",
+    "categories": [
+      "nature"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We took a boat tour to see the glacier.",
+    "exampleZh": "我們搭船去看冰河。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "canyon",
+    "en": "canyon",
+    "pos": "n.",
+    "zh": "峽谷",
+    "categories": [
+      "nature",
+      "sightseeing"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The view from the canyon edge was amazing.",
+    "exampleZh": "從峽谷邊緣看出去的景色好壯觀。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "cliff",
+    "en": "cliff",
+    "pos": "n.",
+    "zh": "懸崖",
+    "categories": [
+      "nature"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Do not stand too close to the cliff.",
+    "exampleZh": "不要站得離懸崖太近。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "hot-spring",
+    "en": "hot spring",
+    "pos": "n.",
+    "zh": "溫泉",
+    "categories": [
+      "nature",
+      "sightseeing"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We relaxed in a hot spring after skiing.",
+    "exampleZh": "滑雪後我們泡溫泉放鬆。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "coral-reef",
+    "en": "coral reef",
+    "pos": "n.",
+    "zh": "珊瑚礁",
+    "categories": [
+      "nature"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Please do not touch the coral reef.",
+    "exampleZh": "請不要觸摸珊瑚礁。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "environment",
+    "en": "environment",
+    "pos": "n.",
+    "zh": "環境",
+    "categories": [
+      "nature"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Take your trash home to protect the environment.",
+    "exampleZh": "把垃圾帶回家，保護環境。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "scenery",
+    "en": "scenery",
+    "pos": "n.",
+    "zh": "風景、景色",
+    "categories": [
+      "nature"
+    ],
+    "level": 3,
+    "syn": "scenery",
+    "example": "The scenery along this train line is beautiful.",
+    "exampleZh": "這條鐵路沿線的風景很美。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "landscape",
+    "en": "landscape",
+    "pos": "n.",
+    "zh": "景觀、地景",
+    "categories": [
+      "nature"
+    ],
+    "level": 3,
+    "syn": "scenery",
+    "example": "The landscape here looks like another planet.",
+    "exampleZh": "這裡的景觀看起來像另一個星球。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "horizon",
+    "en": "horizon",
+    "pos": "n.",
+    "zh": "地平線、海平線",
+    "categories": [
+      "nature"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The sun slowly sank below the horizon.",
+    "exampleZh": "太陽慢慢沉到海平線下。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "tide",
+    "en": "tide",
+    "pos": "n.",
+    "zh": "潮汐、潮水",
+    "categories": [
+      "nature"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "At low tide, you can walk to the island.",
+    "exampleZh": "退潮時可以走到那座島上。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "meadow",
+    "en": "meadow",
+    "pos": "n.",
+    "zh": "草原、草地",
+    "categories": [
+      "nature"
+    ],
+    "level": 3,
+    "syn": "grass",
+    "example": "Cows were resting in the green meadow.",
+    "exampleZh": "牛群在綠色草原上休息。",
+    "form": "",
+    "reviewed": true
+  }
+]

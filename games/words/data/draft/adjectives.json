@@ -1,0 +1,843 @@
+[
+  {
+    "id": "big",
+    "en": "big",
+    "pos": "adj.",
+    "zh": "大的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 1,
+    "syn": "big",
+    "example": "This suitcase is too big for the overhead bin.",
+    "exampleZh": "這個行李箱太大，放不進頭頂置物櫃。",
+    "form": ""
+  },
+  {
+    "id": "small",
+    "en": "small",
+    "pos": "adj.",
+    "zh": "小的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 1,
+    "syn": "small",
+    "example": "Our hotel room was small but clean.",
+    "exampleZh": "我們的旅館房間很小但很乾淨。",
+    "form": ""
+  },
+  {
+    "id": "little",
+    "en": "little",
+    "pos": "adj.",
+    "zh": "小小的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 1,
+    "syn": "small",
+    "example": "We found a little cafe near the river.",
+    "exampleZh": "我們在河邊找到一間小咖啡廳。",
+    "form": ""
+  },
+  {
+    "id": "hot",
+    "en": "hot",
+    "pos": "adj.",
+    "zh": "熱的、燙的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Be careful, the soup is very hot.",
+    "exampleZh": "小心，湯很燙。",
+    "form": ""
+  },
+  {
+    "id": "cold",
+    "en": "cold",
+    "pos": "adj.",
+    "zh": "冷的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "It gets cold in the mountains at night.",
+    "exampleZh": "山上晚上會變冷。",
+    "form": ""
+  },
+  {
+    "id": "new",
+    "en": "new",
+    "pos": "adj.",
+    "zh": "新的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I bought new shoes for the trip.",
+    "exampleZh": "我為這趟旅行買了新鞋。",
+    "form": ""
+  },
+  {
+    "id": "old",
+    "en": "old",
+    "pos": "adj.",
+    "zh": "舊的、老的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "This old temple is very famous.",
+    "exampleZh": "這座老寺廟非常有名。",
+    "form": ""
+  },
+  {
+    "id": "good",
+    "en": "good",
+    "pos": "adj.",
+    "zh": "好的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "This is a good place for photos.",
+    "exampleZh": "這裡是拍照的好地方。",
+    "form": ""
+  },
+  {
+    "id": "bad",
+    "en": "bad",
+    "pos": "adj.",
+    "zh": "壞的、差的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The traffic is bad this morning.",
+    "exampleZh": "今天早上交通很糟。",
+    "form": ""
+  },
+  {
+    "id": "fast",
+    "en": "fast",
+    "pos": "adj.",
+    "zh": "快的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 1,
+    "syn": "fast",
+    "example": "The fast train takes only two hours.",
+    "exampleZh": "快車只要兩個小時。",
+    "form": ""
+  },
+  {
+    "id": "slow",
+    "en": "slow",
+    "pos": "adj.",
+    "zh": "慢的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The hotel Wi-Fi is really slow.",
+    "exampleZh": "旅館的無線網路真的很慢。",
+    "form": ""
+  },
+  {
+    "id": "long",
+    "en": "long",
+    "pos": "adj.",
+    "zh": "長的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "It was a long flight from Taipei.",
+    "exampleZh": "從台北出發是一趟很長的飛行。",
+    "form": ""
+  },
+  {
+    "id": "short",
+    "en": "short",
+    "pos": "adj.",
+    "zh": "短的、矮的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "It is a short walk to the beach.",
+    "exampleZh": "走到海灘只要一下子。",
+    "form": ""
+  },
+  {
+    "id": "tall",
+    "en": "tall",
+    "pos": "adj.",
+    "zh": "高的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 1,
+    "syn": "tall",
+    "example": "That tall building is a hotel.",
+    "exampleZh": "那棟高樓是一間旅館。",
+    "form": ""
+  },
+  {
+    "id": "high",
+    "en": "high",
+    "pos": "adj.",
+    "zh": "高的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 1,
+    "syn": "tall",
+    "example": "The prices here are quite high.",
+    "exampleZh": "這裡的價格相當高。",
+    "form": ""
+  },
+  {
+    "id": "clean",
+    "en": "clean",
+    "pos": "adj.",
+    "zh": "乾淨的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The streets here are very clean.",
+    "exampleZh": "這裡的街道非常乾淨。",
+    "form": ""
+  },
+  {
+    "id": "dirty",
+    "en": "dirty",
+    "pos": "adj.",
+    "zh": "髒的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My shoes got dirty in the rain.",
+    "exampleZh": "我的鞋子在雨中弄髒了。",
+    "form": ""
+  },
+  {
+    "id": "easy",
+    "en": "easy",
+    "pos": "adj.",
+    "zh": "容易的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The subway map is easy to read.",
+    "exampleZh": "地鐵路線圖很容易看懂。",
+    "form": ""
+  },
+  {
+    "id": "hard",
+    "en": "hard",
+    "pos": "adj.",
+    "zh": "困難的、硬的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 1,
+    "syn": "hard",
+    "example": "This bread is too hard to eat.",
+    "exampleZh": "這個麵包太硬，咬不動。",
+    "form": ""
+  },
+  {
+    "id": "cheap",
+    "en": "cheap",
+    "pos": "adj.",
+    "zh": "便宜的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 1,
+    "syn": "cheap",
+    "example": "Street food here is cheap and tasty.",
+    "exampleZh": "這裡的路邊小吃便宜又好吃。",
+    "form": ""
+  },
+  {
+    "id": "expensive",
+    "en": "expensive",
+    "pos": "adj.",
+    "zh": "昂貴的、貴的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Taxis are expensive in this city.",
+    "exampleZh": "這個城市的計程車很貴。",
+    "form": ""
+  },
+  {
+    "id": "heavy",
+    "en": "heavy",
+    "pos": "adj.",
+    "zh": "重的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My backpack is too heavy.",
+    "exampleZh": "我的背包太重了。",
+    "form": ""
+  },
+  {
+    "id": "busy",
+    "en": "busy",
+    "pos": "adj.",
+    "zh": "忙碌的、熱鬧的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The station is busy during rush hour.",
+    "exampleZh": "尖峰時段車站非常繁忙。",
+    "form": ""
+  },
+  {
+    "id": "beautiful",
+    "en": "beautiful",
+    "pos": "adj.",
+    "zh": "美麗的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 1,
+    "syn": "beautiful",
+    "example": "What a beautiful view of the lake!",
+    "exampleZh": "湖景真是太美了！",
+    "form": ""
+  },
+  {
+    "id": "large",
+    "en": "large",
+    "pos": "adj.",
+    "zh": "大型的、大的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 2,
+    "syn": "big",
+    "example": "I would like a large coffee, please.",
+    "exampleZh": "請給我一杯大杯咖啡。",
+    "form": ""
+  },
+  {
+    "id": "difficult",
+    "en": "difficult",
+    "pos": "adj.",
+    "zh": "困難的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 2,
+    "syn": "hard",
+    "example": "Finding parking here is difficult.",
+    "exampleZh": "在這裡找停車位很困難。",
+    "form": ""
+  },
+  {
+    "id": "quiet",
+    "en": "quiet",
+    "pos": "adj.",
+    "zh": "安靜的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Can I have a quiet room, please?",
+    "exampleZh": "可以給我一間安靜的房間嗎？",
+    "form": ""
+  },
+  {
+    "id": "noisy",
+    "en": "noisy",
+    "pos": "adj.",
+    "zh": "吵鬧的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 2,
+    "syn": "noisy",
+    "example": "The bar next door was noisy all night.",
+    "exampleZh": "隔壁的酒吧整晚都很吵。",
+    "form": ""
+  },
+  {
+    "id": "loud",
+    "en": "loud",
+    "pos": "adj.",
+    "zh": "大聲的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 2,
+    "syn": "noisy",
+    "example": "The music in the restaurant is too loud.",
+    "exampleZh": "餐廳裡的音樂太大聲了。",
+    "form": ""
+  },
+  {
+    "id": "pretty",
+    "en": "pretty",
+    "pos": "adj.",
+    "zh": "漂亮的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 2,
+    "syn": "beautiful",
+    "example": "She bought a pretty dress at the shop.",
+    "exampleZh": "她在店裡買了一件漂亮的洋裝。",
+    "form": ""
+  },
+  {
+    "id": "light",
+    "en": "light",
+    "pos": "adj.",
+    "zh": "輕的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "This jacket is light and warm.",
+    "exampleZh": "這件外套又輕又保暖。",
+    "form": ""
+  },
+  {
+    "id": "empty",
+    "en": "empty",
+    "pos": "adj.",
+    "zh": "空的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The train was almost empty at midnight.",
+    "exampleZh": "半夜的火車幾乎是空的。",
+    "form": ""
+  },
+  {
+    "id": "full",
+    "en": "full",
+    "pos": "adj.",
+    "zh": "滿的、飽的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Sorry, the hotel is full tonight.",
+    "exampleZh": "抱歉，旅館今晚客滿了。",
+    "form": ""
+  },
+  {
+    "id": "wet",
+    "en": "wet",
+    "pos": "adj.",
+    "zh": "濕的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "My socks are wet from the rain.",
+    "exampleZh": "我的襪子被雨淋濕了。",
+    "form": ""
+  },
+  {
+    "id": "dry",
+    "en": "dry",
+    "pos": "adj.",
+    "zh": "乾的、乾燥的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Keep your passport in a dry place.",
+    "exampleZh": "把護照放在乾燥的地方。",
+    "form": ""
+  },
+  {
+    "id": "dark",
+    "en": "dark",
+    "pos": "adj.",
+    "zh": "暗的、黑暗的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "It gets dark early in winter.",
+    "exampleZh": "冬天天黑得很早。",
+    "form": ""
+  },
+  {
+    "id": "bright",
+    "en": "bright",
+    "pos": "adj.",
+    "zh": "明亮的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The room is bright and sunny.",
+    "exampleZh": "這個房間明亮又有陽光。",
+    "form": ""
+  },
+  {
+    "id": "crowded",
+    "en": "crowded",
+    "pos": "adj.",
+    "zh": "擁擠的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The night market is crowded on weekends.",
+    "exampleZh": "夜市週末很擁擠。",
+    "form": ""
+  },
+  {
+    "id": "safe",
+    "en": "safe",
+    "pos": "adj.",
+    "zh": "安全的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Is it safe to walk here at night?",
+    "exampleZh": "晚上在這裡走路安全嗎？",
+    "form": ""
+  },
+  {
+    "id": "dangerous",
+    "en": "dangerous",
+    "pos": "adj.",
+    "zh": "危險的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Swimming here is dangerous after storms.",
+    "exampleZh": "暴風雨過後在這裡游泳很危險。",
+    "form": ""
+  },
+  {
+    "id": "fresh",
+    "en": "fresh",
+    "pos": "adj.",
+    "zh": "新鮮的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The fish at this market is very fresh.",
+    "exampleZh": "這個市場的魚非常新鮮。",
+    "form": ""
+  },
+  {
+    "id": "comfortable",
+    "en": "comfortable",
+    "pos": "adj.",
+    "zh": "舒適的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The bed was soft and comfortable.",
+    "exampleZh": "床又軟又舒服。",
+    "form": ""
+  },
+  {
+    "id": "convenient",
+    "en": "convenient",
+    "pos": "adj.",
+    "zh": "方便的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The hotel is close to the subway, very convenient.",
+    "exampleZh": "旅館離地鐵很近，非常方便。",
+    "form": ""
+  },
+  {
+    "id": "delicious",
+    "en": "delicious",
+    "pos": "adj.",
+    "zh": "美味的、好吃的",
+    "categories": [
+      "adjectives",
+      "food"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The dumplings were delicious.",
+    "exampleZh": "那些餃子很好吃。",
+    "form": ""
+  },
+  {
+    "id": "famous",
+    "en": "famous",
+    "pos": "adj.",
+    "zh": "有名的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 2,
+    "syn": "famous",
+    "example": "This street is famous for its bookstores.",
+    "exampleZh": "這條街以書店聞名。",
+    "form": ""
+  },
+  {
+    "id": "popular",
+    "en": "popular",
+    "pos": "adj.",
+    "zh": "受歡迎的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 2,
+    "syn": "famous",
+    "example": "This beach is popular with surfers.",
+    "exampleZh": "這片海灘很受衝浪客歡迎。",
+    "form": ""
+  },
+  {
+    "id": "free",
+    "en": "free",
+    "pos": "adj.",
+    "zh": "免費的、自由的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Breakfast is free for hotel guests.",
+    "exampleZh": "房客可以免費享用早餐。",
+    "form": ""
+  },
+  {
+    "id": "quick",
+    "en": "quick",
+    "pos": "adj.",
+    "zh": "快速的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 2,
+    "syn": "fast",
+    "example": "Let's grab a quick lunch before the tour.",
+    "exampleZh": "導覽開始前我們快速吃個午餐吧。",
+    "form": ""
+  },
+  {
+    "id": "available",
+    "en": "available",
+    "pos": "adj.",
+    "zh": "有空的、可用的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Is this seat available?",
+    "exampleZh": "這個座位可以坐嗎？",
+    "form": ""
+  },
+  {
+    "id": "necessary",
+    "en": "necessary",
+    "pos": "adj.",
+    "zh": "必要的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "A visa is not necessary for short trips.",
+    "exampleZh": "短期旅行不需要簽證。",
+    "form": ""
+  },
+  {
+    "id": "ordinary",
+    "en": "ordinary",
+    "pos": "adj.",
+    "zh": "普通的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "It looks like an ordinary house from outside.",
+    "exampleZh": "從外面看，它像一間普通的房子。",
+    "form": ""
+  },
+  {
+    "id": "spacious",
+    "en": "spacious",
+    "pos": "adj.",
+    "zh": "寬敞的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Our new room is bright and spacious.",
+    "exampleZh": "我們的新房間明亮又寬敞。",
+    "form": ""
+  },
+  {
+    "id": "narrow",
+    "en": "narrow",
+    "pos": "adj.",
+    "zh": "狹窄的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The old town has many narrow streets.",
+    "exampleZh": "老城區有許多狹窄的街道。",
+    "form": ""
+  },
+  {
+    "id": "ancient",
+    "en": "ancient",
+    "pos": "adj.",
+    "zh": "古老的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We toured an ancient castle by the sea.",
+    "exampleZh": "我們參觀了一座海邊的古老城堡。",
+    "form": ""
+  },
+  {
+    "id": "enormous",
+    "en": "enormous",
+    "pos": "adj.",
+    "zh": "巨大的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 3,
+    "syn": "big",
+    "example": "The shopping mall is enormous.",
+    "exampleZh": "這間購物中心非常巨大。",
+    "form": ""
+  },
+  {
+    "id": "tiny",
+    "en": "tiny",
+    "pos": "adj.",
+    "zh": "微小的、極小的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 3,
+    "syn": "small",
+    "example": "The bathroom was tiny but clean.",
+    "exampleZh": "浴室很小，但很乾淨。",
+    "form": ""
+  },
+  {
+    "id": "affordable",
+    "en": "affordable",
+    "pos": "adj.",
+    "zh": "負擔得起的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 3,
+    "syn": "cheap",
+    "example": "This hostel offers affordable rooms downtown.",
+    "exampleZh": "這間青年旅館在市中心提供平價房間。",
+    "form": ""
+  },
+  {
+    "id": "reliable",
+    "en": "reliable",
+    "pos": "adj.",
+    "zh": "可靠的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The buses here are cheap and reliable.",
+    "exampleZh": "這裡的公車便宜又可靠。",
+    "form": ""
+  },
+  {
+    "id": "fragile",
+    "en": "fragile",
+    "pos": "adj.",
+    "zh": "易碎的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Please be careful, this box is fragile.",
+    "exampleZh": "請小心，這個箱子裡是易碎品。",
+    "form": ""
+  },
+  {
+    "id": "temporary",
+    "en": "temporary",
+    "pos": "adj.",
+    "zh": "暫時的",
+    "categories": [
+      "adjectives"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The museum has a temporary exhibit this month.",
+    "exampleZh": "博物館這個月有一個特展。",
+    "form": ""
+  }
+]

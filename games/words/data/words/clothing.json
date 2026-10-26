@@ -1,0 +1,904 @@
+[
+  {
+    "id": "clothes",
+    "en": "clothes",
+    "pos": "n.",
+    "zh": "衣服",
+    "categories": [
+      "clothing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I packed warm clothes for the trip.",
+    "exampleZh": "我為這趟旅行帶了保暖的衣服。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "shirt",
+    "en": "shirt",
+    "pos": "n.",
+    "zh": "襯衫",
+    "categories": [
+      "clothing"
+    ],
+    "level": 1,
+    "syn": "shirt",
+    "example": "He wore a white shirt to the dinner.",
+    "exampleZh": "他穿了一件白襯衫去晚餐。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "t-shirt",
+    "en": "T-shirt",
+    "pos": "n.",
+    "zh": "T恤",
+    "categories": [
+      "clothing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "This T-shirt is too big for me.",
+    "exampleZh": "這件 T 恤對我來說太大了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "pants",
+    "en": "pants",
+    "pos": "n.",
+    "zh": "長褲、褲子",
+    "categories": [
+      "clothing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Bring long pants for the temple visit.",
+    "exampleZh": "參觀寺廟時要帶長褲。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "skirt",
+    "en": "skirt",
+    "pos": "n.",
+    "zh": "裙子",
+    "categories": [
+      "clothing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "She bought a long skirt at the market.",
+    "exampleZh": "她在市場買了一條長裙。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "dress",
+    "en": "dress",
+    "pos": "n.",
+    "zh": "洋裝、連身裙",
+    "categories": [
+      "clothing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "That red dress looks great on you.",
+    "exampleZh": "那件紅色洋裝你穿起來很好看。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "coat",
+    "en": "coat",
+    "pos": "n.",
+    "zh": "大衣、外套",
+    "categories": [
+      "clothing"
+    ],
+    "level": 1,
+    "syn": "coat",
+    "example": "It's cold, so take your coat.",
+    "exampleZh": "天氣冷，帶上你的大衣。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "jacket",
+    "en": "jacket",
+    "pos": "n.",
+    "zh": "夾克",
+    "categories": [
+      "clothing"
+    ],
+    "level": 1,
+    "syn": "coat",
+    "example": "I left my jacket on the bus.",
+    "exampleZh": "我把夾克忘在公車上了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sweater",
+    "en": "sweater",
+    "pos": "n.",
+    "zh": "毛衣",
+    "categories": [
+      "clothing"
+    ],
+    "level": 1,
+    "syn": "sweater",
+    "example": "My grandmother knitted this sweater for me.",
+    "exampleZh": "這件毛衣是我奶奶幫我織的。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "shoes",
+    "en": "shoes",
+    "pos": "n.",
+    "zh": "鞋子",
+    "categories": [
+      "clothing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Please take off your shoes at the door.",
+    "exampleZh": "請在門口脫鞋。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "socks",
+    "en": "socks",
+    "pos": "n.",
+    "zh": "襪子",
+    "categories": [
+      "clothing"
+    ],
+    "level": 1,
+    "syn": "socks",
+    "example": "I need a new pair of socks.",
+    "exampleZh": "我需要一雙新襪子。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "hat",
+    "en": "hat",
+    "pos": "n.",
+    "zh": "帽子",
+    "categories": [
+      "clothing"
+    ],
+    "level": 1,
+    "syn": "hat",
+    "example": "Wear a hat in the hot sun.",
+    "exampleZh": "大太陽下要戴帽子。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "cap",
+    "en": "cap",
+    "pos": "n.",
+    "zh": "鴨舌帽、棒球帽",
+    "categories": [
+      "clothing"
+    ],
+    "level": 1,
+    "syn": "hat",
+    "example": "He always wears a baseball cap.",
+    "exampleZh": "他總是戴著一頂棒球帽。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "glasses",
+    "en": "glasses",
+    "pos": "n.",
+    "zh": "眼鏡",
+    "categories": [
+      "clothing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I can't read the menu without my glasses.",
+    "exampleZh": "沒戴眼鏡我看不清菜單。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "watch",
+    "en": "watch",
+    "pos": "n.",
+    "zh": "手錶",
+    "categories": [
+      "clothing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My watch is still on Taiwan time.",
+    "exampleZh": "我的手錶還是台灣時間。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "belt",
+    "en": "belt",
+    "pos": "n.",
+    "zh": "皮帶、腰帶",
+    "categories": [
+      "clothing",
+      "airport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Please put your belt in the tray.",
+    "exampleZh": "請把皮帶放進托盤裡。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "gloves",
+    "en": "gloves",
+    "pos": "n.",
+    "zh": "手套",
+    "categories": [
+      "clothing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Don't forget your gloves for the ski trip.",
+    "exampleZh": "滑雪之旅別忘了帶手套。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "scarf",
+    "en": "scarf",
+    "pos": "n.",
+    "zh": "圍巾",
+    "categories": [
+      "clothing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "This wool scarf keeps me warm.",
+    "exampleZh": "這條羊毛圍巾讓我很保暖。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "jeans",
+    "en": "jeans",
+    "pos": "n.",
+    "zh": "牛仔褲",
+    "categories": [
+      "clothing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I usually wear jeans when I travel.",
+    "exampleZh": "我旅行時通常穿牛仔褲。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "shorts",
+    "en": "shorts",
+    "pos": "n.",
+    "zh": "短褲",
+    "categories": [
+      "clothing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "It's hot enough for shorts today.",
+    "exampleZh": "今天熱到可以穿短褲。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "boots",
+    "en": "boots",
+    "pos": "n.",
+    "zh": "靴子",
+    "categories": [
+      "clothing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "These boots are good for hiking.",
+    "exampleZh": "這雙靴子很適合健行。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "backpack",
+    "en": "backpack",
+    "pos": "n.",
+    "zh": "背包、後背包",
+    "categories": [
+      "clothing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My backpack is full of snacks.",
+    "exampleZh": "我的背包裡裝滿了零食。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "wear-v",
+    "en": "wear",
+    "pos": "v.",
+    "zh": "穿、戴",
+    "categories": [
+      "clothing"
+    ],
+    "level": 1,
+    "syn": "wear",
+    "example": "What should I wear to the party?",
+    "exampleZh": "我該穿什麼去派對？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "put-on",
+    "en": "put on",
+    "pos": "phr.",
+    "zh": "穿上、戴上",
+    "categories": [
+      "clothing"
+    ],
+    "level": 1,
+    "syn": "wear",
+    "example": "Put on your raincoat before we go out.",
+    "exampleZh": "出門前先穿上雨衣。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "take-off",
+    "en": "take off",
+    "pos": "phr.",
+    "zh": "脫掉、脫下",
+    "categories": [
+      "clothing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "You can take off your coat here.",
+    "exampleZh": "你可以在這裡脫外套。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sneakers",
+    "en": "sneakers",
+    "pos": "n.",
+    "zh": "運動鞋、球鞋",
+    "categories": [
+      "clothing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Comfortable sneakers are best for walking tours.",
+    "exampleZh": "舒適的運動鞋最適合徒步導覽。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sandals",
+    "en": "sandals",
+    "pos": "n.",
+    "zh": "涼鞋",
+    "categories": [
+      "clothing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I wore sandals to the beach.",
+    "exampleZh": "我穿涼鞋去海邊。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "slippers",
+    "en": "slippers",
+    "pos": "n.",
+    "zh": "拖鞋",
+    "categories": [
+      "clothing",
+      "hotel"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The hotel gives you free slippers.",
+    "exampleZh": "飯店會提供免費拖鞋。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "pajamas",
+    "en": "pajamas",
+    "pos": "n.",
+    "zh": "睡衣",
+    "categories": [
+      "clothing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I forgot to pack my pajamas.",
+    "exampleZh": "我忘了帶睡衣。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "underwear",
+    "en": "underwear",
+    "pos": "n.",
+    "zh": "內衣褲",
+    "categories": [
+      "clothing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Pack enough underwear for five days.",
+    "exampleZh": "帶足夠五天穿的內衣褲。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "swimsuit",
+    "en": "swimsuit",
+    "pos": "n.",
+    "zh": "泳衣",
+    "categories": [
+      "clothing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "You must wear a swimsuit in the pool.",
+    "exampleZh": "在泳池裡必須穿泳衣。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "raincoat",
+    "en": "raincoat",
+    "pos": "n.",
+    "zh": "雨衣",
+    "categories": [
+      "clothing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Buy a cheap raincoat at the convenience store.",
+    "exampleZh": "在便利商店買一件便宜的雨衣。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sunglasses",
+    "en": "sunglasses",
+    "pos": "n.",
+    "zh": "太陽眼鏡、墨鏡",
+    "categories": [
+      "clothing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Bring sunglasses for the beach.",
+    "exampleZh": "去海邊要帶太陽眼鏡。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "necklace",
+    "en": "necklace",
+    "pos": "n.",
+    "zh": "項鍊",
+    "categories": [
+      "clothing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "She got a silver necklace as a gift.",
+    "exampleZh": "她收到一條銀項鍊當禮物。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "earrings",
+    "en": "earrings",
+    "pos": "n.",
+    "zh": "耳環",
+    "categories": [
+      "clothing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "These earrings were made by a local artist.",
+    "exampleZh": "這對耳環是當地藝術家做的。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "ring",
+    "en": "ring",
+    "pos": "n.",
+    "zh": "戒指",
+    "categories": [
+      "clothing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "He lost his ring at the swimming pool.",
+    "exampleZh": "他在游泳池弄丟了戒指。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "bracelet",
+    "en": "bracelet",
+    "pos": "n.",
+    "zh": "手環、手鍊",
+    "categories": [
+      "clothing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I bought a bead bracelet at the temple.",
+    "exampleZh": "我在寺廟買了一條串珠手鍊。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "handbag",
+    "en": "handbag",
+    "pos": "n.",
+    "zh": "手提包",
+    "categories": [
+      "clothing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Keep your handbag closed on the subway.",
+    "exampleZh": "在地鐵上要把手提包關好。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "tie",
+    "en": "tie",
+    "pos": "n.",
+    "zh": "領帶",
+    "categories": [
+      "clothing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "You need a tie for this restaurant.",
+    "exampleZh": "去這家餐廳需要打領帶。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "vest",
+    "en": "vest",
+    "pos": "n.",
+    "zh": "背心",
+    "categories": [
+      "clothing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Wear a warm vest under your jacket.",
+    "exampleZh": "在夾克裡面穿一件保暖背心。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "hoodie",
+    "en": "hoodie",
+    "pos": "n.",
+    "zh": "帽T、連帽上衣",
+    "categories": [
+      "clothing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I always bring a hoodie on long flights.",
+    "exampleZh": "長途飛行時我總會帶一件帽 T。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "uniform",
+    "en": "uniform",
+    "pos": "n.",
+    "zh": "制服",
+    "categories": [
+      "clothing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Students in Japan wear school uniforms.",
+    "exampleZh": "日本的學生穿學校制服。",
+    "form": "uniforms",
+    "reviewed": true
+  },
+  {
+    "id": "button",
+    "en": "button",
+    "pos": "n.",
+    "zh": "鈕扣、扣子",
+    "categories": [
+      "clothing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "A button fell off my shirt.",
+    "exampleZh": "我襯衫的一顆扣子掉了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "zipper",
+    "en": "zipper",
+    "pos": "n.",
+    "zh": "拉鍊",
+    "categories": [
+      "clothing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The zipper on my bag is broken.",
+    "exampleZh": "我包包的拉鍊壞了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sleeve",
+    "en": "sleeve",
+    "pos": "n.",
+    "zh": "袖子",
+    "categories": [
+      "clothing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I prefer shirts with short sleeves in summer.",
+    "exampleZh": "夏天我比較喜歡穿短袖襯衫。",
+    "form": "sleeves",
+    "reviewed": true
+  },
+  {
+    "id": "fit-v",
+    "en": "fit",
+    "pos": "v.",
+    "zh": "合身、尺寸適合",
+    "categories": [
+      "clothing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "These pants don't fit me anymore.",
+    "exampleZh": "這條褲子我已經穿不下了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "loose-adj",
+    "en": "loose",
+    "pos": "adj.",
+    "zh": "寬鬆的",
+    "categories": [
+      "clothing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Loose clothes are more comfortable on a plane.",
+    "exampleZh": "在飛機上穿寬鬆的衣服比較舒服。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "tight-adj",
+    "en": "tight",
+    "pos": "adj.",
+    "zh": "緊的",
+    "categories": [
+      "clothing"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "These shoes feel a little tight.",
+    "exampleZh": "這雙鞋穿起來有點緊。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "collar",
+    "en": "collar",
+    "pos": "n.",
+    "zh": "衣領、領子",
+    "categories": [
+      "clothing"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Your collar is sticking up on one side.",
+    "exampleZh": "你的衣領有一邊翹起來了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "blouse",
+    "en": "blouse",
+    "pos": "n.",
+    "zh": "女用襯衫",
+    "categories": [
+      "clothing"
+    ],
+    "level": 3,
+    "syn": "shirt",
+    "example": "She wore a silk blouse to the meeting.",
+    "exampleZh": "她穿了一件絲質女襯衫去開會。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "cardigan",
+    "en": "cardigan",
+    "pos": "n.",
+    "zh": "開襟毛衣、針織外套",
+    "categories": [
+      "clothing"
+    ],
+    "level": 3,
+    "syn": "sweater",
+    "example": "Take a cardigan for the cold air conditioning.",
+    "exampleZh": "帶件針織外套應付冷氣。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "leggings",
+    "en": "leggings",
+    "pos": "n.",
+    "zh": "內搭褲",
+    "categories": [
+      "clothing"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Leggings are comfortable for long bus rides.",
+    "exampleZh": "搭長途巴士時穿內搭褲很舒服。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "stockings",
+    "en": "stockings",
+    "pos": "n.",
+    "zh": "絲襪",
+    "categories": [
+      "clothing"
+    ],
+    "level": 3,
+    "syn": "socks",
+    "example": "She bought black stockings for the wedding.",
+    "exampleZh": "她買了黑色絲襪去參加婚禮。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "high-heels",
+    "en": "high heels",
+    "pos": "n.",
+    "zh": "高跟鞋",
+    "categories": [
+      "clothing"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Walking in high heels on old streets is hard.",
+    "exampleZh": "穿高跟鞋走在老街上很辛苦。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "outfit",
+    "en": "outfit",
+    "pos": "n.",
+    "zh": "一套服裝、穿搭",
+    "categories": [
+      "clothing"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I love your outfit today!",
+    "exampleZh": "我好喜歡你今天的穿搭！",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "accessory",
+    "en": "accessory",
+    "pos": "n.",
+    "zh": "配件、飾品",
+    "categories": [
+      "clothing"
+    ],
+    "level": 3,
+    "syn": "jewelry",
+    "example": "This shop sells hair accessories.",
+    "exampleZh": "這家店賣髮飾。",
+    "form": "accessories",
+    "reviewed": true
+  },
+  {
+    "id": "jewelry",
+    "en": "jewelry",
+    "pos": "n.",
+    "zh": "珠寶、首飾",
+    "categories": [
+      "clothing"
+    ],
+    "level": 3,
+    "syn": "jewelry",
+    "example": "Keep your jewelry in the hotel safe.",
+    "exampleZh": "把你的首飾放進飯店的保險箱。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "waterproof-adj",
+    "en": "waterproof",
+    "pos": "adj.",
+    "zh": "防水的",
+    "categories": [
+      "clothing"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Bring a waterproof jacket to the mountains.",
+    "exampleZh": "上山要帶一件防水外套。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "cotton",
+    "en": "cotton",
+    "pos": "n.",
+    "zh": "棉、棉花",
+    "categories": [
+      "clothing"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "This shirt is made of cotton.",
+    "exampleZh": "這件襯衫是棉質的。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "wool",
+    "en": "wool",
+    "pos": "n.",
+    "zh": "羊毛",
+    "categories": [
+      "clothing"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Wool socks keep your feet warm.",
+    "exampleZh": "羊毛襪可以讓腳保暖。",
+    "form": "",
+    "reviewed": true
+  }
+]

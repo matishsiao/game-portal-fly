@@ -1,0 +1,902 @@
+[
+  {
+    "id": "left",
+    "en": "left",
+    "pos": "n.",
+    "zh": "左邊",
+    "categories": [
+      "directions"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Turn to the left at the bank.",
+    "exampleZh": "在銀行那裡往左轉。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "right",
+    "en": "right",
+    "pos": "n.",
+    "zh": "右邊",
+    "categories": [
+      "directions"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The station is on your right.",
+    "exampleZh": "車站在你的右邊。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "straight-adv",
+    "en": "straight",
+    "pos": "adv.",
+    "zh": "直直地、直走",
+    "categories": [
+      "directions"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Go straight for two blocks.",
+    "exampleZh": "直走兩個街區。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "turn-v",
+    "en": "turn",
+    "pos": "v.",
+    "zh": "轉彎",
+    "categories": [
+      "directions"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Turn right at the traffic light.",
+    "exampleZh": "在紅綠燈右轉。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "near-prep",
+    "en": "near",
+    "pos": "prep.",
+    "zh": "在附近、靠近",
+    "categories": [
+      "directions"
+    ],
+    "level": 1,
+    "syn": "near",
+    "example": "Is there a bank near here?",
+    "exampleZh": "這附近有銀行嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "close-adj",
+    "en": "close",
+    "pos": "adj.",
+    "zh": "近的",
+    "categories": [
+      "directions"
+    ],
+    "level": 1,
+    "syn": "near",
+    "example": "The hotel is close to the station.",
+    "exampleZh": "飯店離車站很近。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "far-adj",
+    "en": "far",
+    "pos": "adj.",
+    "zh": "遠的",
+    "categories": [
+      "directions"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Is the museum far from here?",
+    "exampleZh": "博物館離這裡遠嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "here-adv",
+    "en": "here",
+    "pos": "adv.",
+    "zh": "這裡",
+    "categories": [
+      "directions"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Wait for me here.",
+    "exampleZh": "在這裡等我。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "there-adv",
+    "en": "there",
+    "pos": "adv.",
+    "zh": "那裡",
+    "categories": [
+      "directions"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The post office is over there.",
+    "exampleZh": "郵局在那邊。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "north",
+    "en": "north",
+    "pos": "n.",
+    "zh": "北方",
+    "categories": [
+      "directions"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The mountains are to the north.",
+    "exampleZh": "山在北邊。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "south",
+    "en": "south",
+    "pos": "n.",
+    "zh": "南方",
+    "categories": [
+      "directions"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We drove south to the beach.",
+    "exampleZh": "我們往南開到海邊。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "east",
+    "en": "east",
+    "pos": "n.",
+    "zh": "東方",
+    "categories": [
+      "directions"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The sun rises in the east.",
+    "exampleZh": "太陽從東方升起。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "west",
+    "en": "west",
+    "pos": "n.",
+    "zh": "西方",
+    "categories": [
+      "directions"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The old town is in the west of the city.",
+    "exampleZh": "老城區在城市的西邊。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "corner",
+    "en": "corner",
+    "pos": "n.",
+    "zh": "轉角",
+    "categories": [
+      "directions"
+    ],
+    "level": 1,
+    "syn": "corner",
+    "example": "The café is on the corner.",
+    "exampleZh": "咖啡店在轉角。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "map",
+    "en": "map",
+    "pos": "n.",
+    "zh": "地圖",
+    "categories": [
+      "directions"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Can you show me on the map?",
+    "exampleZh": "你可以在地圖上指給我看嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "in-front-of",
+    "en": "in front of",
+    "pos": "phr.",
+    "zh": "在…前面",
+    "categories": [
+      "directions"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Let's meet in front of the station.",
+    "exampleZh": "我們在車站前面碰面吧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "behind-prep",
+    "en": "behind",
+    "pos": "prep.",
+    "zh": "在…後面",
+    "categories": [
+      "directions"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The parking lot is behind the hotel.",
+    "exampleZh": "停車場在飯店後面。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "next-to",
+    "en": "next to",
+    "pos": "phr.",
+    "zh": "在…旁邊",
+    "categories": [
+      "directions"
+    ],
+    "level": 1,
+    "syn": "next-to",
+    "example": "The bank is next to the bakery.",
+    "exampleZh": "銀行在麵包店旁邊。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "beside-prep",
+    "en": "beside",
+    "pos": "prep.",
+    "zh": "在旁邊",
+    "categories": [
+      "directions"
+    ],
+    "level": 1,
+    "syn": "next-to",
+    "example": "There is a small park beside the river.",
+    "exampleZh": "河邊有一座小公園。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "between-prep",
+    "en": "between",
+    "pos": "prep.",
+    "zh": "在…之間",
+    "categories": [
+      "directions"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The shop is between the bank and the school.",
+    "exampleZh": "那家店在銀行和學校之間。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "across-prep",
+    "en": "across",
+    "pos": "prep.",
+    "zh": "穿過、越過",
+    "categories": [
+      "directions"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Walk across the bridge and turn left.",
+    "exampleZh": "走過橋後左轉。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "where-adv",
+    "en": "where",
+    "pos": "adv.",
+    "zh": "哪裡",
+    "categories": [
+      "directions"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Excuse me, where is the restroom?",
+    "exampleZh": "不好意思，請問廁所在哪裡？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "way",
+    "en": "way",
+    "pos": "n.",
+    "zh": "路、方向",
+    "categories": [
+      "directions"
+    ],
+    "level": 1,
+    "syn": "way",
+    "example": "Is this the way to the zoo?",
+    "exampleZh": "這是去動物園的路嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "get-lost",
+    "en": "get lost",
+    "pos": "phr.",
+    "zh": "迷路",
+    "categories": [
+      "directions"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I think we got lost.",
+    "exampleZh": "我想我們迷路了。",
+    "form": "got lost",
+    "reviewed": true
+  },
+  {
+    "id": "direction",
+    "en": "direction",
+    "pos": "n.",
+    "zh": "方向",
+    "categories": [
+      "directions"
+    ],
+    "level": 2,
+    "syn": "way",
+    "example": "We are walking in the wrong direction.",
+    "exampleZh": "我們走錯方向了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "intersection",
+    "en": "intersection",
+    "pos": "n.",
+    "zh": "十字路口",
+    "categories": [
+      "directions"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Turn left at the next intersection.",
+    "exampleZh": "在下一個十字路口左轉。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "block",
+    "en": "block",
+    "pos": "n.",
+    "zh": "街區",
+    "categories": [
+      "directions"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The hotel is three blocks away.",
+    "exampleZh": "飯店在三個街區外。",
+    "form": "blocks",
+    "reviewed": true
+  },
+  {
+    "id": "crosswalk",
+    "en": "crosswalk",
+    "pos": "n.",
+    "zh": "斑馬線",
+    "categories": [
+      "directions"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Always use the crosswalk.",
+    "exampleZh": "過馬路一定要走斑馬線。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "traffic-light",
+    "en": "traffic light",
+    "pos": "n.",
+    "zh": "紅綠燈",
+    "categories": [
+      "directions"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Wait for the traffic light to turn green.",
+    "exampleZh": "等紅綠燈變綠燈。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sign",
+    "en": "sign",
+    "pos": "n.",
+    "zh": "標誌、招牌",
+    "categories": [
+      "directions"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Follow the signs to the exit.",
+    "exampleZh": "跟著標誌走到出口。",
+    "form": "signs",
+    "reviewed": true
+  },
+  {
+    "id": "opposite-prep",
+    "en": "opposite",
+    "pos": "prep.",
+    "zh": "在…對面",
+    "categories": [
+      "directions"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The bank is opposite the post office.",
+    "exampleZh": "銀行在郵局對面。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "around-the-corner",
+    "en": "around the corner",
+    "pos": "phr.",
+    "zh": "轉角處",
+    "categories": [
+      "directions"
+    ],
+    "level": 2,
+    "syn": "corner",
+    "example": "There is a coffee shop around the corner.",
+    "exampleZh": "轉角處有一家咖啡店。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "u-turn",
+    "en": "U-turn",
+    "pos": "n.",
+    "zh": "迴轉",
+    "categories": [
+      "directions"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "You can't make a U-turn here.",
+    "exampleZh": "這裡不能迴轉。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "downtown-adv",
+    "en": "downtown",
+    "pos": "adv.",
+    "zh": "市中心",
+    "categories": [
+      "directions"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "How do I get downtown from here?",
+    "exampleZh": "從這裡要怎麼去市中心？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "upstairs-adv",
+    "en": "upstairs",
+    "pos": "adv.",
+    "zh": "在樓上",
+    "categories": [
+      "directions"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The restroom is upstairs.",
+    "exampleZh": "廁所在樓上。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "downstairs-adv",
+    "en": "downstairs",
+    "pos": "adv.",
+    "zh": "在樓下",
+    "categories": [
+      "directions"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The restaurant is downstairs.",
+    "exampleZh": "餐廳在樓下。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "entrance",
+    "en": "entrance",
+    "pos": "n.",
+    "zh": "入口",
+    "categories": [
+      "directions"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Where is the main entrance?",
+    "exampleZh": "主要入口在哪裡？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "exit",
+    "en": "exit",
+    "pos": "n.",
+    "zh": "出口",
+    "categories": [
+      "directions"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Take Exit 2 from the subway station.",
+    "exampleZh": "從捷運站二號出口出去。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "address",
+    "en": "address",
+    "pos": "n.",
+    "zh": "地址",
+    "categories": [
+      "directions"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Could you write down the address for me?",
+    "exampleZh": "你可以幫我寫下地址嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "distance",
+    "en": "distance",
+    "pos": "n.",
+    "zh": "距離",
+    "categories": [
+      "directions"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The beach is within walking distance.",
+    "exampleZh": "海灘在走路可到的距離內。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "nearby-adj",
+    "en": "nearby",
+    "pos": "adj.",
+    "zh": "附近的",
+    "categories": [
+      "directions"
+    ],
+    "level": 2,
+    "syn": "near",
+    "example": "Is there a nearby convenience store?",
+    "exampleZh": "附近有便利商店嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "along-prep",
+    "en": "along",
+    "pos": "prep.",
+    "zh": "沿著",
+    "categories": [
+      "directions"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Walk along this street for five minutes.",
+    "exampleZh": "沿著這條街走五分鐘。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "toward-prep",
+    "en": "toward",
+    "pos": "prep.",
+    "zh": "朝向、往",
+    "categories": [
+      "directions"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Head toward the tall building.",
+    "exampleZh": "朝那棟高樓走。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "past-prep",
+    "en": "past",
+    "pos": "prep.",
+    "zh": "經過",
+    "categories": [
+      "directions"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Go past the church and turn right.",
+    "exampleZh": "經過教堂後右轉。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "bridge",
+    "en": "bridge",
+    "pos": "n.",
+    "zh": "橋",
+    "categories": [
+      "directions"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The museum is just over the bridge.",
+    "exampleZh": "博物館就在橋的另一頭。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "alley",
+    "en": "alley",
+    "pos": "n.",
+    "zh": "巷子、小巷",
+    "categories": [
+      "directions"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The noodle shop is in a small alley.",
+    "exampleZh": "那家麵店在一條小巷子裡。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "ask-for-directions",
+    "en": "ask for directions",
+    "pos": "phr.",
+    "zh": "問路",
+    "categories": [
+      "directions"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Let's ask for directions at the shop.",
+    "exampleZh": "我們去那家店問路吧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "overpass",
+    "en": "overpass",
+    "pos": "n.",
+    "zh": "天橋",
+    "categories": [
+      "directions"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Use the overpass to cross the road.",
+    "exampleZh": "走天橋過馬路。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "landmark",
+    "en": "landmark",
+    "pos": "n.",
+    "zh": "地標",
+    "categories": [
+      "directions"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The tower is a famous landmark.",
+    "exampleZh": "那座塔是有名的地標。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "pedestrian",
+    "en": "pedestrian",
+    "pos": "n.",
+    "zh": "行人",
+    "categories": [
+      "directions"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "This street is for pedestrians only.",
+    "exampleZh": "這條街只限行人通行。",
+    "form": "pedestrians",
+    "reviewed": true
+  },
+  {
+    "id": "roundabout",
+    "en": "roundabout",
+    "pos": "n.",
+    "zh": "圓環",
+    "categories": [
+      "directions"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Take the second exit at the roundabout.",
+    "exampleZh": "在圓環走第二個出口。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "underpass",
+    "en": "underpass",
+    "pos": "n.",
+    "zh": "地下道",
+    "categories": [
+      "directions"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Take the underpass to the other side.",
+    "exampleZh": "走地下道到對面。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "compass",
+    "en": "compass",
+    "pos": "n.",
+    "zh": "指南針",
+    "categories": [
+      "directions"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "My phone has a compass app.",
+    "exampleZh": "我的手機有指南針應用程式。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "northeast",
+    "en": "northeast",
+    "pos": "n.",
+    "zh": "東北方",
+    "categories": [
+      "directions"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The airport is to the northeast of the city.",
+    "exampleZh": "機場在城市的東北方。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "southwest",
+    "en": "southwest",
+    "pos": "n.",
+    "zh": "西南方",
+    "categories": [
+      "directions"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Head southwest for about a mile.",
+    "exampleZh": "往西南方走大約一英里。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "destination",
+    "en": "destination",
+    "pos": "n.",
+    "zh": "目的地",
+    "categories": [
+      "directions"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We reached our destination before dark.",
+    "exampleZh": "我們在天黑前抵達目的地。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "shortcut",
+    "en": "shortcut",
+    "pos": "n.",
+    "zh": "捷徑",
+    "categories": [
+      "directions"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I know a shortcut to the market.",
+    "exampleZh": "我知道去市場的捷徑。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "dead-end",
+    "en": "dead end",
+    "pos": "n.",
+    "zh": "死巷",
+    "categories": [
+      "directions"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "This road is a dead end.",
+    "exampleZh": "這條路是死巷。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "navigation",
+    "en": "navigation",
+    "pos": "n.",
+    "zh": "導航",
+    "categories": [
+      "directions"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Turn on the navigation on your phone.",
+    "exampleZh": "打開你手機上的導航。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "adjacent-adj",
+    "en": "adjacent",
+    "pos": "adj.",
+    "zh": "相鄰的",
+    "categories": [
+      "directions"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The parking lot is adjacent to the station.",
+    "exampleZh": "停車場就在車站旁邊。",
+    "form": "",
+    "reviewed": true
+  }
+]

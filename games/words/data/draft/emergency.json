@@ -1,0 +1,850 @@
+[
+  {
+    "id": "help",
+    "en": "help",
+    "pos": "interj.",
+    "zh": "救命",
+    "categories": [
+      "emergency"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Help! Someone took my bag!",
+    "exampleZh": "救命！有人搶了我的包包！",
+    "form": ""
+  },
+  {
+    "id": "police",
+    "en": "police",
+    "pos": "n.",
+    "zh": "警察",
+    "categories": [
+      "emergency"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Call the police right now!",
+    "exampleZh": "馬上報警！",
+    "form": ""
+  },
+  {
+    "id": "doctor",
+    "en": "doctor",
+    "pos": "n.",
+    "zh": "醫生",
+    "categories": [
+      "emergency",
+      "health"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I need to see a doctor.",
+    "exampleZh": "我需要看醫生。",
+    "form": ""
+  },
+  {
+    "id": "hospital",
+    "en": "hospital",
+    "pos": "n.",
+    "zh": "醫院",
+    "categories": [
+      "emergency",
+      "health"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Where is the nearest hospital?",
+    "exampleZh": "最近的醫院在哪裡？",
+    "form": ""
+  },
+  {
+    "id": "sick",
+    "en": "sick",
+    "pos": "adj.",
+    "zh": "生病的",
+    "categories": [
+      "emergency"
+    ],
+    "level": 1,
+    "syn": "sick",
+    "example": "I feel sick after eating that fish.",
+    "exampleZh": "吃了那條魚之後我覺得不舒服。",
+    "form": ""
+  },
+  {
+    "id": "hurt",
+    "en": "hurt",
+    "pos": "v.",
+    "zh": "受傷、痛",
+    "categories": [
+      "emergency"
+    ],
+    "level": 1,
+    "syn": "hurt",
+    "example": "My leg hurts after the fall.",
+    "exampleZh": "跌倒後我的腿很痛。",
+    "form": "hurts"
+  },
+  {
+    "id": "pain",
+    "en": "pain",
+    "pos": "n.",
+    "zh": "疼痛",
+    "categories": [
+      "emergency"
+    ],
+    "level": 1,
+    "syn": "hurt",
+    "example": "I have a sharp pain in my stomach.",
+    "exampleZh": "我的胃一陣劇痛。",
+    "form": ""
+  },
+  {
+    "id": "fire",
+    "en": "fire",
+    "pos": "n.",
+    "zh": "火災、火",
+    "categories": [
+      "emergency"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "There is a fire on the third floor!",
+    "exampleZh": "三樓失火了！",
+    "form": ""
+  },
+  {
+    "id": "lost",
+    "en": "lost",
+    "pos": "adj.",
+    "zh": "遺失的",
+    "categories": [
+      "emergency"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My passport is lost.",
+    "exampleZh": "我的護照遺失了。",
+    "form": ""
+  },
+  {
+    "id": "phone",
+    "en": "phone",
+    "pos": "n.",
+    "zh": "電話、手機",
+    "categories": [
+      "emergency"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Can I use your phone, please?",
+    "exampleZh": "可以借用你的電話嗎？",
+    "form": ""
+  },
+  {
+    "id": "call",
+    "en": "call",
+    "pos": "v.",
+    "zh": "打電話",
+    "categories": [
+      "emergency"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Please call an ambulance!",
+    "exampleZh": "請叫救護車！",
+    "form": ""
+  },
+  {
+    "id": "danger",
+    "en": "danger",
+    "pos": "n.",
+    "zh": "危險",
+    "categories": [
+      "emergency"
+    ],
+    "level": 1,
+    "syn": "danger",
+    "example": "The sign says danger, so stay back.",
+    "exampleZh": "牌子上寫著危險，所以退後一點。",
+    "form": ""
+  },
+  {
+    "id": "dangerous",
+    "en": "dangerous",
+    "pos": "adj.",
+    "zh": "危險的",
+    "categories": [
+      "emergency"
+    ],
+    "level": 1,
+    "syn": "danger",
+    "example": "It's dangerous to swim here at night.",
+    "exampleZh": "晚上在這裡游泳很危險。",
+    "form": ""
+  },
+  {
+    "id": "safe",
+    "en": "safe",
+    "pos": "adj.",
+    "zh": "安全的",
+    "categories": [
+      "emergency"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Is this area safe at night?",
+    "exampleZh": "這一區晚上安全嗎？",
+    "form": ""
+  },
+  {
+    "id": "stop",
+    "en": "stop",
+    "pos": "v.",
+    "zh": "停止、住手",
+    "categories": [
+      "emergency"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Stop! That's my bag!",
+    "exampleZh": "住手！那是我的包包！",
+    "form": ""
+  },
+  {
+    "id": "run",
+    "en": "run",
+    "pos": "v.",
+    "zh": "跑",
+    "categories": [
+      "emergency"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Run to the exit now!",
+    "exampleZh": "現在快跑到出口！",
+    "form": ""
+  },
+  {
+    "id": "fall",
+    "en": "fall",
+    "pos": "v.",
+    "zh": "跌倒",
+    "categories": [
+      "emergency"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My friend fell down the stairs.",
+    "exampleZh": "我朋友從樓梯上跌下來。",
+    "form": "fell"
+  },
+  {
+    "id": "cut",
+    "en": "cut",
+    "pos": "n.",
+    "zh": "傷口、割傷",
+    "categories": [
+      "emergency"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I have a deep cut on my hand.",
+    "exampleZh": "我的手上有一道很深的傷口。",
+    "form": ""
+  },
+  {
+    "id": "blood",
+    "en": "blood",
+    "pos": "n.",
+    "zh": "血",
+    "categories": [
+      "emergency"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "There is blood on his shirt.",
+    "exampleZh": "他的襯衫上有血。",
+    "form": ""
+  },
+  {
+    "id": "cold",
+    "en": "cold",
+    "pos": "n.",
+    "zh": "感冒",
+    "categories": [
+      "emergency"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I caught a cold on the trip.",
+    "exampleZh": "我在旅行中感冒了。",
+    "form": ""
+  },
+  {
+    "id": "fever",
+    "en": "fever",
+    "pos": "n.",
+    "zh": "發燒",
+    "categories": [
+      "emergency",
+      "health"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "My daughter has a high fever.",
+    "exampleZh": "我女兒發高燒。",
+    "form": ""
+  },
+  {
+    "id": "medicine",
+    "en": "medicine",
+    "pos": "n.",
+    "zh": "藥",
+    "categories": [
+      "emergency",
+      "health"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Did you bring any medicine for headaches?",
+    "exampleZh": "你有帶頭痛藥嗎？",
+    "form": ""
+  },
+  {
+    "id": "wallet",
+    "en": "wallet",
+    "pos": "n.",
+    "zh": "錢包、皮夾",
+    "categories": [
+      "emergency"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I can't find my wallet anywhere.",
+    "exampleZh": "我到處都找不到我的錢包。",
+    "form": ""
+  },
+  {
+    "id": "careful",
+    "en": "careful",
+    "pos": "adj.",
+    "zh": "小心的",
+    "categories": [
+      "emergency"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Be careful, the floor is wet.",
+    "exampleZh": "小心，地板是濕的。",
+    "form": ""
+  },
+  {
+    "id": "emergency",
+    "en": "emergency",
+    "pos": "n.",
+    "zh": "緊急情況",
+    "categories": [
+      "emergency"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "In an emergency, dial 119.",
+    "exampleZh": "緊急情況請撥119。",
+    "form": ""
+  },
+  {
+    "id": "ambulance",
+    "en": "ambulance",
+    "pos": "n.",
+    "zh": "救護車",
+    "categories": [
+      "emergency"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The ambulance arrived in five minutes.",
+    "exampleZh": "救護車五分鐘內就到了。",
+    "form": ""
+  },
+  {
+    "id": "accident",
+    "en": "accident",
+    "pos": "n.",
+    "zh": "意外、事故",
+    "categories": [
+      "emergency"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "There was a car accident on the bridge.",
+    "exampleZh": "橋上發生了車禍。",
+    "form": ""
+  },
+  {
+    "id": "injury",
+    "en": "injury",
+    "pos": "n.",
+    "zh": "傷害、受傷",
+    "categories": [
+      "emergency"
+    ],
+    "level": 2,
+    "syn": "hurt",
+    "example": "Luckily, his injury is not serious.",
+    "exampleZh": "幸好他的傷不嚴重。",
+    "form": ""
+  },
+  {
+    "id": "thief",
+    "en": "thief",
+    "pos": "n.",
+    "zh": "小偷",
+    "categories": [
+      "emergency"
+    ],
+    "level": 2,
+    "syn": "thief",
+    "example": "A thief took my phone on the train.",
+    "exampleZh": "有小偷在火車上偷了我的手機。",
+    "form": ""
+  },
+  {
+    "id": "steal",
+    "en": "steal",
+    "pos": "v.",
+    "zh": "偷",
+    "categories": [
+      "emergency"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Someone stole my bike last night.",
+    "exampleZh": "昨晚有人偷了我的腳踏車。",
+    "form": "stole"
+  },
+  {
+    "id": "police-station",
+    "en": "police station",
+    "pos": "n.",
+    "zh": "警察局",
+    "categories": [
+      "emergency"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Where is the nearest police station?",
+    "exampleZh": "最近的警察局在哪裡？",
+    "form": ""
+  },
+  {
+    "id": "earthquake",
+    "en": "earthquake",
+    "pos": "n.",
+    "zh": "地震",
+    "categories": [
+      "emergency"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Stay under the table during an earthquake.",
+    "exampleZh": "地震時要躲在桌子底下。",
+    "form": ""
+  },
+  {
+    "id": "typhoon",
+    "en": "typhoon",
+    "pos": "n.",
+    "zh": "颱風",
+    "categories": [
+      "emergency"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "All flights are canceled because of the typhoon.",
+    "exampleZh": "因為颱風，所有航班都取消了。",
+    "form": ""
+  },
+  {
+    "id": "flood",
+    "en": "flood",
+    "pos": "n.",
+    "zh": "水災、淹水",
+    "categories": [
+      "emergency"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The flood closed many roads.",
+    "exampleZh": "水災讓許多道路封閉。",
+    "form": ""
+  },
+  {
+    "id": "emergency-exit",
+    "en": "emergency exit",
+    "pos": "n.",
+    "zh": "緊急出口",
+    "categories": [
+      "emergency"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Find the emergency exit when you check in.",
+    "exampleZh": "入住時先找好緊急出口。",
+    "form": ""
+  },
+  {
+    "id": "pharmacy",
+    "en": "pharmacy",
+    "pos": "n.",
+    "zh": "藥局",
+    "categories": [
+      "emergency",
+      "health"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Is there a pharmacy open late near here?",
+    "exampleZh": "這附近有開到很晚的藥局嗎？",
+    "form": ""
+  },
+  {
+    "id": "insurance",
+    "en": "insurance",
+    "pos": "n.",
+    "zh": "保險",
+    "categories": [
+      "emergency"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Do you have travel insurance?",
+    "exampleZh": "你有買旅遊保險嗎？",
+    "form": ""
+  },
+  {
+    "id": "report",
+    "en": "report",
+    "pos": "v.",
+    "zh": "報案、報告",
+    "categories": [
+      "emergency"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I want to report a stolen bag.",
+    "exampleZh": "我要報案，我的包包被偷了。",
+    "form": ""
+  },
+  {
+    "id": "missing",
+    "en": "missing",
+    "pos": "adj.",
+    "zh": "不見的、失蹤的",
+    "categories": [
+      "emergency"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "My son is missing!",
+    "exampleZh": "我兒子不見了！",
+    "form": ""
+  },
+  {
+    "id": "broken",
+    "en": "broken",
+    "pos": "adj.",
+    "zh": "壞掉的、斷掉的",
+    "categories": [
+      "emergency"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I think my arm is broken.",
+    "exampleZh": "我覺得我的手臂斷了。",
+    "form": ""
+  },
+  {
+    "id": "bleed",
+    "en": "bleed",
+    "pos": "v.",
+    "zh": "流血",
+    "categories": [
+      "emergency"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Your nose is bleeding.",
+    "exampleZh": "你在流鼻血。",
+    "form": "bleeding"
+  },
+  {
+    "id": "ill",
+    "en": "ill",
+    "pos": "adj.",
+    "zh": "生病的、不舒服",
+    "categories": [
+      "emergency"
+    ],
+    "level": 2,
+    "syn": "sick",
+    "example": "She felt ill during the flight.",
+    "exampleZh": "她在飛機上感到不舒服。",
+    "form": ""
+  },
+  {
+    "id": "first-aid",
+    "en": "first aid",
+    "pos": "n.",
+    "zh": "急救",
+    "categories": [
+      "emergency"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Does anyone know first aid?",
+    "exampleZh": "有人會急救嗎？",
+    "form": ""
+  },
+  {
+    "id": "nurse",
+    "en": "nurse",
+    "pos": "n.",
+    "zh": "護理師、護士",
+    "categories": [
+      "emergency",
+      "health"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The nurse checked my temperature.",
+    "exampleZh": "護理師幫我量了體溫。",
+    "form": ""
+  },
+  {
+    "id": "allergy",
+    "en": "allergy",
+    "pos": "n.",
+    "zh": "過敏",
+    "categories": [
+      "emergency",
+      "health"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I have an allergy to peanuts.",
+    "exampleZh": "我對花生過敏。",
+    "form": ""
+  },
+  {
+    "id": "dizzy",
+    "en": "dizzy",
+    "pos": "adj.",
+    "zh": "頭暈的",
+    "categories": [
+      "emergency"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I feel dizzy and need to sit down.",
+    "exampleZh": "我覺得頭暈，需要坐下來。",
+    "form": ""
+  },
+  {
+    "id": "burn",
+    "en": "burn",
+    "pos": "n.",
+    "zh": "燒燙傷",
+    "categories": [
+      "emergency"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Put cold water on the burn.",
+    "exampleZh": "用冷水沖燙傷的地方。",
+    "form": ""
+  },
+  {
+    "id": "rescue",
+    "en": "rescue",
+    "pos": "v.",
+    "zh": "救援、救出",
+    "categories": [
+      "emergency"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The firefighters rescued everyone from the building.",
+    "exampleZh": "消防員把大樓裡的人都救了出來。",
+    "form": "rescued"
+  },
+  {
+    "id": "pickpocket",
+    "en": "pickpocket",
+    "pos": "n.",
+    "zh": "扒手",
+    "categories": [
+      "emergency"
+    ],
+    "level": 3,
+    "syn": "thief",
+    "example": "Watch out for pickpockets in crowded places.",
+    "exampleZh": "在人多的地方要小心扒手。",
+    "form": "pickpockets"
+  },
+  {
+    "id": "embassy",
+    "en": "embassy",
+    "pos": "n.",
+    "zh": "大使館",
+    "categories": [
+      "emergency"
+    ],
+    "level": 3,
+    "syn": "embassy",
+    "example": "Go to your embassy if you lose your passport.",
+    "exampleZh": "護照遺失的話，請去你國家的大使館。",
+    "form": ""
+  },
+  {
+    "id": "consulate",
+    "en": "consulate",
+    "pos": "n.",
+    "zh": "領事館",
+    "categories": [
+      "emergency"
+    ],
+    "level": 3,
+    "syn": "embassy",
+    "example": "The consulate can issue a new passport.",
+    "exampleZh": "領事館可以補發新護照。",
+    "form": ""
+  },
+  {
+    "id": "fire-extinguisher",
+    "en": "fire extinguisher",
+    "pos": "n.",
+    "zh": "滅火器",
+    "categories": [
+      "emergency"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The fire extinguisher is next to the door.",
+    "exampleZh": "滅火器在門旁邊。",
+    "form": ""
+  },
+  {
+    "id": "evacuate",
+    "en": "evacuate",
+    "pos": "v.",
+    "zh": "疏散、撤離",
+    "categories": [
+      "emergency"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Everyone must evacuate the building now.",
+    "exampleZh": "所有人現在必須撤離大樓。",
+    "form": ""
+  },
+  {
+    "id": "emergency-room",
+    "en": "emergency room",
+    "pos": "n.",
+    "zh": "急診室",
+    "categories": [
+      "emergency"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We spent the night in the emergency room.",
+    "exampleZh": "我們在急診室待了一整晚。",
+    "form": ""
+  },
+  {
+    "id": "prescription",
+    "en": "prescription",
+    "pos": "n.",
+    "zh": "處方箋",
+    "categories": [
+      "emergency",
+      "health"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "You need a prescription for this medicine.",
+    "exampleZh": "這種藥需要處方箋。",
+    "form": ""
+  },
+  {
+    "id": "unconscious",
+    "en": "unconscious",
+    "pos": "adj.",
+    "zh": "失去意識的",
+    "categories": [
+      "emergency"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The man on the floor is unconscious.",
+    "exampleZh": "躺在地上的那個人失去意識了。",
+    "form": ""
+  },
+  {
+    "id": "fracture",
+    "en": "fracture",
+    "pos": "n.",
+    "zh": "骨折",
+    "categories": [
+      "emergency"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The X-ray shows a small fracture.",
+    "exampleZh": "X光顯示有輕微骨折。",
+    "form": ""
+  },
+  {
+    "id": "food-poisoning",
+    "en": "food poisoning",
+    "pos": "n.",
+    "zh": "食物中毒",
+    "categories": [
+      "emergency"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I got food poisoning from the street food.",
+    "exampleZh": "我吃路邊攤食物中毒了。",
+    "form": ""
+  },
+  {
+    "id": "lost-and-found",
+    "en": "lost and found",
+    "pos": "n.",
+    "zh": "失物招領處",
+    "categories": [
+      "emergency"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Ask at the lost and found desk.",
+    "exampleZh": "去失物招領處問問看。",
+    "form": ""
+  },
+  {
+    "id": "sprain",
+    "en": "sprain",
+    "pos": "v.",
+    "zh": "扭傷",
+    "categories": [
+      "emergency"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I sprained my ankle on the stairs.",
+    "exampleZh": "我在樓梯上扭傷了腳踝。",
+    "form": "sprained"
+  }
+]

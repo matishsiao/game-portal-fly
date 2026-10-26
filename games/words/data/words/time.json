@@ -1,0 +1,903 @@
+[
+  {
+    "id": "time",
+    "en": "time",
+    "pos": "n.",
+    "zh": "時間",
+    "categories": [
+      "time"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "What time does the train leave?",
+    "exampleZh": "火車幾點開？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "day",
+    "en": "day",
+    "pos": "n.",
+    "zh": "天、日",
+    "categories": [
+      "time"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We're staying here for five days.",
+    "exampleZh": "我們要在這裡待五天。",
+    "form": "days",
+    "reviewed": true
+  },
+  {
+    "id": "week",
+    "en": "week",
+    "pos": "n.",
+    "zh": "週、星期",
+    "categories": [
+      "time"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I'll be back next week.",
+    "exampleZh": "我下週回來。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "month",
+    "en": "month",
+    "pos": "n.",
+    "zh": "月",
+    "categories": [
+      "time"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I'm studying in London for a month.",
+    "exampleZh": "我要在倫敦讀書一個月。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "year",
+    "en": "year",
+    "pos": "n.",
+    "zh": "年",
+    "categories": [
+      "time"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I visit Japan almost every year.",
+    "exampleZh": "我幾乎每年都去日本。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "hour",
+    "en": "hour",
+    "pos": "n.",
+    "zh": "小時",
+    "categories": [
+      "time"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The flight takes about three hours.",
+    "exampleZh": "這班飛機大約要飛三個小時。",
+    "form": "hours",
+    "reviewed": true
+  },
+  {
+    "id": "minute",
+    "en": "minute",
+    "pos": "n.",
+    "zh": "分鐘",
+    "categories": [
+      "time"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The bus comes every ten minutes.",
+    "exampleZh": "公車每十分鐘來一班。",
+    "form": "minutes",
+    "reviewed": true
+  },
+  {
+    "id": "second",
+    "en": "second",
+    "pos": "n.",
+    "zh": "秒",
+    "categories": [
+      "time"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Wait a few seconds for the door to open.",
+    "exampleZh": "等幾秒鐘門就會打開。",
+    "form": "seconds",
+    "reviewed": true
+  },
+  {
+    "id": "morning",
+    "en": "morning",
+    "pos": "n.",
+    "zh": "早上",
+    "categories": [
+      "time"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Breakfast is served from seven in the morning.",
+    "exampleZh": "早餐從早上七點開始供應。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "afternoon",
+    "en": "afternoon",
+    "pos": "n.",
+    "zh": "下午",
+    "categories": [
+      "time"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Let's go shopping this afternoon.",
+    "exampleZh": "我們今天下午去購物吧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "evening",
+    "en": "evening",
+    "pos": "n.",
+    "zh": "傍晚",
+    "categories": [
+      "time"
+    ],
+    "level": 1,
+    "syn": "night",
+    "example": "We'll walk along the river this evening.",
+    "exampleZh": "我們今天傍晚要沿著河邊散步。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "night",
+    "en": "night",
+    "pos": "n.",
+    "zh": "晚上、夜晚",
+    "categories": [
+      "time"
+    ],
+    "level": 1,
+    "syn": "night",
+    "example": "How much is the room per night?",
+    "exampleZh": "房間一晚多少錢？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "today-adv",
+    "en": "today",
+    "pos": "adv.",
+    "zh": "今天",
+    "categories": [
+      "time"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Is the museum open today?",
+    "exampleZh": "博物館今天有開嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "tomorrow-adv",
+    "en": "tomorrow",
+    "pos": "adv.",
+    "zh": "明天",
+    "categories": [
+      "time"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Our flight leaves early tomorrow.",
+    "exampleZh": "我們的班機明天一早出發。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "yesterday-adv",
+    "en": "yesterday",
+    "pos": "adv.",
+    "zh": "昨天",
+    "categories": [
+      "time"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I arrived in Bangkok yesterday.",
+    "exampleZh": "我昨天抵達曼谷。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "monday",
+    "en": "Monday",
+    "pos": "n.",
+    "zh": "星期一",
+    "categories": [
+      "time"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The museum is closed on Monday.",
+    "exampleZh": "博物館星期一休館。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "tuesday",
+    "en": "Tuesday",
+    "pos": "n.",
+    "zh": "星期二",
+    "categories": [
+      "time"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I have a meeting on Tuesday morning.",
+    "exampleZh": "我星期二早上有個會議。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "wednesday",
+    "en": "Wednesday",
+    "pos": "n.",
+    "zh": "星期三",
+    "categories": [
+      "time"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Let's have dinner together on Wednesday.",
+    "exampleZh": "我們星期三一起吃晚餐吧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "thursday",
+    "en": "Thursday",
+    "pos": "n.",
+    "zh": "星期四",
+    "categories": [
+      "time"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The package will arrive by Thursday.",
+    "exampleZh": "包裹會在星期四前送達。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "friday",
+    "en": "Friday",
+    "pos": "n.",
+    "zh": "星期五",
+    "categories": [
+      "time"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Friday night is always busy at this bar.",
+    "exampleZh": "這家酒吧星期五晚上總是很熱鬧。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "saturday",
+    "en": "Saturday",
+    "pos": "n.",
+    "zh": "星期六",
+    "categories": [
+      "time"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We're going hiking on Saturday.",
+    "exampleZh": "我們星期六要去爬山。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "sunday",
+    "en": "Sunday",
+    "pos": "n.",
+    "zh": "星期日",
+    "categories": [
+      "time"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Most shops close early on Sunday.",
+    "exampleZh": "大多數商店星期日很早關門。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "now-adv",
+    "en": "now",
+    "pos": "adv.",
+    "zh": "現在",
+    "categories": [
+      "time"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I'm at the station now.",
+    "exampleZh": "我現在在車站。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "weekend",
+    "en": "weekend",
+    "pos": "n.",
+    "zh": "週末",
+    "categories": [
+      "time"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "What are you doing this weekend?",
+    "exampleZh": "你這個週末要做什麼？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "january",
+    "en": "January",
+    "pos": "n.",
+    "zh": "一月",
+    "categories": [
+      "time"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "It's very cold in Seoul in January.",
+    "exampleZh": "首爾一月非常冷。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "february",
+    "en": "February",
+    "pos": "n.",
+    "zh": "二月",
+    "categories": [
+      "time"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Lunar New Year is often in February.",
+    "exampleZh": "農曆新年常在二月。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "march",
+    "en": "March",
+    "pos": "n.",
+    "zh": "三月",
+    "categories": [
+      "time"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "My birthday is on March fifth.",
+    "exampleZh": "我的生日是三月五日。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "april",
+    "en": "April",
+    "pos": "n.",
+    "zh": "四月",
+    "categories": [
+      "time"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Cherry blossoms are best in early April.",
+    "exampleZh": "四月初是賞櫻的最佳時節。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "may",
+    "en": "May",
+    "pos": "n.",
+    "zh": "五月",
+    "categories": [
+      "time"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We're planning a trip to Europe in May.",
+    "exampleZh": "我們計畫五月去歐洲旅行。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "june",
+    "en": "June",
+    "pos": "n.",
+    "zh": "六月",
+    "categories": [
+      "time"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "School finishes at the end of June.",
+    "exampleZh": "學校在六月底放假。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "july",
+    "en": "July",
+    "pos": "n.",
+    "zh": "七月",
+    "categories": [
+      "time"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "July is the hottest month in Taiwan.",
+    "exampleZh": "七月是台灣最熱的月份。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "august",
+    "en": "August",
+    "pos": "n.",
+    "zh": "八月",
+    "categories": [
+      "time"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Hotels are expensive in August.",
+    "exampleZh": "八月的飯店很貴。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "september",
+    "en": "September",
+    "pos": "n.",
+    "zh": "九月",
+    "categories": [
+      "time"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The new semester starts in September.",
+    "exampleZh": "新學期九月開始。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "october",
+    "en": "October",
+    "pos": "n.",
+    "zh": "十月",
+    "categories": [
+      "time"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The weather is perfect in October.",
+    "exampleZh": "十月的天氣很宜人。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "november",
+    "en": "November",
+    "pos": "n.",
+    "zh": "十一月",
+    "categories": [
+      "time"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I'm flying to New York in November.",
+    "exampleZh": "我十一月要飛去紐約。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "december",
+    "en": "December",
+    "pos": "n.",
+    "zh": "十二月",
+    "categories": [
+      "time"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The city is full of lights in December.",
+    "exampleZh": "十二月時城市到處都是燈飾。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "noon",
+    "en": "noon",
+    "pos": "n.",
+    "zh": "中午",
+    "categories": [
+      "time"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Check-out time is at noon.",
+    "exampleZh": "退房時間是中午。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "midnight",
+    "en": "midnight",
+    "pos": "n.",
+    "zh": "午夜、半夜",
+    "categories": [
+      "time"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The last train leaves at midnight.",
+    "exampleZh": "末班車在午夜發車。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "date",
+    "en": "date",
+    "pos": "n.",
+    "zh": "日期",
+    "categories": [
+      "time"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "What's the date today?",
+    "exampleZh": "今天幾月幾號？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "calendar",
+    "en": "calendar",
+    "pos": "n.",
+    "zh": "日曆、行事曆",
+    "categories": [
+      "time"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I marked the trip on my calendar.",
+    "exampleZh": "我在行事曆上標記了這趟旅行。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "early-adv",
+    "en": "early",
+    "pos": "adv.",
+    "zh": "早、提早",
+    "categories": [
+      "time"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We need to get up early tomorrow.",
+    "exampleZh": "我們明天需要早起。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "late-adj",
+    "en": "late",
+    "pos": "adj.",
+    "zh": "晚的、遲到的",
+    "categories": [
+      "time"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Sorry I'm late. The bus was slow.",
+    "exampleZh": "抱歉我遲到了，公車開得很慢。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "tonight-adv",
+    "en": "tonight",
+    "pos": "adv.",
+    "zh": "今晚",
+    "categories": [
+      "time"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Do you have a room available tonight?",
+    "exampleZh": "今晚還有空房嗎？",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "birthday",
+    "en": "birthday",
+    "pos": "n.",
+    "zh": "生日",
+    "categories": [
+      "time"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Happy birthday! Here's a small gift.",
+    "exampleZh": "生日快樂！這是一份小禮物。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "holiday",
+    "en": "holiday",
+    "pos": "n.",
+    "zh": "假日、假期",
+    "categories": [
+      "time"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The banks are closed on the national holiday.",
+    "exampleZh": "國定假日銀行不營業。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "oclock-adv",
+    "en": "o'clock",
+    "pos": "adv.",
+    "zh": "點鐘",
+    "categories": [
+      "time"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The museum opens at nine o'clock.",
+    "exampleZh": "博物館九點開門。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "half-an-hour",
+    "en": "half an hour",
+    "pos": "phr.",
+    "zh": "半小時",
+    "categories": [
+      "time"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The tour takes about half an hour.",
+    "exampleZh": "導覽大約需要半小時。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "ago-adv",
+    "en": "ago",
+    "pos": "adv.",
+    "zh": "以前",
+    "categories": [
+      "time"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "I arrived in Seoul three days ago.",
+    "exampleZh": "我三天前抵達首爾。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "schedule",
+    "en": "schedule",
+    "pos": "n.",
+    "zh": "時刻表、行程表",
+    "categories": [
+      "time"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Let me check the train schedule.",
+    "exampleZh": "我查一下火車時刻表。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "deadline",
+    "en": "deadline",
+    "pos": "n.",
+    "zh": "截止期限",
+    "categories": [
+      "time"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The deadline for the visa form is Friday.",
+    "exampleZh": "簽證表格的截止期限是星期五。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "decade",
+    "en": "decade",
+    "pos": "n.",
+    "zh": "十年",
+    "categories": [
+      "time"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I haven't been back home in a decade.",
+    "exampleZh": "我已經十年沒回家了。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "century",
+    "en": "century",
+    "pos": "n.",
+    "zh": "世紀",
+    "categories": [
+      "time"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "This temple was built in the seventeenth century.",
+    "exampleZh": "這座寺廟建於十七世紀。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "anniversary",
+    "en": "anniversary",
+    "pos": "n.",
+    "zh": "週年紀念日",
+    "categories": [
+      "time"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We're celebrating our tenth wedding anniversary in Bali.",
+    "exampleZh": "我們要在峇里島慶祝結婚十週年。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "weekday",
+    "en": "weekday",
+    "pos": "n.",
+    "zh": "平日",
+    "categories": [
+      "time"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The museum is less crowded on weekdays.",
+    "exampleZh": "博物館平日人比較少。",
+    "form": "weekdays",
+    "reviewed": true
+  },
+  {
+    "id": "time-zone",
+    "en": "time zone",
+    "pos": "n.",
+    "zh": "時區",
+    "categories": [
+      "time"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Don't forget to set your watch to the new time zone.",
+    "exampleZh": "別忘了把手錶調成新的時區。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "jet-lag",
+    "en": "jet lag",
+    "pos": "n.",
+    "zh": "時差",
+    "categories": [
+      "time",
+      "airport"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I couldn't sleep because of jet lag.",
+    "exampleZh": "因為時差，我睡不著。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "on-time",
+    "en": "on time",
+    "pos": "phr.",
+    "zh": "準時",
+    "categories": [
+      "time"
+    ],
+    "level": 3,
+    "syn": "on-time",
+    "example": "The train always arrives on time.",
+    "exampleZh": "火車總是準時到站。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "punctual-adj",
+    "en": "punctual",
+    "pos": "adj.",
+    "zh": "守時的",
+    "categories": [
+      "time"
+    ],
+    "level": 3,
+    "syn": "on-time",
+    "example": "Japanese trains are famous for being punctual.",
+    "exampleZh": "日本的火車以準時聞名。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "dawn",
+    "en": "dawn",
+    "pos": "n.",
+    "zh": "黎明",
+    "categories": [
+      "time"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We left the hotel at dawn to see the sunrise.",
+    "exampleZh": "我們在黎明時離開飯店去看日出。",
+    "form": "",
+    "reviewed": true
+  },
+  {
+    "id": "lunar-new-year",
+    "en": "Lunar New Year",
+    "pos": "n.",
+    "zh": "農曆新年",
+    "categories": [
+      "time"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Many shops close during Lunar New Year.",
+    "exampleZh": "農曆新年期間很多商店都休息。",
+    "form": "",
+    "reviewed": true
+  }
+]

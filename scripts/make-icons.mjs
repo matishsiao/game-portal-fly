@@ -122,6 +122,9 @@ const ROLL_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56"><d
 /** 密碼偵探卡片圖示：深灰金屬底、黃銅框面板上的四顆密碼顏色與回饋小點，與 games/codebreaker 的 icon.svg 相同。 */
 const CODEBREAKER_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4b5058"/><stop offset="1" stop-color="#1f2226"/></linearGradient></defs><rect width="56" height="56" rx="12" fill="url(#g)"/><rect x="7.75" y="14.75" width="40.5" height="26.5" rx="3" fill="#1c1e22" stroke="#c8a24a" stroke-width="1.5"/><circle cx="14" cy="24" r="4" fill="#e5383b"/><text x="14" y="25.9" font-size="5" font-family="sans-serif" font-weight="700" text-anchor="middle" fill="#fff">1</text><circle cx="23.3" cy="24" r="4" fill="#2f6fde"/><text x="23.3" y="25.9" font-size="5" font-family="sans-serif" font-weight="700" text-anchor="middle" fill="#fff">6</text><circle cx="32.7" cy="24" r="4" fill="#2e9e44"/><text x="32.7" y="25.9" font-size="5" font-family="sans-serif" font-weight="700" text-anchor="middle" fill="#fff">4</text><circle cx="42" cy="24" r="4" fill="#f2c12e"/><text x="42" y="25.9" font-size="5" font-family="sans-serif" font-weight="700" text-anchor="middle" fill="#fff">3</text><circle cx="22" cy="34.5" r="1.6" fill="#f0f0f0"/><circle cx="28" cy="34.5" r="1.6" fill="#f0f0f0"/><circle cx="34" cy="34.5" r="1.6" fill="none" stroke="#f0f0f0" stroke-width="0.8"/></svg>\n`;
 
+/** 英文單字連線卡片圖示：英文卡片與中文卡片以線相連，與 games/words 的 icon.svg 相同。 */
+const WORDS_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3aa7e0"/><stop offset="1" stop-color="#22b39a"/></linearGradient></defs><rect width="56" height="56" rx="12" fill="url(#g)"/><path d="M23.5 18.5 L32.5 37.5" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><rect x="6" y="9" width="18" height="18" rx="4" fill="#fff"/><rect x="32" y="29" width="18" height="18" rx="4" fill="#fff"/><circle cx="23.5" cy="18.5" r="2.4" fill="#ffd65c"/><circle cx="32.5" cy="37.5" r="2.4" fill="#ffd65c"/><text x="15" y="23.5" font-family="Georgia, serif" font-weight="700" font-size="13" text-anchor="middle" fill="#2a95cc">A</text><text x="41" y="43" font-family="sans-serif" font-weight="700" font-size="11.5" text-anchor="middle" fill="#22a082">中</text></svg>\n`;
+
 mkdirSync(OUT, { recursive: true });
 writeFileSync(join(OUT, 'icon-192.png'), drawIcon(192, 0.1));
 writeFileSync(join(OUT, 'icon-512.png'), drawIcon(512, 0.1));
@@ -134,4 +137,5 @@ writeFileSync(join(OUT, 'numberlink.svg'), NUMBERLINK_SVG);
 writeFileSync(join(OUT, 'idiom.svg'), IDIOM_SVG);
 writeFileSync(join(OUT, 'codebreaker.svg'), CODEBREAKER_SVG);
 writeFileSync(join(OUT, 'roll.svg'), ROLL_SVG);
+writeFileSync(join(OUT, 'words.svg'), WORDS_SVG);
 console.log(`圖示已輸出到 ${OUT}`);

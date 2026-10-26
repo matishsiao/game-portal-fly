@@ -1,0 +1,867 @@
+[
+  {
+    "id": "city",
+    "en": "city",
+    "pos": "n.",
+    "zh": "城市",
+    "categories": [
+      "city"
+    ],
+    "level": 1,
+    "syn": "city",
+    "example": "Taipei is a busy city with great food.",
+    "exampleZh": "台北是個熱鬧的城市，有很棒的美食。",
+    "form": ""
+  },
+  {
+    "id": "town",
+    "en": "town",
+    "pos": "n.",
+    "zh": "城鎮、小鎮",
+    "categories": [
+      "city"
+    ],
+    "level": 1,
+    "syn": "city",
+    "example": "We stayed in a small town by the sea.",
+    "exampleZh": "我們住在海邊的一個小鎮。",
+    "form": ""
+  },
+  {
+    "id": "street",
+    "en": "street",
+    "pos": "n.",
+    "zh": "街道、街",
+    "categories": [
+      "city"
+    ],
+    "level": 1,
+    "syn": "street",
+    "example": "There are many food stalls on this street.",
+    "exampleZh": "這條街上有很多小吃攤。",
+    "form": ""
+  },
+  {
+    "id": "road",
+    "en": "road",
+    "pos": "n.",
+    "zh": "路、道路",
+    "categories": [
+      "city"
+    ],
+    "level": 1,
+    "syn": "street",
+    "example": "The road to the beach is very narrow.",
+    "exampleZh": "通往海灘的路很窄。",
+    "form": ""
+  },
+  {
+    "id": "park",
+    "en": "park",
+    "pos": "n.",
+    "zh": "公園",
+    "categories": [
+      "city",
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Let's have a picnic in the park.",
+    "exampleZh": "我們去公園野餐吧。",
+    "form": ""
+  },
+  {
+    "id": "bank",
+    "en": "bank",
+    "pos": "n.",
+    "zh": "銀行",
+    "categories": [
+      "city",
+      "money"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Is there a bank near here?",
+    "exampleZh": "這附近有銀行嗎？",
+    "form": ""
+  },
+  {
+    "id": "hospital",
+    "en": "hospital",
+    "pos": "n.",
+    "zh": "醫院",
+    "categories": [
+      "city",
+      "health"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The nearest hospital is ten minutes away.",
+    "exampleZh": "最近的醫院大約十分鐘路程。",
+    "form": ""
+  },
+  {
+    "id": "post-office",
+    "en": "post office",
+    "pos": "n.",
+    "zh": "郵局",
+    "categories": [
+      "city"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I mailed some postcards at the post office.",
+    "exampleZh": "我在郵局寄了幾張明信片。",
+    "form": ""
+  },
+  {
+    "id": "store",
+    "en": "store",
+    "pos": "n.",
+    "zh": "商店",
+    "categories": [
+      "city",
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "shop",
+    "example": "The store closes at ten tonight.",
+    "exampleZh": "這家商店今晚十點關門。",
+    "form": ""
+  },
+  {
+    "id": "shop",
+    "en": "shop",
+    "pos": "n.",
+    "zh": "店、小店",
+    "categories": [
+      "city",
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "shop",
+    "example": "This little shop sells handmade soap.",
+    "exampleZh": "這家小店賣手工肥皂。",
+    "form": ""
+  },
+  {
+    "id": "market",
+    "en": "market",
+    "pos": "n.",
+    "zh": "市場",
+    "categories": [
+      "city"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The night market opens at five.",
+    "exampleZh": "夜市五點開始營業。",
+    "form": ""
+  },
+  {
+    "id": "supermarket",
+    "en": "supermarket",
+    "pos": "n.",
+    "zh": "超市、超級市場",
+    "categories": [
+      "city",
+      "shopping"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "We bought snacks and water at the supermarket.",
+    "exampleZh": "我們在超市買了零食和水。",
+    "form": ""
+  },
+  {
+    "id": "restaurant",
+    "en": "restaurant",
+    "pos": "n.",
+    "zh": "餐廳",
+    "categories": [
+      "city",
+      "restaurant"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "This restaurant is famous for its beef noodles.",
+    "exampleZh": "這家餐廳以牛肉麵聞名。",
+    "form": ""
+  },
+  {
+    "id": "bridge",
+    "en": "bridge",
+    "pos": "n.",
+    "zh": "橋",
+    "categories": [
+      "city"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Let's take a photo on the bridge.",
+    "exampleZh": "我們在橋上拍張照吧。",
+    "form": ""
+  },
+  {
+    "id": "building",
+    "en": "building",
+    "pos": "n.",
+    "zh": "大樓、建築物",
+    "categories": [
+      "city"
+    ],
+    "level": 1,
+    "syn": "building",
+    "example": "You can see the whole city from that building.",
+    "exampleZh": "從那棟大樓可以看到整座城市。",
+    "form": ""
+  },
+  {
+    "id": "zoo",
+    "en": "zoo",
+    "pos": "n.",
+    "zh": "動物園",
+    "categories": [
+      "city",
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The kids loved the pandas at the zoo.",
+    "exampleZh": "孩子們很喜歡動物園的貓熊。",
+    "form": ""
+  },
+  {
+    "id": "train-station",
+    "en": "train station",
+    "pos": "n.",
+    "zh": "火車站",
+    "categories": [
+      "city",
+      "transport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "How do I get to the train station?",
+    "exampleZh": "請問火車站怎麼走？",
+    "form": ""
+  },
+  {
+    "id": "bus-stop",
+    "en": "bus stop",
+    "pos": "n.",
+    "zh": "公車站",
+    "categories": [
+      "city",
+      "transport"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The bus stop is across the street.",
+    "exampleZh": "公車站在對街。",
+    "form": ""
+  },
+  {
+    "id": "police-station",
+    "en": "police station",
+    "pos": "n.",
+    "zh": "警察局",
+    "categories": [
+      "city",
+      "emergency"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "I reported my lost wallet at the police station.",
+    "exampleZh": "我到警察局報案說錢包遺失了。",
+    "form": ""
+  },
+  {
+    "id": "corner",
+    "en": "corner",
+    "pos": "n.",
+    "zh": "轉角、角落",
+    "categories": [
+      "city",
+      "directions"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "There's a coffee shop on the corner.",
+    "exampleZh": "轉角有一家咖啡店。",
+    "form": ""
+  },
+  {
+    "id": "bookstore",
+    "en": "bookstore",
+    "pos": "n.",
+    "zh": "書店",
+    "categories": [
+      "city"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "This old bookstore also sells postcards.",
+    "exampleZh": "這家老書店也有賣明信片。",
+    "form": ""
+  },
+  {
+    "id": "coffee-shop",
+    "en": "coffee shop",
+    "pos": "n.",
+    "zh": "咖啡店、咖啡廳",
+    "categories": [
+      "city"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Let's meet at the coffee shop near the hotel.",
+    "exampleZh": "我們在旅館附近的咖啡店見面吧。",
+    "form": ""
+  },
+  {
+    "id": "hotel",
+    "en": "hotel",
+    "pos": "n.",
+    "zh": "旅館、飯店",
+    "categories": [
+      "city",
+      "hotel"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "Our hotel is right in the city center.",
+    "exampleZh": "我們的旅館就在市中心。",
+    "form": ""
+  },
+  {
+    "id": "museum",
+    "en": "museum",
+    "pos": "n.",
+    "zh": "博物館",
+    "categories": [
+      "city",
+      "sightseeing"
+    ],
+    "level": 1,
+    "syn": "",
+    "example": "The museum is free on Sundays.",
+    "exampleZh": "博物館星期日免費參觀。",
+    "form": ""
+  },
+  {
+    "id": "downtown",
+    "en": "downtown",
+    "pos": "adv.",
+    "zh": "市中心",
+    "categories": [
+      "city"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We took a bus downtown to go shopping.",
+    "exampleZh": "我們搭公車到市中心購物。",
+    "form": ""
+  },
+  {
+    "id": "neighborhood",
+    "en": "neighborhood",
+    "pos": "n.",
+    "zh": "社區、附近一帶",
+    "categories": [
+      "city"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "This neighborhood has lots of good restaurants.",
+    "exampleZh": "這一帶有很多好餐廳。",
+    "form": ""
+  },
+  {
+    "id": "village",
+    "en": "village",
+    "pos": "n.",
+    "zh": "村莊",
+    "categories": [
+      "city"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We visited a quiet mountain village.",
+    "exampleZh": "我們去了一個安靜的山中村莊。",
+    "form": ""
+  },
+  {
+    "id": "square",
+    "en": "square",
+    "pos": "n.",
+    "zh": "廣場",
+    "categories": [
+      "city"
+    ],
+    "level": 2,
+    "syn": "square",
+    "example": "There's a concert in the main square tonight.",
+    "exampleZh": "今晚主廣場有一場音樂會。",
+    "form": ""
+  },
+  {
+    "id": "bakery",
+    "en": "bakery",
+    "pos": "n.",
+    "zh": "麵包店",
+    "categories": [
+      "city"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The bakery sells fresh bread every morning.",
+    "exampleZh": "這家麵包店每天早上賣新鮮麵包。",
+    "form": ""
+  },
+  {
+    "id": "gas-station",
+    "en": "gas station",
+    "pos": "n.",
+    "zh": "加油站",
+    "categories": [
+      "city",
+      "transport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We need to stop at a gas station.",
+    "exampleZh": "我們需要停一下加油站。",
+    "form": ""
+  },
+  {
+    "id": "sidewalk",
+    "en": "sidewalk",
+    "pos": "n.",
+    "zh": "人行道",
+    "categories": [
+      "city"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Please ride your bike on the road, not the sidewalk.",
+    "exampleZh": "請在馬路上騎腳踏車，不要騎上人行道。",
+    "form": ""
+  },
+  {
+    "id": "traffic-light",
+    "en": "traffic light",
+    "pos": "n.",
+    "zh": "紅綠燈",
+    "categories": [
+      "city",
+      "directions"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Turn left at the next traffic light.",
+    "exampleZh": "在下一個紅綠燈左轉。",
+    "form": ""
+  },
+  {
+    "id": "crosswalk",
+    "en": "crosswalk",
+    "pos": "n.",
+    "zh": "斑馬線、行人穿越道",
+    "categories": [
+      "city"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Always cross the street at the crosswalk.",
+    "exampleZh": "過馬路一定要走斑馬線。",
+    "form": ""
+  },
+  {
+    "id": "parking-lot",
+    "en": "parking lot",
+    "pos": "n.",
+    "zh": "停車場",
+    "categories": [
+      "city"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The hotel has a free parking lot.",
+    "exampleZh": "這家旅館有免費停車場。",
+    "form": ""
+  },
+  {
+    "id": "pharmacy",
+    "en": "pharmacy",
+    "pos": "n.",
+    "zh": "藥局",
+    "categories": [
+      "city",
+      "health"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Is there a pharmacy open late around here?",
+    "exampleZh": "這附近有開到很晚的藥局嗎？",
+    "form": ""
+  },
+  {
+    "id": "department-store",
+    "en": "department store",
+    "pos": "n.",
+    "zh": "百貨公司",
+    "categories": [
+      "city",
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "mall",
+    "example": "The department store has a food court downstairs.",
+    "exampleZh": "這家百貨公司樓下有美食街。",
+    "form": ""
+  },
+  {
+    "id": "mall",
+    "en": "mall",
+    "pos": "n.",
+    "zh": "購物中心",
+    "categories": [
+      "city",
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "mall",
+    "example": "We spent the rainy afternoon at the mall.",
+    "exampleZh": "我們在購物中心度過下雨的午後。",
+    "form": ""
+  },
+  {
+    "id": "apartment",
+    "en": "apartment",
+    "pos": "n.",
+    "zh": "公寓",
+    "categories": [
+      "city"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We rented an apartment for a week.",
+    "exampleZh": "我們租了一間公寓住一週。",
+    "form": ""
+  },
+  {
+    "id": "convenience-store",
+    "en": "convenience store",
+    "pos": "n.",
+    "zh": "便利商店",
+    "categories": [
+      "city",
+      "shopping"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "You can buy bus cards at any convenience store.",
+    "exampleZh": "任何一家便利商店都買得到公車卡。",
+    "form": ""
+  },
+  {
+    "id": "city-hall",
+    "en": "city hall",
+    "pos": "n.",
+    "zh": "市政府、市政廳",
+    "categories": [
+      "city"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "You can get a free city map at city hall.",
+    "exampleZh": "你可以在市政府拿到免費的市區地圖。",
+    "form": ""
+  },
+  {
+    "id": "fire-station",
+    "en": "fire station",
+    "pos": "n.",
+    "zh": "消防局",
+    "categories": [
+      "city"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The fire station is next to the school.",
+    "exampleZh": "消防局就在學校旁邊。",
+    "form": ""
+  },
+  {
+    "id": "block",
+    "en": "block",
+    "pos": "n.",
+    "zh": "街區",
+    "categories": [
+      "city",
+      "directions"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The museum is two blocks from here.",
+    "exampleZh": "博物館離這裡兩個街區。",
+    "form": "blocks"
+  },
+  {
+    "id": "alley",
+    "en": "alley",
+    "pos": "n.",
+    "zh": "巷子、小巷",
+    "categories": [
+      "city"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "This narrow alley is full of small cafes.",
+    "exampleZh": "這條窄巷裡有很多小咖啡廳。",
+    "form": ""
+  },
+  {
+    "id": "intersection",
+    "en": "intersection",
+    "pos": "n.",
+    "zh": "十字路口、路口",
+    "categories": [
+      "city",
+      "directions"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Turn right at the big intersection.",
+    "exampleZh": "在大十字路口右轉。",
+    "form": ""
+  },
+  {
+    "id": "subway-station",
+    "en": "subway station",
+    "pos": "n.",
+    "zh": "捷運站、地鐵站",
+    "categories": [
+      "city",
+      "transport"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "The closest subway station is five minutes away.",
+    "exampleZh": "最近的捷運站大約五分鐘路程。",
+    "form": ""
+  },
+  {
+    "id": "harbor",
+    "en": "harbor",
+    "pos": "n.",
+    "zh": "港口",
+    "categories": [
+      "city"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "We watched the boats in the harbor at sunset.",
+    "exampleZh": "我們在夕陽下看港口的船。",
+    "form": ""
+  },
+  {
+    "id": "avenue",
+    "en": "avenue",
+    "pos": "n.",
+    "zh": "大道",
+    "categories": [
+      "city"
+    ],
+    "level": 2,
+    "syn": "street",
+    "example": "Our hotel is on Fifth Avenue.",
+    "exampleZh": "我們的旅館在第五大道上。",
+    "form": ""
+  },
+  {
+    "id": "capital",
+    "en": "capital",
+    "pos": "n.",
+    "zh": "首都",
+    "categories": [
+      "city"
+    ],
+    "level": 2,
+    "syn": "",
+    "example": "Tokyo is the capital of Japan.",
+    "exampleZh": "東京是日本的首都。",
+    "form": ""
+  },
+  {
+    "id": "plaza",
+    "en": "plaza",
+    "pos": "n.",
+    "zh": "廣場",
+    "categories": [
+      "city"
+    ],
+    "level": 3,
+    "syn": "square",
+    "example": "The plaza fills with street performers on weekends.",
+    "exampleZh": "週末時廣場上滿是街頭藝人。",
+    "form": ""
+  },
+  {
+    "id": "skyscraper",
+    "en": "skyscraper",
+    "pos": "n.",
+    "zh": "摩天大樓",
+    "categories": [
+      "city"
+    ],
+    "level": 3,
+    "syn": "building",
+    "example": "The view from the skyscraper was amazing.",
+    "exampleZh": "從摩天大樓看出去的景色很驚人。",
+    "form": ""
+  },
+  {
+    "id": "suburb",
+    "en": "suburb",
+    "pos": "n.",
+    "zh": "郊區",
+    "categories": [
+      "city"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Many families live in the suburbs and drive to work.",
+    "exampleZh": "很多家庭住在郊區，開車去上班。",
+    "form": "suburbs"
+  },
+  {
+    "id": "laundromat",
+    "en": "laundromat",
+    "pos": "n.",
+    "zh": "自助洗衣店",
+    "categories": [
+      "city"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "We washed our clothes at a laundromat near the hostel.",
+    "exampleZh": "我們在青年旅館附近的自助洗衣店洗衣服。",
+    "form": ""
+  },
+  {
+    "id": "landmark",
+    "en": "landmark",
+    "pos": "n.",
+    "zh": "地標",
+    "categories": [
+      "city",
+      "sightseeing"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "This tower is the city's most famous landmark.",
+    "exampleZh": "這座塔是這座城市最有名的地標。",
+    "form": ""
+  },
+  {
+    "id": "resident",
+    "en": "resident",
+    "pos": "n.",
+    "zh": "居民",
+    "categories": [
+      "city"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Local residents get free entry to the park.",
+    "exampleZh": "當地居民可以免費進入公園。",
+    "form": "residents"
+  },
+  {
+    "id": "population",
+    "en": "population",
+    "pos": "n.",
+    "zh": "人口",
+    "categories": [
+      "city"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The city has a population of about two million.",
+    "exampleZh": "這座城市的人口約兩百萬。",
+    "form": ""
+  },
+  {
+    "id": "pedestrian",
+    "en": "pedestrian",
+    "pos": "n.",
+    "zh": "行人",
+    "categories": [
+      "city"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "This street is for pedestrians only.",
+    "exampleZh": "這條街只限行人通行。",
+    "form": "pedestrians"
+  },
+  {
+    "id": "district",
+    "en": "district",
+    "pos": "n.",
+    "zh": "區、區域",
+    "categories": [
+      "city"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "The shopping district is crowded on weekends.",
+    "exampleZh": "購物區週末很擁擠。",
+    "form": ""
+  },
+  {
+    "id": "embassy",
+    "en": "embassy",
+    "pos": "n.",
+    "zh": "大使館",
+    "categories": [
+      "city",
+      "emergency"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "I went to the embassy to replace my passport.",
+    "exampleZh": "我去大使館補辦護照。",
+    "form": ""
+  },
+  {
+    "id": "public-restroom",
+    "en": "public restroom",
+    "pos": "n.",
+    "zh": "公共廁所",
+    "categories": [
+      "city"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Excuse me, is there a public restroom nearby?",
+    "exampleZh": "請問附近有公共廁所嗎？",
+    "form": ""
+  },
+  {
+    "id": "construction-site",
+    "en": "construction site",
+    "pos": "n.",
+    "zh": "工地",
+    "categories": [
+      "city"
+    ],
+    "level": 3,
+    "syn": "",
+    "example": "Please walk around the construction site.",
+    "exampleZh": "請繞過施工工地。",
+    "form": ""
+  }
+]
