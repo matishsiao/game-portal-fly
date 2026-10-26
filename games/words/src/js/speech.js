@@ -132,6 +132,8 @@ export function speak(text) {
     if (synth.speaking || synth.pending) synth.cancel();
     // Chrome 偶爾會卡在暫停狀態，之後的語句都不會播放。
     synth.resume();
+    // iOS 16.4 以上：把音訊工作階段設為影音播放，嘗試讓發音不受靜音開關影響（不支援時略過）。
+    if (navigator.audioSession && navigator.audioSession.type !== 'playback') navigator.audioSession.type = 'playback';
     synth.speak(makeUtterance(text, currentVoice(), true));
   } catch {
     // 忽略：語音合成失敗時不影響遊戲。

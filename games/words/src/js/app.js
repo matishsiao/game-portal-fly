@@ -28,6 +28,7 @@ const els = {
   themeBtn: $('theme-btn'),
   offlineStatus: $('offline-status'),
   homeNotice: $('home-notice'),
+  toast: $('toast'),
   continueBtn: $('continue-btn'),
   continueDetail: $('continue-detail'),
   learnedCount: $('learned-count'),
@@ -287,6 +288,37 @@ function speakButton(en, inCard = false) {
   return `<${tag} ${type} class="speak-btn" data-speak="${esc(en)}" aria-label="唸出 ${esc(en)}">🔊</${tag}>`;
 }
 
+/** 本次開啟後是否已顯示過靜音提示。 */
+let muteHintShown = false;
+let toastTimer = 0;
+
+/**
+ * 在畫面下方短暫顯示提示，不阻擋操作。
+ * @param {string} text 提示文字。
+ * @param {number} [ms=4500] 顯示時間（毫秒）。
+ */
+function showToast(text, ms = 4500) {
+  els.toast.textContent = text;
+  els.toast.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    els.toast.hidden = true;
+  }, ms);
+}
+
+/**
+ * 唸出英文；在 iPhone／iPad 上，每次開啟後第一次發音時提示靜音開關。
+ * 網頁無法讀取 iOS 的靜音開關，語音合成在靜音模式下可能沒有聲音，所以只能提示。
+ * @param {string} text 英文。
+ */
+function sayWord(text) {
+  speak(text);
+  if (isIos() && !muteHintShown) {
+    muteHintShown = true;
+    showToast('🔇 沒聽到聲音？請關閉 iPhone 的靜音模式並調高音量。');
+  }
+}
+
 /**
  * 讓容器內的發音按鈕可點按（不觸發卡片選取）。
  * @param {HTMLElement} root 容器。
@@ -295,7 +327,7 @@ function bindSpeakButtons(root) {
   root.querySelectorAll('[data-speak]').forEach((b) => {
     b.addEventListener('click', (e) => {
       e.stopPropagation();
-      speak(b.dataset.speak);
+      sayWord(b.dataset.speak);
     });
   });
 }
@@ -509,7 +541,7 @@ function makeCard(side, w, showEnglish, index) {
   /** 點到發音圖示時只發音，不選取卡片；其他位置選取卡片。 */
   b.addEventListener('click', (e) => {
     const sp = e.target.closest('[data-speak]');
-    if (sp) speak(sp.dataset.speak);
+    if (sp) sayWord(sp.dataset.speak);
     else onCard(side, w.id);
   });
   return b;
@@ -831,7 +863,7 @@ async function chooseVoice() {
   if (choice === null) return;
   app.settings.voice = choice;
   applySpeechSettings();
-  speak(SAMPLE_TEXT);
+  sayWord(SAMPLE_TEXT);
 }
 
 /** 顯示設定。 */
@@ -857,7 +889,7 @@ async function openSettings() {
   } else if (choice === 'rate') {
     app.settings.rate = app.settings.rate === 'slow' ? 'normal' : 'slow';
     applySpeechSettings();
-    speak(SAMPLE_TEXT);
+    sayWord(SAMPLE_TEXT);
     openSettings();
   } else if (choice === 'theme') {
     cycleTheme();
@@ -1013,13 +1045,20 @@ function setupPortalLink() {
 }
 
 /**
+ * 判斷是否為 iPhone、iPad 或 iPod（包含以桌面模式回報的 iPad）。
+ * @returns {boolean} 是時為 true。
+ */
+function isIos() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
+/**
  * 判斷是否為 iOS 瀏覽器分頁（非主畫面 App）。
  * @returns {boolean} 是時為 true。
  */
 function isIosBrowserTab() {
-  const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   const standalone = navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-  return ios && !standalone;
+  return isIos() && !standalone;
 }
 
 /** 綁定事件。 */

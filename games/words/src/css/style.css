@@ -976,3 +976,34 @@ a:focus-visible {
     transition: none;
   }
 }
+
+/* 短暫提示（例如 iPhone 靜音提醒）：畫面下方，高於對話框，不阻擋操作。 */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  z-index: 40;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 32px);
+  padding: 10px 16px;
+  border-radius: 14px;
+  background: var(--text);
+  color: var(--bg);
+  font-size: 14px;
+  line-height: 1.5;
+  box-shadow: var(--shadow-lg);
+  pointer-events: none;
+  animation: toast-in 0.2s ease-out;
+}
+
+.toast[hidden] {
+  display: none;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+}
