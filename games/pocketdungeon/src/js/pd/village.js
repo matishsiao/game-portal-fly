@@ -1,7 +1,7 @@
 // 村莊規則（純邏輯）：商店刷新與買賣、裝備穿脫、強化、區域與深度解鎖、探險開始與結算。
 // 所有函式直接修改傳入的角色資料，回傳結果與要顯示的訊息。
 
-import { AREAS, AREA_KEYS, LIMITS, MAX_DEPTH, RARITIES, ENHANCE, BAG_EXPAND, EQUIP_SLOTS, SHARED_SLOTS, CLASSES } from './data.js';
+import { AREAS, AREA_KEYS, LIMITS, MAX_DEPTH, RARITIES, ENHANCE, BAG_EXPAND, EQUIP_SLOTS, SHARED_SLOTS, CLASSES, REBIRTH, MAX_LEVEL } from './data.js';
 import { makeItem, itemValue, sellPrice, enhanceCost, tryEnhance, rollRarity, dungeonLevel } from './rules.js';
 
 /** 商店一次陳列的裝備數。 */
@@ -151,6 +151,41 @@ export function equip(ch, id, key) {
   if (old) ch.bag.splice(idx, 0, old);
   ch.equipped[target] = item;
   return { ok: true, message: `${def.name}裝備 ${item.name}` };
+}
+
+/**
+ * 角色目前的職稱（依轉職次數）。
+ * @param {object} ch 角色。
+ * @returns {string} 例如「騎士」。
+ */
+export function classTitle(ch) {
+  return REBIRTH.titles[ch.cls][Math.min(REBIRTH.max, ch.rebirth || 0)];
+}
+
+/**
+ * 判斷角色現在能不能轉職。
+ * @param {object} ch 角色。
+ * @returns {{ok: boolean, message: string}} 可以時 ok 為 true；不行時附上原因。
+ */
+export function canRebirth(ch) {
+  if ((ch.rebirth || 0) >= REBIRTH.max) return { ok: false, message: `已完成全部 ${REBIRTH.max} 次轉職` };
+  if (ch.level < MAX_LEVEL) return { ok: false, message: `Lv.${MAX_LEVEL} 才能轉職` };
+  return { ok: true, message: '' };
+}
+
+/**
+ * 轉職：回到 Lv.1、經驗值歸零、轉職次數 +1；裝備、背包、金幣、技能與地城進度全部保留。
+ * @param {object} ch 角色（會被修改）。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function rebirth(ch) {
+  const check = canRebirth(ch);
+  if (!check.ok) return check;
+  ch.rebirth = (ch.rebirth || 0) + 1;
+  ch.level = 1;
+  ch.xp = 0;
+  ch.stats.rebirths = (ch.stats.rebirths || 0) + 1;
+  return { ok: true, message: `轉職為${classTitle(ch)}！回到 Lv.1，起始能力提升` };
 }
 
 /**

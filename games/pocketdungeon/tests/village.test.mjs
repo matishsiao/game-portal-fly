@@ -3,7 +3,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as v from '../src/js/pd/village.js';
-import { seededRng, makeItem } from '../src/js/pd/rules.js';
+import { seededRng, makeItem, characterStats } from '../src/js/pd/rules.js';
+import { skillLevel, skillPoints } from '../src/js/pd/skills.js';
 import { World } from '../src/js/pd/world.js';
 import { LIMITS } from '../src/js/pd/data.js';
 
@@ -206,4 +207,36 @@ test('武器有職業限制：其他職業可以取出但不能裝備', () => {
   assert.equal(v.canWield(mage, sword), false);
   warrior.bag.push(sword);
   assert.ok(v.equip(warrior, sword.id).ok);
+});
+
+test('轉職：Lv.30 才能轉職、最多 3 次；回到 Lv.1，HP／攻擊／防禦起始值為轉職前滿級的一半，速度不變', () => {
+  const ch = hero();
+  ch.skills = { lv: { whirl: 5 }, slots: ['whirl', null] };
+  ch.level = 29;
+  assert.equal(v.rebirth(ch).ok, false);
+  const gear = makeItem({ slot: 'armor', level: 20, rarity: 2 }, seededRng(3));
+  ch.equipped.armor = gear;
+  ch.gold = 1234;
+  for (let n = 1; n <= 3; n++) {
+    ch.level = 30;
+    ch.xp = 0;
+    const before = characterStats('warrior', 30, [], n - 1);
+    assert.ok(v.rebirth(ch).ok);
+    assert.equal(ch.level, 1);
+    assert.equal(ch.rebirth, n);
+    const after = characterStats('warrior', 1, [], n);
+    for (const k of ['hp', 'atk', 'def']) assert.ok(Math.abs(after[k] - before[k] / 2) <= 1, `${k} ${after[k]} vs ${before[k] / 2}`);
+    assert.equal(after.spd, 100);
+  }
+  assert.equal(v.classTitle(ch), '英雄');
+  ch.level = 30;
+  assert.equal(v.rebirth(ch).ok, false, '最多 3 次');
+  // 裝備、金幣、技能保留；技能在 Lv.1 仍維持解鎖。
+  assert.equal(ch.equipped.armor, gear);
+  assert.equal(ch.gold, 1234);
+  ch.level = 1;
+  assert.equal(skillLevel(ch, 'quake'), 1);
+  assert.equal(skillLevel(ch, 'whirl'), 5);
+  assert.equal(skillPoints(ch), 29 * 3 - 4);
+  assert.equal(ch.stats.rebirths, 3);
 });

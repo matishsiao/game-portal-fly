@@ -50,18 +50,19 @@ export function newSkills(cls) {
  * @returns {number} 等級。
  */
 export function skillLevel(ch, id) {
-  if (ch.level < SKILLS[id].unlock) return 0;
+  // 轉職過的角色曾經到達 Lv.30，所有技能維持解鎖。
+  if (ch.level < SKILLS[id].unlock && !(ch.rebirth > 0)) return 0;
   return Math.max(1, Math.min(SKILL_MAX, ch.skills.lv[id] || 1));
 }
 
 /**
- * 可用的技能點：角色等級 − 1 − 已升級的次數。
+ * 可用的技能點：角色等級 − 1 ＋ 每次轉職 29 點（轉職前滿級所得）− 已升級的次數。
  * @param {object} ch 角色。
  * @returns {number} 點數。
  */
 export function skillPoints(ch) {
   const spent = classSkills(ch.cls).reduce((sum, id) => sum + Math.max(0, skillLevel(ch, id) - 1), 0);
-  return Math.max(0, ch.level - 1 - spent);
+  return Math.max(0, ch.level - 1 + 29 * (ch.rebirth || 0) - spent);
 }
 
 /**

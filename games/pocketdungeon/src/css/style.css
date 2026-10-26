@@ -801,6 +801,37 @@ button:focus-visible {
   align-items: flex-start;
 }
 
+.rebirth-card {
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  border: 2px solid var(--line);
+}
+
+.rebirth-card.ready {
+  border-color: var(--coin);
+  box-shadow: 0 0 0 1px rgba(232, 184, 74, 0.4), 0 0 16px rgba(232, 184, 74, 0.25);
+}
+
+.rebirth-card p {
+  margin: 6px 0;
+}
+
+.rebirth-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  font-size: 14px;
+}
+
+.rebirth-card .buy-btn {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 4px;
+}
+
 .hero-actions {
   margin-top: 20px;
   text-align: center;

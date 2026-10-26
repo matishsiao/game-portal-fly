@@ -140,7 +140,7 @@ export function isValidCharacter(ch) {
   return !!ch && CLASS_KEYS.includes(ch.cls) && ch.id === ch.cls && typeof ch.name === 'string' && Number.isInteger(ch.level) && ch.level >= 1 && ch.level <= 30
     && n(ch.xp) && n(ch.gold) && Array.isArray(ch.bag) && ch.bag.every(isValidItem) && ch.equipped && typeof ch.equipped === 'object'
     && Object.values(ch.equipped).every((it) => it === null || isValidItem(it)) && ch.unlocked && typeof ch.unlocked === 'object' && Number.isInteger(ch.unlocked.easy)
-    && n(ch.potions) && n(ch.scroll) && ch.stats && typeof ch.stats === 'object'
+    && n(ch.potions) && n(ch.scroll) && ch.stats && typeof ch.stats === 'object' && (ch.rebirth === undefined || (Number.isInteger(ch.rebirth) && ch.rebirth >= 0 && ch.rebirth <= 3))
     && ch.skills && typeof ch.skills.lv === 'object' && Array.isArray(ch.skills.slots) && ch.skills.slots.length === SKILL_SLOTS
     && ch.skills.slots.every((id) => id === null || (SKILLS[id] && SKILLS[id].cls === ch.cls));
 }
@@ -168,7 +168,7 @@ export function newCharacter(cls, name) {
   return {
     id: cls, cls, name: [...(name.trim() || CLASSES[cls].name)].slice(0, 8).join(''), level: 1, xp: 0, gold: 50,
     equipped: { weapon: null, helmet: null, armor: null, boots: null, acc1: null, acc2: null }, bag: [], bagSize: 20, bagExpand: 0, potions: 3, scroll: 1,
-    unlocked: { easy: 1 }, clears: {}, evolved: {}, shop: null, created: Date.now(), skills: newSkills(cls),
+    unlocked: { easy: 1 }, clears: {}, evolved: {}, rebirth: 0, shop: null, created: Date.now(), skills: newSkills(cls),
     stats: { playMs: 0, kills: 0, maxHit: 0, legends: 0, deaths: 0, runs: 0 },
   };
 }

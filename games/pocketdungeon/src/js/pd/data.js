@@ -36,6 +36,20 @@ export const CLASS_KEYS = Object.keys(CLASSES);
 export const MAX_LEVEL = 30;
 
 /**
+ * 轉職：Lv.30 才能轉職，最多 3 次；轉職後回到 Lv.1，HP、攻擊、防禦的起始值為轉職前滿級（不含裝備）的 1/2，速度維持職業初始值。
+ * titles 為各職業依轉職次數（0～3）的職稱。
+ */
+export const REBIRTH = {
+  max: 3,
+  halve: ['hp', 'atk', 'def'],
+  titles: {
+    warrior: ['戰士', '騎士', '聖騎士', '英雄'],
+    archer: ['弓箭手', '遊俠', '神射手', '風之射手'],
+    mage: ['法師', '術士', '大法師', '賢者'],
+  },
+};
+
+/**
  * 區域：難度代碼、名稱、基礎地城等級（深度每 +1，地城等級 +2）、出現的怪物與 Boss、建議等級、地圖色調。
  * 深淵的 Boss 從三個 Boss 中隨機選一個強化版。
  */

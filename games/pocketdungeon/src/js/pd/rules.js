@@ -1,6 +1,6 @@
 // 成長與裝備規則（純邏輯）：亂數、經驗曲線、角色屬性、傷害公式、怪物強度、裝備產生與強化、獎勵。
 
-import { CLASSES, MAX_LEVEL, AREAS, MONSTERS, BOSSES, RARITIES, ACCESSORY_STATS, ITEM_NAMES, ENHANCE, EVOLVE } from './data.js';
+import { CLASSES, MAX_LEVEL, AREAS, MONSTERS, BOSSES, RARITIES, ACCESSORY_STATS, ITEM_NAMES, ENHANCE, EVOLVE, REBIRTH } from './data.js';
 
 /**
  * 建立可重現的亂數產生器（mulberry32）。
@@ -58,19 +58,36 @@ export function gainXp(ch, amount) {
 }
 
 /**
+ * 某職業在轉職 n 次後的起始屬性：每轉職一次，HP、攻擊、防禦變為上一階滿級（Lv.30、不含裝備）的 1/2；速度不變。
+ * @param {string} cls 職業代碼。
+ * @param {number} [rebirth=0] 轉職次數（0～3）。
+ * @returns {{hp: number, atk: number, def: number, spd: number}} 起始屬性。
+ */
+export function rebirthBase(cls, rebirth = 0) {
+  const c = CLASSES[cls];
+  const base = { ...c.base };
+  for (let n = 0; n < rebirth; n++) {
+    for (const k of REBIRTH.halve) base[k] = Math.round(((base[k] + c.growth[k] * (MAX_LEVEL - 1)) / 2) * 10) / 10;
+  }
+  return base;
+}
+
+/**
  * 計算角色在某等級、穿戴某些裝備時的屬性。
  * @param {string} cls 職業代碼。
  * @param {number} level 等級。
  * @param {object[]} [equipped=[]] 穿戴中的裝備。
+ * @param {number} [rebirth=0] 轉職次數（決定起始屬性）。
  * @returns {{hp: number, atk: number, def: number, spd: number, goldPct: number, xpPct: number}} 屬性（四捨五入到整數）。
  */
-export function characterStats(cls, level, equipped = []) {
+export function characterStats(cls, level, equipped = [], rebirth = 0) {
   const c = CLASSES[cls];
+  const b = rebirthBase(cls, rebirth);
   const lv = level - 1;
-  let hp = c.base.hp + c.growth.hp * lv;
-  let atk = c.base.atk + c.growth.atk * lv;
-  let def = c.base.def + c.growth.def * lv;
-  let spd = c.base.spd + c.growth.spd * lv;
+  let hp = b.hp + c.growth.hp * lv;
+  let atk = b.atk + c.growth.atk * lv;
+  let def = b.def + c.growth.def * lv;
+  let spd = b.spd + c.growth.spd * lv;
   const pct = { atkPct: 0, defPct: 0, hpPct: 0, goldPct: 0, xpPct: 0 };
   for (const item of equipped) {
     if (!item) continue;

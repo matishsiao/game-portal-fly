@@ -112,7 +112,7 @@ export class World {
    * @param {boolean} heal 是否補滿 HP。
    */
   applyStats(p, heal) {
-    const s = characterStats(this.ch.cls, this.ch.level, Object.values(this.ch.equipped));
+    const s = characterStats(this.ch.cls, this.ch.level, Object.values(this.ch.equipped), this.ch.rebirth || 0);
     const ratio = p.maxHp ? p.hp / p.maxHp : 1;
     p.maxHp = s.hp;
     p.atk = s.atk;

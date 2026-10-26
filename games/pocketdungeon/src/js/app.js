@@ -1,7 +1,7 @@
 // 主程式：首頁、村莊、地城畫面、遊戲迴圈、輸入、存檔與 Service Worker。
 
 import * as store from './storage.js';
-import { CLASSES, CLASS_KEYS, AREAS, AREA_KEYS, RARITIES, LIMITS, MAX_LEVEL, EQUIP_SLOTS, ITEM_SLOTS, BAG_EXPAND, EVOLVE, SHARED_SLOTS } from './pd/data.js';
+import { CLASSES, CLASS_KEYS, AREAS, AREA_KEYS, RARITIES, LIMITS, MAX_LEVEL, EQUIP_SLOTS, ITEM_SLOTS, BAG_EXPAND, EVOLVE, SHARED_SLOTS, REBIRTH } from './pd/data.js';
 import { xpToNext, characterStats, speedProfile, describeStats, sellPrice, enhanceCost } from './pd/rules.js';
 import { World } from './pd/world.js';
 import { Renderer } from './pd/render.js';
@@ -280,7 +280,7 @@ function renderHome() {
     const ch = app.chars.get(run.charId);
     const s = run.snap;
     const floor = s.floor >= 3 ? 'Boss 層' : `第 ${s.floor + 1} 層`;
-    els.continueDetail.textContent = `${ch.name}（${CLASSES[ch.cls].name} Lv.${ch.level}）・${AREAS[s.area].name} 深度 ${s.depth}・${floor}・${formatTime(s.elapsed * 1000)}`;
+    els.continueDetail.textContent = `${ch.name}（${village.classTitle(ch)} Lv.${ch.level}）・${AREAS[s.area].name} 深度 ${s.depth}・${floor}・${formatTime(s.elapsed * 1000)}`;
     els.continueBtn.hidden = false;
   } else {
     els.continueBtn.hidden = true;
@@ -292,7 +292,7 @@ function renderHome() {
     }
     const best = AREA_KEYS.filter((a) => village.areaUnlocked(ch, a)).pop();
     const busy = app.run && app.run.charId === cls ? '<em class="busy">探險中</em>' : '';
-    return `<button type="button" class="char-card" data-char="${cls}" data-cls="${cls}"><img src="${heroDataUrl(cls)}" alt="" class="char-img"><span class="char-text"><b>${esc(ch.name)} ${busy}</b><small>${CLASSES[cls].name}・Lv.${ch.level}・${AREAS[best].name} 深度 ${village.maxDepth(ch, best)}</small><small class="gold-text">${ch.gold}G</small></span></button>`;
+    return `<button type="button" class="char-card" data-char="${cls}" data-cls="${cls}"><img src="${heroDataUrl(cls)}" alt="" class="char-img"><span class="char-text"><b>${esc(ch.name)} ${busy}</b><small>${village.classTitle(ch)}${ch.rebirth ? ` ${'★'.repeat(ch.rebirth)}` : ''}・Lv.${ch.level}・${AREAS[best].name} 深度 ${village.maxDepth(ch, best)}</small><small class="gold-text">${ch.gold}G</small></span></button>`;
   }).join('');
 }
 
@@ -388,7 +388,7 @@ function renderVillage() {
   if (!ch) return;
   $('village-avatar').src = heroDataUrl(ch.cls, 3);
   $('village-name').textContent = ch.name;
-  $('village-level').textContent = `${CLASSES[ch.cls].name}・Lv.${ch.level}${ch.level >= MAX_LEVEL ? '（MAX）' : ''}`;
+  $('village-level').textContent = `${village.classTitle(ch)}・Lv.${ch.level}${ch.level >= MAX_LEVEL ? '（MAX）' : ''}`;
   $('village-gold').textContent = `${ch.gold}G`;
   for (const b of els.villageTabs.querySelectorAll('button')) b.setAttribute('aria-selected', String(b.dataset.tab === app.tab));
   const panels = { gate: gatePanel, shop: shopPanel, smith: smithPanel, bag: bagPanel, skill: skillPanel, hero: heroPanel };
@@ -451,9 +451,9 @@ function shopPanel(ch) {
  * @returns {string} HTML。
  */
 function compareHtml(ch, item) {
-  const now = characterStats(ch.cls, ch.level, Object.values(ch.equipped));
+  const now = characterStats(ch.cls, ch.level, Object.values(ch.equipped), ch.rebirth || 0);
   const eq = { ...ch.equipped, [village.slotFor(ch, item)]: item };
-  const next = characterStats(ch.cls, ch.level, Object.values(eq));
+  const next = characterStats(ch.cls, ch.level, Object.values(eq), ch.rebirth || 0);
   const parts = [];
   for (const [k, name] of [['atk', '攻擊'], ['def', '防禦'], ['hp', 'HP'], ['spd', '速度']]) {
     const d = next[k] - now[k];
@@ -554,12 +554,33 @@ function sharedHtml(ch) {
 }
 
 /**
+ * 轉職區塊：說明條件、下一個職稱與轉職後的起始能力。
+ * @param {object} ch 角色。
+ * @returns {string} HTML。
+ */
+function rebirthHtml(ch) {
+  const n = ch.rebirth || 0;
+  if (n >= REBIRTH.max) return `<div class="rebirth-card done"><b>已完成全部 ${REBIRTH.max} 次轉職</b><p class="muted small">${village.classTitle(ch)}是${CLASSES[ch.cls].name}的最終職業。</p></div>`;
+  const nextTitle = REBIRTH.titles[ch.cls][n + 1];
+  const now1 = characterStats(ch.cls, 1, [], n);
+  const next1 = characterStats(ch.cls, 1, [], n + 1);
+  const check = village.canRebirth(ch);
+  const rows = [['HP', 'hp'], ['攻擊', 'atk'], ['防禦', 'def']].map(([name, k]) => `<span>${name} ${now1[k]} → <b>${next1[k]}</b></span>`).join('');
+  return `<div class="rebirth-card${check.ok ? ' ready' : ''}">
+      <div class="skill-head"><b>轉職：${village.classTitle(ch)} → ${nextTitle}</b><small>第 ${n + 1}／${REBIRTH.max} 次</small></div>
+      <p class="item-stats">Lv.${MAX_LEVEL} 才能轉職。轉職後回到 Lv.1，起始的 HP、攻擊、防禦變為目前滿級的一半（速度不變）；裝備、金幣、技能與地城進度全部保留。</p>
+      <p class="rebirth-stats">Lv.1 起始能力：${rows}</p>
+      <button type="button" class="buy-btn" data-rebirth="1"${check.ok ? '' : ' disabled'}>${check.ok ? `轉職為${nextTitle}` : `尚未達到 Lv.${MAX_LEVEL}（目前 Lv.${ch.level}）`}</button>
+    </div>`;
+}
+
+/**
  * 角色分頁：等級、屬性與角色統計。
  * @param {object} ch 角色。
  * @returns {string} HTML。
  */
 function heroPanel(ch) {
-  const s = characterStats(ch.cls, ch.level, Object.values(ch.equipped));
+  const s = characterStats(ch.cls, ch.level, Object.values(ch.equipped), ch.rebirth || 0);
   const prof = speedProfile(s.spd);
   const need = xpToNext(ch.level);
   const xp = ch.level >= MAX_LEVEL ? 'MAX' : `${ch.xp}／${need}`;
@@ -568,6 +589,7 @@ function heroPanel(ch) {
   if (s.xpPct) extra.push(`經驗 +${s.xpPct}%`);
   const st = ch.stats;
   return `<div class="hero-card"><img src="${heroDataUrl(ch.cls, 6)}" alt="" class="char-img big"><dl class="result-list">
+      <dt>職業</dt><dd>${village.classTitle(ch)}<small class="muted">（轉職 ${ch.rebirth || 0}／${REBIRTH.max}）</small></dd>
       <dt>等級</dt><dd>Lv.${ch.level}${ch.level >= MAX_LEVEL ? '（MAX）' : ''}</dd>
       <dt>經驗值</dt><dd>${xp}</dd>
       <dt>HP</dt><dd>${s.hp}</dd>
@@ -585,6 +607,7 @@ function heroPanel(ch) {
       <dt>傳說裝備</dt><dd>${st.legends} 件</dd>
       <dt>倒下次數</dt><dd>${st.deaths}</dd>
     </dl>
+    ${rebirthHtml(ch)}
     <div class="hero-actions"><button type="button" class="link-btn danger-text" data-delete="${ch.id}">刪除角色</button></div>`;
 }
 
@@ -617,7 +640,11 @@ async function onVillageClick(e) {
   else if (d.skillSlot !== undefined) r = skills.equipSkill(ch, d.skill, Number(d.skillSlot));
   else if (d.skillReset) r = skills.resetSkills(ch);
   else if (d.enhance) r = village.enhance(ch, d.enhance, Math.random);
-  else if (d.delete) {
+  else if (d.rebirth) {
+    const next = REBIRTH.titles[ch.cls][(ch.rebirth || 0) + 1];
+    if (!(await confirmDialog('轉職', `確定要轉職為「${next}」嗎？等級會回到 Lv.1（經驗值歸零），起始能力提升；裝備、金幣、技能與地城進度都會保留。`, '轉職'))) return;
+    r = village.rebirth(ch);
+  } else if (d.delete) {
     if (!(await confirmDialog('刪除角色', `確定要刪除「${esc(ch.name)}」嗎？等級、裝備與金幣都會消失，無法復原。`, '刪除'))) return;
     if (app.run && app.run.charId === ch.id) {
       app.run = null;
@@ -981,9 +1008,10 @@ function updateHud(force) {
     $('hp-fill').parentElement.classList.toggle('low', p.hp / p.maxHp < 0.3);
   });
   const need = xpToNext(ch.level);
-  set('xp', `${ch.level}/${ch.xp}`, () => {
+  set('xp', `${ch.level}/${ch.xp}/${ch.rebirth || 0}`, () => {
     $('xp-fill').style.width = ch.level >= MAX_LEVEL ? '100%' : `${(ch.xp / need) * 100}%`;
-    $('hud-level').textContent = ch.level >= MAX_LEVEL ? 'MAX' : ch.level;
+    // 轉職過的角色在等級前顯示星數（每轉職一次一顆）。
+    $('hud-level').textContent = `${'★'.repeat(ch.rebirth || 0)}${ch.level >= MAX_LEVEL ? 'MAX' : ch.level}`;
   });
   set('floor', `${w.area}/${w.floorIndex}`, () => {
     $('hud-floor').textContent = `${AREAS[w.area].name} ${w.depth}-${w.floorIndex >= 3 ? 'B' : w.floorIndex + 1}`;
