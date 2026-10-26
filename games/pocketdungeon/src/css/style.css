@@ -504,6 +504,11 @@ button:focus-visible {
   font-size: 14px;
 }
 
+.rebirth-note {
+  border-left: 4px solid var(--coin);
+  font-weight: 600;
+}
+
 .carry {
   margin: 0 0 8px;
   font-size: 14px;

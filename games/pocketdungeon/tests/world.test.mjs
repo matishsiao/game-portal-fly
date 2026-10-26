@@ -3,7 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { World } from '../src/js/pd/world.js';
-import { seededRng } from '../src/js/pd/rules.js';
+import { seededRng, rarityWeights } from '../src/js/pd/rules.js';
 import { LIMITS, MONSTERS, BOSS_HEAL } from '../src/js/pd/data.js';
 
 const IDLE = { mx: 0, my: 0, attack: false, dodge: false, potion: false };
@@ -378,4 +378,31 @@ test('斜走補償：45° 斜走時水平、垂直各約為直走的 94%；藥�
   assert.equal(LIMITS.potions, 10);
   const w = new World(hero('warrior'), { area: 'easy', depth: 1, seed: 1, potions: 12 }, seededRng(1));
   assert.equal(w.player.potions, 10);
+});
+
+test('轉職加成：怪物 HP／攻擊每次 +15%、掉落裝備等級每次 +2 且稀有度提高、金幣與經驗值 +15%', () => {
+  const base = hero('warrior', 10);
+  const reborn = { ...hero('warrior', 10), rebirth: 2 };
+  const w0 = new World(base, { area: 'easy', depth: 1, seed: 4 }, () => 0.5);
+  const w2 = new World(reborn, { area: 'easy', depth: 1, seed: 4 }, () => 0.5);
+  const m0 = w0.spawnMonster('skeleton', 3, 3);
+  const m2 = w2.spawnMonster('skeleton', 3, 3);
+  assert.ok(Math.abs(m2.maxHp / m0.maxHp - 1.3) < 0.03, `${m2.maxHp / m0.maxHp}`);
+  assert.ok(Math.abs(m2.atk / m0.atk - 1.3) < 0.1);
+  const b0 = new World(base, { area: 'easy', depth: 1, seed: 4, floor: 3 }, () => 0.5).boss();
+  const b2 = new World(reborn, { area: 'easy', depth: 1, seed: 4, floor: 3 }, () => 0.5).boss();
+  assert.ok(Math.abs(b2.maxHp / b0.maxHp - 1.3) < 0.03);
+  w0.pickups = [];
+  w2.pickups = [];
+  w0.dropItem(3, 3, 'monster');
+  w2.dropItem(3, 3, 'monster');
+  assert.equal(w2.pickups[0].item.level - w0.pickups[0].item.level, 4);
+  const legend = (rb) => rarityWeights('monster', 1, rb)[3];
+  assert.ok(legend(2) > legend(0));
+  assert.ok(rarityWeights('boss', 30, 3).every((v) => v >= 0), '權重不為負');
+  m0.hp = 1;
+  m2.hp = 1;
+  w0.hitMonster(m0, 9999);
+  w2.hitMonster(m2, 9999);
+  assert.ok(w2.loot.xp > w0.loot.xp);
 });

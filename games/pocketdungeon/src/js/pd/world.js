@@ -3,7 +3,7 @@
 //
 // 座標單位為「格」，(x, y) 為實體中心；地圖格子 (i, j) 的範圍為 [i, i + 1) × [j, j + 1)。
 
-import { CLASSES, MONSTERS, BOSSES, LIMITS, BOSS_HEAL, EVOLVE } from './data.js';
+import { CLASSES, MONSTERS, BOSSES, LIMITS, BOSS_HEAL, EVOLVE, REBIRTH } from './data.js';
 import { generateFloor, walkable, STAIRS, SPIKES, WALL } from './dungeon.js';
 import {
   characterStats, speedProfile, damage, dungeonLevel, monsterStats, killReward, rollRarity, rarityWeights, makeItem, gainXp, sellPrice,
@@ -159,6 +159,14 @@ export class World {
   }
 
   /**
+   * 角色的轉職次數（決定怪物強度、掉落與獎勵的加成）。
+   * @returns {number} 0～3。
+   */
+  rebirth() {
+    return this.ch.rebirth || 0;
+  }
+
+  /**
    * 這一關（區域＋深度）的代碼，用來記錄角色的破關次數與 Boss 是否已進化。
    * @returns {string} 例如「easy-2」。
    */
@@ -195,7 +203,7 @@ export class World {
    */
   spawnMonster(type, x, y, opts = {}) {
     const base = opts.boss ? BOSSES[type] : MONSTERS[type];
-    const s = monsterStats(type, this.level, this.depth, opts);
+    const s = monsterStats(type, this.level, this.depth, { ...opts, rebirth: this.rebirth() });
     const scale = opts.small ? 0.4 : 1;
     const m = {
       id: this.nextId++, type, x, y, boss: !!opts.boss, elite: !!opts.elite, small: !!opts.small, abyss: !!opts.abyss,
@@ -771,6 +779,9 @@ export class World {
     this.monsters = this.monsters.filter((o) => o !== m);
     this.loot.kills++;
     const reward = killReward(this.level, m.xpMult, this.rng);
+    const rewardBonus = 1 + REBIRTH.reward * this.rebirth();
+    reward.xp *= rewardBonus;
+    reward.gold *= rewardBonus;
     const xp = Math.round(reward.xp * (1 + this.player.xpPct / 100) * (m.evolved ? EVOLVE.xp : 1));
     this.addXp(xp);
     const gold = Math.round(reward.gold * (1 + this.player.goldPct / 100) * (m.evolved ? EVOLVE.gold : 1));
@@ -826,8 +837,9 @@ export class World {
   dropItem(x, y, source, levelBonus = 0) {
     const r = this.rng();
     const slot = r < 0.3 ? 'weapon' : r < 0.5 ? 'armor' : r < 0.65 ? 'helmet' : r < 0.8 ? 'boots' : 'accessory';
-    const rarity = rollRarity(rarityWeights(source, this.depth), this.rng);
-    const item = makeItem({ slot, cls: this.ch.cls, level: this.level + levelBonus, rarity }, this.rng);
+    const rb = this.rebirth();
+    const rarity = rollRarity(rarityWeights(source, this.depth, rb), this.rng);
+    const item = makeItem({ slot, cls: this.ch.cls, level: this.level + levelBonus + REBIRTH.dropLevel * rb, rarity }, this.rng);
     this.pickups.push({ kind: 'item', x, y, item, t: 0 });
   }
 
@@ -1139,7 +1151,7 @@ export class World {
     for (const c of this.chests) {
       if (c.opened || dist(p.x, p.y, c.x, c.y) > 0.8) continue;
       c.opened = true;
-      const gold = Math.round(20 + 8 * this.level);
+      const gold = Math.round((20 + 8 * this.level) * (1 + REBIRTH.reward * this.rebirth()));
       this.pickups.push({ kind: 'gold', x: c.x, y: c.y + 0.3, amount: gold, t: 0 });
       if (c.evolved) this.dropItem(c.x + 0.4, c.y + 0.2, 'evolved', EVOLVE.levelBonus);
       else if (c.boss || this.rng() < 0.6) this.dropItem(c.x + 0.4, c.y + 0.2, c.boss ? 'boss' : 'chest');

@@ -402,7 +402,11 @@ function renderVillage() {
  */
 function gatePanel(ch) {
   const busy = app.run ? `<p class="notice-inline">${esc(app.chars.get(app.run.charId).name)} 的探險尚未結束，開始新的探險前須先完成或放棄那一趟。</p>` : '';
-  const carry = `<p class="carry">攜帶：回復藥水 ${Math.min(LIMITS.potions, ch.potions)} 瓶・回城卷軸 ${Math.min(1, ch.scroll)} 張 <small class="muted">（在商店補充）</small></p>`;
+  const rb = ch.rebirth || 0;
+  const bonus = rb
+    ? `<p class="notice-inline rebirth-note">轉職 ${'★'.repeat(rb)}：怪物與 Boss 的 HP、攻擊 +${Math.round(REBIRTH.monster * rb * 100)}%；掉落裝備等級 +${REBIRTH.dropLevel * rb}、稀有度提高；金幣與經驗值 +${Math.round(REBIRTH.reward * rb * 100)}%</p>`
+    : '';
+  const carry = `${bonus}<p class="carry">攜帶：回復藥水 ${Math.min(LIMITS.potions, ch.potions)} 瓶・回城卷軸 ${Math.min(1, ch.scroll)} 張 <small class="muted">（在商店補充）</small></p>`;
   const areas = AREA_KEYS.map((area) => {
     const a = AREAS[area];
     const unlocked = village.areaUnlocked(ch, area);
@@ -1014,7 +1018,8 @@ function updateHud(force) {
     $('hud-level').textContent = `${'★'.repeat(ch.rebirth || 0)}${ch.level >= MAX_LEVEL ? 'MAX' : ch.level}`;
   });
   set('floor', `${w.area}/${w.floorIndex}`, () => {
-    $('hud-floor').textContent = `${AREAS[w.area].name} ${w.depth}-${w.floorIndex >= 3 ? 'B' : w.floorIndex + 1}`;
+    const rb = w.ch.rebirth || 0;
+    $('hud-floor').textContent = `${AREAS[w.area].name} ${w.depth}-${w.floorIndex >= 3 ? 'B' : w.floorIndex + 1}${rb ? ` ${'★'.repeat(rb)}` : ''}`;
   });
   set('gold', w.loot.gold, () => {
     $('hud-gold').textContent = w.loot.gold;

@@ -42,6 +42,11 @@ export const MAX_LEVEL = 30;
 export const REBIRTH = {
   max: 3,
   halve: ['hp', 'atk', 'def'],
+  /** 每轉職一次：怪物與 Boss 的 HP、攻擊 +15%；掉落裝備等級 +2；稀有度如同深度 +2；金幣與經驗值 +15%。 */
+  monster: 0.15,
+  dropLevel: 2,
+  rarityDepth: 2,
+  reward: 0.15,
   titles: {
     warrior: ['戰士', '騎士', '聖騎士', '英雄'],
     archer: ['弓箭手', '遊俠', '神射手', '風之射手'],

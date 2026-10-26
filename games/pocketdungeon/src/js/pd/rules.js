@@ -146,7 +146,7 @@ export function dungeonLevel(area, depth, floor) {
  * @param {string} type 怪物或 Boss 代碼。
  * @param {number} level 地城等級。
  * @param {number} depth 深度。
- * @param {{elite?: boolean, boss?: boolean, abyss?: boolean, evolved?: boolean}} [opts] 菁英、Boss、深淵強化版、進化 Boss。
+ * @param {{elite?: boolean, boss?: boolean, abyss?: boolean, evolved?: boolean, rebirth?: number}} [opts] 菁英、Boss、深淵強化版、進化 Boss、玩家的轉職次數。
  * @returns {{hp: number, atk: number, def: number}} 屬性。
  */
 export function monsterStats(type, level, depth, opts = {}) {
@@ -159,6 +159,11 @@ export function monsterStats(type, level, depth, opts = {}) {
   if (opts.elite) {
     hp *= 3;
     atk *= 1.3;
+  }
+  if (opts.rebirth) {
+    // 轉職加成：每轉職一次 HP、攻擊 +15%。
+    hp *= 1 + REBIRTH.monster * opts.rebirth;
+    atk *= 1 + REBIRTH.monster * opts.rebirth;
   }
   if (opts.evolved) {
     hp *= EVOLVE.hp;
@@ -199,17 +204,21 @@ export function rollRarity(weights, rng) {
 }
 
 /**
- * 依深度調整掉落稀有度權重：深度愈深，精良以上的機率愈高。
+ * 依深度與轉職次數調整掉落稀有度權重：深度愈深、轉職次數愈多（每次如同深度 +2），精良以上的機率愈高。
+ * 權重不低於 0（深淵的深度沒有上限）。
  * @param {string} source 'monster'、'elite'、'boss'、'evolved'（進化 Boss）或 'chest'。
  * @param {number} depth 深度。
+ * @param {number} [rebirth=0] 轉職次數。
  * @returns {number[]} 權重。
  */
-export function rarityWeights(source, depth) {
-  const d = depth - 1;
-  if (source === 'evolved') return [0, 0, 65 - d * 5, 35 + d * 5];
-  if (source === 'boss') return [0, 0, 90 - d * 5, 10 + d * 5];
-  if (source === 'elite' || source === 'chest') return [40 - d * 4, 45, 13 + d * 3, 2 + d];
-  return [70 - d * 5, 25 + d * 3, 5 + d * 2, d * 0.5];
+export function rarityWeights(source, depth, rebirth = 0) {
+  const d = depth - 1 + rebirth * REBIRTH.rarityDepth;
+  let w;
+  if (source === 'evolved') w = [0, 0, 65 - d * 5, 35 + d * 5];
+  else if (source === 'boss') w = [0, 0, 90 - d * 5, 10 + d * 5];
+  else if (source === 'elite' || source === 'chest') w = [40 - d * 4, 45, 13 + d * 3, 2 + d];
+  else w = [70 - d * 5, 25 + d * 3, 5 + d * 2, d * 0.5];
+  return w.map((v) => Math.max(0, v));
 }
 
 /**
