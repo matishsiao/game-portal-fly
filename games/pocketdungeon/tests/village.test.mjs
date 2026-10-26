@@ -30,7 +30,7 @@ test('商店刷新 6 件，購買扣金幣並放入背包', () => {
   assert.equal(ch.shop.length, v.SHOP_SIZE - 1);
 });
 
-test('藥水最多 5 瓶、卷軸最多 1 張；金幣不足時說明原因', () => {
+test('藥水最多 10 瓶、卷軸最多 1 張；金幣不足時說明原因', () => {
   const ch = hero();
   for (let i = 0; i < LIMITS.potions; i++) assert.ok(v.buyPotion(ch).ok);
   assert.equal(v.buyPotion(ch).ok, false);

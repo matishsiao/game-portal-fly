@@ -58,7 +58,7 @@ export function buyItem(ch, index) {
 }
 
 /**
- * 購買回復藥水（最多持有 5 瓶）。
+ * 購買回復藥水（最多持有 10 瓶）。
  * @param {object} ch 角色。
  * @returns {{ok: boolean, message: string}} 結果。
  */

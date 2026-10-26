@@ -15,6 +15,8 @@ import { bagLimit } from './village.js';
 const PLAYER_R = 0.34;
 /** 怪物發現玩家的距離（格）。 */
 const AGGRO = 6.5;
+/** 斜走補償：45° 斜走時額外的速度比例。 */
+const DIAGONAL_BOOST = 0.33;
 /** 地刺循環（秒）：前 1 秒升起。 */
 const SPIKE_CYCLE = 2.5;
 /** 同時存在的怪物、投射物與效果上限（效能）。 */
@@ -480,6 +482,10 @@ export class World {
     }
     p.moving = len > 0.05;
     if (p.moving) p.facing = { x: mx / (len || 1), y: my / (len || 1) };
+    // 斜走補償：方格地圖上斜走時水平、垂直各只剩 70%，看起來像變慢；
+    // 依偏離軸線的程度加速，45° 時總速度 ×1.33（各軸約為直走的 94%）。
+    const diag = Math.abs(Math.sin(2 * Math.atan2(my, mx)));
+    const boost = 1 + DIAGONAL_BOOST * diag;
     if (input.dodge && p.dodgeCd <= 0) {
       p.dodgeT = 0.25;
       p.dodgeSpeed = 12;
@@ -502,7 +508,7 @@ export class World {
         }
       }
     } else if (p.moving) {
-      this.slideMove(p, mx * p.move * dt, my * p.move * dt);
+      this.slideMove(p, mx * p.move * boost * dt, my * p.move * boost * dt);
     }
     if (input.potion && p.potions > 0 && p.potionCd <= 0 && p.hp < p.maxHp) {
       p.potions--;

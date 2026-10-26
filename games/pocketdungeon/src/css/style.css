@@ -798,6 +798,10 @@ button:focus-visible {
   background: #07040c;
   color: #fff;
   overflow: hidden;
+  /* 地城畫面不接受瀏覽器的捲動、縮放等手勢，避免按住搖桿時被中斷。 */
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .stage {

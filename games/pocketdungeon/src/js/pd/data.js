@@ -136,7 +136,7 @@ export const ENHANCE = {
 };
 
 /** 背包初始上限、每趟藥水上限與道具價格。 */
-export const LIMITS = { bag: 20, potions: 5, potionPrice: 30, scrollPrice: 40 };
+export const LIMITS = { bag: 20, potions: 10, potionPrice: 30, scrollPrice: 40 };
 
 /** 背包擴充袋：每次使用 +5 格，最多擴充到 40 格；售價依已擴充次數倍增（200、400、800、1600）。 */
 export const BAG_EXPAND = { step: 5, max: 40, basePrice: 200 };

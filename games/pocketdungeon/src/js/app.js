@@ -1039,6 +1039,7 @@ function resetInput() {
   i.potion = false;
   i.skill = [false, false];
   app.stickPointer = null;
+  app.attackPointer = null;
   idleStick();
   $('attack-btn').classList.remove('pressed');
 }
@@ -1121,18 +1122,35 @@ function idleStick() {
 
 /**
  * 浮動搖桿：在搖桿區任何位置按下，搖桿底座就移到手指下，拖曳決定方向與力道（死區 12%，拖到半徑 30% 為全速）。
- * 點地移動模式下，短按（未拖曳）視為點選地圖上的該位置。
+ * 手機使用原生觸控事件並在按下時阻止瀏覽器的預設手勢，避免長按或拖曳時被判定為「觸控取消」而停下；
+ * 只有手指真的離開才停止。滑鼠則使用指標事件。點地移動模式下，短按（未拖曳）視為點選地圖上的該位置。
  */
 function bindStick() {
   const R = 46;
   /**
-   * 依手指位置更新搖桿向量。
-   * @param {PointerEvent} e 指標事件。
+   * 開始操作搖桿：底座移到按下的位置。
+   * @param {string} id 手指或指標的識別碼。
+   * @param {number} cx 畫面 x。
+   * @param {number} cy 畫面 y。
    */
-  const move = (e) => {
+  const begin = (id, cx, cy) => {
+    const rect = els.stickZone.getBoundingClientRect();
+    app.stickPointer = { id, x: cx, y: cy, moved: 0, t: performance.now() };
+    els.stick.classList.remove('idle');
+    els.stick.style.left = `${cx - rect.left}px`;
+    els.stick.style.top = `${cy - rect.top}px`;
+    els.stickKnob.style.transform = '';
+    if (app.world) app.world.player.path = [];
+  };
+  /**
+   * 依手指位置更新搖桿向量。
+   * @param {number} cx 畫面 x。
+   * @param {number} cy 畫面 y。
+   */
+  const move = (cx, cy) => {
     const s = app.stickPointer;
-    let dx = e.clientX - s.x;
-    let dy = e.clientY - s.y;
+    let dx = cx - s.x;
+    let dy = cy - s.y;
     const len = Math.hypot(dx, dy);
     s.moved = Math.max(s.moved, len);
     if (len > R) {
@@ -1145,35 +1163,71 @@ function bindStick() {
     const k = r < 0.12 ? 0 : Math.min(1, 0.6 + ((r - 0.12) / 0.18) * 0.4);
     app.input.stick = k === 0 ? { x: 0, y: 0 } : { x: (dx / (len || 1)) * k, y: (dy / (len || 1)) * k };
   };
-  els.stickZone.addEventListener('pointerdown', (e) => {
-    if (app.stickPointer) return;
-    e.preventDefault();
-    els.stickZone.setPointerCapture(e.pointerId);
-    const rect = els.stickZone.getBoundingClientRect();
-    app.stickPointer = { id: e.pointerId, x: e.clientX, y: e.clientY, moved: 0, t: performance.now() };
-    els.stick.classList.remove('idle');
-    els.stick.style.left = `${e.clientX - rect.left}px`;
-    els.stick.style.top = `${e.clientY - rect.top}px`;
-    els.stickKnob.style.transform = '';
-    if (app.world) app.world.player.path = [];
-  });
-  els.stickZone.addEventListener('pointermove', (e) => {
-    if (app.stickPointer && e.pointerId === app.stickPointer.id) move(e);
-  });
   /**
    * 手指離開：停止移動，搖桿回到閒置位置；點地移動模式下的短按改為設定目的地。
-   * @param {PointerEvent} e 指標事件。
+   * @param {number} cx 放開時的畫面 x。
+   * @param {number} cy 放開時的畫面 y。
+   * @param {boolean} released 是否為正常放開（取消時不當作點地）。
    */
-  const end = (e) => {
+  const finish = (cx, cy, released) => {
     const s = app.stickPointer;
-    if (!s || e.pointerId !== s.id) return;
     app.stickPointer = null;
     app.input.stick = { x: 0, y: 0 };
     idleStick();
-    if (e.type === 'pointerup' && app.settings.tapMove && s.moved < 10 && performance.now() - s.t < 300) tapMoveAt(e.clientX, e.clientY);
+    if (released && app.settings.tapMove && s.moved < 10 && performance.now() - s.t < 300) tapMoveAt(cx, cy);
   };
-  els.stickZone.addEventListener('pointerup', end);
-  els.stickZone.addEventListener('pointercancel', end);
+  /**
+   * 在觸控清單中找出目前操作搖桿的手指。
+   * @param {TouchList} list 觸控清單。
+   * @returns {Touch | null} 手指。
+   */
+  const findTouch = (list) => {
+    for (const t of list) if (app.stickPointer && `t${t.identifier}` === app.stickPointer.id) return t;
+    return null;
+  };
+  els.stickZone.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if (app.stickPointer) return;
+    const t = e.changedTouches[0];
+    begin(`t${t.identifier}`, t.clientX, t.clientY);
+  }, { passive: false });
+  els.stickZone.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    const t = findTouch(e.changedTouches);
+    if (t) move(t.clientX, t.clientY);
+  }, { passive: false });
+  /**
+   * 手指離開或系統中斷觸控。系統中斷時，若這根手指其實還在螢幕上（仍在 touches 清單中），就繼續維持移動。
+   * @param {TouchEvent} e 觸控事件。
+   */
+  const touchEnd = (e) => {
+    const t = findTouch(e.changedTouches);
+    if (!t) return;
+    if (e.type === 'touchcancel' && findTouch(e.touches)) return;
+    finish(t.clientX, t.clientY, e.type === 'touchend');
+  };
+  els.stickZone.addEventListener('touchend', touchEnd);
+  els.stickZone.addEventListener('touchcancel', touchEnd);
+  // 滑鼠（桌面）：觸控已由上面的觸控事件處理，這裡略過觸控產生的指標事件。
+  els.stickZone.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'touch' || app.stickPointer) return;
+    e.preventDefault();
+    els.stickZone.setPointerCapture(e.pointerId);
+    begin(`p${e.pointerId}`, e.clientX, e.clientY);
+  });
+  els.stickZone.addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'touch' && app.stickPointer && app.stickPointer.id === `p${e.pointerId}`) move(e.clientX, e.clientY);
+  });
+  /**
+   * 滑鼠放開。
+   * @param {PointerEvent} e 指標事件。
+   */
+  const pointerEnd = (e) => {
+    if (e.pointerType === 'touch' || !app.stickPointer || app.stickPointer.id !== `p${e.pointerId}`) return;
+    finish(e.clientX, e.clientY, e.type === 'pointerup');
+  };
+  els.stickZone.addEventListener('pointerup', pointerEnd);
+  els.stickZone.addEventListener('pointercancel', pointerEnd);
 }
 
 /**
@@ -1204,19 +1258,50 @@ function pressSkill(n) {
 /** 動作按鈕：攻擊按住連續、閃避與藥水為點按；點地移動模式下點地圖設定目的地。 */
 function bindButtons() {
   const atk = $('attack-btn');
-  atk.addEventListener('pointerdown', (e) => {
-    e.preventDefault();
-    atk.setPointerCapture(e.pointerId);
+  /** 按住攻擊鍵（記錄是哪一根手指或哪個指標按住）。 */
+  const hold = (id) => {
+    app.attackPointer = id;
     app.input.attackHeld = true;
     atk.classList.add('pressed');
-  });
+  };
   /** 放開攻擊鍵。 */
   const release = () => {
+    app.attackPointer = null;
     app.input.attackHeld = false;
     atk.classList.remove('pressed');
   };
-  atk.addEventListener('pointerup', release);
-  atk.addEventListener('pointercancel', release);
+  // 手機用原生觸控事件，按住時不會被瀏覽器的長按手勢中斷；滑鼠用指標事件。
+  atk.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    hold(`t${e.changedTouches[0].identifier}`);
+  }, { passive: false });
+  /**
+   * 攻擊鍵上的手指離開（系統中斷但手指仍在螢幕上時繼續按住）。
+   * @param {TouchEvent} e 觸控事件。
+   */
+  const touchUp = (e) => {
+    const mine = (list) => [...list].some((t) => `t${t.identifier}` === app.attackPointer);
+    if (!mine(e.changedTouches)) return;
+    if (e.type === 'touchcancel' && mine(e.touches)) return;
+    release();
+  };
+  atk.addEventListener('touchend', touchUp);
+  atk.addEventListener('touchcancel', touchUp);
+  atk.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'touch') return;
+    e.preventDefault();
+    atk.setPointerCapture(e.pointerId);
+    hold(`p${e.pointerId}`);
+  });
+  /**
+   * 滑鼠放開攻擊鍵。
+   * @param {PointerEvent} e 指標事件。
+   */
+  const pointerUp = (e) => {
+    if (e.pointerType !== 'touch') release();
+  };
+  atk.addEventListener('pointerup', pointerUp);
+  atk.addEventListener('pointercancel', pointerUp);
   $('dodge-btn').addEventListener('pointerdown', (e) => {
     e.preventDefault();
     app.input.dodge = true;

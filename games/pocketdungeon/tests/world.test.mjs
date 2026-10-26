@@ -359,3 +359,23 @@ test('讀檔還原 Boss 層時不重新擲進化', () => {
   assert.equal(r.boss().evolved, false);
   assert.ok(!(ch.evolved && ch.evolved['easy-1']));
 });
+
+test('斜走補償：45° 斜走時水平、垂直各約為直走的 94%；藥水上限 10 瓶', () => {
+  const measure = (mx, my) => {
+    const w = empty('warrior');
+    const f = w.floor;
+    f.tiles.fill(1);
+    const p = w.player;
+    p.x = 20;
+    p.y = 15;
+    run(w, 0.5, { ...IDLE, mx, my });
+    return { dx: Math.abs(p.x - 20), dy: Math.abs(p.y - 15) };
+  };
+  const straight = measure(1, 0);
+  const diag = measure(Math.SQRT1_2, Math.SQRT1_2);
+  assert.ok(Math.abs(diag.dx / straight.dx - 0.94) < 0.02, `${diag.dx / straight.dx}`);
+  assert.ok(Math.abs(diag.dy / straight.dx - 0.94) < 0.02);
+  assert.equal(LIMITS.potions, 10);
+  const w = new World(hero('warrior'), { area: 'easy', depth: 1, seed: 1, potions: 12 }, seededRng(1));
+  assert.equal(w.player.potions, 10);
+});
