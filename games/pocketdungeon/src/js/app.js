@@ -1,7 +1,7 @@
 // 主程式：首頁、村莊、地城畫面、遊戲迴圈、輸入、存檔與 Service Worker。
 
 import * as store from './storage.js';
-import { CLASSES, CLASS_KEYS, AREAS, AREA_KEYS, RARITIES, LIMITS, MAX_LEVEL, EQUIP_SLOTS, ITEM_SLOTS, BAG_EXPAND, EVOLVE } from './pd/data.js';
+import { CLASSES, CLASS_KEYS, AREAS, AREA_KEYS, RARITIES, LIMITS, MAX_LEVEL, EQUIP_SLOTS, ITEM_SLOTS, BAG_EXPAND, EVOLVE, SHARED_SLOTS } from './pd/data.js';
 import { xpToNext, characterStats, speedProfile, describeStats, sellPrice, enhanceCost } from './pd/rules.js';
 import { World } from './pd/world.js';
 import { Renderer } from './pd/render.js';
@@ -60,6 +60,8 @@ const els = {
 const app = {
   /** @type {Map<string, object>} */
   chars: new Map(),
+  /** 共用倉庫（所有角色共用的 20 格裝備與金幣）。 */
+  shared: { items: [], gold: 0 },
   /** 進行中的探險 {charId, snap}。 */
   run: null,
   current: null,
@@ -494,17 +496,20 @@ function bagPanel(ch) {
    * @param {object} it 裝備。
    * @returns {string} HTML。
    */
-  const equipBtns = (it) => (it.slot === 'accessory'
-    ? ['acc1', 'acc2'].map((k, n) => `<button type="button" class="buy-btn" data-equip="${it.id}" data-slot="${k}">飾品 ${n + 1}</button>`).join('')
-    : `<button type="button" class="buy-btn" data-equip="${it.id}">裝備</button>`);
+  const equipBtns = (it) => {
+    if (!village.canWield(ch, it)) return `<span class="muted small">${village.weaponOwner(it)}用</span>`;
+    return it.slot === 'accessory'
+      ? ['acc1', 'acc2'].map((k, n) => `<button type="button" class="buy-btn" data-equip="${it.id}" data-slot="${k}">飾品 ${n + 1}</button>`).join('')
+      : `<button type="button" class="buy-btn" data-equip="${it.id}">裝備</button>`;
+  };
   const bag = ch.bag.length
-    ? ch.bag.map((it) => `<div class="shop-row">${itemHtml(it)}${compareHtml(ch, it)}<span class="row-actions">${equipBtns(it)}<button type="button" class="sell-btn" data-sell="${it.id}">賣 ${sellPrice(it)}G</button></span></div>`).join('')
+    ? ch.bag.map((it) => `<div class="shop-row">${itemHtml(it)}${compareHtml(ch, it)}<span class="row-actions">${equipBtns(it)}<button type="button" class="sell-btn" data-deposit="${it.id}">存入共用</button><button type="button" class="sell-btn" data-sell="${it.id}">賣 ${sellPrice(it)}G</button></span></div>`).join('')
     : '<p class="muted">背包是空的。打倒怪物、打開寶箱或在商店購買裝備。</p>';
   const limit = village.bagLimit(ch);
   const pouch = ch.bagExpand > 0
     ? `<div class="shop-row"><img src="${itemDataUrl('pouch')}" alt="" class="icon"><div class="item-main"><b>背包擴充袋 ×${ch.bagExpand}</b><span class="item-stats">使用後背包上限 +${BAG_EXPAND.step} 格（最多 ${BAG_EXPAND.max} 格）</span></div><button type="button" class="buy-btn" data-use-pouch="1"${limit >= BAG_EXPAND.max ? ' disabled' : ''}>使用</button></div>`
     : '';
-  return `<h3>裝備欄</h3>${slots}${pouch ? `<h3>道具</h3>${pouch}` : ''}<h3>背包 <small class="muted">${ch.bag.length}／${limit}</small></h3>${bag}`;
+  return `<h3>裝備欄</h3>${slots}${pouch ? `<h3>道具</h3>${pouch}` : ''}<h3>背包 <small class="muted">${ch.bag.length}／${limit}</small></h3>${bag}${sharedHtml(ch)}`;
 }
 
 /**
@@ -530,6 +535,22 @@ function skillPanel(ch) {
   }).join('');
   return `<p class="skill-points">技能點：<b>${points}</b> <small class="muted">（每升 1 級得到 1 點）</small></p><div class="slot-chips">${slots}</div>${rows}
     <div class="hero-actions"><button type="button" class="link-btn" data-skill-reset="1">重置技能（免費退回所有點數）</button></div>`;
+}
+
+/**
+ * 共用倉庫區塊：所有角色共用的金幣（存入、取出）與 20 格裝備（取出）。
+ * @param {object} ch 目前的角色。
+ * @returns {string} HTML。
+ */
+function sharedHtml(ch) {
+  const sh = app.shared;
+  const gold = `<div class="shop-row shared-gold"><img src="${itemDataUrl('coin')}" alt="" class="icon"><div class="item-main"><b>共用金幣 ${sh.gold}G</b><span class="item-stats">身上 ${ch.gold}G</span></div>
+    <span class="row-actions"><button type="button" class="buy-btn" data-gold-in="100">存 100</button><button type="button" class="buy-btn" data-gold-in="all">全部存入</button>
+    <button type="button" class="sell-btn" data-gold-out="100">取 100</button><button type="button" class="sell-btn" data-gold-out="all">全部取出</button></span></div>`;
+  const items = sh.items.length
+    ? sh.items.map((it) => `<div class="shop-row">${itemHtml(it)}${village.canWield(ch, it) ? compareHtml(ch, it) : `<span class="muted small">${village.weaponOwner(it)}用</span>`}<span class="row-actions"><button type="button" class="buy-btn" data-withdraw="${it.id}">取出</button></span></div>`).join('')
+    : '<p class="muted">共用倉庫是空的。在背包的裝備按「存入共用」，其他角色就能取出。</p>';
+  return `<h3 class="shared-title">共用倉庫 <small class="muted">所有角色共用・${sh.items.length}／${SHARED_SLOTS} 格（不能擴充）</small></h3>${gold}${items}`;
 }
 
 /**
@@ -609,9 +630,19 @@ async function onVillageClick(e) {
     goHome();
     return;
   }
+  let sharedChanged = false;
+  if (!r) {
+    // 共用倉庫：裝備存入與取出、金幣存入與取出。
+    sharedChanged = true;
+    const amount = (v) => (v === 'all' ? 'all' : Number(v));
+    if (d.deposit) r = village.depositItem(ch, app.shared, d.deposit);
+    else if (d.withdraw) r = village.withdrawItem(ch, app.shared, d.withdraw);
+    else if (d.goldIn) r = village.depositGold(ch, app.shared, amount(d.goldIn));
+    else if (d.goldOut) r = village.withdrawGold(ch, app.shared, amount(d.goldOut));
+  }
   if (!r) return;
   villageMessage(r.message, !r.ok || r.success === false);
-  if (r.ok) await store.saveProgress(ch);
+  if (r.ok) await (sharedChanged ? store.saveShared(ch, app.shared) : store.saveProgress(ch));
   renderVillage();
 }
 
@@ -1642,6 +1673,7 @@ async function init() {
   const data = await store.loadAll();
   app.chars = data.characters;
   app.run = data.run;
+  app.shared = data.shared;
   app.current = data.meta.current && app.chars.has(data.meta.current) ? data.meta.current : null;
   const notices = [];
   if (!ok) notices.push('此瀏覽器無法儲存資料（可能是私密瀏覽模式），關閉後進度會遺失。');

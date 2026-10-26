@@ -166,3 +166,44 @@ test('擊敗 Boss 回城時記錄這一關的破關次數', () => {
   assert.equal(ch.clears['easy-2'], 2);
   assert.equal(r.clears, 2);
 });
+
+test('共用倉庫：20 格固定、存入與取出裝備、金幣共用', () => {
+  const a = hero();
+  const b = { ...hero(), id: 'mage', cls: 'mage', bag: [], gold: 0 };
+  const shared = v.newShared();
+  const rng = seededRng(5);
+  const items = Array.from({ length: 21 }, () => makeItem({ slot: 'armor', level: 3, rarity: 0 }, rng));
+  a.bag.push(...items);
+  for (let i = 0; i < 20; i++) assert.ok(v.depositItem(a, shared, items[i].id).ok);
+  assert.equal(v.depositItem(a, shared, items[20].id).ok, false, '共用倉庫只有 20 格');
+  assert.equal(shared.items.length, 20);
+  assert.equal(a.bag.length, 1);
+  assert.ok(v.withdrawItem(b, shared, items[0].id).ok);
+  assert.ok(b.bag.includes(items[0]));
+  assert.equal(shared.items.length, 19);
+  // 裝備中的道具不能直接存入。
+  v.equip(a, items[20].id);
+  assert.equal(v.depositItem(a, shared, items[20].id).ok, false);
+  // 金幣：a 存入，b 取出。
+  a.gold = 500;
+  assert.ok(v.depositGold(a, shared, 100).ok);
+  assert.ok(v.depositGold(a, shared, 'all').ok);
+  assert.equal(a.gold, 0);
+  assert.equal(shared.gold, 500);
+  assert.ok(v.withdrawGold(b, shared, 'all').ok);
+  assert.equal(b.gold, 500);
+  assert.equal(v.withdrawGold(b, shared, 100).ok, false);
+});
+
+test('武器有職業限制：其他職業可以取出但不能裝備', () => {
+  const warrior = hero();
+  const mage = { ...hero(), id: 'mage', cls: 'mage', bag: [] };
+  const sword = makeItem({ slot: 'weapon', cls: 'warrior', level: 3, rarity: 1 }, seededRng(2));
+  mage.bag.push(sword);
+  const r = v.equip(mage, sword.id);
+  assert.equal(r.ok, false);
+  assert.match(r.message, /戰士的武器/);
+  assert.equal(v.canWield(mage, sword), false);
+  warrior.bag.push(sword);
+  assert.ok(v.equip(warrior, sword.id).ok);
+});

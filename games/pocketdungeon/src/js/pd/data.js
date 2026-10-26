@@ -138,6 +138,9 @@ export const ENHANCE = {
 /** 背包初始上限、每趟藥水上限與道具價格。 */
 export const LIMITS = { bag: 20, potions: 10, potionPrice: 30, scrollPrice: 40 };
 
+/** 共用倉庫：所有角色共用的裝備格數（固定，不能擴充）。金幣另外共用，沒有上限。 */
+export const SHARED_SLOTS = 20;
+
 /** 背包擴充袋：每次使用 +5 格，最多擴充到 40 格；售價依已擴充次數倍增（200、400、800、1600）。 */
 export const BAG_EXPAND = { step: 5, max: 40, basePrice: 200 };
 

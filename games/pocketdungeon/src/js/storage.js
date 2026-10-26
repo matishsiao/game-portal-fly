@@ -1,7 +1,7 @@
 // 本機儲存：角色、探險與設定存在 IndexedDB（資料庫 pocketdungeon）；大廳讀取用的摘要與統計存在 localStorage。
 // IndexedDB 無法使用時改存記憶體（關閉後遺失）。所有讀寫都容錯，任何儲存錯誤不讓遊戲停止。
 
-import { AREA_KEYS, CLASS_KEYS, CLASSES } from './pd/data.js';
+import { AREA_KEYS, CLASS_KEYS, CLASSES, SHARED_SLOTS } from './pd/data.js';
 import { newSkills, SKILLS, SKILL_SLOTS } from './pd/skills.js';
 
 /** IndexedDB 資料庫名稱。 */
@@ -175,7 +175,7 @@ export function newCharacter(cls, name) {
 
 /**
  * 讀取全部資料並驗證。
- * @returns {Promise<{characters: Map<string, object>, run: object | null, meta: object, problems: string[]}>} 角色、進行中的探險、設定與資料損毀說明。
+ * @returns {Promise<{characters: Map<string, object>, run: object | null, meta: object, shared: {items: object[], gold: number}, problems: string[]}>} 角色、進行中的探險、設定、共用倉庫與資料損毀說明。
  */
 export async function loadAll() {
   const problems = [];
@@ -194,6 +194,11 @@ export async function loadAll() {
   }
   const metaMap = await readAll('meta');
   const meta = metaMap.get('meta') || { v: FORMAT, current: null };
+  let shared = metaMap.get('shared') || { items: [], gold: 0 };
+  if (!isValidShared(shared)) {
+    problems.push('共用倉庫資料損毀，已重設為空（各角色的資料不受影響）');
+    shared = { items: [], gold: 0 };
+  }
   if (meta.v !== FORMAT) problems.push('存檔格式版本無法辨識');
   const runMap = await readAll('run');
   let run = runMap.get('run') || null;
@@ -204,7 +209,7 @@ export async function loadAll() {
     removeKey(KEYS.save);
   }
   if (!run) removeKey(KEYS.save);
-  return { characters, run, meta, problems };
+  return { characters, run, meta, shared, problems };
 }
 
 /**
@@ -226,6 +231,28 @@ export function saveProgress(ch, run) {
     removeKey(KEYS.save);
   }
   return writeMany(ops);
+}
+
+/**
+ * 判斷共用倉庫資料是否合法。
+ * @param {any} sh 共用倉庫。
+ * @returns {boolean} 合法時為 true。
+ */
+function isValidShared(sh) {
+  return !!sh && Array.isArray(sh.items) && sh.items.length <= SHARED_SLOTS && sh.items.every(isValidItem) && Number.isFinite(sh.gold) && sh.gold >= 0;
+}
+
+/**
+ * 在同一個交易中儲存角色與共用倉庫（存取共用倉庫時使用，避免只存到一半）。
+ * @param {object} ch 角色。
+ * @param {{items: object[], gold: number}} shared 共用倉庫。
+ * @returns {Promise<boolean>} 是否成功。
+ */
+export function saveShared(ch, shared) {
+  return writeMany([
+    { store: 'characters', key: ch.id, value: ch },
+    { store: 'meta', key: 'shared', value: shared },
+  ]);
 }
 
 /**

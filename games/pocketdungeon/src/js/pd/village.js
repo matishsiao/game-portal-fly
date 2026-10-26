@@ -1,7 +1,7 @@
 // 村莊規則（純邏輯）：商店刷新與買賣、裝備穿脫、強化、區域與深度解鎖、探險開始與結算。
 // 所有函式直接修改傳入的角色資料，回傳結果與要顯示的訊息。
 
-import { AREAS, AREA_KEYS, LIMITS, MAX_DEPTH, RARITIES, ENHANCE, BAG_EXPAND, EQUIP_SLOTS } from './data.js';
+import { AREAS, AREA_KEYS, LIMITS, MAX_DEPTH, RARITIES, ENHANCE, BAG_EXPAND, EQUIP_SLOTS, SHARED_SLOTS, CLASSES } from './data.js';
 import { makeItem, itemValue, sellPrice, enhanceCost, tryEnhance, rollRarity, dungeonLevel } from './rules.js';
 
 /** 商店一次陳列的裝備數。 */
@@ -145,11 +145,103 @@ export function equip(ch, id, key) {
   const target = key || slotFor(ch, item);
   const def = EQUIP_SLOTS.find((e) => e.key === target);
   if (!def || def.slot !== item.slot) return { ok: false, message: `${item.name}不能裝在這個欄位` };
+  if (item.slot === 'weapon' && !canWield(ch, item)) return { ok: false, message: `${item.name}是${weaponOwner(item)}的武器，${CLASSES[ch.cls].name}不能裝備` };
   ch.bag.splice(idx, 1);
   const old = ch.equipped[target];
   if (old) ch.bag.splice(idx, 0, old);
   ch.equipped[target] = item;
   return { ok: true, message: `${def.name}裝備 ${item.name}` };
+}
+
+/**
+ * 判斷角色的職業能不能使用這把武器（非武器一律可以）。
+ * @param {object} ch 角色。
+ * @param {object} item 裝備。
+ * @returns {boolean} 可以使用時為 true。
+ */
+export function canWield(ch, item) {
+  return item.slot !== 'weapon' || CLASSES[ch.cls].weapon.includes(item.type);
+}
+
+/**
+ * 武器屬於哪個職業（顯示用）。
+ * @param {object} item 武器。
+ * @returns {string} 職業名稱，例如「戰士」。
+ */
+export function weaponOwner(item) {
+  const cls = Object.values(CLASSES).find((c) => c.weapon.includes(item.type));
+  return cls ? cls.name : '其他職業';
+}
+
+/**
+ * 建立空的共用倉庫。
+ * @returns {{items: object[], gold: number}} 共用倉庫。
+ */
+export function newShared() {
+  return { items: [], gold: 0 };
+}
+
+/**
+ * 把背包中的裝備存入共用倉庫（裝備中的道具須先卸下）。
+ * @param {object} ch 角色（會被修改）。
+ * @param {object} shared 共用倉庫（會被修改）。
+ * @param {string} id 裝備 id。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function depositItem(ch, shared, id) {
+  const idx = ch.bag.findIndex((i) => i.id === id);
+  if (idx < 0) return { ok: false, message: '只能存入背包中的裝備，請先卸下' };
+  if (shared.items.length >= SHARED_SLOTS) return { ok: false, message: `共用倉庫已滿（${SHARED_SLOTS} 格）` };
+  const [item] = ch.bag.splice(idx, 1);
+  shared.items.push(item);
+  return { ok: true, message: `${item.name} 存入共用倉庫` };
+}
+
+/**
+ * 從共用倉庫取出裝備放進角色的背包。
+ * @param {object} ch 角色（會被修改）。
+ * @param {object} shared 共用倉庫（會被修改）。
+ * @param {string} id 裝備 id。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function withdrawItem(ch, shared, id) {
+  const idx = shared.items.findIndex((i) => i.id === id);
+  if (idx < 0) return { ok: false, message: '共用倉庫裡沒有這件裝備' };
+  if (ch.bag.length >= bagLimit(ch)) return { ok: false, message: `背包已滿（${bagLimit(ch)} 件）` };
+  const [item] = shared.items.splice(idx, 1);
+  ch.bag.push(item);
+  const note = canWield(ch, item) ? '' : `（${weaponOwner(item)}的武器，${CLASSES[ch.cls].name}不能裝備）`;
+  return { ok: true, message: `取出 ${item.name}${note}` };
+}
+
+/**
+ * 存入金幣到共用倉庫。
+ * @param {object} ch 角色（會被修改）。
+ * @param {object} shared 共用倉庫（會被修改）。
+ * @param {number | 'all'} amount 數量或全部。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function depositGold(ch, shared, amount) {
+  const n = amount === 'all' ? ch.gold : Math.min(amount, ch.gold);
+  if (!(n > 0)) return { ok: false, message: '身上沒有金幣' };
+  ch.gold -= n;
+  shared.gold += n;
+  return { ok: true, message: `存入 ${n}G（共用 ${shared.gold}G）` };
+}
+
+/**
+ * 從共用倉庫取出金幣。
+ * @param {object} ch 角色（會被修改）。
+ * @param {object} shared 共用倉庫（會被修改）。
+ * @param {number | 'all'} amount 數量或全部。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function withdrawGold(ch, shared, amount) {
+  const n = amount === 'all' ? shared.gold : Math.min(amount, shared.gold);
+  if (!(n > 0)) return { ok: false, message: '共用倉庫沒有金幣' };
+  shared.gold -= n;
+  ch.gold += n;
+  return { ok: true, message: `取出 ${n}G（共用剩 ${shared.gold}G）` };
 }
 
 /**
