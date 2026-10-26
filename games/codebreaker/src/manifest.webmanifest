@@ -1,0 +1,17 @@
+{
+  "name": "離線密碼偵探",
+  "short_name": "密碼偵探",
+  "description": "可離線遊玩的單機密碼偵探（猜顏色密碼）",
+  "lang": "zh-Hant-TW",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#eceef1",
+  "theme_color": "#2d3036",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

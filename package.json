@@ -9,8 +9,8 @@
     "node": ">=16.17"
   },
   "scripts": {
-    "test": "npm --prefix games/sudoku test && npm --prefix games/crossmath test && npm --prefix games/numberlink test && npm --prefix games/idiom test && npm --prefix games/roll test",
-    "check:puzzles": "npm --prefix games/sudoku run check:puzzles && npm --prefix games/crossmath run check:puzzles && npm --prefix games/numberlink run check:puzzles && npm --prefix games/idiom run check:puzzles && npm --prefix games/roll run check:levels",
+    "test": "npm --prefix games/sudoku test && npm --prefix games/crossmath test && npm --prefix games/numberlink test && npm --prefix games/idiom test && npm --prefix games/roll test && npm --prefix games/codebreaker test",
+    "check:puzzles": "npm --prefix games/sudoku run check:puzzles && npm --prefix games/crossmath run check:puzzles && npm --prefix games/numberlink run check:puzzles && npm --prefix games/idiom run check:puzzles && npm --prefix games/roll run check:levels && npm --prefix games/codebreaker run check:puzzles",
     "build": "node scripts/build.mjs",
     "assemble": "node scripts/assemble.mjs",
     "preview": "node scripts/assemble.mjs && node scripts/serve.mjs",
@@ -19,6 +19,7 @@
     "dev:crossmath": "npm --prefix games/crossmath run dev",
     "dev:numberlink": "npm --prefix games/numberlink run dev",
     "dev:idiom": "npm --prefix games/idiom run dev",
-    "dev:roll": "npm --prefix games/roll run dev"
+    "dev:roll": "npm --prefix games/roll run dev",
+    "dev:codebreaker": "npm --prefix games/codebreaker run dev"
   }
 }

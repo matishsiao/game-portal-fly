@@ -12,6 +12,7 @@
 | 數字連線 | <https://matishsiao.github.io/game-portal-fly/numberlink/> |
 | 成語填字 | <https://matishsiao.github.io/game-portal-fly/idiom/> |
 | 滾滾解謎 | <https://matishsiao.github.io/game-portal-fly/roll/> |
+| 密碼偵探 | <https://matishsiao.github.io/game-portal-fly/codebreaker/> |
 
 用手機開啟大廳並加入主畫面，連網時會自動下載所有遊戲，之後沒有網路也能玩。
 
@@ -26,7 +27,8 @@ game-portal/
 │   ├── crossmath/       數學填字（自成一個專案：src/、scripts/、tests/、cm_spec.md）
 │   ├── numberlink/      數字連線（自成一個專案：src/、scripts/、tests/、spec.md）
 │   ├── idiom/           成語填字（自成一個專案：src/、scripts/、tests/、data/、spec.md；詞庫取自教育部《成語典》）
-│   └── roll/            滾滾解謎（自成一個專案：src/、scripts/、tests/、levels/、spec.md）
+│   ├── roll/            滾滾解謎（自成一個專案：src/、scripts/、tests/、levels/、spec.md）
+│   └── codebreaker/     密碼偵探（自成一個專案：src/、scripts/、tests/、spec.md）
 └── site/                組合結果（不進版本控制），內容即網站根目錄
 ```
 
@@ -39,7 +41,8 @@ game-portal/
 ├── crossmath/    ← games/crossmath 的 dist/
 ├── numberlink/   ← games/numberlink 的 dist/
 ├── idiom/        ← games/idiom 的 dist/
-└── roll/         ← games/roll 的 dist/
+├── roll/         ← games/roll 的 dist/
+└── codebreaker/  ← games/codebreaker 的 dist/
 ```
 
 ## 功能
@@ -63,7 +66,7 @@ game-portal/
 | --- | --- |
 | `npm test` | 執行所有遊戲的單元測試 |
 | `npm run check:puzzles` | 所有遊戲各難度批次出題驗收 |
-| `npm run dev:sudoku`／`npm run dev:crossmath`／`npm run dev:numberlink`／`npm run dev:idiom`／`npm run dev:roll` | 單獨開發某個遊戲（不啟用離線快取） |
+| `npm run dev:sudoku`／`npm run dev:crossmath`／`npm run dev:numberlink`／`npm run dev:idiom`／`npm run dev:roll`／`npm run dev:codebreaker` | 單獨開發某個遊戲（不啟用離線快取） |
 | `npm run preview` | 建置大廳與所有遊戲、組合成 `site/`，以 `http://localhost:5180/` 預覽 |
 | `npm run assemble` | 只建置並組合成 `site/`（加 `-- --no-build` 則不重新建置遊戲） |
 | `npm run build` | 只建置大廳到 `dist/` |
@@ -79,7 +82,7 @@ game-portal/
 
 推送到 `main` 後，`.github/workflows/pages.yml` 會自動執行所有遊戲的單元測試、組合 `site/`，並部署到 GitHub Pages：
 
-- 網址：`https://matishsiao.github.io/game-portal-fly/`（大廳），遊戲在 `/sudoku/`、`/crossmath/`、`/numberlink/`、`/idiom/`、`/roll/`。
+- 網址：`https://matishsiao.github.io/game-portal-fly/`（大廳），遊戲在 `/sudoku/`、`/crossmath/`、`/numberlink/`、`/idiom/`、`/roll/`、`/codebreaker/`。
 - HTTPS 憑證由 GitHub 自動提供與續期。
 - 首次使用需在 repo 的 **Settings → Pages** 把 Source 設為 **GitHub Actions**。公開 repo 使用 GitHub Actions 與 Pages 不需付費。
 - 也可在 Actions 分頁對「Deploy to GitHub Pages」按 **Run workflow** 手動重新部署。

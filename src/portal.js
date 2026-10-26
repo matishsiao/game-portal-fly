@@ -9,6 +9,7 @@ const GAMES = [
   { dir: 'numberlink', title: '數字連線', desc: '連起相同數字，線不交叉並填滿棋盤', tags: [['layers', '4 種難度'], ['link', '4×4～10×10']] },
   { dir: 'idiom', title: '成語填字', desc: '選字完成成語，學會意思與用法', tags: [['layers', '4 種難度'], ['book', '成語卡・成語本']] },
   { dir: 'roll', title: '滾滾解謎', desc: '推箱子、浮起來、滑過去、彈上去', tags: [['layers', '4 章 80 關'], ['sparkle', '物理小知識']] },
+  { dir: 'codebreaker', title: '密碼偵探', desc: '看回饋推理，破解保險箱的顏色密碼', tags: [['layers', '4 種難度'], ['lock', '推理回顧']] },
 ];
 
 /** 難度代碼與名稱，依由易到難排列。 */

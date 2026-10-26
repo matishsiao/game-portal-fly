@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>離線密碼偵探</title>
+  <meta name="description" content="可離線遊玩的單機密碼偵探：依回饋推理出顏色密碼">
+  <meta name="theme-color" content="#2d3036">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="密碼偵探">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <div id="update-banner" class="banner" hidden>
+    <span>有新版本可以使用</span>
+    <button type="button" id="update-btn" class="banner-btn">重新整理以更新</button>
+  </div>
+
+  <main id="home" class="screen home">
+    <header class="home-header">
+      <div class="hero-deco" aria-hidden="true"><span style="left:58%;top:8%;font-size:30px">🔒</span><span style="left:78%;top:6%;font-size:22px">7</span><span style="left:88%;top:40%;font-size:28px">🔍</span><span style="left:66%;top:56%;font-size:22px">●</span><span style="left:82%;top:74%;font-size:24px">○</span></div>
+      <div class="hero-title">
+        <h1>密碼偵探</h1>
+        <p class="hero-sub">看回饋推理・破解顏色密碼</p>
+      </div>
+      <button type="button" id="theme-btn" class="icon-btn" aria-label="切換主題"></button>
+    </header>
+
+    <p id="offline-status" class="offline-status" role="status"></p>
+    <div id="home-notice" class="notice" role="alert" hidden></div>
+
+    <button type="button" id="continue-btn" class="continue-btn" hidden>
+      <span class="continue-title">繼續遊戲</span>
+      <span id="continue-detail" class="continue-detail"></span>
+    </button>
+
+    <h2 class="section-title">開始新局</h2>
+    <div id="difficulty-list" class="difficulty-list"></div>
+
+    <nav class="home-links">
+      <a id="portal-link" class="link-btn" href="../" hidden>‹ 所有遊戲</a>
+      <button type="button" id="rules-btn" class="link-btn">玩法</button>
+      <button type="button" id="stats-btn" class="link-btn">統計</button>
+    </nav>
+  </main>
+
+  <main id="game" class="screen game" hidden>
+    <header class="game-bar">
+      <button type="button" id="home-btn" class="bar-btn" aria-label="回首頁">‹ 首頁</button>
+      <div class="game-info">
+        <span id="game-difficulty"></span>
+        <span class="dot">·</span>
+        <span id="timer" aria-label="耗時">00:00</span>
+        <span class="dot">·</span>
+        <span id="mistakes">錯誤 0</span>
+      </div>
+      <button type="button" id="menu-btn" class="bar-btn" aria-label="選單">選單</button>
+    </header>
+
+    <div class="play-area">
+      <div class="board-area">
+        <p class="legend"><span><b>● 全對</b>＝顏色和位置都對</span><span><b>○ 位置錯</b>＝顏色對、位置不對</span></p>
+        <ol id="history" class="history" aria-label="猜測紀錄"></ol>
+        <div id="pause-cover" class="pause-cover" hidden>
+          <p>已暫停</p>
+          <button type="button" id="resume-btn" class="primary-btn">繼續</button>
+        </div>
+      </div>
+
+      <div class="controls">
+        <p id="progress" class="progress"></p>
+        <p id="game-message" class="game-message" aria-live="polite"></p>
+        <div class="input-row">
+          <div id="input" class="input-slots" role="group" aria-label="目前的猜測"></div>
+          <button type="button" id="copy-btn" class="copy-btn" aria-label="沿用上次的猜測"><span aria-hidden="true">↺</span><small>沿用</small></button>
+        </div>
+        <div id="palette" class="palette" role="group" aria-label="顏色"></div>
+        <div class="tools">
+          <button type="button" id="undo-btn" class="tool-btn"><span class="tool-icon" aria-hidden="true">↶</span>復原</button>
+          <button type="button" id="erase-btn" class="tool-btn"><span class="tool-icon" aria-hidden="true">⌫</span>清除</button>
+          <button type="button" id="notes-btn" class="tool-btn" aria-pressed="false"><span class="tool-icon" aria-hidden="true">✎</span>筆記<span id="notes-state" class="tool-state">關</span></button>
+          <button type="button" id="hint-btn" class="tool-btn"><span class="tool-icon" aria-hidden="true">💡</span>提示<span id="hint-count" class="tool-badge">0</span></button>
+          <button type="button" id="pause-btn" class="tool-btn"><span class="tool-icon" aria-hidden="true">⏸</span>暫停</button>
+          <button type="button" id="submit-btn" class="submit-btn">送出</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="modal" class="overlay" hidden>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <h2 id="modal-title"></h2>
+      <div id="modal-body" class="modal-body"></div>
+      <div id="modal-actions" class="modal-actions"></div>
+    </div>
+  </div>
+</body>
+</html>
