@@ -1149,19 +1149,19 @@ function bindStick() {
    */
   const move = (cx, cy) => {
     const s = app.stickPointer;
-    let dx = cx - s.x;
-    let dy = cy - s.y;
+    const dx = cx - s.x;
+    const dy = cy - s.y;
     const len = Math.hypot(dx, dy);
     s.moved = Math.max(s.moved, len);
-    if (len > R) {
-      dx = (dx / len) * R;
-      dy = (dy / len) * R;
-    }
-    els.stickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+    // 方向一律以手指相對於中心的單位向量計算；手指拖到半徑外時只把搖桿頭的顯示限制在邊緣，速度維持全速。
+    const ux = dx / (len || 1);
+    const uy = dy / (len || 1);
+    const shown = Math.min(len, R);
+    els.stickKnob.style.transform = `translate(${ux * shown}px, ${uy * shown}px)`;
     // 死區 12%；一離開死區就有 6 成速度，拖到半徑 30%（約 14px）即為全速，與鍵盤相同。
     const r = Math.min(1, len / R);
     const k = r < 0.12 ? 0 : Math.min(1, 0.6 + ((r - 0.12) / 0.18) * 0.4);
-    app.input.stick = k === 0 ? { x: 0, y: 0 } : { x: (dx / (len || 1)) * k, y: (dy / (len || 1)) * k };
+    app.input.stick = k === 0 ? { x: 0, y: 0 } : { x: ux * k, y: uy * k };
   };
   /**
    * 手指離開：停止移動，搖桿回到閒置位置；點地移動模式下的短按改為設定目的地。
