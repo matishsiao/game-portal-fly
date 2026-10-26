@@ -21,6 +21,7 @@ const GAMES = {
   roll: 'games/roll',
   words: 'games/words',
   codebreaker: 'games/codebreaker',
+  pocketdungeon: 'games/pocketdungeon',
 };
 
 /**

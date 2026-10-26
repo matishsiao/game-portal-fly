@@ -28,6 +28,8 @@
   --words-2: #22b39a;
   --codebreaker-1: #4b5058;
   --codebreaker-2: #1f2226;
+  --pocketdungeon-1: #9e2a3a;
+  --pocketdungeon-2: #3a1d4f;
   color-scheme: light;
 }
 
@@ -62,6 +64,8 @@
     --words-2: #157564;
     --codebreaker-1: #454a52;
     --codebreaker-2: #17191c;
+    --pocketdungeon-1: #8a2433;
+    --pocketdungeon-2: #2c1540;
     color-scheme: dark;
   }
 }
@@ -364,6 +368,14 @@ summary:focus-visible {
     repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 3px),
     linear-gradient(135deg, var(--codebreaker-1), var(--codebreaker-2));
   box-shadow: inset 0 0 0 1px rgba(200, 162, 74, 0.6);
+}
+
+/* 口袋地城：酒紅到深紫的地城漸層、像素掃描線與金幣金細邊。 */
+.game-card[data-theme="pocketdungeon"] {
+  background:
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.08) 0 2px, transparent 2px 4px),
+    linear-gradient(135deg, var(--pocketdungeon-1), var(--pocketdungeon-2));
+  box-shadow: inset 0 0 0 1px rgba(232, 184, 74, 0.6);
 }
 
 /* 卡片右上的大型浮水印圖示，營造主視覺。 */

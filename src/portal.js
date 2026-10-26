@@ -11,6 +11,7 @@ const GAMES = [
   { dir: 'roll', title: '滾滾解謎', desc: '推箱子、浮起來、滑過去、彈上去', tags: [['layers', '4 章 80 關'], ['sparkle', '物理小知識']] },
   { dir: 'words', title: '英文單字連線', desc: '旅行與生活單字，配對學英文', tags: [['layers', '34 個分類'], ['book', '單字卡・單字本']] },
   { dir: 'codebreaker', title: '密碼偵探', desc: '看回饋推理，破解保險箱的顏色密碼', tags: [['layers', '4 種難度'], ['lock', '推理回顧']] },
+  { dir: 'pocketdungeon', title: '口袋地城', desc: '像素動作 RPG，闖地城打倒 Boss', tags: [['layers', '4 個地城'], ['sword', '3 種職業']] },
 ];
 
 /** 難度代碼與名稱，依由易到難排列。 */
