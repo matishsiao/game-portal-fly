@@ -528,9 +528,12 @@ button:focus-visible {
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
 }
 
+.area-card[data-area="grass"] { --a1: #7ab048; --a2: #3a6a24; }
 .area-card[data-area="easy"] { --a1: #4f8a3a; --a2: #24452a; }
 .area-card[data-area="medium"] { --a1: #c2552a; --a2: #4a1c18; }
 .area-card[data-area="hard"] { --a1: #4a8ac2; --a2: #1c2e4a; }
+.area-card[data-area="sky"] { --a1: #5aa0e0; --a2: #c8a040; }
+.area-card[data-area="necro"] { --a1: #4a4458; --a2: #160f1e; }
 .area-card[data-area="expert"] { --a1: #6a3f98; --a2: #1a0f2a; }
 
 .area-card.locked {

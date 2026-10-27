@@ -1,8 +1,8 @@
 // 主程式：首頁、村莊、地城畫面、遊戲迴圈、輸入、存檔與 Service Worker。
 
 import * as store from './storage.js';
-import { CLASSES, CLASS_KEYS, AREAS, AREA_KEYS, RARITIES, LIMITS, MAX_LEVEL, EQUIP_SLOTS, ITEM_SLOTS, BAG_EXPAND, EVOLVE, SHARED_SLOTS, REBIRTH } from './pd/data.js';
-import { xpToNext, characterStats, speedProfile, describeStats, sellPrice, enhanceCost } from './pd/rules.js';
+import { CLASSES, CLASS_KEYS, AREAS, AREA_KEYS, RARITIES, LIMITS, EQUIP_SLOTS, ITEM_SLOTS, BAG_EXPAND, EVOLVE, SHARED_SLOTS, REBIRTH } from './pd/data.js';
+import { xpToNext, characterStats, speedProfile, describeStats, sellPrice, enhanceCost, levelCap } from './pd/rules.js';
 import { World } from './pd/world.js';
 import { Renderer } from './pd/render.js';
 import { heroDataUrl, itemDataUrl } from './pd/sprites.js';
@@ -388,7 +388,7 @@ function renderVillage() {
   if (!ch) return;
   $('village-avatar').src = heroDataUrl(ch.cls, 3);
   $('village-name').textContent = ch.name;
-  $('village-level').textContent = `${village.classTitle(ch)}・Lv.${ch.level}${ch.level >= MAX_LEVEL ? '（MAX）' : ''}`;
+  $('village-level').textContent = `${village.classTitle(ch)}・Lv.${ch.level}${ch.level >= levelCap(ch.rebirth || 0) ? '（MAX）' : ''}`;
   $('village-gold').textContent = `${ch.gold}G`;
   for (const b of els.villageTabs.querySelectorAll('button')) b.setAttribute('aria-selected', String(b.dataset.tab === app.tab));
   const panels = { gate: gatePanel, shop: shopPanel, smith: smithPanel, bag: bagPanel, skill: skillPanel, hero: heroPanel };
@@ -572,9 +572,9 @@ function rebirthHtml(ch) {
   const rows = [['HP', 'hp'], ['攻擊', 'atk'], ['防禦', 'def']].map(([name, k]) => `<span>${name} ${now1[k]} → <b>${next1[k]}</b></span>`).join('');
   return `<div class="rebirth-card${check.ok ? ' ready' : ''}">
       <div class="skill-head"><b>轉職：${village.classTitle(ch)} → ${nextTitle}</b><small>第 ${n + 1}／${REBIRTH.max} 次</small></div>
-      <p class="item-stats">Lv.${MAX_LEVEL} 才能轉職。轉職後回到 Lv.1，起始的 HP、攻擊、防禦變為目前滿級的一半（速度不變）；裝備、金幣、技能與地城進度全部保留。</p>
+      <p class="item-stats">Lv.${levelCap(n)} 才能轉職。轉職後回到 Lv.1、等級上限提高為 Lv.${levelCap(n + 1)}，起始的 HP、攻擊、防禦變為目前滿級的一半（速度不變）；裝備、金幣、技能與地城進度全部保留。</p>
       <p class="rebirth-stats">Lv.1 起始能力：${rows}</p>
-      <button type="button" class="buy-btn" data-rebirth="1"${check.ok ? '' : ' disabled'}>${check.ok ? `轉職為${nextTitle}` : `尚未達到 Lv.${MAX_LEVEL}（目前 Lv.${ch.level}）`}</button>
+      <button type="button" class="buy-btn" data-rebirth="1"${check.ok ? '' : ' disabled'}>${check.ok ? `轉職為${nextTitle}` : `尚未達到 Lv.${levelCap(n)}（目前 Lv.${ch.level}）`}</button>
     </div>`;
 }
 
@@ -586,15 +586,16 @@ function rebirthHtml(ch) {
 function heroPanel(ch) {
   const s = characterStats(ch.cls, ch.level, Object.values(ch.equipped), ch.rebirth || 0);
   const prof = speedProfile(s.spd);
-  const need = xpToNext(ch.level);
-  const xp = ch.level >= MAX_LEVEL ? 'MAX' : `${ch.xp}／${need}`;
+  const cap = levelCap(ch.rebirth || 0);
+  const need = xpToNext(ch.level, cap);
+  const xp = ch.level >= cap ? 'MAX' : `${ch.xp}／${need}`;
   const extra = [];
   if (s.goldPct) extra.push(`金幣 +${s.goldPct}%`);
   if (s.xpPct) extra.push(`經驗 +${s.xpPct}%`);
   const st = ch.stats;
   return `<div class="hero-card"><img src="${heroDataUrl(ch.cls, 6)}" alt="" class="char-img big"><dl class="result-list">
       <dt>職業</dt><dd>${village.classTitle(ch)}<small class="muted">（轉職 ${ch.rebirth || 0}／${REBIRTH.max}）</small></dd>
-      <dt>等級</dt><dd>Lv.${ch.level}${ch.level >= MAX_LEVEL ? '（MAX）' : ''}</dd>
+      <dt>等級</dt><dd>Lv.${ch.level}${ch.level >= levelCap(ch.rebirth || 0) ? '（MAX）' : ''}</dd>
       <dt>經驗值</dt><dd>${xp}</dd>
       <dt>HP</dt><dd>${s.hp}</dd>
       <dt>攻擊</dt><dd>${s.atk}</dd>
@@ -1011,11 +1012,12 @@ function updateHud(force) {
     $('hp-text').textContent = `${p.hp}／${p.maxHp}`;
     $('hp-fill').parentElement.classList.toggle('low', p.hp / p.maxHp < 0.3);
   });
-  const need = xpToNext(ch.level);
+  const cap = levelCap(ch.rebirth || 0);
+  const need = xpToNext(ch.level, cap);
   set('xp', `${ch.level}/${ch.xp}/${ch.rebirth || 0}`, () => {
-    $('xp-fill').style.width = ch.level >= MAX_LEVEL ? '100%' : `${(ch.xp / need) * 100}%`;
+    $('xp-fill').style.width = ch.level >= cap ? '100%' : `${(ch.xp / need) * 100}%`;
     // 轉職過的角色在等級前顯示星數（每轉職一次一顆）。
-    $('hud-level').textContent = `${'★'.repeat(ch.rebirth || 0)}${ch.level >= MAX_LEVEL ? 'MAX' : ch.level}`;
+    $('hud-level').textContent = `${'★'.repeat(ch.rebirth || 0)}${ch.level >= cap ? 'MAX' : ch.level}`;
   });
   set('floor', `${w.area}/${w.floorIndex}`, () => {
     const rb = w.ch.rebirth || 0;

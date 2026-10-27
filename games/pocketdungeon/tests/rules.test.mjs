@@ -55,9 +55,11 @@ test('傷害公式與浮動範圍，最少 1 點', () => {
 });
 
 test('地城等級與深度加成', () => {
-  assert.equal(dungeonLevel('easy', 1, 0), 2);
-  assert.equal(dungeonLevel('easy', 2, 0), 4);
-  assert.equal(dungeonLevel('medium', 1, 3), 12.5);
+  assert.equal(dungeonLevel('grass', 1, 0), 1);
+  assert.equal(dungeonLevel('easy', 1, 0), 5);
+  assert.equal(dungeonLevel('easy', 2, 0), 7);
+  assert.equal(dungeonLevel('medium', 1, 3), 10.5);
+  assert.equal(dungeonLevel('expert', 30, 0), 60, '最高 Lv.60');
   const d1 = monsterStats('slime', 5, 1);
   const d2 = monsterStats('slime', 5, 2);
   assert.ok(Math.abs(d2.hp / d1.hp - 1.12) < 0.02);

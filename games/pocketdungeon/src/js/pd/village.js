@@ -1,8 +1,8 @@
 // 村莊規則（純邏輯）：商店刷新與買賣、裝備穿脫、強化、區域與深度解鎖、探險開始與結算。
 // 所有函式直接修改傳入的角色資料，回傳結果與要顯示的訊息。
 
-import { AREAS, AREA_KEYS, LIMITS, MAX_DEPTH, RARITIES, ENHANCE, BAG_EXPAND, EQUIP_SLOTS, SHARED_SLOTS, CLASSES, REBIRTH, MAX_LEVEL } from './data.js';
-import { makeItem, itemValue, sellPrice, enhanceCost, tryEnhance, rollRarity, dungeonLevel } from './rules.js';
+import { AREAS, AREA_KEYS, LIMITS, MAX_DEPTH, RARITIES, ENHANCE, BAG_EXPAND, EQUIP_SLOTS, SHARED_SLOTS, CLASSES, REBIRTH } from './data.js';
+import { makeItem, itemValue, sellPrice, enhanceCost, tryEnhance, rollRarity, dungeonLevel, levelCap } from './rules.js';
 
 /** 商店一次陳列的裝備數。 */
 export const SHOP_SIZE = 8;
@@ -169,7 +169,8 @@ export function classTitle(ch) {
  */
 export function canRebirth(ch) {
   if ((ch.rebirth || 0) >= REBIRTH.max) return { ok: false, message: `已完成全部 ${REBIRTH.max} 次轉職` };
-  if (ch.level < MAX_LEVEL) return { ok: false, message: `Lv.${MAX_LEVEL} 才能轉職` };
+  const cap = levelCap(ch.rebirth || 0);
+  if (ch.level < cap) return { ok: false, message: `Lv.${cap} 才能轉職` };
   return { ok: true, message: '' };
 }
 
@@ -381,7 +382,7 @@ export function maxDepth(ch, area) {
 }
 
 /**
- * 擊敗 Boss 後解鎖：同區域下一個深度（深淵無上限），第一次擊敗時解鎖下一個區域。
+ * 擊敗 Boss 後解鎖：同區域下一個深度（一般區域最深 5、深淵最深 17），第一次擊敗時解鎖下一個區域。
  * @param {object} ch 角色（會被修改）。
  * @param {string} area 區域代碼。
  * @param {number} depth 深度。
@@ -389,7 +390,7 @@ export function maxDepth(ch, area) {
  */
 export function unlockAfterBoss(ch, area, depth) {
   const out = [];
-  const cap = area === 'expert' ? Infinity : MAX_DEPTH;
+  const cap = AREAS[area].maxDepth || MAX_DEPTH;
   if (depth + 1 <= cap && maxDepth(ch, area) < depth + 1) {
     ch.unlocked[area] = depth + 1;
     out.push(`${AREAS[area].name} 深度 ${depth + 1}`);

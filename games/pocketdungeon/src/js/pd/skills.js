@@ -56,13 +56,15 @@ export function skillLevel(ch, id) {
 }
 
 /**
- * 可用的技能點：角色等級 − 1 ＋ 每次轉職 29 點（轉職前滿級所得）− 已升級的次數。
+ * 可用的技能點：角色等級 − 1 ＋ 歷次轉職前滿級所得的點數（29、39、49）− 已升級的次數。
  * @param {object} ch 角色。
  * @returns {number} 點數。
  */
 export function skillPoints(ch) {
   const spent = classSkills(ch.cls).reduce((sum, id) => sum + Math.max(0, skillLevel(ch, id) - 1), 0);
-  return Math.max(0, ch.level - 1 + 29 * (ch.rebirth || 0) - spent);
+  let earned = ch.level - 1;
+  for (let n = 0; n < (ch.rebirth || 0); n++) earned += 29 + 10 * n;
+  return Math.max(0, earned - spent);
 }
 
 /**

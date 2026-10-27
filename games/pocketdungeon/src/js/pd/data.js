@@ -32,15 +32,20 @@ export const CLASSES = {
 /** 職業代碼（角色欄位順序）。 */
 export const CLASS_KEYS = Object.keys(CLASSES);
 
-/** 最高等級。 */
+/** 未轉職時的最高等級；每轉職一次上限 +10（見 REBIRTH.capStep），轉職 3 次後為 Lv.60。 */
 export const MAX_LEVEL = 30;
 
+/** 地城等級上限（深淵最深處）。 */
+export const MAX_DUNGEON_LEVEL = 60;
+
 /**
- * 轉職：Lv.30 才能轉職，最多 3 次；轉職後回到 Lv.1，HP、攻擊、防禦的起始值為轉職前滿級（不含裝備）的 1/2，速度維持職業初始值。
+ * 轉職：達到目前的等級上限（Lv.30／40／50）才能轉職，最多 3 次；每轉職一次等級上限 +10（最高 Lv.60）。
+ * 轉職後回到 Lv.1，HP、攻擊、防禦的起始值為轉職前滿級（不含裝備）的 1/2，速度維持職業初始值。
  * titles 為各職業依轉職次數（0～3）的職稱。
  */
 export const REBIRTH = {
   max: 3,
+  capStep: 10,
   halve: ['hp', 'atk', 'def'],
   /** 每轉職一次：怪物與 Boss 的 HP、攻擊 +15%；掉落裝備等級 +2；稀有度如同深度 +2；金幣與經驗值 +15%。 */
   monster: 0.15,
@@ -55,27 +60,33 @@ export const REBIRTH = {
 };
 
 /**
- * 區域：難度代碼、名稱、基礎地城等級（深度每 +1，地城等級 +2）、出現的怪物與 Boss、建議等級、地圖色調。
- * 深淵的 Boss 從三個 Boss 中隨機選一個強化版。
+ * 區域（依解鎖順序排列，鍵即區域代碼）：名稱、回報大廳用的難度代碼（code）、基礎地城等級（深度每 +1，地城等級 +2）、
+ * 出現的怪物與 Boss、建議等級、地圖色調、可挑戰的最大深度（maxDepth，省略時為 MAX_DEPTH）。
+ * 深淵的 Boss 從六個 Boss 中隨機選一個強化版；深淵最深為深度 17（地城等級最高 Lv.60）。
+ * easy、medium、hard、expert 四個鍵沿用最初的區域代碼，以相容既有存檔。
  */
 export const AREAS = {
-  easy: { name: '苔蘚遺跡', baseLevel: 2, monsters: ['slime', 'bat', 'skeleton', 'skelArcher', 'mushroom', 'vineflower'], boss: ['treant'], recommend: [1, 9], theme: 'moss' },
-  medium: { name: '熔岩礦坑', baseLevel: 11, monsters: ['bat', 'goblin', 'lavaWorm', 'fireSpirit', 'spider', 'bomber', 'magmaSlime'], boss: ['golem'], recommend: [10, 18], theme: 'lava' },
-  hard: { name: '冰晶要塞', baseLevel: 20, monsters: ['skeleton', 'iceWolf', 'wraith', 'crystal', 'yeti', 'frostSprite', 'gargoyle'], boss: ['lich'], recommend: [19, 26], theme: 'ice' },
-  expert: { name: '深淵', baseLevel: 26, monsters: ['skelArcher', 'fireSpirit', 'wraith', 'crystal', 'shade', 'voidEye', 'gargoyle'], boss: ['treant', 'golem', 'lich'], recommend: [25, 30], theme: 'abyss' },
+  grass: { name: '翠綠草原', code: 'easy', baseLevel: 1, monsters: ['slime', 'mushroom', 'boar', 'hornet', 'scarecrow', 'goblin'], boss: ['bullKing'], recommend: [1, 4], theme: 'grass' },
+  easy: { name: '苔蘚遺跡', code: 'easy', baseLevel: 5, monsters: ['slime', 'bat', 'skeleton', 'skelArcher', 'mushroom', 'vineflower'], boss: ['treant'], recommend: [5, 9], theme: 'moss' },
+  medium: { name: '熔岩礦坑', code: 'medium', baseLevel: 9, monsters: ['bat', 'goblin', 'lavaWorm', 'fireSpirit', 'spider', 'bomber', 'magmaSlime'], boss: ['golem'], recommend: [9, 14], theme: 'lava' },
+  hard: { name: '冰晶要塞', code: 'hard', baseLevel: 14, monsters: ['skeleton', 'iceWolf', 'wraith', 'crystal', 'yeti', 'frostSprite', 'gargoyle'], boss: ['lich'], recommend: [14, 19], theme: 'ice' },
+  sky: { name: '天空之城', code: 'hard', baseLevel: 19, monsters: ['harpy', 'thunderSprite', 'skyKnight', 'gargoyle', 'frostSprite', 'skelArcher'], boss: ['thunderbird'], recommend: [19, 23], theme: 'sky' },
+  necro: { name: '死靈墓地', code: 'expert', baseLevel: 23, monsters: ['zombie', 'boneMage', 'banshee', 'skeleton', 'wraith', 'shade'], boss: ['necromancer'], recommend: [23, 27], theme: 'necro' },
+  expert: { name: '深淵', code: 'expert', baseLevel: 27, monsters: ['skelArcher', 'fireSpirit', 'wraith', 'crystal', 'shade', 'voidEye', 'gargoyle'], boss: ['treant', 'golem', 'lich', 'bullKing', 'thunderbird', 'necromancer'], recommend: [27, 60], theme: 'abyss', maxDepth: 17 },
 };
 
-/** 區域代碼依解鎖順序排列（同時是共用的難度代碼）。 */
+/** 區域代碼依解鎖順序排列。 */
 export const AREA_KEYS = Object.keys(AREAS);
 
-/** 每個區域可挑戰的最大深度（深淵沒有上限）。 */
+/** 一般區域可挑戰的最大深度（深淵另見 AREAS.expert.maxDepth）。 */
 export const MAX_DEPTH = 5;
 
 /** 每趟的一般樓層數（之後為 Boss 層）。 */
 export const FLOORS = 3;
 
 /**
- * 怪物（20 種）：名稱、地城等級 1 時的屬性、半徑、移動速度（格／秒）、行為與經驗值倍率；deathPool 為死亡時留下熔岩。
+ * 怪物（29 種）：名稱、地城等級 1 時的屬性、半徑、移動速度（格／秒）、行為與經驗值倍率；
+ * deathPool 為死亡時留下熔岩；shot 為投射物外觀（省略時依行為預設）。
  * 行為細節在 world.js 依 ai 代碼實作。
  */
 export const MONSTERS = {
@@ -99,6 +110,15 @@ export const MONSTERS = {
   gargoyle: { name: '石像鬼', hp: 50, atk: 14, def: 10, r: 0.44, speed: 2.6, ai: 'gargoyle', xp: 1.5 },
   shade: { name: '暗影刺客', hp: 32, atk: 13, def: 3, r: 0.36, speed: 2.8, ai: 'assassin', xp: 1.4 },
   voidEye: { name: '虛空之眼', hp: 34, atk: 13, def: 4, r: 0.4, speed: 1.2, ai: 'beam', xp: 1.4 },
+  boar: { name: '野豬', hp: 32, atk: 8, def: 3, r: 0.4, speed: 2.2, ai: 'leaper', xp: 1 },
+  hornet: { name: '大黃蜂', hp: 16, atk: 6, def: 1, r: 0.28, speed: 2.8, ai: 'bat', xp: 0.8 },
+  scarecrow: { name: '稻草人', hp: 36, atk: 9, def: 3, r: 0.4, speed: 1.5, ai: 'melee', xp: 1.1 },
+  harpy: { name: '鷹身女妖', hp: 30, atk: 11, def: 3, r: 0.38, speed: 2.4, ai: 'tri', xp: 1.3, shot: 'feather' },
+  thunderSprite: { name: '雷霆精靈', hp: 28, atk: 12, def: 3, r: 0.34, speed: 1.6, ai: 'beam', xp: 1.3 },
+  skyKnight: { name: '天空守衛', hp: 64, atk: 14, def: 10, r: 0.46, speed: 1.6, ai: 'brute', xp: 1.6 },
+  zombie: { name: '殭屍', hp: 58, atk: 12, def: 5, r: 0.42, speed: 1.1, ai: 'melee', xp: 1.3 },
+  boneMage: { name: '骷髏法師', hp: 30, atk: 13, def: 3, r: 0.36, speed: 1.5, ai: 'caster', xp: 1.4, shot: 'curse' },
+  banshee: { name: '怨靈', hp: 34, atk: 13, def: 3, r: 0.38, speed: 2.4, ai: 'wraith', xp: 1.4 },
 };
 
 /**
@@ -109,6 +129,9 @@ export const BOSSES = {
   treant: { name: '古樹守衛', hp: 680, atk: 15, def: 6, r: 1.0, speed: 1.1, kind: 'treant' },
   golem: { name: '熔岩魔像', hp: 760, atk: 16, def: 9, r: 1.05, speed: 1.2, kind: 'golem' },
   lich: { name: '霜之巫妖', hp: 640, atk: 16, def: 6, r: 0.9, speed: 1.4, kind: 'lich' },
+  bullKing: { name: '巨角牛王', hp: 640, atk: 14, def: 6, r: 1.0, speed: 1.4, kind: 'bullKing' },
+  thunderbird: { name: '雷鳥', hp: 620, atk: 16, def: 6, r: 0.95, speed: 1.6, kind: 'thunderbird' },
+  necromancer: { name: '死靈法師', hp: 660, atk: 16, def: 6, r: 0.9, speed: 1.3, kind: 'necromancer' },
 };
 
 /** Boss 回復：觸發的 HP 比例、機率、蓄力秒數、回復量、每場次數（深淵強化版另計）、打斷所需傷害與打斷後的暈眩秒數。 */

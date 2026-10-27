@@ -1,6 +1,6 @@
 // 成長與裝備規則（純邏輯）：亂數、經驗曲線、角色屬性、傷害公式、怪物強度、裝備產生與強化、獎勵。
 
-import { CLASSES, MAX_LEVEL, AREAS, MONSTERS, BOSSES, RARITIES, ACCESSORY_STATS, ITEM_NAMES, ENHANCE, EVOLVE, REBIRTH } from './data.js';
+import { CLASSES, MAX_LEVEL, MAX_DUNGEON_LEVEL, AREAS, MONSTERS, BOSSES, RARITIES, ACCESSORY_STATS, ITEM_NAMES, ENHANCE, EVOLVE, REBIRTH } from './data.js';
 
 /**
  * 建立可重現的亂數產生器（mulberry32）。
@@ -30,35 +30,46 @@ export function pick(arr, rng) {
 }
 
 /**
- * 升到下一級所需的經驗值。
- * @param {number} level 目前等級。
- * @returns {number} 所需經驗值；已達最高等級時為 Infinity。
+ * 等級上限：未轉職 Lv.30，每轉職一次 +10。
+ * @param {number} [rebirth=0] 轉職次數。
+ * @returns {number} 等級上限。
  */
-export function xpToNext(level) {
-  return level >= MAX_LEVEL ? Infinity : Math.round(20 * level ** 1.6);
+export function levelCap(rebirth = 0) {
+  return MAX_LEVEL + REBIRTH.capStep * rebirth;
 }
 
 /**
- * 加入經驗值並處理升級（可能連升數級）。
- * @param {{level: number, xp: number}} ch 角色（會被修改）。
+ * 升到下一級所需的經驗值。
+ * @param {number} level 目前等級。
+ * @param {number} [cap=MAX_LEVEL] 等級上限。
+ * @returns {number} 所需經驗值；已達等級上限時為 Infinity。
+ */
+export function xpToNext(level, cap = MAX_LEVEL) {
+  return level >= cap ? Infinity : Math.round(20 * level ** 1.6);
+}
+
+/**
+ * 加入經驗值並處理升級（可能連升數級），等級上限依轉職次數而定。
+ * @param {{level: number, xp: number, rebirth?: number}} ch 角色（會被修改）。
  * @param {number} amount 經驗值。
  * @returns {number} 這次升了幾級。
  */
 export function gainXp(ch, amount) {
-  if (ch.level >= MAX_LEVEL) return 0;
+  const cap = levelCap(ch.rebirth || 0);
+  if (ch.level >= cap) return 0;
   ch.xp += Math.max(0, Math.round(amount));
   let ups = 0;
-  while (ch.level < MAX_LEVEL && ch.xp >= xpToNext(ch.level)) {
-    ch.xp -= xpToNext(ch.level);
+  while (ch.level < cap && ch.xp >= xpToNext(ch.level, cap)) {
+    ch.xp -= xpToNext(ch.level, cap);
     ch.level++;
     ups++;
   }
-  if (ch.level >= MAX_LEVEL) ch.xp = 0;
+  if (ch.level >= cap) ch.xp = 0;
   return ups;
 }
 
 /**
- * 某職業在轉職 n 次後的起始屬性：每轉職一次，HP、攻擊、防禦變為上一階滿級（Lv.30、不含裝備）的 1/2；速度不變。
+ * 某職業在轉職 n 次後的起始屬性：每轉職一次，HP、攻擊、防禦變為上一階滿級（該階的等級上限、不含裝備）的 1/2；速度不變。
  * @param {string} cls 職業代碼。
  * @param {number} [rebirth=0] 轉職次數（0～3）。
  * @returns {{hp: number, atk: number, def: number, spd: number}} 起始屬性。
@@ -67,7 +78,7 @@ export function rebirthBase(cls, rebirth = 0) {
   const c = CLASSES[cls];
   const base = { ...c.base };
   for (let n = 0; n < rebirth; n++) {
-    for (const k of REBIRTH.halve) base[k] = Math.round(((base[k] + c.growth[k] * (MAX_LEVEL - 1)) / 2) * 10) / 10;
+    for (const k of REBIRTH.halve) base[k] = Math.round(((base[k] + c.growth[k] * (levelCap(n) - 1)) / 2) * 10) / 10;
   }
   return base;
 }
@@ -131,14 +142,14 @@ export function damage(atk, def, mult = 1, roll = 0.5) {
 }
 
 /**
- * 計算某區域、深度與樓層的地城等級。
+ * 計算某區域、深度與樓層的地城等級（最高 Lv.60）。
  * @param {string} area 區域代碼。
  * @param {number} depth 深度（1 起算）。
  * @param {number} floor 樓層（0 起算，Boss 層為 FLOORS）。
  * @returns {number} 地城等級。
  */
 export function dungeonLevel(area, depth, floor) {
-  return AREAS[area].baseLevel + (depth - 1) * 2 + floor * 0.5;
+  return Math.min(MAX_DUNGEON_LEVEL, AREAS[area].baseLevel + (depth - 1) * 2 + floor * 0.5);
 }
 
 /**

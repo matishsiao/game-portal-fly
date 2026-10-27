@@ -179,7 +179,7 @@ test('背包已滿時拾取的裝備自動賣出', () => {
 });
 
 test('Boss 層：HP 50% 以下進入第二階段，擊敗後開啟傳送點', () => {
-  for (const [area, ai] of [['easy', 'treant'], ['medium', 'golem'], ['hard', 'lich']]) {
+  for (const [area, ai] of [['grass', 'bullKing'], ['easy', 'treant'], ['medium', 'golem'], ['hard', 'lich'], ['sky', 'thunderbird'], ['necro', 'necromancer']]) {
     const w = new World(hero('warrior', 20), { area, depth: 1, seed: 3, floor: 3 }, seededRng(2));
     const b = w.boss();
     assert.equal(b.ai, ai);
@@ -263,8 +263,8 @@ test('斜走貼牆時以全速滑行；直走碰到牆角會自動修正通過',
   assert.ok(p.y < 4.5, `應該通過轉角進入通道，y=${p.y}`);
 });
 
-test('20 種怪物都有對應的行為與像素圖資料', () => {
-  assert.equal(Object.keys(MONSTERS).length, 20);
+test('29 種怪物都有對應的行為', () => {
+  assert.equal(Object.keys(MONSTERS).length, 29);
   for (const [type, m] of Object.entries(MONSTERS)) assert.equal(typeof World.prototype.ai[m.ai], 'function', type);
 });
 

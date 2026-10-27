@@ -333,6 +333,94 @@ export const MONSTER_ART = {
       ['...oooooo...', '..oPPPPPPo..', '.oPWWWWWWPo.', 'oPWWWiiWWWPo', 'oPWWiKKiWWPo', 'oPWWWiiWWWPo', '.oPWWWWWWPo.', '..oPPPPPPo..', '..o..oo..o..', 'o..o....o..o'],
     ],
   },
+  boar: {
+    palette: { o: O, B: '#8a5a3a', w: '#fff4e0', n: '#c8907a', N: O, e: O },
+    frames: [
+      ['...o....o...', '..oBo..oBo..', '.oBBBBBBBBo.', 'oBBeBBBBeBBo', 'oBBBBBBBBBBo', 'oBwBnnnnBwBo', '.oBBnNNnBBo.', '..oBBBBBBo..', '..oBo..oBo..', '..oo....oo..'],
+      ['...o....o...', '..oBo..oBo..', '.oBBBBBBBBo.', 'oBBeBBBBeBBo', 'oBBBBBBBBBBo', 'oBwBnnnnBwBo', '.oBBnNNnBBo.', '..oBBBBBBo..', '.oBo....oBo.', '.oo......oo.'],
+    ],
+  },
+  hornet: {
+    palette: { o: O, Y: '#f0c030', K: '#2a2010', W: '#d8f0ff', e: O },
+    frames: [
+      ['..oo....oo..', '.oWWo..oWWo.', '..oWWooWWo..', '...oYYYYo...', '..oYeYYeYo..', '..oKKKKKKo..', '..oYYYYYYo..', '...oKKKKo...', '....oYYo....', '.....oo.....'],
+      ['............', 'oWWo....oWWo', '.oWWooooWWo.', '...oYYYYo...', '..oYeYYeYo..', '..oKKKKKKo..', '..oYYYYYYo..', '...oKKKKo...', '....oYYo....', '.....oo.....'],
+    ],
+  },
+  scarecrow: {
+    palette: { o: O, H: '#c8a050', S: '#e8d090', e: O, m: '#5a3a1a', C: '#6a8a4a', p: '#c84a3a', y: '#e8c860', B: '#7a5a3a' },
+    frames: [
+      ['...oooooo...', '..oHHHHHHo..', 'oooooooooooo', '..oSSSSSSo..', '..oSeSSeSo..', '..oSSmmSSo..', 'oooCCCCCCooo', 'oyyCCpCCCyyo', 'oooCCCCCCooo', '...oCCCCo...', '....oBBo....', '....oBBo....', '....oooo....'],
+    ],
+  },
+  harpy: {
+    palette: { o: O, H: '#5a3a8a', s: '#e8c0a0', e: O, F: '#c8d0e8', W: '#7a8ac8', Y: '#e8b84a' },
+    frames: [
+      ['....oooo....', '...oHHHHo...', '..oHseesHo..', '..oHssssHo..', 'oo.ooFFoo.oo', 'oWWoFFFFoWWo', 'oWWWoFFoWWWo', '.oWWoFFoWWo.', '..oo.oo.oo..', '...oYo.oYo..'],
+      ['....oooo....', '...oHHHHo...', '..oHseesHo..', '..oHssssHo..', 'oWo.oFFo.oWo', 'oWWooFFooWWo', '.oWWoFFoWWo.', '..oooFFooo..', '..oo.oo.oo..', '...oYo.oYo..'],
+    ],
+  },
+  thunderSprite: {
+    palette: { o: O, Y: '#ffe14d', y: '#ffffff', e: '#3a2a10', w: '#c88a10' },
+    frames: [
+      ['....oooo....', '..ooYYYYoo..', '.oYYyyYYYYo.', 'oYYyeYYeYYYo', 'oYYYYYYYYYYo', 'oYYYYwwYYYYo', '.oYYYYYYYYo.', '..ooYYYYoo..', '.o..oooo..o.', 'o..........o'],
+      ['o..........o', '..ooYYYYoo..', '.oYYyyYYYYo.', 'oYYyeYYeYYYo', 'oYYYYYYYYYYo', 'oYYYYwwYYYYo', '.oYYYYYYYYo.', '..ooYYYYoo..', '....oooo....', '............'],
+    ],
+  },
+  skyKnight: {
+    palette: { o: O, B: '#3a7ad8', G: '#e8b84a', W: '#e8eef5', k: O },
+    frames: [
+      ['.....oo.....', '....oBBo....', '...oGGGGo...', '..oGWWWWGo..', '..oGWkkWGo..', '..oGWWWWGo..', 'oooGGGGGGooo', 'oWoWWGGWWoWo', 'oWoWWGGWWoWo', 'ooooWWWWoooo', '...oWWWWo...', '...oWooWo...', '...oo..oo...'],
+      ['.....oo.....', '....oBBo....', '...oGGGGo...', '..oGWWWWGo..', '..oGWkkWGo..', '..oGWWWWGo..', 'oooGGGGGGooo', 'oWoWWGGWWoWo', 'oWoWWGGWWoWo', 'ooooWWWWoooo', '...oWWWWo...', '..oWo..oWo..', '..oo....oo..'],
+    ],
+  },
+  zombie: {
+    palette: { o: O, Z: '#7aa860', e: '#ff4d4d', m: '#3a2a2a', C: '#5a5a7a', c: '#7a7a9a', P: '#4a3a2a' },
+    frames: [
+      ['...oooooo...', '..oZZZZZZo..', '..oZeZZeZo..', '..oZZZZZZo..', '..oZZmmZZo..', '...oooooo...', 'oZZoCCCCoZZo', 'oZZoCcCCoZZo', '.oooCCCCooo.', '...oPPPPo...', '...oPooPo...', '...oo..oo...'],
+      ['...oooooo...', '..oZZZZZZo..', '..oZeZZeZo..', '..oZZZZZZo..', '..oZZmmZZo..', '...oooooo...', 'oZZoCCCCoZZo', 'oZZoCcCCoZZo', '.oooCCCCooo.', '...oPPPPo...', '..oPo..oPo..', '..oo....oo..'],
+    ],
+  },
+  boneMage: {
+    palette: { o: O, R: '#3a2a5a', r: '#5a4a8a', W: '#e8e4d8', e: '#c87aff', G: '#c87aff' },
+    frames: [
+      ['...oooooo...', '..oRRRRRRo.o', '..oRWWWWRooG', '..oRWeeWRo.o', '..oRWWWWRo.o', '.oRRRWWRRRoo', 'oRRRRRRRRRoW', 'oRRRrRRRRRoW', '.oRRRRRRRo.o', '.oRRRRRRRo..', '..ooooooo...'],
+    ],
+  },
+  banshee: {
+    palette: { o: '#2a4a3a', H: '#a8e0c0', F: '#d8f8e8', e: O },
+    alpha: 0.85,
+    frames: [
+      ['...oooooo...', '..oHHHHHHo..', '.oHFFFFFFHo.', '.oHFeFFeFHo.', '.oHFFooFFHo.', '.oHFFFFFFHo.', '.oHHFFFFHHo.', '..oFFFFFFo..', '.oFFFFFFFFo.', '.oFoFFoFFoo.', '..o.oo.oo...'],
+      ['...oooooo...', '..oHHHHHHo..', '.oHFFFFFFHo.', '.oHFeFFeFHo.', '.oHFFooFFHo.', '.oHFFFFFFHo.', '.oHHFFFFHHo.', '..oFFFFFFo..', '.oFFFFFFFFo.', '.ooFFoFFoFo.', '...oo.oo.o..'],
+    ],
+  },
+  bullKing: {
+    palette: { o: O, B: '#6a3a24', H: '#f0e6c8', e: '#ff4d4d', n: '#a87a5a', N: O },
+    evolvedPalette: { o: O, B: '#2a2a3a', H: '#e8b84a', e: '#5fe0ff', n: '#5a5a7a', N: O },
+    scale: 2,
+    frames: [
+      ['o............o', 'oHo..oooo..oHo', '.oHooBBBBooHo.', '..oHBBBBBBHo..', '..oBBeBBeBBo..', '..oBBBBBBBBo..', '.oBBnnnnnnBBo.', '.oBBnNnnNnBBo.', 'oBBBBnnnnBBBBo', 'oBBBBBBBBBBBBo', 'oBBoBBBBBBoBBo', 'oBBoBBBBBBoBBo', '.oo.oBBBBo.oo.', '....oBooBo....', '....oo..oo....'],
+      ['o............o', 'oHo..oooo..oHo', '.oHooBBBBooHo.', '..oHBBBBBBHo..', '..oBBeBBeBBo..', '..oBBBBBBBBo..', '.oBBnnnnnnBBo.', '.oBBnNnnNnBBo.', 'oBBBBnnnnBBBBo', 'oBBBBBBBBBBBBo', 'oBBoBBBBBBoBBo', 'oBBoBBBBBBoBBo', '.oo.oBBBBo.oo.', '...oBo..oBo...', '...oo....oo...'],
+    ],
+  },
+  thunderbird: {
+    palette: { o: O, Y: '#ffe14d', e: O, K: '#e8a030', W: '#4a7ad8', B: '#2a4a9a' },
+    evolvedPalette: { o: O, Y: '#ff8a3a', e: '#ffffff', K: '#c8a030', W: '#2a2a3a', B: '#4a1a5a' },
+    scale: 2,
+    frames: [
+      ['......oo......', '.....oYYo.....', '....oYeYYo....', 'o...oYYYYo...o', 'oWo..oKKo..oWo', 'oWWo.oBBo.oWWo', 'oWWWoBBBBoWWWo', '.oWWWBBBBWWWo.', '..oWWBYYBWWo..', '...oWBBBBWo...', '....oBBBBo....', '.....oBBo.....', '....oYooYo....', '....oo..oo....'],
+      ['......oo......', '.....oYYo.....', '....oYeYYo....', 'oWo.oYYYYo.oWo', 'oWWo.oKKo.oWWo', '.oWWooBBooWWo.', '..oWWBBBBWWo..', '...oWBBBBWo...', '..oWWBYYBWWo..', '...oWBBBBWo...', '....oBBBBo....', '.....oBBo.....', '....oYooYo....', '....oo..oo....'],
+    ],
+  },
+  necromancer: {
+    palette: { o: O, R: '#4a3468', r: '#7a58a8', W: '#e8e4d8', e: '#5fff8a', m: O, g: '#5fff8a', a: '#e8b84a' },
+    evolvedPalette: { o: O, R: '#4a0a1a', r: '#8a1a2a', W: '#e8e4d8', e: '#ff3a3a', m: O, g: '#ff3a3a', a: '#e8b84a' },
+    scale: 2,
+    frames: [
+      ['...oooooooo...', '..oRRRRRRRRo..', '.oRRrrrrrrRRo.', '.oRrWWWWWWrRo.', '.oRrWeWWeWrRo.', '.oRrWWWWWWrRo.', '.oRRrWmmWrRRo.', 'oRRRRRRRRRRRRo', 'oRgRRRRRRRRgRo', 'oRRRRRaaRRRRRo', 'oRRRRRaaRRRRRo', '.oRRRRRRRRRRo.', '.oRRrRRRRrRRo.', '..oooooooooo..'],
+    ],
+  },
   treant: {
     palette: { o: O, T: '#6b4a2a', t: '#a07a4a', L: '#4f9a3a', e: '#ffe14d' },
     evolvedPalette: { o: O, T: '#7a2a24', t: '#b8503a', L: '#e0a030', e: '#fff3a0' },

@@ -8,11 +8,14 @@ import { heroArt, monsterArt, itemArt } from './sprites.js';
 /** 一格的像素數。 */
 const T = 16;
 
-/** 各區域的地圖色調：地板兩色、地板斑點、牆頂、牆面、牆面暗線。 */
+/** 各區域的地圖色調：地板兩色、地板斑點（草原為小花）、牆頂、牆面、牆面暗線、地圖外背景。 */
 const THEMES = {
   moss: { floor: ['#3b4a33', '#40503a'], speck: '#55683f', top: '#6b7a5a', face: '#2c3626', line: '#222a1e', bg: '#10140e' },
   lava: { floor: ['#3a2a26', '#42302a'], speck: '#7a3a1a', top: '#8a5240', face: '#2a1a18', line: '#1e1210', bg: '#120a08' },
   ice: { floor: ['#2e3f52', '#34485e'], speck: '#4f6f8a', top: '#9fc3dc', face: '#22303f', line: '#18222e', bg: '#0a1018' },
+  grass: { floor: ['#5c8a3c', '#64923f'], speck: '#e8d870', top: '#3f6e2e', face: '#2a4a1e', line: '#1c3214', bg: '#101a0a' },
+  sky: { floor: ['#c8d4e8', '#d2dcee'], speck: '#ffffff', top: '#f0e6c8', face: '#8a9ab8', line: '#6a7a98', bg: '#5a90c8' },
+  necro: { floor: ['#3a3542', '#403a48'], speck: '#6a5a7a', top: '#4a4458', face: '#1e1a24', line: '#141018', bg: '#08060c' },
   abyss: { floor: ['#241a33', '#2a1f3b'], speck: '#4a2f6a', top: '#5a3f78', face: '#160f21', line: '#0e0916', bg: '#07040c' },
 };
 
@@ -326,6 +329,22 @@ export class Renderer {
       } else if (tg.shape === 'line') {
         this.linePath(tg);
         g.fill();
+        g.stroke();
+      } else if (tg.shape === 'ring') {
+        // 環狀震波：內外兩圈外框，中間填色隨倒數加深。
+        const r1 = tg.r * T;
+        const r0 = (tg.r - tg.width) * T;
+        g.beginPath();
+        g.arc(x, y, r1, 0, Math.PI * 2);
+        g.arc(x, y, Math.max(0, r0), 0, Math.PI * 2, true);
+        g.fill();
+        g.fillStyle = `rgba(255,60,60,${0.15 + 0.35 * k})`;
+        g.fill();
+        g.beginPath();
+        g.arc(x, y, r1, 0, Math.PI * 2);
+        g.stroke();
+        g.beginPath();
+        g.arc(x, y, Math.max(0, r0), 0, Math.PI * 2);
         g.stroke();
       } else {
         const r = tg.r * T;
@@ -754,7 +773,7 @@ export class Renderer {
         g.restore();
         continue;
       }
-      const colors = { orb: ['200,168,255', '#c8a8ff'], fire: ['255,120,40', '#ff8a3a'], ice: ['122,200,255', '#9ad8ff'], seed: ['140,200,90', '#8ac85a'] }[pr.kind] || ['255,255,255', '#fff'];
+      const colors = { orb: ['200,168,255', '#c8a8ff'], fire: ['255,120,40', '#ff8a3a'], ice: ['122,200,255', '#9ad8ff'], seed: ['140,200,90', '#8ac85a'], feather: ['240,240,250', '#e8e8f4'], curse: ['160,90,210', '#a05ad2'] }[pr.kind] || ['255,255,255', '#fff'];
       const r = pr.r * T;
       // 拖尾：沿飛行反方向的幾個淡色圓點。
       const sp = Math.hypot(pr.vx, pr.vy) || 1;
@@ -859,7 +878,12 @@ export class Renderer {
       } else if (e.kind === 'blast') {
         const looks = { nova: '150,210,255', spin: '255,255,255', slam: '210,170,110', rain: '240,224,176', beam: '255,240,170', meteor: '255,150,60' };
         g.fillStyle = e.friendly ? `rgba(${looks[e.look] || '200,168,255'},${0.6 * (1 - k)})` : `rgba(255,140,60,${0.55 * (1 - k)})`;
-        if (e.shape === 'circle' || !e.shape) {
+        if (e.shape === 'ring') {
+          g.beginPath();
+          g.arc(x, y, e.r * T, 0, Math.PI * 2);
+          g.arc(x, y, Math.max(0, (e.r - (e.width || 1)) * T), 0, Math.PI * 2, true);
+          g.fill();
+        } else if (e.shape === 'circle' || !e.shape) {
           g.beginPath();
           g.arc(x, y, (e.r || 1) * T, 0, Math.PI * 2);
           g.fill();

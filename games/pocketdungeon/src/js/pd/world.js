@@ -210,7 +210,7 @@ export class World {
       name: (opts.elite ? '菁英' : '') + (opts.evolved ? '進化・' : '') + base.name,
       r: base.r * (opts.elite ? 1.25 : 1) * (opts.small ? 0.7 : 1) * (opts.evolved ? EVOLVE.scale : 1), evolved: !!opts.evolved,
       hp: Math.max(1, Math.round(s.hp * scale)), maxHp: Math.max(1, Math.round(s.hp * scale)), atk: s.atk, def: s.def,
-      speed: base.speed, ai: opts.boss ? base.kind : base.ai, xpMult: (opts.boss ? 20 : opts.elite ? 3 : 1) * (base.xp || 1) * scale,
+      speed: base.speed, ai: opts.boss ? base.kind : base.ai, shot: base.shot, xpMult: (opts.boss ? 20 : opts.elite ? 3 : 1) * (base.xp || 1) * scale,
       state: 'idle', t: 0, cd: 1 + this.rng(), aggro: !!opts.boss, hurt: 0, facing: 0, invisible: false, intangible: false,
       vx: 0, vy: 0, phase2: false, pattern: 0, split: !!opts.small, summoned: false,
     };
@@ -880,7 +880,7 @@ export class World {
 
   /**
    * 建立預警：時間到時判定玩家是否在範圍內並造成傷害。
-   * @param {{shape: 'circle' | 'line' | 'arc', x: number, y: number, r?: number, angle?: number, len?: number, width?: number, arc?: number, t: number, dmg: number, delay?: number, after?: string}} tg 預警。
+   * @param {{shape: 'circle' | 'ring' | 'line' | 'arc', x: number, y: number, r?: number, angle?: number, len?: number, width?: number, arc?: number, t: number, dmg: number, delay?: number, after?: string}} tg 預警。
    */
   telegraph(tg) {
     if (this.telegraphs.length > MAX_ENTITIES) return;
@@ -897,6 +897,10 @@ export class World {
    */
   inShape(tg, x, y, r) {
     if (tg.shape === 'circle') return dist(tg.x, tg.y, x, y) <= tg.r + r;
+    if (tg.shape === 'ring') {
+      const d = dist(tg.x, tg.y, x, y);
+      return d <= tg.r + r && d >= tg.r - tg.width - r;
+    }
     if (tg.shape === 'line') {
       const x2 = tg.x + Math.cos(tg.angle) * tg.len;
       const y2 = tg.y + Math.sin(tg.angle) * tg.len;
@@ -922,6 +926,18 @@ export class World {
       this.telegraphs.splice(this.telegraphs.indexOf(tg), 1);
       this.effect('blast', tg.x, tg.y, { shape: tg.shape, r: tg.r, angle: tg.angle, len: tg.len, width: tg.width, arc: tg.arc });
       if (tg.dmg && this.inShape(tg, p.x, p.y, p.r)) this.hurtPlayer(tg.dmg, tg.x, tg.y);
+      if (tg.after === 'land') {
+        // 雷鳥俯衝：落在預警位置並現身。
+        const m = this.monsters.find((o) => o.id === tg.owner);
+        if (m) {
+          m.x = tg.x;
+          m.y = tg.y;
+          m.intangible = false;
+          m.invisible = false;
+          m.state = 'attacking';
+          m.t = 0.6;
+        }
+      }
       if (tg.after === 'worm') {
         const m = this.monsters.find((o) => o.id === tg.owner);
         if (m) {
@@ -1501,7 +1517,7 @@ World.prototype.ai = {
   caster(m, dt, d) {
     if (m.state === 'cast') {
       if (m.t <= 0) {
-        this.shoot(m, 4, m.facing, 1.1, { kind: 'fire', homing: 1, r: 0.22 });
+        this.shoot(m, 4, m.facing, 1.1, { kind: m.shot || 'fire', homing: 1, r: 0.22 });
         m.state = 'idle';
         m.cd = 2.2;
       }
@@ -1756,7 +1772,7 @@ World.prototype.ai = {
   tri(m, dt, d) {
     if (m.state === 'cast') {
       if (m.t <= 0) {
-        for (const off of [-0.3, 0, 0.3]) this.shoot(m, 5, m.facing + off, 0.9, { kind: 'ice', r: 0.16 });
+        for (const off of [-0.3, 0, 0.3]) this.shoot(m, 5, m.facing + off, 0.9, { kind: m.shot || 'ice', r: 0.16 });
         m.state = 'idle';
         m.cd = 2.4;
       }
@@ -2019,6 +2035,189 @@ World.prototype.ai = {
       m.t = 0.5;
       m.invisible = true;
       m.intangible = true;
+    }
+  },
+
+  /**
+   * 巨角牛王：直線衝撞、三圈擴散的震地波、呼叫野豬；第二階段衝撞後立刻再衝一次。
+   * @param {object} m Boss。
+   * @param {number} dt 秒。
+   */
+  bullKing(m, dt) {
+    bossPhase.call(this, m);
+    if (bossHealing.call(this, m)) return;
+    const p = this.player;
+    if (m.state === 'charge') {
+      if (m.t <= 0) {
+        m.state = 'dash';
+        m.t = 0.8;
+      }
+      return;
+    }
+    if (m.state === 'dash') {
+      const blocked = this.moveEntity(m, Math.cos(m.dashAngle) * 11 * dt, Math.sin(m.dashAngle) * 11 * dt);
+      if (blocked || m.t <= 0) {
+        this.effect('blast', m.x, m.y, { shape: 'circle', r: 1.2 });
+        if (m.phase2 && m.charges > 0) {
+          // 第二階段：再衝一次（重新瞄準，仍有預警）。
+          m.charges--;
+          m.dashAngle = Math.atan2(p.y - m.y, p.x - m.x);
+          m.state = 'charge';
+          m.t = 0.6;
+          this.telegraph({ shape: 'line', x: m.x, y: m.y, angle: m.dashAngle, len: 9, width: 1.8, t: 0.6, dmg: 0 });
+        } else {
+          m.state = 'attacking';
+          m.t = 0.8;
+        }
+      }
+      return;
+    }
+    if (m.state === 'attacking') {
+      if (m.t <= 0) {
+        m.state = 'move';
+        m.cd = (m.phase2 ? 1.0 : 1.5) * (m.abyss ? 0.8 : 1) * (m.evolved ? EVOLVE.cd : 1);
+      }
+      return;
+    }
+    this.chase(m, dt, 0.7);
+    if (m.cd > 0) return;
+    if (startHeal.call(this, m)) return;
+    const moves = ['charge', 'stomp', 'charge', 'call'];
+    const move = moves[m.pattern++ % moves.length];
+    if (move === 'charge') {
+      m.dashAngle = Math.atan2(p.y - m.y, p.x - m.x);
+      m.charges = 1;
+      m.state = 'charge';
+      m.t = 0.8;
+      this.telegraph({ shape: 'line', x: m.x, y: m.y, angle: m.dashAngle, len: 9, width: 1.8, t: 0.8, dmg: 0 });
+    } else if (move === 'stomp') {
+      // 三圈依序擴散的震地波：站在圈與圈之間或跳過波可以躲開。
+      [1.8, 3.2, 4.6].forEach((r, k) => {
+        this.telegraph({ shape: 'ring', x: m.x, y: m.y, r, width: 1, t: 0.7, delay: k * 0.35, dmg: this.monsterDamage(m, 1.1) });
+      });
+      m.state = 'attacking';
+      m.t = 1.6;
+    } else {
+      const minions = this.monsters.filter((o) => o.summoned).length;
+      for (let k = 0; k < 2 && minions + k < 4; k++) {
+        const s = this.spawnMonster('boar', m.x + (k ? 1.6 : -1.6), m.y + 0.5, {});
+        s.summoned = true;
+        s.aggro = true;
+        s.xpMult = 0.3;
+      }
+      m.state = 'attacking';
+      m.t = 0.8;
+    }
+  },
+
+  /**
+   * 雷鳥：落雷、環狀羽毛彈、消失後俯衝落地；第二階段落雷更多、羽毛彈兩圈。
+   * @param {object} m Boss。
+   * @param {number} dt 秒。
+   */
+  thunderbird(m, dt) {
+    bossPhase.call(this, m);
+    if (bossHealing.call(this, m)) return;
+    const p = this.player;
+    if (m.state === 'attacking') {
+      if (m.t <= 0) {
+        m.state = 'move';
+        m.cd = (m.phase2 ? 1.0 : 1.5) * (m.abyss ? 0.8 : 1) * (m.evolved ? EVOLVE.cd : 1);
+      }
+      return;
+    }
+    if (m.state === 'diving') return;
+    if (m.state === 'vanish') {
+      if (m.t <= 0) {
+        m.state = 'diving';
+        this.telegraph({ shape: 'circle', x: p.x, y: p.y, r: 1.4, t: 0.7, dmg: this.monsterDamage(m, 1.3), after: 'land', owner: m.id });
+      }
+      return;
+    }
+    this.keepRange(m, dt, dist(m.x, m.y, p.x, p.y), 3, 6);
+    if (m.cd > 0) return;
+    if (startHeal.call(this, m)) return;
+    const moves = ['strikes', 'feathers', 'dive'];
+    const move = moves[m.pattern++ % moves.length];
+    if (move === 'strikes') {
+      const n = m.phase2 ? 8 : 5;
+      for (let k = 0; k < n; k++) {
+        const x = p.x + (k ? (this.rng() - 0.5) * 5 : 0);
+        const y = p.y + (k ? (this.rng() - 0.5) * 5 : 0);
+        this.telegraph({ shape: 'circle', x, y, r: 0.9, t: 0.8, delay: k * 0.15, dmg: this.monsterDamage(m, 1.0) });
+      }
+      m.state = 'attacking';
+      m.t = 0.9 + n * 0.15;
+    } else if (move === 'feathers') {
+      this.telegraph({ shape: 'circle', x: m.x, y: m.y, r: m.r + 0.4, t: 0.5, dmg: 0 });
+      for (const off of m.phase2 ? [0, Math.PI / 14] : [0]) {
+        for (let k = 0; k < 14; k++) this.shoot(m, off ? 3.4 : 4.2, (k / 14) * Math.PI * 2 + off, 0.9, { kind: 'feather', life: 5, r: 0.18 });
+      }
+      m.state = 'attacking';
+      m.t = 1.0;
+    } else {
+      m.state = 'vanish';
+      m.t = 0.5;
+      m.invisible = true;
+      m.intangible = true;
+      this.effect('poof', m.x, m.y, { r: m.r, color: '#ffffff' });
+    }
+  },
+
+  /**
+   * 死靈法師：一排排竄出的骨刺、召喚亡者、螺旋詛咒彈；第二階段骨刺三排並多召喚怨靈。
+   * @param {object} m Boss。
+   * @param {number} dt 秒。
+   */
+  necromancer(m, dt) {
+    bossPhase.call(this, m);
+    if (bossHealing.call(this, m)) return;
+    const p = this.player;
+    if (m.state === 'attacking') {
+      if (m.spiral > 0 && m.t <= m.spiralNext) {
+        m.spiral--;
+        m.spiralNext -= 0.3;
+        for (let k = 0; k < 8; k++) this.shoot(m, 3.4, (k / 8) * Math.PI * 2 + m.spiral * 0.3, 0.9, { kind: 'curse', life: 5, r: 0.2 });
+      }
+      if (m.t <= 0) {
+        m.state = 'move';
+        m.cd = (m.phase2 ? 1.0 : 1.5) * (m.abyss ? 0.8 : 1) * (m.evolved ? EVOLVE.cd : 1);
+      }
+      return;
+    }
+    this.keepRange(m, dt, dist(m.x, m.y, p.x, p.y), 3.5, 6);
+    if (m.cd > 0) return;
+    if (startHeal.call(this, m)) return;
+    const moves = ['bones', 'summon', 'curse'];
+    const move = moves[m.pattern++ % moves.length];
+    const base = Math.atan2(p.y - m.y, p.x - m.x);
+    m.state = 'attacking';
+    if (move === 'bones') {
+      const lines = m.phase2 ? [base - 0.4, base, base + 0.4] : [base];
+      for (const a of lines) {
+        for (let k = 0; k < 8; k++) {
+          this.telegraph({ shape: 'circle', x: m.x + Math.cos(a) * (1.3 + k), y: m.y + Math.sin(a) * (1.3 + k), r: 0.55, t: 0.6, delay: k * 0.1, dmg: this.monsterDamage(m, 1.0) });
+        }
+      }
+      m.t = 1.5;
+    } else if (move === 'summon') {
+      const minions = this.monsters.filter((o) => o.summoned).length;
+      const types = m.phase2 ? ['zombie', 'skeleton', 'banshee'] : ['zombie', 'skeleton'];
+      types.forEach((type, k) => {
+        if (minions + k >= 6) return;
+        const a = (k / types.length) * Math.PI * 2;
+        const s = this.spawnMonster(type, m.x + Math.cos(a) * 1.8, m.y + Math.sin(a) * 1.8, {});
+        s.summoned = true;
+        s.aggro = true;
+        s.xpMult = 0.3;
+        this.effect('poof', s.x, s.y, { r: 0.5, color: '#9a7ad0' });
+      });
+      m.t = 0.9;
+    } else {
+      this.telegraph({ shape: 'circle', x: m.x, y: m.y, r: m.r + 0.4, t: 0.5, dmg: 0 });
+      m.spiral = 3;
+      m.spiralNext = 1.2;
+      m.t = 1.5;
     }
   },
 };

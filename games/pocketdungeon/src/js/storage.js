@@ -1,7 +1,7 @@
 // 本機儲存：角色、探險與設定存在 IndexedDB（資料庫 pocketdungeon）；大廳讀取用的摘要與統計存在 localStorage。
 // IndexedDB 無法使用時改存記憶體（關閉後遺失）。所有讀寫都容錯，任何儲存錯誤不讓遊戲停止。
 
-import { AREA_KEYS, CLASS_KEYS, CLASSES, SHARED_SLOTS } from './pd/data.js';
+import { AREAS, AREA_KEYS, CLASS_KEYS, CLASSES, SHARED_SLOTS } from './pd/data.js';
 import { newSkills, SKILLS, SKILL_SLOTS } from './pd/skills.js';
 
 /** IndexedDB 資料庫名稱。 */
@@ -15,6 +15,7 @@ export const FORMAT = 1;
 const KEYS = {
   save: 'pocketdungeon.save',
   stats: 'pocketdungeon.stats',
+  areaStats: 'pocketdungeon.areaStats',
   settings: 'pocketdungeon.settings',
 };
 
@@ -139,7 +140,7 @@ export function isValidCharacter(ch) {
   const n = (v) => Number.isFinite(v) && v >= 0;
   return !!ch && CLASS_KEYS.includes(ch.cls) && ch.id === ch.cls && typeof ch.name === 'string' && Number.isInteger(ch.level) && ch.level >= 1 && ch.level <= 30
     && n(ch.xp) && n(ch.gold) && Array.isArray(ch.bag) && ch.bag.every(isValidItem) && ch.equipped && typeof ch.equipped === 'object'
-    && Object.values(ch.equipped).every((it) => it === null || isValidItem(it)) && ch.unlocked && typeof ch.unlocked === 'object' && Number.isInteger(ch.unlocked.easy)
+    && Object.values(ch.equipped).every((it) => it === null || isValidItem(it)) && ch.unlocked && typeof ch.unlocked === 'object' && AREA_KEYS.some((k) => Number.isInteger(ch.unlocked[k]))
     && n(ch.potions) && n(ch.scroll) && ch.stats && typeof ch.stats === 'object' && (ch.rebirth === undefined || (Number.isInteger(ch.rebirth) && ch.rebirth >= 0 && ch.rebirth <= 3))
     && ch.skills && typeof ch.skills.lv === 'object' && Array.isArray(ch.skills.slots) && ch.skills.slots.length === SKILL_SLOTS
     && ch.skills.slots.every((id) => id === null || (SKILLS[id] && SKILLS[id].cls === ch.cls));
@@ -168,7 +169,7 @@ export function newCharacter(cls, name) {
   return {
     id: cls, cls, name: [...(name.trim() || CLASSES[cls].name)].slice(0, 8).join(''), level: 1, xp: 0, gold: 50,
     equipped: { weapon: null, helmet: null, armor: null, boots: null, acc1: null, acc2: null }, bag: [], bagSize: 20, bagExpand: 0, potions: 3, scroll: 1,
-    unlocked: { easy: 1 }, clears: {}, evolved: {}, rebirth: 0, shop: null, created: Date.now(), skills: newSkills(cls),
+    unlocked: { grass: 1 }, clears: {}, evolved: {}, rebirth: 0, shop: null, created: Date.now(), skills: newSkills(cls),
     stats: { playMs: 0, kills: 0, maxHit: 0, legends: 0, deaths: 0, runs: 0 },
   };
 }
@@ -184,6 +185,11 @@ export async function loadAll() {
   for (const [k, ch] of rawChars) {
     // 加入技能之前建立的角色沒有技能資料，補上預設值（技能點由等級計算，不會損失）。
     if (ch && !ch.skills && CLASS_KEYS.includes(ch.cls)) ch.skills = newSkills(ch.cls);
+    // 區域插入主線前的角色：已解鎖較後面的區域時，前面（含新加入）的區域也一併解鎖深度 1。
+    if (ch && ch.unlocked && typeof ch.unlocked === 'object') {
+      const last = AREA_KEYS.reduce((idx, k, i) => (Number.isInteger(ch.unlocked[k]) && ch.unlocked[k] >= 1 ? i : idx), -1);
+      for (let i = 0; i < last; i++) if (!(ch.unlocked[AREA_KEYS[i]] >= 1)) ch.unlocked[AREA_KEYS[i]] = 1;
+    }
     // 裝備欄擴充前（武器、防具、飾品 3 格）的角色：飾品移到飾品 1，補上新欄位。
     if (ch && ch.equipped && 'accessory' in ch.equipped) {
       const { accessory, ...rest } = ch.equipped;
@@ -223,7 +229,7 @@ export function saveProgress(ch, run) {
   if (run) {
     ops.push({ store: 'run', key: 'run', value: run });
     writeJson(KEYS.save, {
-      v: FORMAT, difficulty: run.snap.area, elapsedMs: Math.round(run.snap.elapsed * 1000), completed: false,
+      v: FORMAT, difficulty: AREAS[run.snap.area].code, area: run.snap.area, elapsedMs: Math.round(run.snap.elapsed * 1000), completed: false,
       name: ch.name, cls: ch.cls, level: ch.level, depth: run.snap.depth, floor: run.snap.floor,
     });
   } else if (run === null) {
@@ -330,26 +336,31 @@ function removeKey(key) {
   memory.delete(key);
 }
 
+/** 大廳使用的難度代碼。 */
+const CODES = ['easy', 'medium', 'hard', 'expert'];
+
 /**
  * 建立空白統計。
- * @returns {Record<string, object>} 每個區域的統計。
+ * @param {string[]} keys 鍵（區域代碼或難度代碼）。
+ * @returns {Record<string, object>} 每個鍵的統計。
  */
-function emptyStats() {
+function emptyStats(keys) {
   const stats = {};
-  for (const key of AREA_KEYS) stats[key] = { started: 0, completed: 0, bestMs: null, totalMs: 0, noHint: 0, deaths: 0, kills: 0, bestDepth: 0 };
+  for (const key of keys) stats[key] = { started: 0, completed: 0, bestMs: null, totalMs: 0, noHint: 0, deaths: 0, kills: 0, bestDepth: 0 };
   return stats;
 }
 
 /**
- * 讀取統計；資料損毀時重設為空白。
- * @returns {Record<string, {started: number, completed: number, bestMs: number | null, totalMs: number, noHint: number, deaths: number, kills: number, bestDepth: number}>} 統計。
+ * 讀取並驗證一組統計；個別項目損毀時改為空白。
+ * @param {any} data 原始資料。
+ * @param {string[]} keys 鍵。
+ * @returns {Record<string, object>} 統計。
  */
-export function loadStats() {
-  const data = readJson(KEYS.stats);
-  const stats = emptyStats();
+function parseStats(data, keys) {
+  const stats = emptyStats(keys);
   if (!data || typeof data !== 'object') return stats;
   const num = (v) => Number.isFinite(v) && v >= 0;
-  for (const key of AREA_KEYS) {
+  for (const key of keys) {
     const d = data[key];
     if (d && num(d.started) && num(d.completed) && num(d.totalMs) && num(d.noHint) && (d.bestMs === null || num(d.bestMs))) {
       // deaths、kills、bestDepth 為本遊戲額外的欄位，不完整時補預設值。
@@ -357,6 +368,42 @@ export function loadStats() {
     }
   }
   return stats;
+}
+
+/**
+ * 讀取各區域的統計（遊戲內顯示用）。
+ * 區域插入主線前只有 `pocketdungeon.stats`（當時區域代碼與難度代碼相同），第一次讀取時以它為初始值。
+ * @returns {Record<string, {started: number, completed: number, bestMs: number | null, totalMs: number, noHint: number, deaths: number, kills: number, bestDepth: number}>} 統計。
+ */
+export function loadStats() {
+  const data = readJson(KEYS.areaStats);
+  return parseStats(data || readJson(KEYS.stats), AREA_KEYS);
+}
+
+/**
+ * 大廳用的統計（以難度代碼合併各區域：同一個難度代碼的區域加總，最佳時間取最短）。
+ * @param {Record<string, object>} areaStats 各區域的統計。
+ * @returns {Record<string, object>} 以 easy、medium、hard、expert 為鍵的統計。
+ */
+function portalStats(areaStats) {
+  const out = emptyStats(CODES);
+  for (const key of AREA_KEYS) {
+    const a = areaStats[key];
+    const o = out[AREAS[key].code];
+    for (const f of ['started', 'completed', 'totalMs', 'noHint', 'deaths', 'kills']) o[f] += a[f];
+    o.bestDepth = Math.max(o.bestDepth, a.bestDepth);
+    if (a.bestMs !== null && (o.bestMs === null || a.bestMs < o.bestMs)) o.bestMs = a.bestMs;
+  }
+  return out;
+}
+
+/**
+ * 寫入各區域統計，並同步更新大廳讀取的統計。
+ * @param {Record<string, object>} stats 各區域的統計。
+ */
+function writeStats(stats) {
+  writeJson(KEYS.areaStats, stats);
+  writeJson(KEYS.stats, portalStats(stats));
 }
 
 /**
@@ -368,14 +415,14 @@ export function recordStart(area, depth) {
   const stats = loadStats();
   stats[area].started++;
   stats[area].bestDepth = Math.max(stats[area].bestDepth, depth);
-  writeJson(KEYS.stats, stats);
+  writeStats(stats);
 }
 
 /**
  * 記錄探險結束。
  * @param {string} area 區域代碼。
  * @param {{result: 'victory' | 'dead' | 'recall', ms: number, kills: number, potionsUsed: number}} r 結果、耗時、擊倒數與用掉的藥水數。
- * @returns {{newRecord: boolean}} 擊敗 Boss 時是否刷新最短耗時。
+ * @returns {{newRecord: boolean}} 擊敗 Boss 時是否刷新該區域的最短耗時。
  */
 export function recordEnd(area, r) {
   const stats = loadStats();
@@ -391,13 +438,13 @@ export function recordEnd(area, r) {
   } else if (r.result === 'dead') {
     s.deaths++;
   }
-  writeJson(KEYS.stats, stats);
+  writeStats(stats);
   return { newRecord };
 }
 
 /** 重設統計。 */
 export function resetStats() {
-  writeJson(KEYS.stats, emptyStats());
+  writeStats(emptyStats(AREA_KEYS));
 }
 
 /** 預設設定。 */
