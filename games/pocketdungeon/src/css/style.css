@@ -3631,3 +3631,15 @@ button:focus-visible {
 .home-gifts img { width: 40px; height: 40px; image-rendering: pixelated; flex: none; }
 .home-gifts span { display: flex; flex-direction: column; gap: 2px; }
 .home-gifts small { color: var(--text-muted); }
+
+/* 背包標題旁的「擴充」按鈕（持有背包擴充袋時顯示） */
+.bag-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.bag-head h3 { margin-right: auto; }
+.expand-btn { display: flex; align-items: center; gap: 6px; flex: none; min-height: 44px; padding: 4px 12px 4px 6px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--text); font: inherit; cursor: pointer; }
+.expand-btn img { width: 32px; height: 32px; image-rendering: pixelated; }
+.expand-btn span { display: flex; flex-direction: column; line-height: 1.15; text-align: left; }
+.expand-btn small { color: var(--text-muted); font-size: 0.75rem; }
+.expand-btn.ready { border-color: var(--gold); background: linear-gradient(135deg, rgba(240, 192, 64, .22), rgba(240, 192, 64, .06)); animation: expand-glow 1.6s ease-in-out infinite; }
+.expand-btn:disabled { opacity: .55; cursor: default; }
+@keyframes expand-glow { 50% { box-shadow: 0 0 0 3px rgba(240, 192, 64, .28); } }
+@media (prefers-reduced-motion: reduce) { .expand-btn.ready { animation: none; } }

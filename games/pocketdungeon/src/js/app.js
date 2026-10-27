@@ -612,8 +612,8 @@ async function openMapNode(ch, key) {
  */
 function shopPanel(ch) {
   if (!ch.shop || !ch.shopBooks) village.refreshShop(ch, Math.random);
-  const goods = `<div class="shop-row"><img src="${itemDataUrl('potion')}" alt="" class="icon"><div class="item-main"><b>回復藥水</b><span class="item-stats">回復 40% HP・持有 ${ch.potions}／${LIMITS.potions}</span></div><button type="button" class="buy-btn" data-buy="potion">${LIMITS.potionPrice}G</button></div>
-    <div class="shop-row"><img src="${itemDataUrl('cure')}" alt="" class="icon"><div class="item-main"><b>淨化藥水</b><span class="item-stats">解除中毒、睡眠、暈眩（睡眠或暈眩中也能喝）・持有 ${ch.cures || 0}／${LIMITS.cures}</span></div><button type="button" class="buy-btn" data-buy="cure">${LIMITS.curePrice}G</button></div>
+  const goods = `<div class="shop-row"><img src="${itemDataUrl('potion')}" alt="" class="icon"><div class="item-main"><b>回復藥水</b><span class="item-stats">回復 40% HP・持有 ${ch.potions}／${LIMITS.potionHold}・每趟帶 ${LIMITS.potions} 瓶</span></div><button type="button" class="buy-btn" data-buy="potion">${LIMITS.potionPrice}G</button></div>
+    <div class="shop-row"><img src="${itemDataUrl('cure')}" alt="" class="icon"><div class="item-main"><b>淨化藥水</b><span class="item-stats">解除中毒、睡眠、暈眩（睡眠或暈眩中也能喝）・持有 ${ch.cures || 0}／${LIMITS.cureHold}・每趟帶 ${LIMITS.cures} 瓶</span></div><button type="button" class="buy-btn" data-buy="cure">${LIMITS.curePrice}G</button></div>
     <div class="shop-row"><img src="${itemDataUrl('key')}" alt="" class="icon"><div class="item-main"><b>回城卷軸</b><span class="item-stats">帶著全部所得返回村莊・持有 ${ch.scroll}／1</span></div><button type="button" class="buy-btn" data-buy="scroll">${LIMITS.scrollPrice}G</button></div>
     <div class="shop-row"><img src="${itemDataUrl('pouch')}" alt="" class="icon"><div class="item-main"><b>背包擴充袋</b><span class="item-stats">背包上限 +${BAG_EXPAND.step} 格・目前 ${village.bagLimit(ch)}／${BAG_EXPAND.max} 格${ch.bagExpand ? `・持有 ${ch.bagExpand} 個` : ''}・商店剩 ${Math.max(0, BAG_EXPAND.shopMax - village.pouchesBought(ch))}／${BAG_EXPAND.shopMax} 個（賣完後打怪取得）</span></div><button type="button" class="buy-btn" data-buy="pouch"${village.bagExpandPrice(ch) === Infinity ? ' disabled' : ''}>${village.bagExpandPrice(ch) !== Infinity ? `${village.bagExpandPrice(ch)}G` : village.pouchesBought(ch) >= BAG_EXPAND.shopMax ? '已賣完' : '已達上限'}</button></div>`;
   const items = ch.shop.length
@@ -771,13 +771,16 @@ function bagPanel(ch) {
   ];
   // 空格：顯示剩下的容量（擴充背包時看得到成長）。
   for (let k = used; k < limit; k++) cells.push('<span class="inv-cell empty" aria-hidden="true"></span>');
-  const pouch = ch.bagExpand > 0 ? stackCell('pouch', ch.bagExpand, 'pouch', 'pouch', '背包擴充袋') : '';
+  // 持有背包擴充袋時，在背包標題旁顯示「擴充」按鈕（已達上限時停用）。
+  const full = limit >= BAG_EXPAND.max;
+  const expand = ch.bagExpand > 0
+    ? `<button type="button" class="expand-btn${full ? '' : ' ready'}" data-use-pouch="1"${full ? ' disabled' : ''} aria-label="使用背包擴充袋"><img src="${itemDataUrl('pouch')}" alt=""><span><b>${full ? '已達上限' : `擴充 +${BAG_EXPAND.step} 格`}</b><small>擴充袋 ×${ch.bagExpand}</small></span></button>`
+    : '';
   // 子頁面：個人（裝備欄與背包）、共用（所有角色共用的金幣與倉庫）。
   const tabs = [['mine', '個人'], ['shared', `共用 ${app.shared.items.length}／${SHARED_SLOTS}`]].map(([k, name]) => `<button type="button" role="tab" data-bag-tab="${k}" aria-selected="${app.bagTab === k}">${name}</button>`).join('');
   if (app.bagTab === 'shared') return `<div class="sub-tabs" role="tablist">${tabs}</div>${sharedHtml(ch)}`;
   return `<div class="sub-tabs" role="tablist">${tabs}</div><h3>裝備欄 <small class="muted">（點格子查看與卸下）</small></h3>${paperDoll(ch)}
-    <h3>背包 <small class="muted">${used}／${limit} 格${limit < BAG_EXPAND.max ? `・擴充袋最多到 ${BAG_EXPAND.max} 格` : ''}</small></h3>
-    ${pouch ? `<div class="inv-grid tools">${pouch}</div>` : ''}
+    <div class="bag-head"><h3>背包 <small class="muted">${used}／${limit} 格${limit < BAG_EXPAND.max && !expand ? `・擴充袋最多到 ${BAG_EXPAND.max} 格` : ''}</small></h3>${expand}</div>
     <div class="inv-grid">${cells.join('')}</div>
     <p class="muted small">點格子查看裝備資訊並操作（裝備、分解、存入共用、賣出）。每種材料與製作書只佔 1 格，最多疊 ${LIMITS.stack} 個。</p>`;
 }
@@ -821,15 +824,11 @@ function stackCell(icon, n, key, cls, name) {
 /**
  * 點背包格子：顯示內容與可做的操作，並執行玩家選的操作。
  * @param {object} ch 角色。
- * @param {string} key 格子代碼（item:id、mat:key、book:slot、pouch）。
+ * @param {string} key 格子代碼（item:id、mat:key、book:slot 等）。
  * @returns {Promise<{r: {ok: boolean, message: string}, shared?: boolean} | null>} 操作結果；關閉時為 null。
  */
 async function openBagCell(ch, key) {
   const [kind, id] = key.split(':');
-  if (kind === 'pouch') {
-    const act = await openModal({ title: `背包擴充袋 ×${ch.bagExpand}`, html: `<p>使用後背包上限 +${BAG_EXPAND.step} 格（目前 ${village.bagLimit(ch)}／${BAG_EXPAND.max} 格）。可在商店購買，Boss 寶箱也有機會掉落。</p>`, actions: [{ label: '關閉', value: null }, { label: '使用', value: 'use', className: 'primary' }] });
-    return act ? { r: village.useBagExpand(ch) } : null;
-  }
   if (kind === 'gift') {
     const tier = Number(id);
     const k = tier - 1;
@@ -837,12 +836,14 @@ async function openBagCell(ch, key) {
     const act = await openModal({
       title: `${GIFT.names[k]} ×${n}`,
       html: `<div class="gift-head"><span class="inv-cell stack static gift-cell tier${tier}"><img src="${itemDataUrl('gift')}" alt=""></span><p>來自其他遊戲的第一次過關或第一次全對。開啟可以得到：</p></div>
-        <ul><li>金幣 ${GIFT.gold[k]}G</li><li>裝備材料 ${GIFT.mats[k]} 個（等級愈高，高品質材料愈多）</li><li>技能書碎片 ${GIFT.shards[k]} 片（同一本的碎片 ${GIFT.shardNeed} 片合成 1 本技能書）</li></ul>`,
+        <ul><li>金幣 ${GIFT.gold[k]}G</li><li>裝備材料 ${GIFT.mats[k]} 個（等級愈高，高品質材料愈多）</li><li>技能書碎片 ${GIFT.shards[k]} 片（同一本的碎片 ${GIFT.shardNeed} 片合成 1 本技能書）</li>
+        <li>機率：回復藥水 ${GIFT.potions[k]} 瓶（${Math.round(GIFT.potionChance[k] * 100)}%）、淨化藥水 ${GIFT.cures[k]} 瓶（${Math.round(GIFT.cureChance[k] * 100)}%）、背包擴充袋（${Math.round(GIFT.pouchChance[k] * 100)}%）</li></ul>
+        <p class="muted">藥水超過持有上限（各 ${LIMITS.potionHold} 瓶）或背包已擴充到 ${BAG_EXPAND.max} 格時，改為金幣。</p>`,
       actions: [{ label: '關閉', value: null }, ...(n > 1 ? [{ label: `全部開啟（${n}）`, value: 'all' }] : []), { label: '開啟', value: 'one', className: 'primary' }],
     });
     if (!act) return null;
     // 開啟（可以連續開全部），彙整得到的內容。
-    const total = { gold: 0, mats: {}, shards: {} };
+    const total = { gold: 0, mats: {}, shards: {}, potions: 0, cures: 0, pouch: 0, converted: 0 };
     let opened = 0;
     let last = null;
     for (let i = 0; i < (act === 'all' ? n : 1); i++) {
@@ -850,13 +851,20 @@ async function openBagCell(ch, key) {
       if (!last.ok) break;
       opened++;
       total.gold += last.gold;
+      for (const f of ['potions', 'cures', 'pouch', 'converted']) total[f] += last[f];
       for (const [m, c] of Object.entries(last.mats)) total.mats[m] = (total.mats[m] || 0) + c;
       for (const [s2, c] of Object.entries(last.shards)) total.shards[s2] = (total.shards[s2] || 0) + c;
     }
     if (!opened) return { r: last };
     const matList = Object.entries(total.mats).map(([m, c]) => `<span class="loot-chip"><img src="${itemDataUrl(m)}" alt="">${MATERIALS.find((x) => x.key === m).name} ×${c}</span>`).join('');
     const shardList = Object.entries(total.shards).map(([s2, c]) => `<span class="loot-chip r${skills.SKILLS[s2].rarity || 0}"><img src="${itemDataUrl('shard')}" alt=""><b class="item-name r${skills.SKILLS[s2].rarity || 0}">${skills.SKILLS[s2].name}</b> 碎片 ×${c}<small class="muted">（持有 ${ch.shards[s2]}／${GIFT.shardNeed}）</small></span>`).join('');
-    await openModal({ title: `開啟了 ${opened} 個${GIFT.names[k]}`, html: `<p class="gold-text">金幣 +${total.gold}G</p><h3>裝備材料</h3><div class="loot-chips">${matList}</div><h3>技能書碎片</h3><div class="loot-chips">${shardList}</div>${last.ok ? '' : `<p class="notice-inline">${last.message}，其餘的禮包沒有開啟。</p>`}`, actions: [{ label: '好', value: null, className: 'primary' }] });
+    const extras = [
+      total.potions ? `<span class="loot-chip"><img src="${itemDataUrl('potion')}" alt="">回復藥水 ×${total.potions}</span>` : '',
+      total.cures ? `<span class="loot-chip"><img src="${itemDataUrl('cure')}" alt="">淨化藥水 ×${total.cures}</span>` : '',
+      total.pouch ? `<span class="loot-chip"><img src="${itemDataUrl('pouch')}" alt="">背包擴充袋 ×${total.pouch}</span>` : '',
+    ].join('');
+    const goldNote = total.converted ? `<small class="muted">（含超過上限換成的 ${total.converted}G）</small>` : '';
+    await openModal({ title: `開啟了 ${opened} 個${GIFT.names[k]}`, html: `<p class="gold-text">金幣 +${total.gold}G ${goldNote}</p>${extras ? `<h3>道具</h3><div class="loot-chips">${extras}</div>` : ''}<h3>裝備材料</h3><div class="loot-chips">${matList}</div><h3>技能書碎片</h3><div class="loot-chips">${shardList}</div>${last.ok ? '' : `<p class="notice-inline">${last.message}，其餘的禮包沒有開啟。</p>`}`, actions: [{ label: '好', value: null, className: 'primary' }] });
     return { r: { ok: true, message: `開啟了 ${opened} 個${GIFT.names[k]}` } };
   }
   if (kind === 'shard') {

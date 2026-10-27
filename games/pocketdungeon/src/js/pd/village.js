@@ -91,7 +91,7 @@ export function buyItem(ch, index) {
  * @returns {{ok: boolean, message: string}} 結果。
  */
 export function buyPotion(ch) {
-  if (ch.potions >= LIMITS.potions) return { ok: false, message: `藥水最多持有 ${LIMITS.potions} 瓶` };
+  if (ch.potions >= LIMITS.potionHold) return { ok: false, message: `藥水最多持有 ${LIMITS.potionHold} 瓶` };
   if (ch.gold < LIMITS.potionPrice) return { ok: false, message: `金幣不足（需要 ${LIMITS.potionPrice}G）` };
   ch.gold -= LIMITS.potionPrice;
   ch.potions++;
@@ -105,7 +105,7 @@ export function buyPotion(ch) {
  */
 export function buyCure(ch) {
   const have = ch.cures || 0;
-  if (have >= LIMITS.cures) return { ok: false, message: `淨化藥水最多持有 ${LIMITS.cures} 瓶` };
+  if (have >= LIMITS.cureHold) return { ok: false, message: `淨化藥水最多持有 ${LIMITS.cureHold} 瓶` };
   if (ch.gold < LIMITS.curePrice) return { ok: false, message: `金幣不足（需要 ${LIMITS.curePrice}G）` };
   ch.gold -= LIMITS.curePrice;
   ch.cures = have + 1;
@@ -348,11 +348,12 @@ export function addGift(ch, tier, n = 1) {
 }
 
 /**
- * 開啟 1 個獎勵禮包：金幣、裝備材料、技能書碎片（數量與品質依等級）。背包放不下新的材料或碎片種類時不開啟。
+ * 開啟 1 個獎勵禮包：金幣、裝備材料、技能書碎片（數量與品質依等級），有機會得到回復藥水、淨化藥水與背包擴充袋。
+ * 藥水超過持有上限、背包已擴充到上限時改為金幣（gold 已包含，換算的部分另記在 converted）。背包放不下新的材料或碎片種類時不開啟。
  * @param {object} ch 角色（會被修改）。
  * @param {number} tier 等級（1～5）。
  * @param {() => number} rng 亂數函式。
- * @returns {{ok: boolean, message: string, gold?: number, mats?: Record<string, number>, shards?: Record<string, number>}} 結果與內容。
+ * @returns {{ok: boolean, message: string, gold?: number, mats?: Record<string, number>, shards?: Record<string, number>, potions?: number, cures?: number, pouch?: number, converted?: number}} 結果與內容。
  */
 export function openGift(ch, tier, rng) {
   if (!(ch.gifts && ch.gifts[String(tier)] > 0)) return { ok: false, message: '沒有這個禮包' };
@@ -374,11 +375,23 @@ export function openGift(ch, tier, rng) {
   const fresh = Object.keys(mats).filter((m) => !(ch.mats && ch.mats[m] > 0)).length + Object.keys(shards).filter((id) => !(ch.shards && ch.shards[id] > 0)).length;
   const freed = ch.gifts[String(tier)] === 1 ? 1 : 0;
   if (bagUsed(ch) - freed + fresh > bagLimit(ch)) return { ok: false, message: `背包空間不足（需要 ${fresh - freed} 格）` };
+  // 藥水與擴充袋：放不下的換成金幣。
+  const potionRoll = rng() < GIFT.potionChance[k] ? GIFT.potions[k] : 0;
+  const cureRoll = rng() < GIFT.cureChance[k] ? GIFT.cures[k] : 0;
+  const pouchRoll = rng() < GIFT.pouchChance[k] ? 1 : 0;
+  const potions = Math.min(potionRoll, Math.max(0, LIMITS.potionHold - (ch.potions || 0)));
+  const cures = Math.min(cureRoll, Math.max(0, LIMITS.cureHold - (ch.cures || 0)));
+  const pouch = pouchRoll && bagLimit(ch) + ((ch.bagExpand || 0) + 1) * BAG_EXPAND.step <= BAG_EXPAND.max ? 1 : 0;
+  const converted = (potionRoll - potions) * LIMITS.potionPrice + (cureRoll - cures) * LIMITS.curePrice + (pouchRoll - pouch) * BAG_EXPAND.basePrice;
+  const gold = GIFT.gold[k] + converted;
   addGift(ch, tier, -1);
-  ch.gold += GIFT.gold[k];
+  ch.gold += gold;
+  ch.potions = (ch.potions || 0) + potions;
+  ch.cures = (ch.cures || 0) + cures;
+  ch.bagExpand = (ch.bagExpand || 0) + pouch;
   for (const [m, n] of Object.entries(mats)) addMaterial(ch, m, n);
   for (const [id, n] of Object.entries(shards)) addStack(ch, 'shards', id, n);
-  return { ok: true, message: `開啟${GIFT.names[k]}：金幣 +${GIFT.gold[k]}`, gold: GIFT.gold[k], mats, shards };
+  return { ok: true, message: `開啟${GIFT.names[k]}：金幣 +${gold}`, gold, mats, shards, potions, cures, pouch, converted };
 }
 
 /**
@@ -836,9 +849,9 @@ export function settleRun(ch, world, result) {
     goldLost = Math.floor(loot.gold / 2);
     ch.gold = Math.max(0, ch.gold - goldLost);
   }
-  ch.potions = Math.min(LIMITS.potions, ch.potions + world.player.potions);
+  ch.potions = Math.min(LIMITS.potionHold, ch.potions + world.player.potions);
   ch.scroll = Math.min(1, ch.scroll + world.player.scroll);
-  ch.cures = Math.min(LIMITS.cures, (ch.cures || 0) + (world.player.cures || 0));
+  ch.cures = Math.min(LIMITS.cureHold, (ch.cures || 0) + (world.player.cures || 0));
   const ms = Math.round(world.elapsed * 1000);
   const s = ch.stats;
   s.playMs += ms;

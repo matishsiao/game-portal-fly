@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { World } from '../src/js/pd/world.js';
 import { seededRng, characterStats, gemBonus, parseGem, socketCount, makeItem, rollGem } from '../src/js/pd/rules.js';
-import { STATUS, GEMS, GEM_RULES, LIMITS } from '../src/js/pd/data.js';
+import { STATUS, GEMS, GEM_RULES, LIMITS, GIFT, BAG_EXPAND } from '../src/js/pd/data.js';
 import * as sk from '../src/js/pd/skills.js';
 import * as v from '../src/js/pd/village.js';
 import { isValidCharacter, newCharacter, loadRewards } from '../src/js/storage.js';
@@ -276,17 +276,21 @@ test('寶石鑲嵌、取下、合成；賣出裝備時寶石放回寶石袋；�
   assert.equal(ch.gems['shield-1'], 2);
 });
 
-test('淨化藥水：商店購買上限 5 瓶，探險時攜帶、結束時放回', () => {
+test('淨化藥水：最多持有 999 瓶、每趟攜帶 5 瓶，探險時取出、結束時放回', () => {
   const ch = hero('mage');
   ch.gold = 1000;
   for (let k = 0; k < 6; k++) v.buyCure(ch);
-  assert.equal(ch.cures, LIMITS.cures);
+  assert.equal(ch.cures, 6);
+  ch.cures = LIMITS.cureHold;
+  assert.equal(v.buyCure(ch).ok, false);
+  ch.cures = 6;
   const carry = v.packForRun(ch);
-  assert.equal(carry.cures, 5);
+  assert.equal(carry.cures, LIMITS.cures);
+  assert.equal(ch.cures, 1);
   const w = arena(ch, { cures: carry.cures });
   w.player.cures = 3;
   v.settleRun(ch, w, 'recall');
-  assert.equal(ch.cures, 3);
+  assert.equal(ch.cures, 4);
 });
 
 test('主動寶石：血量護盾吸收傷害（25%、10 秒）、抗異常護盾免疫異常（30 秒），冷卻 60 秒', () => {
@@ -795,6 +799,33 @@ test('獎勵禮包：等級愈高金幣、材料、碎片愈多；碎片 3 片�
   assert.ok(v.combineShards(ch, 'cleave').ok);
   assert.equal(ch.skillBooks.cleave, 1);
   assert.equal(ch.shards.cleave, undefined);
+});
+
+test('獎勵禮包：有機會得到藥水與背包擴充袋，超過上限改為金幣', () => {
+  const ch = newCharacter('warrior', '測試');
+  ch.gifts = {};
+  ch.potions = 0;
+  ch.cures = 0;
+  v.addGift(ch, 5, 2);
+  // 亂數固定為 0：藥水、淨化藥水與擴充袋都會抽中。
+  const a = v.openGift(ch, 5, () => 0);
+  assert.ok(a.ok);
+  assert.equal(a.potions, GIFT.potions[4]);
+  assert.equal(a.cures, GIFT.cures[4]);
+  assert.equal(a.pouch, 1);
+  assert.equal(a.converted, 0);
+  assert.equal(ch.potions, GIFT.potions[4]);
+  assert.equal(ch.bagExpand, 1);
+  // 藥水已滿、背包已到上限：全部改成金幣。
+  ch.potions = LIMITS.potionHold;
+  ch.cures = LIMITS.cureHold;
+  ch.bagSize = BAG_EXPAND.max;
+  const gold = ch.gold;
+  const b = v.openGift(ch, 5, () => 0);
+  assert.equal(b.potions + b.cures + b.pouch, 0);
+  assert.equal(b.converted, GIFT.potions[4] * LIMITS.potionPrice + GIFT.cures[4] * LIMITS.curePrice + BAG_EXPAND.basePrice);
+  assert.equal(ch.gold - gold, GIFT.gold[4] + b.converted);
+  assert.equal(ch.potions, LIMITS.potionHold);
 });
 
 test('獲得紀錄：讀取其他遊戲寫入的紀錄，並從過關統計與 roll 進度回補（同一個 id 只算一次）', () => {

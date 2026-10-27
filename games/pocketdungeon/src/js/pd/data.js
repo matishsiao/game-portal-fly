@@ -228,8 +228,11 @@ export const ENHANCE = {
   failRate: [0, 0, 0, 0, 0, 0, 0.1, 0.2, 0.3, 0.4, 0.5],
 };
 
-/** 背包初始格數（裝備每件 1 格；每種材料、每種製作書各佔 1 格）、堆疊上限、每趟藥水上限與道具價格。 */
-export const LIMITS = { bag: 20, stack: 9999, potions: 10, potionPrice: 30, scrollPrice: 40, cures: 5, curePrice: 50 };
+/**
+ * 背包初始格數（裝備每件 1 格；每種材料、每種製作書各佔 1 格）、堆疊上限、道具價格，
+ * 以及藥水的每趟攜帶上限（potions、cures）與村莊持有上限（potionHold、cureHold）。
+ */
+export const LIMITS = { bag: 20, stack: 9999, potions: 10, potionPrice: 30, scrollPrice: 40, cures: 5, curePrice: 50, potionHold: 999, cureHold: 999 };
 
 /**
  * 異常狀態：名稱、持續秒數與顏色。玩家與怪物共用同一套規則，Boss 承受的持續時間為 bossMult 倍。
@@ -299,7 +302,8 @@ export const MAT_DROP = { monster: 0.08, elite: 0.4, boss: 1, count: { monster: 
 
 /**
  * 獎勵禮包（等級 1～5：銅、銀、金、白金、鑽石）：只能從其他遊戲的「第一次過關」與「第一次全對（沒用提示／三顆星）」取得，
- * 重複過關不會再給。開啟後得到金幣、裝備材料（數量與品質權重依等級）與技能書碎片（同一本技能書 3 片合成 1 本）。
+ * 重複過關不會再給。開啟後得到金幣、裝備材料（數量與品質權重依等級）與技能書碎片（同一本技能書 3 片合成 1 本），
+ * 並有機會得到回復藥水、淨化藥水（機率與瓶數）與背包擴充袋（機率）；藥水超過持有上限、背包已擴充到上限時改為金幣（商店價格）。
  * games 為會寫入獲得紀錄的遊戲（目錄 → 名稱）。
  */
 export const GIFT = {
@@ -310,6 +314,9 @@ export const GIFT = {
   shards: [1, 2, 3, 4, 5],
   shardWeights: [[75, 22, 3, 0], [55, 32, 11, 2], [35, 38, 22, 5], [20, 35, 33, 12], [8, 27, 40, 25]],
   shardNeed: 3,
+  potionChance: [0.5, 0.6, 0.7, 0.8, 0.9], potions: [1, 2, 2, 3, 4],
+  cureChance: [0.2, 0.3, 0.4, 0.5, 0.6], cures: [1, 1, 1, 2, 2],
+  pouchChance: [0.03, 0.06, 0.1, 0.15, 0.25],
   games: { sudoku: '數獨', crossmath: '數學填字', numberlink: '數字連線', idiom: '成語填字', roll: '滾滾解謎', words: '英文單字連線', codebreaker: '密碼偵探' },
 };
 
