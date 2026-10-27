@@ -464,9 +464,13 @@ function gatePanel(ch) {
   const bonus = rb
     ? `<button type="button" class="rebirth-bonus" data-info="rebirthBonus">${'★'.repeat(rb)} 轉職加成：怪物 +${Math.round(REBIRTH.monster * rb * 100)}%・掉落 +${REBIRTH.dropLevel * rb} 級・獎勵 +${Math.round(REBIRTH.reward * rb * 100)}%</button>`
     : '';
-  // 攜帶道具：圖示與數量。
-  const carry = [['potion', Math.min(LIMITS.potions, ch.potions), '回復藥水'], ['cure', Math.min(LIMITS.cures, ch.cures || 0), '淨化藥水'], ['key', Math.min(1, ch.scroll), '回城卷軸']]
-    .map(([icon, n, name]) => `<span class="carry-chip${n ? '' : ' none'}" title="${name}"><img src="${itemDataUrl(icon)}" alt="${name}"><b>${n}</b></span>`).join('');
+  // 攜帶道具：這趟會帶的數量；持有比每趟上限多時，另外標示持有數量（例如「10／57」）。
+  const carry = [['potion', ch.potions, LIMITS.potions, '回復藥水'], ['cure', ch.cures || 0, LIMITS.cures, '淨化藥水'], ['key', ch.scroll, 1, '回城卷軸']]
+    .map(([icon, have, cap, name]) => {
+      const n = Math.min(cap, have);
+      const label = have > cap ? `${name}：這趟帶 ${n}，持有 ${have}` : `${name}：${n}`;
+      return `<span class="carry-chip${n ? '' : ' none'}" title="${label}" aria-label="${label}"><img src="${itemDataUrl(icon)}" alt=""><b>${n}</b>${have > cap ? `<small class="carry-have">／${have}</small>` : ''}</span>`;
+    }).join('');
   const top = `${busy}<div class="gate-top"><div class="carry-chips">${carry}<small class="muted">在商店補充</small></div>${bonus}</div>`;
   if (app.gateArea && village.areaUnlocked(ch, app.gateArea)) return top + areaView(ch, app.gateArea);
   app.gateArea = null;
@@ -492,7 +496,7 @@ function gatePanel(ch) {
 }
 
 /** 地圖上各區域的主題色（區域周圍的暈染）。 */
-const MAP_TINT = { grass: '#7fb050', moss: '#5f8a4a', lava: '#d0602a', ice: '#6fa8d8', sky: '#8cc4ec', necro: '#8a7a9a', abyss: '#7a4fa8' };
+const MAP_TINT = { grass: '#7fb050', moss: '#5f8a4a', lava: '#d0602a', ice: '#6fa8d8', sky: '#8cc4ec', necro: '#8a7a9a', desert: '#d8b070', sea: '#4fa0b0', clock: '#c8a050', dragon: '#d0602a', demon: '#c03a5a', abyss: '#7a4fa8' };
 
 /**
  * 區域地圖的版面：這個區域的所有深度排成一條由上往下的蛇行小路（每行 3 關），Boss 頭像放在最後一關之後。
@@ -1949,6 +1953,11 @@ function updateHud(force) {
     $('cure-btn').classList.toggle('empty', p.cures <= 0);
   });
   set('cureCd', Math.ceil(Math.max(0, p.cureCd) * 10), () => cooldown('cure', p.cureCd, 1, ''));
+  // 提醒使用：HP 低於 50% 且有回復藥水、身上有異常狀態且有淨化藥水時閃爍（冷卻中不閃）。
+  const lowHp = p.hp > 0 && p.hp < p.maxHp * 0.5 && p.potions > 0 && p.potionCd <= 0;
+  const ailing = (p.status.poison > 0 || p.status.sleep > 0 || p.status.stun > 0) && p.cures > 0 && p.cureCd <= 0;
+  set('potionAlert', lowHp, () => $('potion-btn').classList.toggle('alert', lowHp));
+  set('cureAlert', ailing, () => $('cure-btn').classList.toggle('alert', ailing));
   // 異常狀態與護盾：HP 條下方的小標籤（剩餘秒數）。
   const st = p.status;
   const chips = [];
@@ -1985,6 +1994,8 @@ function updateHud(force) {
       const btn = $(`skill${n + 1}-btn`);
       // 第 3、4 格在轉職後才出現。
       btn.hidden = n >= w.skills.length;
+      // 有第 3、4 格技能時，藥水往上移一排。
+      if (n === 2) btn.parentElement.classList.toggle('four-skills', w.skills.length > 2);
       btn.classList.toggle('empty', !sk);
       $(`skill${n + 1}-icon`).innerHTML = sk ? skillIcon(sk.id, sk.kind) : '';
       $(`skill${n + 1}-name`).textContent = sk ? sk.short : '未裝備';

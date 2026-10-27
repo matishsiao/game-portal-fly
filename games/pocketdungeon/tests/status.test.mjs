@@ -453,7 +453,7 @@ test('Boss：HP 25% 以下狂暴；每個 Boss 的新招式都能施放', () => 
   w.updateFlow();
   w.updateMonster(b, DT);
   assert.ok(b.enraged && b.phase2);
-  for (const [type, move] of [['treant', 'thorns'], ['golem', 'fissure'], ['lich', 'blizzard'], ['bullKing', 'gore'], ['thunderbird', 'cross'], ['necromancer', 'grave']]) {
+  for (const [type, move] of [['treant', 'thorns'], ['golem', 'fissure'], ['lich', 'blizzard'], ['bullKing', 'gore'], ['thunderbird', 'cross'], ['necromancer', 'grave'], ['pharaoh', 'curse'], ['kraken', 'whirlpool'], ['steamTitan', 'laser'], ['redDragon', 'meteor'], ['demonLord', 'wave']]) {
     const v = new World(hero('warrior', 30), { area: 'expert', depth: 1, seed: 5, floor: 3 }, seededRng(4));
     v.monsters = [];
     const m = v.spawnMonster(type, v.player.x + 3, v.player.y, { boss: true });
@@ -464,8 +464,8 @@ test('Boss：HP 25% 以下狂暴；每個 Boss 的新招式都能施放', () => 
       const before = m.pattern;
       v.update(DT, IDLE);
       if (m.pattern !== before && m.lastMove === undefined) {
-        const moves = { treant: 5, golem: 4, lich: 4, bullKing: 5, thunderbird: 4, necromancer: 4 }[type];
-        const idx = { treant: 2, golem: 2, lich: 2, bullKing: 2, thunderbird: 2, necromancer: 2 }[type];
+        const moves = { treant: 5, golem: 4, lich: 4, bullKing: 5, thunderbird: 4, necromancer: 4, pharaoh: 4, kraken: 4, steamTitan: 4, redDragon: 4, demonLord: 4 }[type];
+        const idx = { treant: 2, golem: 2, lich: 2, bullKing: 2, thunderbird: 2, necromancer: 2, pharaoh: 2, kraken: 2, steamTitan: 2, redDragon: 2, demonLord: 0 }[type];
         if ((m.pattern - 1) % moves === idx) seen = v.telegraphs.length > 0 || v.projectiles.length > 0;
       }
     }
@@ -826,6 +826,24 @@ test('獎勵禮包：有機會得到藥水與背包擴充袋，超過上限改�
   assert.equal(b.converted, GIFT.potions[4] * LIMITS.potionPrice + GIFT.cures[4] * LIMITS.curePrice + BAG_EXPAND.basePrice);
   assert.equal(ch.gold - gold, GIFT.gold[4] + b.converted);
   assert.equal(ch.potions, LIMITS.potionHold);
+});
+
+test('地城撿到回復藥水：身上帶滿 10 瓶時放進村莊庫存，庫存也滿了才換成金幣', () => {
+  const ch = hero('warrior');
+  ch.potions = 20;
+  const w = arena(ch, { potions: LIMITS.potions });
+  const drop = () => {
+    w.pickups.push({ kind: 'potion', x: w.player.x, y: w.player.y, t: 1 });
+    w.updatePickups(0);
+  };
+  drop();
+  assert.equal(w.player.potions, LIMITS.potions);
+  assert.equal(ch.potions, 21);
+  ch.potions = LIMITS.potionHold;
+  const gold = ch.gold;
+  drop();
+  assert.equal(ch.potions, LIMITS.potionHold);
+  assert.equal(ch.gold - gold, LIMITS.potionPrice / 2);
 });
 
 test('獲得紀錄：讀取其他遊戲寫入的紀錄，並從過關統計與 roll 進度回補（同一個 id 只算一次）', () => {

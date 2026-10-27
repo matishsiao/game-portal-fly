@@ -3,8 +3,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { World } from '../src/js/pd/world.js';
+import { walkable } from '../src/js/pd/dungeon.js';
 import { seededRng, rarityWeights } from '../src/js/pd/rules.js';
-import { LIMITS, MONSTERS, BOSS_HEAL } from '../src/js/pd/data.js';
+import { LIMITS, MONSTERS, BOSSES, BOSS_HEAL } from '../src/js/pd/data.js';
 
 const IDLE = { mx: 0, my: 0, attack: false, dodge: false, potion: false };
 const DT = 1 / 60;
@@ -179,7 +180,7 @@ test('背包已滿時拾取的裝備自動賣出', () => {
 });
 
 test('Boss 層：HP 50% 以下進入第二階段，擊敗後開啟傳送點', () => {
-  for (const [area, ai] of [['grass', 'bullKing'], ['easy', 'treant'], ['medium', 'golem'], ['hard', 'lich'], ['sky', 'thunderbird'], ['necro', 'necromancer']]) {
+  for (const [area, ai] of [['grass', 'bullKing'], ['easy', 'treant'], ['medium', 'golem'], ['hard', 'lich'], ['sky', 'thunderbird'], ['necro', 'necromancer'], ['desert', 'pharaoh'], ['sea', 'kraken'], ['clock', 'steamTitan'], ['dragon', 'redDragon'], ['demon', 'demonLord']]) {
     const w = new World(hero('warrior', 20), { area, depth: 1, seed: 3, floor: 3 }, seededRng(2));
     const b = w.boss();
     assert.equal(b.ai, ai);
@@ -263,9 +264,11 @@ test('斜走貼牆時以全速滑行；直走碰到牆角會自動修正通過',
   assert.ok(p.y < 4.5, `應該通過轉角進入通道，y=${p.y}`);
 });
 
-test('29 種怪物都有對應的行為', () => {
-  assert.equal(Object.keys(MONSTERS).length, 29);
+test('44 種怪物與 11 個 Boss 都有對應的行為與圖', () => {
+  assert.equal(Object.keys(MONSTERS).length, 44);
   for (const [type, m] of Object.entries(MONSTERS)) assert.equal(typeof World.prototype.ai[m.ai], 'function', type);
+  assert.equal(Object.keys(BOSSES).length, 11);
+  for (const [type, b] of Object.entries(BOSSES)) assert.equal(typeof World.prototype.ai[b.kind], 'function', type);
 });
 
 test('Boss 回復：HP 70% 以下才會回復；蓄力 2 秒後回復 15%；受到 8% 傷害會被打斷並暈眩', () => {
@@ -417,4 +420,27 @@ test('轉職加成：怪物 HP／攻擊每次 +15%、掉落裝備等級每次 +2
   w0.hitMonster(m0, 9999);
   w2.hitMonster(m2, 9999);
   assert.ok(w2.loot.xp > w0.loot.xp);
+});
+
+test('掉落物落在牆壁裡時移到最近的可走格子，角色撿得到', () => {
+  const w = new World(hero('warrior', 5), { area: 'easy', depth: 1, seed: 7 }, seededRng(3));
+  w.monsters = [];
+  const f = w.floor;
+  // 找一格旁邊就是牆的地板，把掉落物丟進那面牆。
+  let spot = null;
+  for (let j = 1; j < f.h - 1 && !spot; j++) {
+    for (let i = 1; i < f.w - 1 && !spot; i++) {
+      if (walkable(w.tileAt(i, j)) && !walkable(w.tileAt(i - 1, j))) spot = { i, j };
+    }
+  }
+  assert.ok(spot);
+  const gold = w.ch.gold;
+  w.addPickup({ kind: 'gold', x: spot.i - 0.5, y: spot.j + 0.5, amount: 7, t: 1 });
+  const it = w.pickups[w.pickups.length - 1];
+  assert.ok(walkable(w.tileAt(Math.floor(it.x), Math.floor(it.y))), '移到可走的格子');
+  assert.ok(it.x - Math.floor(it.x) >= 0.25 || walkable(w.tileAt(Math.floor(it.x) - 1, Math.floor(it.y))), '與牆保持距離');
+  w.player.x = it.x;
+  w.player.y = it.y;
+  w.updatePickups(0);
+  assert.equal(w.ch.gold - gold, 7);
 });

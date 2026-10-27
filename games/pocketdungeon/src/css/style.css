@@ -536,6 +536,11 @@ button:focus-visible {
 .area-card[data-area="hard"] { --a1: #4a8ac2; --a2: #1c2e4a; }
 .area-card[data-area="sky"] { --a1: #5aa0e0; --a2: #c8a040; }
 .area-card[data-area="necro"] { --a1: #4a4458; --a2: #160f1e; }
+.area-card[data-area="desert"] { --a1: #d0a050; --a2: #5a3a14; }
+.area-card[data-area="sea"] { --a1: #2a8a9a; --a2: #0c2a3a; }
+.area-card[data-area="clock"] { --a1: #a8803a; --a2: #2e2620; }
+.area-card[data-area="dragon"] { --a1: #c8402a; --a2: #2a0c08; }
+.area-card[data-area="demon"] { --a1: #8a1a3a; --a2: #140610; }
 .area-card[data-area="expert"] { --a1: #6a3f98; --a2: #1a0f2a; }
 
 .area-card.locked {
@@ -1142,7 +1147,7 @@ button:focus-visible {
   transform: scale(0.94);
 }
 
-/* 道具與主動寶石（右上 2 × 2）：藥水、淨化藥水、血量護盾、抗異常護盾。圓形圖示，冷卻以放射狀遮罩加秒數表示；
+/* 道具按鈕：右上為主動寶石（血量護盾、抗異常護盾），回復藥水與淨化藥水在技能鍵上方。圓形圖示，冷卻以放射狀遮罩加秒數表示；
    藥水顯示剩餘數量，護盾生效中右上角倒數剩餘秒數。 */
 .item-grid {
   display: grid;
@@ -1567,6 +1572,63 @@ button:focus-visible {
   pointer-events: auto;
 }
 
+/* 藥水在技能鍵上方：沒有第 3、4 格技能時貼在技能 1、2 上方，有 4 格時再往上一排。 */
+.buttons .item-btn {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+}
+
+#potion-btn {
+  right: 11px;
+  bottom: 158px;
+}
+
+#cure-btn {
+  right: 85px;
+  bottom: 158px;
+}
+
+.buttons.four-skills #potion-btn,
+.buttons.four-skills #cure-btn {
+  bottom: 228px;
+}
+
+/* 提醒使用：回復藥水在 HP 低於 50%、淨化藥水在有異常狀態時閃爍（可以使用時才閃）。 */
+.item-btn.alert {
+  animation: item-alert 0.8s ease-in-out infinite;
+}
+
+.item-btn.alert::before {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 3px solid var(--rim);
+  animation: item-alert-ring 0.8s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes item-alert {
+  50% { transform: scale(1.12); filter: brightness(1.35); box-shadow: 0 0 16px var(--rim), 0 3px 8px rgba(0, 0, 0, 0.45); }
+}
+
+@keyframes item-alert-ring {
+  from { transform: scale(0.95); opacity: 1; }
+  to { transform: scale(1.4); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item-btn.alert,
+  .item-btn.alert::before {
+    animation: none;
+  }
+
+  .item-btn.alert {
+    box-shadow: 0 0 0 3px var(--rim), 0 0 14px var(--rim);
+  }
+}
+
 .act-btn {
   --c1: #ff6b6b;
   --c2: #9e2a3a;
@@ -1819,7 +1881,23 @@ button:focus-visible {
   /* 橫向高度不足：技能 2 × 2 移到攻擊鈕左側，閃避移到攻擊鈕上方。 */
   .buttons {
     width: 226px;
-    height: 160px;
+    height: 214px;
+  }
+
+  /* 橫向：藥水在技能 2 × 2 上方（沒有第 3、4 格技能時貼在技能 1、2 上方）。 */
+  #potion-btn {
+    right: 89px;
+    bottom: 80px;
+  }
+
+  #cure-btn {
+    right: 163px;
+    bottom: 80px;
+  }
+
+  .buttons.four-skills #potion-btn,
+  .buttons.four-skills #cure-btn {
+    bottom: 152px;
   }
 
   .dodge-btn {
@@ -3102,6 +3180,11 @@ button:focus-visible {
 .area-banner.theme-ice { --a: #4f7fa8; --b: #141e2c; }
 .area-banner.theme-sky { --a: #6aa0d8; --b: #24406a; }
 .area-banner.theme-necro { --a: #6a5a7a; --b: #141018; }
+.area-banner.theme-desert { --a: #c09050; --b: #3a2410; }
+.area-banner.theme-sea { --a: #2a7a8a; --b: #08202a; }
+.area-banner.theme-clock { --a: #9a7a4a; --b: #1e1814; }
+.area-banner.theme-dragon { --a: #b0402a; --b: #1c0806; }
+.area-banner.theme-demon { --a: #8a2040; --b: #10040a; }
 .area-banner.theme-abyss { --a: #6a3f90; --b: #0e0916; }
 
 .area-banner.locked {
@@ -3643,3 +3726,6 @@ button:focus-visible {
 .expand-btn:disabled { opacity: .55; cursor: default; }
 @keyframes expand-glow { 50% { box-shadow: 0 0 0 3px rgba(240, 192, 64, .28); } }
 @media (prefers-reduced-motion: reduce) { .expand-btn.ready { animation: none; } }
+
+/* 地城入口攜帶道具：持有比每趟上限多時顯示持有數量 */
+.carry-have { font-size: 0.72rem; color: var(--text-muted); margin-left: 1px; }

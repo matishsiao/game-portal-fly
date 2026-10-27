@@ -16,6 +16,11 @@ const THEMES = {
   grass: { floor: ['#5c8a3c', '#64923f'], speck: '#e8d870', top: '#3f6e2e', face: '#2a4a1e', line: '#1c3214', bg: '#101a0a' },
   sky: { floor: ['#c8d4e8', '#d2dcee'], speck: '#ffffff', top: '#f0e6c8', face: '#8a9ab8', line: '#6a7a98', bg: '#5a90c8' },
   necro: { floor: ['#3a3542', '#403a48'], speck: '#6a5a7a', top: '#4a4458', face: '#1e1a24', line: '#141018', bg: '#08060c' },
+  desert: { floor: ['#b8945a', '#c09c60'], speck: '#e0c890', top: '#d8b878', face: '#7a5a30', line: '#5a4020', bg: '#2a1c0c' },
+  sea: { floor: ['#1f4a5a', '#235262'], speck: '#4fa0a8', top: '#3a8a8a', face: '#123038', line: '#0c2228', bg: '#06141a' },
+  clock: { floor: ['#4a4038', '#52463c'], speck: '#c8a050', top: '#8a7a68', face: '#2e2620', line: '#1e1814', bg: '#100c0a' },
+  dragon: { floor: ['#4a2a22', '#523026'], speck: '#d06a2a', top: '#7a4a3a', face: '#2a1410', line: '#1c0c08', bg: '#140604' },
+  demon: { floor: ['#2e1420', '#361826'], speck: '#a02040', top: '#5a2a3a', face: '#1a0a12', line: '#10060c', bg: '#080306' },
   abyss: { floor: ['#241a33', '#2a1f3b'], speck: '#4a2f6a', top: '#5a3f78', face: '#160f21', line: '#0e0916', bg: '#07040c' },
 };
 
@@ -921,7 +926,7 @@ export class Renderer {
         g.restore();
         continue;
       }
-      const colors = { orb: ['200,168,255', '#c8a8ff'], fire: ['255,120,40', '#ff8a3a'], ice: ['122,200,255', '#9ad8ff'], seed: ['140,200,90', '#8ac85a'], feather: ['240,240,250', '#e8e8f4'], curse: ['160,90,210', '#a05ad2'] }[pr.look === 'fireball' ? 'fire' : pr.kind] || ['255,255,255', '#fff'];
+      const colors = { orb: ['200,168,255', '#c8a8ff'], fire: ['255,120,40', '#ff8a3a'], ice: ['122,200,255', '#9ad8ff'], seed: ['140,200,90', '#8ac85a'], feather: ['240,240,250', '#e8e8f4'], curse: ['160,90,210', '#a05ad2'], sand: ['220,190,110', '#e0c070'], bubble: ['120,200,255', '#a8e4ff'], gear: ['200,200,215', '#c8c8d8'], dark: ['210,60,100', '#d8406a'] }[pr.look === 'fireball' ? 'fire' : pr.kind] || ['255,255,255', '#fff'];
       const r = pr.r * T;
       // 拖尾：沿飛行反方向的幾個淡色圓點。
       const sp = Math.hypot(pr.vx, pr.vy) || 1;

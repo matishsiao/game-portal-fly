@@ -6,7 +6,7 @@ import * as v from '../src/js/pd/village.js';
 import { seededRng, makeItem, characterStats, levelCap, gainXp, dungeonLevel } from '../src/js/pd/rules.js';
 import { skillLevel, skillPoints } from '../src/js/pd/skills.js';
 import { World } from '../src/js/pd/world.js';
-import { LIMITS } from '../src/js/pd/data.js';
+import { LIMITS, AREAS } from '../src/js/pd/data.js';
 
 /**
  * 建立測試用角色。
@@ -123,15 +123,16 @@ test('強化：成功 +1；失敗只扣金幣', () => {
   assert.ok(ch.gold < g);
 });
 
-test('擊敗 Boss 解鎖下一個深度與下一個區域；一般區域深度上限 5', () => {
+test('擊敗 Boss 解鎖下一個深度與下一個區域；每個區域深度上限 5', () => {
   const ch = hero();
   assert.deepEqual(v.unlockAfterBoss(ch, 'easy', 1), ['苔蘚遺跡 深度 2', '熔岩礦坑']);
   assert.equal(ch.unlocked.medium, 1);
   ch.unlocked.easy = 5;
   assert.deepEqual(v.unlockAfterBoss(ch, 'easy', 5), []);
-  ch.unlocked.expert = 9;
-  v.unlockAfterBoss(ch, 'expert', 9);
-  assert.equal(ch.unlocked.expert, 10);
+  ch.unlocked.expert = 4;
+  v.unlockAfterBoss(ch, 'expert', 4);
+  assert.equal(ch.unlocked.expert, 5);
+  assert.deepEqual(v.unlockAfterBoss(ch, 'expert', 5), []);
 });
 
 test('結算：倒下失去一半本趟金幣；回城保留全部；剩餘藥水放回', () => {
@@ -258,15 +259,25 @@ test('轉職：達到等級上限才能轉職、最多 3 次；上限每次 +10�
   assert.equal(ch.stats.rebirths, 3);
 });
 
-test('區域主線：草原 → 苔蘚遺跡 → 熔岩礦坑 → 冰晶要塞 → 天空之城 → 死靈墓地 → 深淵；深淵最深 17、地城等級最高 60', () => {
+test('區域主線：草原 → 苔蘚遺跡 → 熔岩礦坑 → 冰晶要塞 → 天空之城 → 死靈墓地 → 黃沙神殿 → 沉沒神殿 → 機械工坊 → 龍之峽谷 → 魔王城 → 深淵；深淵給 Lv.52 以上、最深 5、地城等級最高 60', () => {
   const ch = hero();
   ch.unlocked = { grass: 1 };
   assert.deepEqual(v.unlockAfterBoss(ch, 'grass', 1), ['翠綠草原 深度 2', '苔蘚遺跡']);
   assert.deepEqual(v.unlockAfterBoss(ch, 'hard', 1).slice(-1), ['天空之城']);
   assert.deepEqual(v.unlockAfterBoss(ch, 'sky', 1).slice(-1), ['死靈墓地']);
-  assert.deepEqual(v.unlockAfterBoss(ch, 'necro', 1).slice(-1), ['深淵']);
-  ch.unlocked.expert = 17;
-  assert.deepEqual(v.unlockAfterBoss(ch, 'expert', 17), [], '深淵最深 17');
-  assert.equal(dungeonLevel('expert', 17, 3), 60);
-  assert.ok(dungeonLevel('expert', 17, 0) <= 60);
+  assert.deepEqual(v.unlockAfterBoss(ch, 'necro', 1).slice(-1), ['黃沙神殿']);
+  assert.deepEqual(v.unlockAfterBoss(ch, 'desert', 1).slice(-1), ['沉沒神殿']);
+  assert.deepEqual(v.unlockAfterBoss(ch, 'sea', 1).slice(-1), ['機械工坊']);
+  assert.deepEqual(v.unlockAfterBoss(ch, 'clock', 1).slice(-1), ['龍之峽谷']);
+  assert.deepEqual(v.unlockAfterBoss(ch, 'dragon', 1).slice(-1), ['魔王城']);
+  assert.deepEqual(v.unlockAfterBoss(ch, 'demon', 1).slice(-1), ['深淵']);
+  // 每個等級區間都有適合的區域：建議等級首尾相接，從 Lv.1 一路到 Lv.52，深淵涵蓋到 Lv.60。
+  const keys = Object.keys(AREAS).filter((k) => k !== 'expert');
+  for (let i = 1; i < keys.length; i++) assert.ok(AREAS[keys[i]].recommend[0] <= AREAS[keys[i - 1]].recommend[1] + 1, `${keys[i]} 與前一區之間沒有空檔`);
+  assert.equal(AREAS.demon.recommend[1], 52);
+  assert.deepEqual(AREAS.expert.recommend, [52, 60]);
+  assert.equal(dungeonLevel('expert', 1, 0), 52);
+  ch.unlocked.expert = 5;
+  assert.deepEqual(v.unlockAfterBoss(ch, 'expert', 5), [], '深淵最深 5');
+  assert.equal(dungeonLevel('expert', 5, 3), 60);
 });

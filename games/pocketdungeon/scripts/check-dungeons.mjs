@@ -1,4 +1,4 @@
-// 地城生成檢查：每個區域的每個深度（一般區域 1～5、深淵 1～17）各產生 200 個樓層（含 Boss 層），驗證連通性與配置，並統計生成時間。
+// 地城生成檢查：每個區域的每個深度（1～5）各產生 200 個樓層（含 Boss 層），驗證連通性與配置，並統計生成時間。
 // 用法：node scripts/check-dungeons.mjs（有不合格樓層或生成超過 50ms 時以非 0 結束）。
 
 import { AREA_KEYS, AREAS, MAX_DEPTH, FLOORS } from '../src/js/pd/data.js';

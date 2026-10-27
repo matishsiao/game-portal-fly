@@ -789,7 +789,7 @@ export function maxDepth(ch, area) {
 }
 
 /**
- * 擊敗 Boss 後解鎖：同區域下一個深度（一般區域最深 5、深淵最深 17），第一次擊敗時解鎖下一個區域。
+ * 擊敗 Boss 後解鎖：同區域下一個深度（最深 5），第一次擊敗時解鎖下一個區域。
  * @param {object} ch 角色（會被修改）。
  * @param {string} area 區域代碼。
  * @param {number} depth 深度。

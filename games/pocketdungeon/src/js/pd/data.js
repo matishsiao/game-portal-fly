@@ -91,7 +91,8 @@ export const REBIRTH = {
 /**
  * 區域（依解鎖順序排列，鍵即區域代碼）：名稱、回報大廳用的難度代碼（code）、基礎地城等級（深度每 +1，地城等級 +2）、
  * 出現的怪物與 Boss、建議等級、地圖色調、可挑戰的最大深度（maxDepth，省略時為 MAX_DEPTH）。
- * 深淵的 Boss 從六個 Boss 中隨機選一個強化版；深淵最深為深度 17（地城等級最高 Lv.60）。
+ * 深淵的 Boss 從十一個 Boss 中隨機選一個強化版；深淵接在魔王城之後，給 Lv.52 以上挑戰（深度 5 的 Boss 層為地城等級上限 Lv.60）。
+ * 死靈墓地之後的五個區域（黃沙神殿～魔王城）銜接 Lv.27～52，每個區域涵蓋約 5 級，深度 5 的地城等級比下一區的起點再高一些。
  * easy、medium、hard、expert 四個鍵沿用最初的區域代碼，以相容既有存檔。
  */
 export const AREAS = {
@@ -101,20 +102,25 @@ export const AREAS = {
   hard: { name: '冰晶要塞', code: 'hard', baseLevel: 14, monsters: ['skeleton', 'iceWolf', 'wraith', 'crystal', 'yeti', 'frostSprite', 'gargoyle'], boss: ['lich'], recommend: [14, 19], theme: 'ice' },
   sky: { name: '天空之城', code: 'hard', baseLevel: 19, monsters: ['harpy', 'thunderSprite', 'skyKnight', 'gargoyle', 'frostSprite', 'skelArcher'], boss: ['thunderbird'], recommend: [19, 23], theme: 'sky' },
   necro: { name: '死靈墓地', code: 'expert', baseLevel: 23, monsters: ['zombie', 'boneMage', 'banshee', 'skeleton', 'wraith', 'shade'], boss: ['necromancer'], recommend: [23, 27], theme: 'necro' },
-  expert: { name: '深淵', code: 'expert', baseLevel: 27, monsters: ['skelArcher', 'fireSpirit', 'wraith', 'crystal', 'shade', 'voidEye', 'gargoyle'], boss: ['treant', 'golem', 'lich', 'bullKing', 'thunderbird', 'necromancer'], recommend: [27, 60], theme: 'abyss', maxDepth: 17 },
+  desert: { name: '黃沙神殿', code: 'expert', baseLevel: 27, monsters: ['scorpion', 'mummy', 'sandWorm', 'skelArcher', 'fireSpirit', 'bomber'], boss: ['pharaoh'], recommend: [27, 32], theme: 'desert' },
+  sea: { name: '沉沒神殿', code: 'expert', baseLevel: 32, monsters: ['crab', 'siren', 'jelly', 'frostSprite', 'wraith', 'skeleton'], boss: ['kraken'], recommend: [32, 37], theme: 'sea' },
+  clock: { name: '機械工坊', code: 'expert', baseLevel: 37, monsters: ['clockSoldier', 'turretBot', 'drone', 'bomber', 'gargoyle', 'crystal'], boss: ['steamTitan'], recommend: [37, 42], theme: 'clock' },
+  dragon: { name: '龍之峽谷', code: 'expert', baseLevel: 42, monsters: ['lizardman', 'drake', 'wyvern', 'lavaWorm', 'fireSpirit', 'magmaSlime'], boss: ['redDragon'], recommend: [42, 47], theme: 'dragon' },
+  demon: { name: '魔王城', code: 'expert', baseLevel: 47, monsters: ['imp', 'demonKnight', 'succubus', 'voidEye', 'shade', 'banshee'], boss: ['demonLord'], recommend: [47, 52], theme: 'demon' },
+  expert: { name: '深淵', code: 'expert', baseLevel: 52, monsters: ['skelArcher', 'fireSpirit', 'wraith', 'crystal', 'shade', 'voidEye', 'gargoyle'], boss: ['treant', 'golem', 'lich', 'bullKing', 'thunderbird', 'necromancer', 'pharaoh', 'kraken', 'steamTitan', 'redDragon', 'demonLord'], recommend: [52, 60], theme: 'abyss' },
 };
 
 /** 區域代碼依解鎖順序排列。 */
 export const AREA_KEYS = Object.keys(AREAS);
 
-/** 一般區域可挑戰的最大深度（深淵另見 AREAS.expert.maxDepth）。 */
+/** 每個區域可挑戰的最大深度（區域可用 maxDepth 另外指定）。 */
 export const MAX_DEPTH = 5;
 
 /** 每趟的一般樓層數（之後為 Boss 層）。 */
 export const FLOORS = 3;
 
 /**
- * 怪物（29 種）：名稱、地城等級 1 時的屬性、半徑、移動速度（格／秒）、行為與經驗值倍率；
+ * 怪物（44 種）：名稱、地城等級 1 時的屬性、半徑、移動速度（格／秒）、行為與經驗值倍率；
  * deathPool 為死亡時留下熔岩；shot 為投射物外觀（省略時依行為預設）；status 為攻擊命中時附加的異常狀態與機率。
  * 行為細節在 world.js 依 ai 代碼實作。
  */
@@ -148,6 +154,21 @@ export const MONSTERS = {
   zombie: { name: '殭屍', hp: 58, atk: 12, def: 5, r: 0.42, speed: 1.1, ai: 'melee', xp: 1.3, status: ['poison', 0.4] },
   boneMage: { name: '骷髏法師', hp: 30, atk: 13, def: 3, r: 0.36, speed: 1.5, ai: 'caster', xp: 1.4, shot: 'curse', status: ['sleep', 0.15] },
   banshee: { name: '怨靈', hp: 34, atk: 13, def: 3, r: 0.38, speed: 2.4, ai: 'wraith', xp: 1.4, status: ['sleep', 0.15] },
+  scorpion: { name: '沙漠毒蠍', hp: 32, atk: 12, def: 5, r: 0.36, speed: 3.0, ai: 'leaper', xp: 1.3, status: ['poison', 0.45] },
+  mummy: { name: '木乃伊', hp: 60, atk: 12, def: 5, r: 0.4, speed: 1.2, ai: 'melee', xp: 1.4, status: ['stun', 0.15] },
+  sandWorm: { name: '沙蟲', hp: 44, atk: 13, def: 5, r: 0.44, speed: 2.4, ai: 'worm', xp: 1.4 },
+  crab: { name: '巨鉗蟹', hp: 66, atk: 14, def: 12, r: 0.46, speed: 1.4, ai: 'brute', xp: 1.6, status: ['stun', 0.2] },
+  siren: { name: '海妖', hp: 30, atk: 12, def: 3, r: 0.36, speed: 1.8, ai: 'tri', xp: 1.4, shot: 'bubble', status: ['sleep', 0.15] },
+  jelly: { name: '電水母', hp: 22, atk: 10, def: 2, r: 0.32, speed: 2.4, ai: 'bat', xp: 1.1, status: ['stun', 0.15] },
+  clockSoldier: { name: '發條士兵', hp: 52, atk: 13, def: 9, r: 0.4, speed: 2.0, ai: 'melee', xp: 1.4, status: ['stun', 0.12] },
+  turretBot: { name: '砲台機關', hp: 40, atk: 12, def: 8, r: 0.42, speed: 0, ai: 'turret', xp: 1.3, shot: 'gear' },
+  drone: { name: '偵察機', hp: 22, atk: 10, def: 3, r: 0.3, speed: 2.8, ai: 'bat', xp: 1.1 },
+  lizardman: { name: '蜥蜴戰士', hp: 42, atk: 12, def: 6, r: 0.38, speed: 3.0, ai: 'goblin', xp: 1.4 },
+  drake: { name: '幼龍', hp: 38, atk: 12, def: 5, r: 0.4, speed: 1.8, ai: 'caster', xp: 1.5, status: ['poison', 0.2] },
+  wyvern: { name: '飛龍', hp: 52, atk: 14, def: 9, r: 0.46, speed: 2.8, ai: 'gargoyle', xp: 1.6 },
+  imp: { name: '小惡魔', hp: 26, atk: 12, def: 3, r: 0.32, speed: 2.8, ai: 'bat', xp: 1.2, status: ['poison', 0.3] },
+  demonKnight: { name: '魔族騎士', hp: 72, atk: 16, def: 11, r: 0.48, speed: 1.6, ai: 'brute', xp: 1.7, status: ['stun', 0.2] },
+  succubus: { name: '魅魔', hp: 34, atk: 14, def: 4, r: 0.38, speed: 2.4, ai: 'wraith', xp: 1.5, status: ['sleep', 0.15] },
 };
 
 /**
@@ -161,6 +182,11 @@ export const BOSSES = {
   bullKing: { name: '巨角牛王', hp: 640, atk: 14, def: 6, r: 1.0, speed: 1.4, kind: 'bullKing' },
   thunderbird: { name: '雷鳥', hp: 620, atk: 16, def: 6, r: 0.95, speed: 1.6, kind: 'thunderbird', status: ['stun', 0.08] },
   necromancer: { name: '死靈法師', hp: 660, atk: 16, def: 6, r: 0.9, speed: 1.3, kind: 'necromancer', status: ['sleep', 0.1] },
+  pharaoh: { name: '法老王', hp: 660, atk: 16, def: 7, r: 0.95, speed: 1.3, kind: 'pharaoh', status: ['sleep', 0.1] },
+  kraken: { name: '深海巨妖', hp: 740, atk: 16, def: 7, r: 1.05, speed: 1.0, kind: 'kraken', status: ['stun', 0.08] },
+  steamTitan: { name: '蒸汽巨像', hp: 760, atk: 16, def: 9, r: 1.05, speed: 1.2, kind: 'steamTitan', status: ['stun', 0.08] },
+  redDragon: { name: '炎龍', hp: 720, atk: 17, def: 7, r: 1.05, speed: 1.4, kind: 'redDragon', status: ['poison', 0.25] },
+  demonLord: { name: '魔王', hp: 700, atk: 17, def: 7, r: 1.0, speed: 1.4, kind: 'demonLord', status: ['sleep', 0.1] },
 };
 
 /** Boss 回復：觸發的 HP 比例、機率、蓄力秒數、回復量、每場次數（深淵強化版另計）、打斷所需傷害與打斷後的暈眩秒數。 */

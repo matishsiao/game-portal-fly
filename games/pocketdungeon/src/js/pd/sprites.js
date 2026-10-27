@@ -497,6 +497,158 @@ export const MONSTER_ART = {
       ['...o..oo..o...', '...oaoaaoao...', '...oaaaaaao...', '..oPPPPPPPPo..', '..oPWWWWWWPo..', '..oPWeWWeWPo..', '..oPWWWWWWPo..', '.oPPPoWWoPPPo.', 'oPPpPPPPPPpPPo', 'oPPpPPPPPPPpPo', '.oPPPPPPPPPPo.', '..oPPPPPPPPo..', '..oPpPPPPpPo..', '...oooooooo...'],
     ],
   },
+  scorpion: {
+    palette: { o: O, B: '#c08a3a', b: '#e8b860', S: '#7a4a1a', e: '#ff4d4d', C: '#a06a2a' },
+    frames: [
+      ['.......ooo..', '......oSSSo.', '.......oooSo', '..........So', '...ooooooooS', '..oBBbBBBBo.', '.oBeBBBBeBBo', 'oCoBBBBBBBoC', 'oCCooooooooC', '.oo.o.o.o.o.'],
+      ['.......ooo..', '......oSSSo.', '.......oooSo', '..........So', '...ooooooooS', '..oBBbBBBBo.', '.oBeBBBBeBBo', 'oCoBBBBBBBoC', 'oCCooooooooC', '..o.o.o.o.o.'],
+    ],
+  },
+  mummy: {
+    palette: { o: O, W: '#e8dcc0', w: '#b8a888', e: '#ffd04d' },
+    frames: [
+      ['...oooooo...', '..oWwWWwWo..', '..oWeWWeWo..', '..owWWWWwo..', '...oWwWWo...', '.ooWWwWWwoo.', 'oWWwWWWwWWWo', 'oWo.oWwWo.oW', '....oWWwo...', '...oWwoWWo..', '...oWo.oWo..', '...oo..oo...'],
+      ['...oooooo...', '..oWwWWwWo..', '..oWeWWeWo..', '..owWWWWwo..', '...oWwWWo...', '.ooWWwWWwoo.', 'oWWwWWWwWWWo', 'oWo.oWwWo.oW', '....oWWwo...', '...oWwoWWo..', '..oWo..oWo..', '..oo....oo..'],
+    ],
+  },
+  sandWorm: {
+    palette: { o: O, S: '#d8a860', s: '#a07a40', M: '#8a2a2a', T: '#f0e8d0' },
+    frames: [
+      ['....oooo....', '...oSSSSo...', '..oSTMMTSo..', '..oSMMMMSo..', '..oSTMMTSo..', '...osSSso...', '...oSSSSo...', '..osSSSSso..', '..oSSSSSSo..', '.oosssssooo.'],
+      ['....oooo....', '...oSSSSo...', '..oSMMMMSo..', '..oSMTTMSo..', '..oSMMMMSo..', '...osSSso...', '...oSSSSo...', '..osSSSSso..', '..oSSSSSSo..', '.oosssssooo.'],
+    ],
+  },
+  crab: {
+    palette: { o: O, R: '#d04a3a', r: '#f08a6a', e: O, W: '#ffffff' },
+    frames: [
+      ['oo........oo', 'oRo......oRo', 'oRRo.oo.oRRo', '.oRoeWWeoRo.', '..ooRRRRoo..', '.oRRrRRrRRo.', 'oRRRRRRRRRRo', 'oRRRRRRRRRRo', '.oooooooooo.', '.o.o.o.o.o..'],
+      ['.oo......oo.', 'oRRo....oRRo', 'oRo.oooo.oRo', '.oRoeWWeoRo.', '..ooRRRRoo..', '.oRRrRRrRRo.', 'oRRRRRRRRRRo', 'oRRRRRRRRRRo', '.oooooooooo.', '..o.o.o.o.o.'],
+    ],
+  },
+  siren: {
+    palette: { o: O, H: '#3ac0a8', S: '#f0c8b0', e: O, T: '#2a7aa8', t: '#5ab0e0' },
+    frames: [
+      ['...oooooo...', '..oHHHHHHo..', '.oHHSSSSHHo.', '.oHSeSSeSHo.', '.oHHSSSSHHo.', '..oHoSSoHo..', '..oSSttSSo..', '...oTTTTo...', '...oTtTTo...', '....oTTo....', '...oTooTo...', '..ooo..ooo..'],
+      ['...oooooo...', '..oHHHHHHo..', '.oHHSSSSHHo.', '.oHSeSSeSHo.', '.oHHSSSSHHo.', '..oHoSSoHo..', '..oSSttSSo..', '...oTTTTo...', '...oTTtTo...', '....oTTo....', '....oTTo....', '...ooooo....'],
+    ],
+  },
+  jelly: {
+    palette: { o: '#3a2a6a', J: '#b08aff', j: '#e8d8ff', Y: '#ffe14d' },
+    alpha: 0.9,
+    frames: [
+      ['...oooooo...', '..oJjjJJJo..', '.oJjJJJJJJo.', '.oJJYJJYJJo.', '.oJJJJJJJJo.', '..oooooooo..', '..Y.J..J.Y..', '..J.Y..Y.J..', '...J....J...'],
+      ['...oooooo...', '..oJjjJJJo..', '.oJjJJJJJJo.', '.oJJYJJYJJo.', '.oJJJJJJJJo.', '..oooooooo..', '...J.YY.J...', '..Y..JJ..Y..', '..J......J..'],
+    ],
+  },
+  clockSoldier: {
+    palette: { o: O, B: '#b88a3a', b: '#e8c060', G: '#5a5a6a', e: '#5fe0ff', K: '#8a8a9a' },
+    frames: [
+      ['....oooo....', '...oBBBBo...', '..oBeBBeBo..', '..oBBBBBBo..', '...oGGGGo..o', '..oBBbbBBooK', '.oBoBGGBoBKo', '.oGoBbbBo.o.', '...oGGGGo...', '...oBooBo...', '...oGo.oGo..', '...oo..oo...'],
+      ['....oooo....', '...oBBBBo...', '..oBeBBeBo..', '..oBBBBBBo..', '...oGGGGo..o', '..oBBbbBBooK', '.oBoBGGBoBKo', '.oGoBbbBo.o.', '...oGGGGo...', '...oBooBo...', '..oGo..oGo..', '..oo....oo..'],
+    ],
+  },
+  turretBot: {
+    palette: { o: O, G: '#6a6a7a', g: '#9a9aaa', B: '#b88a3a', e: '#ff4d4d' },
+    frames: [
+      ['....oooo....', '...oGGGGoooo', '..oGgeegGGGo', '..oGGeeGGooo', '..oGGGGGGo..', '...oBBBBo...', '..oBBBBBBo..', '.oGGGGGGGGo.', '.oggggggggo.', '.oooooooooo.'],
+      ['....oooo....', '...oGGGGoooo', '..oGgeegGGGo', '..oGGGGGGooo', '..oGGGGGGo..', '...oBBBBo...', '..oBBBBBBo..', '.oGGGGGGGGo.', '.oggggggggo.', '.oooooooooo.'],
+    ],
+  },
+  drone: {
+    palette: { o: O, G: '#8a8a9a', g: '#c8c8d8', e: '#5fe0ff', P: '#5a5a6a' },
+    frames: [
+      ['oooo....oooo', '..o......o..', '..oooooooo..', '.oGGGGGGGGo.', 'oGgGeeeGgGGo', 'oGGGeeeGGGGo', '.oGGGGGGGGo.', '..oPoooPo...', '...o...o....'],
+      ['.oo......oo.', '..o......o..', '..oooooooo..', '.oGGGGGGGGo.', 'oGgGeeeGgGGo', 'oGGGeeeGGGGo', '.oGGGGGGGGo.', '..oPoooPo...', '...o...o....'],
+    ],
+  },
+  lizardman: {
+    palette: { o: O, L: '#4a9a4a', l: '#8ad06a', e: '#ffe14d', S: '#c8c8d8', B: '#8a5a2a' },
+    frames: [
+      ['...ooooo....', '..oLLLLLoo..', '..oLeLLLLLo.', '..oLLLLooo..', '...oLLo....o', '..oLlllLo.oS', '.oLoBBBBooSo', '.oLolllLoBo.', '...oLLLLo...', '...oLooLo...', '...oLo.oLoo.', '...oo..ooLLo'],
+      ['...ooooo....', '..oLLLLLoo..', '..oLeLLLLLo.', '..oLLLLooo..', '...oLLo....o', '..oLlllLo.oS', '.oLoBBBBooSo', '.oLolllLoBo.', '...oLLLLo...', '...oLooLo...', '..oLo..oLoo.', '..oo....oLLo'],
+    ],
+  },
+  drake: {
+    palette: { o: O, R: '#c83a2a', r: '#f07a4a', Y: '#ffd04d', e: O, W: '#8a2a2a' },
+    frames: [
+      ['..o......o..', '.oWo....oWo.', 'oWWWoooWWWWo', 'oWWoRRRRoWWo', '.ooRReRReRo.', '..oRRRRRRo..', '..oRYYYYRo..', '...oRYYRoo..', '...oRRRRoRo.', '...oRooRo.o.', '...oo..oo...'],
+      ['............', '.oo......oo.', 'oWWooooooWWo', 'oWWoRRRRoWWo', 'oWoRReRReRoo', '..oRRRRRRo..', '..oRYYYYRo..', '...oRYYRoo..', '...oRRRRoRo.', '...oRooRo.o.', '...oo..oo...'],
+    ],
+  },
+  wyvern: {
+    palette: { o: O, G: '#3a6a5a', g: '#6aa08a', Y: '#ffd04d', W: '#2a4a3a' },
+    frames: [
+      ['o..........o', 'oWo..oo..oWo', 'oWWooGGooWWo', 'oWWWGYGYGWWo', '.oWWGGGGWWo.', '..ooGggGoo..', '...oGggGo...', '...oGGGGo...', '....oGGo....', '...oGooGo...', '...oo..oo...'],
+      ['............', 'oo...oo...oo', 'oWWooGGooWWo', '.oWWGYGYGWo.', '..oWGGGGWo..', '..ooGggGoo..', '...oGggGo...', '...oGGGGo...', '....oGGo....', '...oGooGo...', '...oo..oo...'],
+    ],
+  },
+  imp: {
+    palette: { o: O, R: '#c02a3a', r: '#e85a6a', e: '#ffe14d', W: '#5a1a2a' },
+    frames: [
+      ['.o........o.', '.oRo....oRo.', 'oWoRooooRoWo', 'oWWRReeRRWWo', '.oWRRRRRRWo.', '..oRrrrrRo..', '...oRRRRo...', '...oRooRo.o.', '....o..o.oR.', '..........o.'],
+      ['.o........o.', 'ooRo....oRoo', 'oWWRooooRWWo', '.oWRReeRRWo.', '..oRRRRRRo..', '..oRrrrrRo..', '...oRRRRo...', '...oRooRo.o.', '....o..o.oR.', '..........o.'],
+    ],
+  },
+  demonKnight: {
+    palette: { o: O, A: '#3a2a3a', a: '#6a4a6a', R: '#d02a3a', H: '#c8b8a0', S: '#a8a8b8' },
+    frames: [
+      ['.H........H.', '.oH.oooo.Ho.', '..oHAAAAHo..', '..oAARRAAo..', '..oAAAAAAo.o', '.ooAaaaaAooS', 'oAAoAaaAoAoS', 'oAAoAAAAoAoS', '.oooAaaAooo.', '...oAooAo...', '...oAo.oAo..', '...ooo.ooo..'],
+      ['.H........H.', '.oH.oooo.Ho.', '..oHAAAAHo..', '..oAARRAAo..', '..oAAAAAAo.o', '.ooAaaaaAooS', 'oAAoAaaAoAoS', 'oAAoAAAAoAoS', '.oooAaaAooo.', '...oAooAo...', '..oAo..oAo..', '..ooo..ooo..'],
+    ],
+  },
+  succubus: {
+    palette: { o: O, H: '#8a2a6a', S: '#f0c0c8', e: '#ff4d8a', W: '#4a1a3a', D: '#b03a7a' },
+    alpha: 0.95,
+    frames: [
+      ['o..oooooo..o', 'oWoHHHHHHoWo', 'oWoHSSSSHoWo', 'oWWHSeeSHWWo', '.oWHSSSSHWo.', '..oHoSSoHo..', '...oDDDDo...', '...oDSSDo...', '...oDDDDo...', '..oDDooDDo..', '..ooo..ooo..'],
+      ['...oooooo...', 'oo.HHHHHH.oo', 'oWWHSSSSHWWo', 'oWWHSeeSHWWo', '.ooHSSSSHoo.', '..oHoSSoHo..', '...oDDDDo...', '...oDSSDo...', '...oDDDDo...', '..oDDooDDo..', '..ooo..ooo..'],
+    ],
+  },
+  pharaoh: {
+    palette: { o: O, G: '#e8b84a', B: '#3a5ab8', S: '#c8905a', e: '#5fe0ff', W: '#f0e8d0', R: '#8a2a2a' },
+    evolvedPalette: { o: O, G: '#3a3a4a', B: '#8a1a2a', S: '#8a6a4a', e: '#ff3a3a', W: '#c8b8a0', R: '#ffd04d' },
+    scale: 2,
+    frames: [
+      ['.....oooo.....', '....oGGGGo....', '...oGBGGBGo...', '..oGBGGGGBGo..', '..oBGSSSSGBo..', '..oGSeSSeSGo..', '..oBGSSSSGBo..', '..oGBoSSoBGo..', '.oWWWGGGGWWWo.', 'oWWWWRGGRWWWWo', 'oSoWWWGGWWWoSo', 'oSoWWWRRWWWoSo', '...oWWWWWWo...', '...oWWooWWo...', '...ooo..ooo...'],
+      ['.....oooo.....', '....oGGGGo....', '...oGBGGBGo...', '..oGBGGGGBGo..', '..oBGSSSSGBo..', '..oGSeSSeSGo..', '..oBGSSSSGBo..', '..oGBoSSoBGo..', '.oWWWGGGGWWWo.', 'oWWWWRGGRWWWWo', 'oSoWWWGGWWWoSo', 'oSoWWWRRWWWoSo', '...oWWWWWWo...', '..oWWo..oWWo..', '..ooo....ooo..'],
+    ],
+  },
+  kraken: {
+    palette: { o: O, P: '#8a3a8a', p: '#c06ac0', e: '#ffe14d', E: O },
+    evolvedPalette: { o: O, P: '#1a4a5a', p: '#3a9aa8', e: '#ff3a3a', E: O },
+    scale: 2,
+    frames: [
+      ['....oooooo....', '...oPPPPPPo...', '..oPPpPPpPPo..', '.oPPPPPPPPPPo.', '.oPPoeoPoeoPo.', '.oPPoEoPoEoPo.', '.oPPPPPPPPPPo.', '..oPPPppPPPo..', '.oPoPoPPoPoPo.', 'oPo.oPooPo.oPo', 'oPo.oPo.oPoPo.', '.oPooPo.oPoo..', '..ooPo...oPo..', '....oo....oo..'],
+      ['....oooooo....', '...oPPPPPPo...', '..oPPpPPpPPo..', '.oPPPPPPPPPPo.', '.oPPoeoPoeoPo.', '.oPPoEoPoEoPo.', '.oPPPPPPPPPPo.', '..oPPPppPPPo..', '.oPoPoPPoPoPo.', '.oPoPo.oPoPoPo', '..oPoPo.oPo.oP', '...oPoPooPooPo', '....oo.oPo.oo.', '........oo....'],
+    ],
+  },
+  steamTitan: {
+    palette: { o: O, B: '#b88a3a', b: '#e8c060', G: '#5a5a6a', g: '#8a8a9a', e: '#ff8a3a', W: '#e8e8f0' },
+    evolvedPalette: { o: O, B: '#3a3a4a', b: '#6a6a7a', G: '#8a1a2a', g: '#c03a3a', e: '#5fe0ff', W: '#e8e8f0' },
+    scale: 2,
+    frames: [
+      ['..W......W....', '.oWo.oooooWo..', '.oGo.oBBBoGo..', '..oooBeBeBoo..', '...oBBBBBBo...', '.ooGGGGGGGGoo.', 'oBBoGbbbbGoBBo', 'oBBoGbGGbGoBBo', 'oGGoGbbbbGoGGo', 'ogggoGGGGoggg.', '.ooo.oGGo.ooo.', '....oBooBo....', '...oBBooBBo...', '...oooo.ooo...'],
+      ['..W......W....', '.oWo.oooooWo..', '.oGo.oBBBoGo..', '..oooBeBeBoo..', '...oBBBBBBo...', '.ooGGGGGGGGoo.', 'oBBoGbbbbGoBBo', 'oBBoGbGGbGoBBo', 'oGGoGbbbbGoGGo', 'ogggoGGGGoggg.', '.ooo.oGGo.ooo.', '...oBo..oBo...', '..oBBo..oBBo..', '..oooo..oooo..'],
+    ],
+  },
+  redDragon: {
+    palette: { o: O, R: '#c8302a', r: '#f07040', Y: '#ffd04d', W: '#7a1a1a', e: '#ffe14d', T: '#f0e8d0' },
+    evolvedPalette: { o: O, R: '#2a2a3a', r: '#5a5a7a', Y: '#5fe0ff', W: '#4a1a5a', e: '#ff3a3a', T: '#f0e8d0' },
+    scale: 2,
+    frames: [
+      ['oo..........oo', 'oWo..oooo..oWo', 'oWWooRRRRooWWo', 'oWWWRReRReRWWo', 'oWWWRRRRRRRWWo', '.oWWRToTToRWo.', '..oWoRRRRoWo..', '...oRYYYYRo...', '..oRRYYYYRRo..', '..oRrYYYYrRo..', '...oRRRRRRo.o.', '...oRRooRRooRo', '..oRRo..oRRoo.', '..ooo....ooo..'],
+      ['..............', 'oo...oooo...oo', 'oWWooRRRRooWWo', 'oWWWRReRReRWWo', '.oWWRRRRRRRWo.', '..oWRToTToRWo.', '..ooRRRRRRoo..', '...oRYYYYRo...', '..oRRYYYYRRo..', '..oRrYYYYrRo..', '...oRRRRRRo...', '...oRRooRRoRo.', '..oRRo..oRRoRo', '..ooo....ooo..'],
+    ],
+  },
+  demonLord: {
+    palette: { o: O, A: '#2a1a2a', a: '#4a2a4a', R: '#d02a3a', H: '#e8d8b8', S: '#c8b0a0', e: '#ffe14d', C: '#8a1a2a' },
+    evolvedPalette: { o: O, A: '#e8e0f0', a: '#b8a8c8', R: '#5fe0ff', H: '#3a3a4a', S: '#d8c8b8', e: '#5fe0ff', C: '#3a5ab8' },
+    scale: 2,
+    frames: [
+      ['oH........Ho..', 'oHo.oooo.oHo..', '.oHoAAAAoHo...', '..oAASSAAo....', '..oASeSeSAo...', '..oAASSSAAo...', '.ooAAoRRoAAoo.', 'oCCAAaaaaAACCo', 'oCCAoaRRaoACCo', 'oCCSoaaaaoSCCo', 'oCCCoAAAAoCCCo', '.oCCoAooAoCCo.', '..oooAo.oAooo.', '....oo...oo...'],
+      ['oH........Ho..', 'oHo.oooo.oHo..', '.oHoAAAAoHo...', '..oAASSAAo....', '..oASeSeSAo...', '..oAASSSAAo...', '.ooAAoRRoAAoo.', 'oCCAAaaaaAACCo', 'oCCAoaRRaoACCo', 'oCCSoaaaaoSCCo', 'oCCCoAAAAoCCCo', 'oCCCoAooAoCCCo', '.ooooAo.oAoooo', '....oo...oo...'],
+    ],
+  },
 };
 
 // 岩漿史萊姆與苔蘚史萊姆同形，只換顏色。

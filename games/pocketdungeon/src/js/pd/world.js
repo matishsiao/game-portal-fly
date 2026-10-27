@@ -1239,7 +1239,7 @@ export class World {
     const xp = Math.round(reward.xp * (1 + this.player.xpPct / 100) * (m.evolved ? EVOLVE.xp : 1));
     this.addXp(xp);
     const gold = Math.round(reward.gold * (1 + this.player.goldPct / 100) * (m.evolved ? EVOLVE.gold : 1));
-    this.pickups.push({ kind: 'gold', x: m.x, y: m.y, amount: gold, t: 0 });
+    this.addPickup({ kind: 'gold', x: m.x, y: m.y, amount: gold, t: 0 });
     // 破關滿 5 次的關卡：打倒原本的 Boss 有 25% 機率復活成進化 Boss（這次只給經驗與金幣，裝備、寶石與寶箱留給進化 Boss）。
     if (m.boss && !m.evolved && this.canEvolve() && this.rng() < EVOLVE.chance) {
       this.evolveBoss(m);
@@ -1250,26 +1250,26 @@ export class World {
       // 進化 Boss：必掉 2 件更好的裝備（等級 +3）。
       for (let k = 0; k < EVOLVE.items; k++) this.dropItem(m.x + 0.3 + k * 0.5, m.y, 'evolved', EVOLVE.levelBonus);
     } else if (this.rng() < chance) this.dropItem(m.x + 0.3, m.y, m.boss ? 'boss' : m.elite ? 'elite' : 'monster');
-    if (!m.boss && this.rng() < 0.05) this.pickups.push({ kind: 'potion', x: m.x - 0.3, y: m.y, t: 0 });
+    if (!m.boss && this.rng() < 0.05) this.addPickup({ kind: 'potion', x: m.x - 0.3, y: m.y, t: 0 });
     // 寶石：Boss 必掉（進化 Boss 掉 2 顆、等級 +1），菁英 25%，一般怪物 3%；分裂的小史萊姆不掉。
     if (m.boss) {
       for (let k = 0; k < (m.evolved ? 2 : 1); k++) this.dropGem(m.x - 0.4 - k * 0.4, m.y + 0.3, m.evolved ? 1 : 0);
     } else if (!m.small && this.rng() < (m.elite ? GEM_RULES.drop.elite : GEM_RULES.drop.monster)) this.dropGem(m.x, m.y + 0.3);
     // 背包擴充袋：菁英 3%（Boss 寶箱另計）。
-    if (m.elite && this.rng() < BAG_EXPAND.eliteDrop) this.pickups.push({ kind: 'bagExpand', x: m.x - 0.4, y: m.y + 0.4, t: 0 });
+    if (m.elite && this.rng() < BAG_EXPAND.eliteDrop) this.addPickup({ kind: 'bagExpand', x: m.x - 0.4, y: m.y + 0.4, t: 0 });
     // 技能書：只有 Boss 會掉（一般 Boss 30%、進化 Boss 必掉），種類從 50 種中隨機。
     if (m.boss && this.rng() < (m.evolved ? SKILL_BOOK.evolvedDrop : SKILL_BOOK.bossDrop)) {
       // 先決定稀有度，再從該稀有度的技能書中隨機。
       const rarity = rollRarity(m.evolved ? SKILL_BOOK.evolvedWeights : SKILL_BOOK.weights, this.rng);
       const ids = bookSkillIds().filter((id) => (SKILLS[id].rarity || 0) === rarity);
-      this.pickups.push({ kind: 'skillBook', x: m.x + 0.6, y: m.y - 0.4, skill: ids[Math.floor(this.rng() * ids.length)], t: 0 });
+      this.addPickup({ kind: 'skillBook', x: m.x + 0.6, y: m.y - 0.4, skill: ids[Math.floor(this.rng() * ids.length)], t: 0 });
     }
     // 材料：一般怪物 8%、菁英 40%（1～2 個）、Boss 必掉（2～4 個）；品質依裝備掉落的稀有度規則。
     const src = m.boss ? 'boss' : m.elite ? 'elite' : 'monster';
     if (!m.small && this.rng() < MAT_DROP[src]) {
       const [lo, hi] = MAT_DROP.count[src];
       const tier = rollRarity(rarityWeights(src, this.depth, this.rebirth()), this.rng);
-      this.pickups.push({ kind: 'mat', x: m.x - 0.5, y: m.y - 0.3, mat: MATERIALS[tier].key, n: lo + Math.floor(this.rng() * (hi - lo + 1)), t: 0 });
+      this.addPickup({ kind: 'mat', x: m.x - 0.5, y: m.y - 0.3, mat: MATERIALS[tier].key, n: lo + Math.floor(this.rng() * (hi - lo + 1)), t: 0 });
     }
     // 製作書：一般怪物 1%、菁英 10%、Boss 30%。
     if (!m.small && this.rng() < (m.boss ? CRAFT.drop.boss : m.elite ? CRAFT.drop.elite : CRAFT.drop.monster)) this.dropBook(m.x + 0.4, m.y + 0.4);
@@ -1320,13 +1320,51 @@ export class World {
   }
 
   /**
+   * 放下一個掉落物：位置落在牆壁或地圖外時，移到最近的可走格子（掉落物會加上偏移，貼牆的怪物掉的東西可能落進牆裡撿不到）。
+   * 可走格子內也與牆保持一點距離，確保角色碰得到。
+   * @param {object} it 掉落物（會被修改位置）。
+   */
+  addPickup(it) {
+    const i = Math.floor(it.x);
+    const j = Math.floor(it.y);
+    if (!walkable(this.tileAt(i, j))) {
+      let best = null;
+      for (let r = 1; r <= 4 && !best; r++) {
+        for (let dj = -r; dj <= r; dj++) {
+          for (let di = -r; di <= r; di++) {
+            if (Math.max(Math.abs(di), Math.abs(dj)) !== r || !walkable(this.tileAt(i + di, j + dj))) continue;
+            const d = dist(it.x, it.y, i + di + 0.5, j + dj + 0.5);
+            if (!best || d < best.d) best = { i: i + di, j: j + dj, d };
+          }
+        }
+      }
+      // 附近都沒有可走的格子（理論上不會發生）時放在角色腳下。
+      if (best) {
+        it.x = best.i + 0.5;
+        it.y = best.j + 0.5;
+      } else {
+        it.x = this.player.x;
+        it.y = this.player.y;
+      }
+    }
+    // 貼牆時往格子中央靠，與牆至少 0.25 格。
+    const ci = Math.floor(it.x);
+    const cj = Math.floor(it.y);
+    if (!walkable(this.tileAt(ci - 1, cj))) it.x = Math.max(it.x, ci + 0.25);
+    if (!walkable(this.tileAt(ci + 1, cj))) it.x = Math.min(it.x, ci + 0.75);
+    if (!walkable(this.tileAt(ci, cj - 1))) it.y = Math.max(it.y, cj + 0.25);
+    if (!walkable(this.tileAt(ci, cj + 1))) it.y = Math.min(it.y, cj + 0.75);
+    this.pickups.push(it);
+  }
+
+  /**
    * 掉落一顆寶石（種類隨機，等級依地城等級）。
    * @param {number} x 座標 x。
    * @param {number} y 座標 y。
    * @param {number} [bonus=0] 等級加成。
    */
   dropGem(x, y, bonus = 0) {
-    this.pickups.push({ kind: 'gem', x, y, gem: rollGem(this.level, this.rng, bonus), t: 0 });
+    this.addPickup({ kind: 'gem', x, y, gem: rollGem(this.level, this.rng, bonus), t: 0 });
   }
 
   /**
@@ -1335,7 +1373,7 @@ export class World {
    * @param {number} y 座標 y。
    */
   dropBook(x, y) {
-    this.pickups.push({ kind: 'book', x, y, slot: CRAFT.books[Math.floor(this.rng() * CRAFT.books.length)], t: 0 });
+    this.addPickup({ kind: 'book', x, y, slot: CRAFT.books[Math.floor(this.rng() * CRAFT.books.length)], t: 0 });
   }
 
   /**
@@ -1351,7 +1389,7 @@ export class World {
     const rb = this.rebirth();
     const rarity = rollRarity(rarityWeights(source, this.depth, rb), this.rng);
     const item = makeItem({ slot, cls: this.ch.cls, level: this.level + levelBonus + REBIRTH.dropLevel * rb, rarity }, this.rng);
-    this.pickups.push({ kind: 'item', x, y, item, t: 0 });
+    this.addPickup({ kind: 'item', x, y, item, t: 0 });
   }
 
   /**
@@ -1572,7 +1610,7 @@ export class World {
     if (d < m.r + 1.9) {
       this.telegraph({ shape: 'arc', x: m.x, y: m.y, r: m.r + 1.5, angle: m.facing, arc: (110 * Math.PI) / 180, t: 0.35, dmg: this.monsterDamage(m, 0.45), hidden: true });
     } else {
-      const kind = { treant: 'seed', golem: 'fire', lich: 'ice', bullKing: 'seed', thunderbird: 'feather', necromancer: 'curse' }[m.ai] || 'fire';
+      const kind = { treant: 'seed', golem: 'fire', lich: 'ice', bullKing: 'seed', thunderbird: 'feather', necromancer: 'curse', pharaoh: 'sand', kraken: 'bubble', steamTitan: 'gear', redDragon: 'fire', demonLord: 'dark' }[m.ai] || 'fire';
       this.shoot(m, 6.5, m.facing, 0.45, { kind, r: 0.2, life: 3 });
       // 遠距離射擊的間隔較長（約 1.7 秒），保持距離的 Boss 不會一直連射。
       m.basicT *= 1.4;
@@ -1792,7 +1830,9 @@ export class World {
           this.events.push({ type: 'message', text: `背包已滿，${bookName(it.slot)}自動賣出（+${price}G）` });
         }
       } else if (it.kind === 'potion') {
+        // 身上已帶滿時放進村莊的庫存（回村莊後可用），庫存也滿了才換成金幣。
         if (p.potions < LIMITS.potions) p.potions++;
+        else if ((this.ch.potions || 0) < LIMITS.potionHold) this.ch.potions = (this.ch.potions || 0) + 1;
         else {
           this.ch.gold += LIMITS.potionPrice / 2;
           this.loot.gold += LIMITS.potionPrice / 2;
@@ -1811,13 +1851,13 @@ export class World {
       if (c.opened || dist(p.x, p.y, c.x, c.y) > 0.8) continue;
       c.opened = true;
       const gold = Math.round((20 + 8 * this.level) * (1 + REBIRTH.reward * this.rebirth()));
-      this.pickups.push({ kind: 'gold', x: c.x, y: c.y + 0.3, amount: gold, t: 0 });
+      this.addPickup({ kind: 'gold', x: c.x, y: c.y + 0.3, amount: gold, t: 0 });
       if (c.evolved) this.dropItem(c.x + 0.4, c.y + 0.2, 'evolved', EVOLVE.levelBonus);
       else if (c.boss || this.rng() < 0.6) this.dropItem(c.x + 0.4, c.y + 0.2, c.boss ? 'boss' : 'chest');
       if (!c.boss && this.rng() < CRAFT.drop.chest) this.dropBook(c.x - 0.3, c.y + 0.6);
       // Boss 寶箱有 25% 機會出現背包擴充袋（進化 Boss 50%）。
-      if (c.boss && this.rng() < (c.evolved ? EVOLVE.pouch : 0.25)) this.pickups.push({ kind: 'bagExpand', x: c.x, y: c.y + 0.5, t: 0 });
-      if (this.rng() < 0.3) this.pickups.push({ kind: 'potion', x: c.x - 0.4, y: c.y + 0.2, t: 0 });
+      if (c.boss && this.rng() < (c.evolved ? EVOLVE.pouch : 0.25)) this.addPickup({ kind: 'bagExpand', x: c.x, y: c.y + 0.5, t: 0 });
+      if (this.rng() < 0.3) this.addPickup({ kind: 'potion', x: c.x - 0.4, y: c.y + 0.2, t: 0 });
       if (!c.boss && this.rng() < GEM_RULES.drop.chest) this.dropGem(c.x, c.y + 0.5);
       this.effect('poof', c.x, c.y, { r: 0.4, color: '#e8b84a' });
     }
@@ -1998,7 +2038,9 @@ export class World {
       const n = w.spawnMonster(m.type, m.x, m.y, { boss: m.boss, elite: m.elite, small: m.small, abyss: m.abyss, evolved: m.evolved, affix: m.affix });
       Object.assign(n, { hp: m.hp, maxHp: m.maxHp, split: m.split, phase2: m.phase2, summoned: m.summoned, heals: m.heals || 0, awake: !!m.awake, enraged: !!m.enraged });
     }
-    w.pickups = snap.pickups;
+    // 舊存檔中掉進牆裡的掉落物也移回可走的位置。
+    w.pickups = [];
+    for (const it of snap.pickups) w.addPickup(it);
     w.chests = snap.chests;
     w.portalOpen = snap.portalOpen;
     w.bossDefeated = snap.bossDefeated;
@@ -2319,7 +2361,7 @@ World.prototype.ai = {
     }
     if (m.state === 'burst') {
       if (m.t <= 0) {
-        this.shoot(m, 6, m.aimAngle + (this.rng() - 0.5) * 0.15, 0.8, { kind: 'seed', r: 0.14 });
+        this.shoot(m, 6, m.aimAngle + (this.rng() - 0.5) * 0.15, 0.8, { kind: m.shot || 'seed', r: 0.14 });
         m.shots--;
         m.t = 0.18;
         if (m.shots <= 0) {
@@ -2912,6 +2954,315 @@ World.prototype.ai = {
       m.spiral = 3;
       m.spiralNext = 1.2;
       m.t = 1.5;
+    }
+  },
+  /**
+   * 法老王：留有一個缺口的流沙牆往前推進、三連扇形聖甲蟲彈、召喚木乃伊、腳下的詛咒法陣；
+   * 第二階段流沙牆兩道、聖甲蟲彈更密並多召喚沙漠毒蠍。
+   * @param {object} m Boss。
+   * @param {number} dt 秒。
+   */
+  pharaoh(m, dt) {
+    bossPhase.call(this, m);
+    if (bossHealing.call(this, m)) return;
+    const p = this.player;
+    if (m.state === 'attacking') {
+      if (m.volleys > 0 && m.t <= m.volleyNext) {
+        // 聖甲蟲彈：每波朝玩家射出扇形（第二階段 7 發）。
+        m.volleys--;
+        m.volleyNext -= 0.35;
+        const base = Math.atan2(p.y - m.y, p.x - m.x);
+        const n = m.phase2 ? 7 : 5;
+        for (let k = 0; k < n; k++) this.shoot(m, 5, base + (k - (n - 1) / 2) * 0.22, 0.7, { kind: 'sand', r: 0.18 });
+      }
+      if (m.t <= 0) {
+        m.state = 'move';
+        m.cd = bossCd(m);
+      }
+      return;
+    }
+    this.keepRange(m, dt, dist(m.x, m.y, p.x, p.y), 3, 6);
+    if (m.cd > 0) return;
+    if (startHeal.call(this, m)) return;
+    const moves = ['sands', 'scarab', 'curse', 'summon'];
+    const move = moves[m.pattern++ % moves.length];
+    const base = Math.atan2(p.y - m.y, p.x - m.x);
+    m.state = 'attacking';
+    if (move === 'sands') {
+      // 流沙牆：垂直於玩家方向的一排沙暴往前推進 4 步，其中一格是缺口（站進缺口才躲得掉）。
+      const walls = m.phase2 ? 2 : 1;
+      for (let w = 0; w < walls; w++) {
+        const gap = Math.floor(this.rng() * 5);
+        for (let step = 0; step < 4; step++) {
+          for (let k = 0; k < 5; k++) {
+            if (k === gap) continue;
+            const along = 1.6 + step * 1.3;
+            const side = (k - 2) * 1.2;
+            const x = m.x + Math.cos(base) * along - Math.sin(base) * side;
+            const y = m.y + Math.sin(base) * along + Math.cos(base) * side;
+            this.telegraph({ shape: 'circle', x, y, r: 0.65, t: 0.8, delay: w * 1.1 + step * 0.3, dmg: this.monsterDamage(m, 0.9) });
+          }
+        }
+      }
+      m.t = 1.4 + walls * 1.1;
+    } else if (move === 'scarab') {
+      this.telegraph({ shape: 'circle', x: m.x, y: m.y, r: m.r + 0.4, t: 0.4, dmg: 0 });
+      m.volleys = 3;
+      m.volleyNext = 1.3;
+      m.t = 1.6;
+    } else if (move === 'curse') {
+      // 詛咒法陣：玩家腳下先出現大法陣，0.5 秒後外圈再爆一次（往外跑再站回來）。
+      this.telegraph({ shape: 'circle', x: p.x, y: p.y, r: 1.6, t: 0.9, dmg: this.monsterDamage(m, 1.2) });
+      this.telegraph({ shape: 'ring', x: p.x, y: p.y, r: 3, width: 1.1, t: 0.9, delay: 0.5, dmg: this.monsterDamage(m, 1.0) });
+      m.t = 1.6;
+    } else {
+      const minions = this.monsters.filter((o) => o.summoned).length;
+      const types = m.phase2 ? ['mummy', 'mummy', 'scorpion'] : ['mummy', 'mummy'];
+      types.forEach((type, k) => {
+        if (minions + k >= 5) return;
+        const a = base + Math.PI / 2 + (k / types.length) * Math.PI * 2;
+        const s = this.spawnMonster(type, m.x + Math.cos(a) * 1.8, m.y + Math.sin(a) * 1.8, {});
+        s.summoned = true;
+        s.aggro = true;
+        s.xpMult = 0.3;
+        this.effect('poof', s.x, s.y, { r: 0.5, color: '#e0c070' });
+      });
+      m.t = 0.9;
+    }
+  },
+
+  /**
+   * 深海巨妖：從四周拍下的觸手、由外往內收縮的漩渦、螺旋泡泡彈、前後兩段的巨鉗橫掃；
+   * 第二階段觸手更多、漩渦多一圈。
+   * @param {object} m Boss。
+   * @param {number} dt 秒。
+   */
+  kraken(m, dt) {
+    bossPhase.call(this, m);
+    if (bossHealing.call(this, m)) return;
+    const p = this.player;
+    if (m.state === 'attacking') {
+      if (m.spiral > 0 && m.t <= m.spiralNext) {
+        m.spiral--;
+        m.spiralNext -= 0.3;
+        for (let k = 0; k < 10; k++) this.shoot(m, 3, (k / 10) * Math.PI * 2 + m.spiral * 0.25, 0.85, { kind: 'bubble', life: 5, r: 0.22 });
+      }
+      if (m.t <= 0) {
+        m.state = 'move';
+        m.cd = bossCd(m);
+      }
+      return;
+    }
+    this.chase(m, dt, 0.6);
+    if (m.cd > 0) return;
+    if (startHeal.call(this, m)) return;
+    const moves = ['tentacles', 'sweep', 'whirlpool', 'bubbles'];
+    const move = moves[m.pattern++ % moves.length];
+    const base = Math.atan2(p.y - m.y, p.x - m.x);
+    m.state = 'attacking';
+    if (move === 'tentacles') {
+      // 觸手：從玩家四周隨機方向拍向玩家所在位置（長條預警，依序落下）。
+      const n = m.phase2 ? 6 : 4;
+      for (let k = 0; k < n; k++) {
+        const a = this.rng() * Math.PI * 2;
+        const x = p.x + Math.cos(a) * 3.5;
+        const y = p.y + Math.sin(a) * 3.5;
+        this.telegraph({ shape: 'line', x, y, angle: a + Math.PI, len: 7, width: 1.1, t: 0.8, delay: k * 0.3, dmg: this.monsterDamage(m, 1.1) });
+      }
+      m.t = 1.0 + n * 0.3;
+    } else if (move === 'sweep') {
+      // 巨鉗橫掃：先掃前方，再掃後方（繞到背後的玩家也會被打到）。
+      this.telegraph({ shape: 'arc', x: m.x, y: m.y, r: m.r + 2.6, angle: base, arc: (160 * Math.PI) / 180, t: 0.7, dmg: this.monsterDamage(m, 1.2) });
+      this.telegraph({ shape: 'arc', x: m.x, y: m.y, r: m.r + 2.6, angle: base + Math.PI, arc: (160 * Math.PI) / 180, t: 0.7, delay: 0.6, dmg: this.monsterDamage(m, 1.2) });
+      m.t = 1.6;
+    } else if (move === 'whirlpool') {
+      // 漩渦：由外往內收縮的水環，要往 Boss 身邊靠或在環與環之間閃。
+      const rings = m.phase2 ? [5.4, 4.2, 3, 1.8] : [4.6, 3.2, 1.8];
+      rings.forEach((r, k) => this.telegraph({ shape: 'ring', x: m.x, y: m.y, r, width: 1, t: 0.7, delay: k * 0.35, dmg: this.monsterDamage(m, 1.0) }));
+      m.t = 1.0 + rings.length * 0.35;
+    } else {
+      this.telegraph({ shape: 'circle', x: m.x, y: m.y, r: m.r + 0.4, t: 0.5, dmg: 0 });
+      m.spiral = 3;
+      m.spiralNext = 1.2;
+      m.t = 1.5;
+    }
+  },
+
+  /**
+   * 蒸汽巨像：直線火箭拳、身邊噴發蒸汽再向外擴散、飛彈轟炸、掃射的雷射光束；
+   * 第二階段飛彈更多、雷射來回掃兩次。
+   * @param {object} m Boss。
+   * @param {number} dt 秒。
+   */
+  steamTitan(m, dt) {
+    bossPhase.call(this, m);
+    if (bossHealing.call(this, m)) return;
+    const p = this.player;
+    if (m.state === 'attacking') {
+      if (m.t <= 0) {
+        m.state = 'move';
+        m.cd = bossCd(m);
+      }
+      return;
+    }
+    this.chase(m, dt, 0.7);
+    if (m.cd > 0) return;
+    if (startHeal.call(this, m)) return;
+    const moves = ['fist', 'steam', 'laser', 'missiles'];
+    const move = moves[m.pattern++ % moves.length];
+    const base = Math.atan2(p.y - m.y, p.x - m.x);
+    m.state = 'attacking';
+    if (move === 'fist') {
+      // 火箭拳：左右兩拳先後射出（第二階段三拳）。
+      const n = m.phase2 ? 3 : 2;
+      for (let k = 0; k < n; k++) {
+        this.telegraph({ shape: 'line', x: m.x, y: m.y, angle: base + (k - (n - 1) / 2) * 0.35, len: 10, width: 1.3, t: 0.7, delay: k * 0.35, dmg: this.monsterDamage(m, 1.2) });
+      }
+      m.t = 1.0 + n * 0.35;
+    } else if (move === 'steam') {
+      // 蒸汽噴發：身邊先爆，接著向外擴散一圈。
+      this.telegraph({ shape: 'circle', x: m.x, y: m.y, r: m.r + 1.8, t: 0.8, dmg: this.monsterDamage(m, 1.2) });
+      this.telegraph({ shape: 'ring', x: m.x, y: m.y, r: m.r + 3.4, width: 1.2, t: 0.8, delay: 0.5, dmg: this.monsterDamage(m, 1.0) });
+      m.t = 1.7;
+    } else if (move === 'laser') {
+      // 雷射掃射：光束從一側掃到另一側（第二階段再掃回來）。
+      const sweeps = m.phase2 ? 2 : 1;
+      let step = 0;
+      for (let s2 = 0; s2 < sweeps; s2++) {
+        for (let k = 0; k < 6; k++) {
+          const off = s2 % 2 ? 0.9 - k * 0.36 : -0.9 + k * 0.36;
+          this.telegraph({ shape: 'line', x: m.x, y: m.y, angle: base + off, len: 9, width: 0.8, t: 0.7, delay: step++ * 0.15, dmg: this.monsterDamage(m, 0.9) });
+        }
+      }
+      m.t = 1.0 + step * 0.15;
+    } else {
+      // 飛彈轟炸：玩家附近一連串爆炸，第一發瞄準玩家所在位置。
+      const n = m.phase2 ? 9 : 6;
+      for (let k = 0; k < n; k++) {
+        const x = p.x + (k ? (this.rng() - 0.5) * 6 : 0);
+        const y = p.y + (k ? (this.rng() - 0.5) * 6 : 0);
+        this.telegraph({ shape: 'circle', x, y, r: 1.0, t: 0.9, delay: k * 0.18, dmg: this.monsterDamage(m, 1.0) });
+      }
+      m.t = 1.1 + n * 0.18;
+    }
+  },
+
+  /**
+   * 炎龍：朝玩家掃過的三段火焰吐息、隕石雨、甩尾迴旋、扇形火球；第二階段吐息與隕石更多。
+   * @param {object} m Boss。
+   * @param {number} dt 秒。
+   */
+  redDragon(m, dt) {
+    bossPhase.call(this, m);
+    if (bossHealing.call(this, m)) return;
+    const p = this.player;
+    if (m.state === 'attacking') {
+      if (m.t <= 0) {
+        m.state = 'move';
+        m.cd = bossCd(m);
+      }
+      return;
+    }
+    this.chase(m, dt, 0.8);
+    if (m.cd > 0) return;
+    if (startHeal.call(this, m)) return;
+    const moves = ['breath', 'tail', 'meteor', 'fireballs'];
+    const move = moves[m.pattern++ % moves.length];
+    const base = Math.atan2(p.y - m.y, p.x - m.x);
+    m.state = 'attacking';
+    if (move === 'breath') {
+      // 火焰吐息：錐形火焰從左掃到右（第二階段再掃回來）。
+      const offs = m.phase2 ? [-0.6, 0, 0.6, 0, -0.6] : [-0.6, 0, 0.6];
+      offs.forEach((off, k) => this.telegraph({ shape: 'arc', x: m.x, y: m.y, r: m.r + 4.2, angle: base + off, arc: (50 * Math.PI) / 180, t: 0.6, delay: k * 0.3, dmg: this.monsterDamage(m, 1.1) }));
+      m.t = 0.9 + offs.length * 0.3;
+    } else if (move === 'tail') {
+      // 甩尾迴旋：身邊一圈，接著外圈再一次。
+      this.telegraph({ shape: 'circle', x: m.x, y: m.y, r: m.r + 1.8, t: 0.7, dmg: this.monsterDamage(m, 1.2) });
+      this.telegraph({ shape: 'ring', x: m.x, y: m.y, r: m.r + 3.2, width: 1.1, t: 0.7, delay: 0.4, dmg: this.monsterDamage(m, 1.0) });
+      m.t = 1.5;
+    } else if (move === 'meteor') {
+      const n = m.phase2 ? 7 : 4;
+      for (let k = 0; k < n; k++) {
+        const x = p.x + (k ? (this.rng() - 0.5) * 5 : 0);
+        const y = p.y + (k ? (this.rng() - 0.5) * 5 : 0);
+        this.telegraph({ shape: 'circle', x, y, r: 1.5, t: 1.0, delay: k * 0.25, dmg: this.monsterDamage(m, 1.2) });
+      }
+      m.t = 1.2 + n * 0.25;
+    } else {
+      this.telegraph({ shape: 'circle', x: m.x, y: m.y, r: m.r + 0.4, t: 0.4, dmg: 0 });
+      for (const off of m.phase2 ? [0, 0.12] : [0]) {
+        for (let k = 0; k < 5; k++) this.shoot(m, off ? 4.2 : 5, base + (k - 2) * 0.28 + off, 1.0, { kind: 'fire', life: 4, r: 0.24 });
+      }
+      m.t = 1.1;
+    }
+  },
+
+  /**
+   * 魔王：一圈圈擴散的暗黑波動、棋盤狀交替落下的魔柱、瞬間移動到玩家身邊爆發、召喚魔物；
+   * 第二階段暗黑波動附帶環狀彈幕、召喚魔族騎士。
+   * @param {object} m Boss。
+   * @param {number} dt 秒。
+   */
+  demonLord(m, dt) {
+    bossPhase.call(this, m);
+    if (bossHealing.call(this, m)) return;
+    const p = this.player;
+    if (m.state === 'attacking') {
+      if (m.t <= 0) {
+        m.state = 'move';
+        m.cd = bossCd(m);
+      }
+      return;
+    }
+    if (m.state === 'diving') return;
+    if (m.state === 'vanish') {
+      if (m.t <= 0) {
+        m.state = 'diving';
+        this.telegraph({ shape: 'circle', x: p.x, y: p.y, r: 2, t: 0.8, dmg: this.monsterDamage(m, 1.3), after: 'land', owner: m.id });
+      }
+      return;
+    }
+    this.keepRange(m, dt, dist(m.x, m.y, p.x, p.y), 2.5, 5);
+    if (m.cd > 0) return;
+    if (startHeal.call(this, m)) return;
+    const moves = ['wave', 'pillars', 'blink', 'summon'];
+    const move = moves[m.pattern++ % moves.length];
+    if (move === 'wave') {
+      [1.8, 3.2, 4.6, 6].forEach((r, k) => this.telegraph({ shape: 'ring', x: m.x, y: m.y, r, width: 1, t: 0.7, delay: k * 0.3, dmg: this.monsterDamage(m, 1.0) }));
+      if (m.phase2) for (let k = 0; k < 16; k++) this.shoot(m, 3.4, (k / 16) * Math.PI * 2, 0.85, { kind: 'dark', life: 5, r: 0.2 });
+      m.state = 'attacking';
+      m.t = 2.0;
+    } else if (move === 'pillars') {
+      // 魔柱：玩家周圍 4×4 的棋盤，先落下其中一色，0.7 秒後落下另一色。
+      for (let i = 0; i < 4; i++) {
+        for (let j = 0; j < 4; j++) {
+          const x = p.x + (i - 1.5) * 1.5;
+          const y = p.y + (j - 1.5) * 1.5;
+          this.telegraph({ shape: 'circle', x, y, r: 0.75, t: 0.8, delay: (i + j) % 2 ? 0.7 : 0, dmg: this.monsterDamage(m, 1.0) });
+        }
+      }
+      m.state = 'attacking';
+      m.t = 2.0;
+    } else if (move === 'blink') {
+      m.state = 'vanish';
+      m.t = 0.4;
+      m.invisible = true;
+      m.intangible = true;
+      this.effect('poof', m.x, m.y, { r: m.r, color: '#d04060' });
+    } else {
+      const minions = this.monsters.filter((o) => o.summoned).length;
+      const types = m.phase2 ? ['imp', 'imp', 'demonKnight'] : ['imp', 'imp'];
+      types.forEach((type, k) => {
+        if (minions + k >= 5) return;
+        const a = (k / types.length) * Math.PI * 2;
+        const s = this.spawnMonster(type, m.x + Math.cos(a) * 1.8, m.y + Math.sin(a) * 1.8, {});
+        s.summoned = true;
+        s.aggro = true;
+        s.xpMult = 0.3;
+        this.effect('poof', s.x, s.y, { r: 0.5, color: '#d04060' });
+      });
+      m.state = 'attacking';
+      m.t = 0.9;
     }
   },
 };

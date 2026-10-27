@@ -1,7 +1,7 @@
 // 本機儲存：角色、探險與設定存在 IndexedDB（資料庫 pocketdungeon）；大廳讀取用的摘要與統計存在 localStorage。
 // IndexedDB 無法使用時改存記憶體（關閉後遺失）。所有讀寫都容錯，任何儲存錯誤不讓遊戲停止。
 
-import { AREAS, AREA_KEYS, CLASS_KEYS, CLASSES, SHARED_SLOTS, STATUS, MATERIALS, CRAFT, LIMITS, GIFT } from './pd/data.js';
+import { AREAS, AREA_KEYS, CLASS_KEYS, CLASSES, SHARED_SLOTS, STATUS, MATERIALS, CRAFT, LIMITS, GIFT, MAX_DEPTH } from './pd/data.js';
 import { newSkills, SKILLS, SKILL_SLOTS, bookSkillIds } from './pd/skills.js';
 import { levelCap, parseGem, socketCount } from './pd/rules.js';
 
@@ -226,6 +226,11 @@ export async function loadAll() {
     if (ch && ch.unlocked && typeof ch.unlocked === 'object') {
       const last = AREA_KEYS.reduce((idx, k, i) => (Number.isInteger(ch.unlocked[k]) && ch.unlocked[k] >= 1 ? i : idx), -1);
       for (let i = 0; i < last; i++) if (!(ch.unlocked[AREA_KEYS[i]] >= 1)) ch.unlocked[AREA_KEYS[i]] = 1;
+      // 深淵改為 Lv.52 以上、最深 5 之前的角色：已開放的深度超過上限時改為上限。
+      for (const k of AREA_KEYS) {
+        const cap = AREAS[k].maxDepth || MAX_DEPTH;
+        if (Number.isInteger(ch.unlocked[k]) && ch.unlocked[k] > cap) ch.unlocked[k] = cap;
+      }
     }
     // 裝備欄擴充前（武器、防具、飾品 3 格）的角色：飾品移到飾品 1，補上新欄位。
     if (ch && ch.equipped && 'accessory' in ch.equipped) {
