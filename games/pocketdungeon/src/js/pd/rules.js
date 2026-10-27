@@ -84,6 +84,15 @@ export function rebirthBase(cls, rebirth = 0) {
 }
 
 /**
+ * 戰力：HP ÷ 4 ＋ 攻擊 × 3 ＋ 防禦 × 2 ＋ 速度 ÷ 2（角色分頁與「比較好的裝備」判斷共用）。
+ * @param {{hp: number, atk: number, def: number, spd: number}} s 屬性。
+ * @returns {number} 戰力。
+ */
+export function powerScore(s) {
+  return Math.round(s.hp / 4 + s.atk * 3 + s.def * 2 + s.spd / 2);
+}
+
+/**
  * 計算角色在某等級、穿戴某些裝備時的屬性。
  * @param {string} cls 職業代碼。
  * @param {number} level 等級。

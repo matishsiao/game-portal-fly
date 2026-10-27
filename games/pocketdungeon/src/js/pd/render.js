@@ -446,7 +446,7 @@ export class Renderer {
     }
     for (const it of world.pickups) {
       const bob = Math.round(Math.sin(world.time * 5 + it.x) * 1);
-      const name = it.kind === 'gem' ? `gem-${it.gem.split('-')[0]}` : it.kind === 'mat' ? it.mat : { gold: 'coin', potion: 'potion', bagExpand: 'pouch', book: 'book', skillBook: 'skillbook' }[it.kind] || 'bag';
+      const name = it.kind === 'gem' ? `gem-${it.gem.split('-')[0]}` : it.kind === 'mat' ? it.mat : { gold: 'coin', potion: 'potion', cure: 'cure', bagExpand: 'pouch', book: 'book', skillBook: 'skillbook' }[it.kind] || 'bag';
       const img = itemArt(name);
       const x = Math.round(it.x * T - img.width / 2);
       const y = Math.round(it.y * T - img.height / 2) + bob;

@@ -256,9 +256,9 @@ export const ENHANCE = {
 
 /**
  * 背包初始格數（裝備每件 1 格；每種材料、每種製作書各佔 1 格）、堆疊上限、道具價格，
- * 以及藥水的每趟攜帶上限（potions、cures）與村莊持有上限（potionHold、cureHold）。
+ * 藥水的每趟攜帶上限（potions、cures）與村莊持有上限（potionHold、cureHold），以及淨化藥水在地城的掉落機率（一般怪物、寶箱）。
  */
-export const LIMITS = { bag: 20, stack: 9999, potions: 10, potionPrice: 30, scrollPrice: 40, cures: 5, curePrice: 50, potionHold: 999, cureHold: 999 };
+export const LIMITS = { bag: 20, stack: 9999, potions: 10, potionPrice: 30, scrollPrice: 40, cures: 5, curePrice: 50, potionHold: 999, cureHold: 999, cureDrop: 0.03, cureChestDrop: 0.15 };
 
 /**
  * 異常狀態：名稱、持續秒數與顏色。玩家與怪物共用同一套規則，Boss 承受的持續時間為 bossMult 倍。
@@ -327,8 +327,25 @@ export const SKILL_BOOK = { bossDrop: 0.3, evolvedDrop: 1, weights: [50, 30, 15,
 export const MAT_DROP = { monster: 0.08, elite: 0.4, boss: 1, count: { monster: [1, 1], elite: [1, 2], boss: [2, 4] }, matGold: 5 };
 
 /**
+ * 入場卷（等級 1～5：銅、銀、金、白金、鑽石）：每趟探險出發時用掉 1 張該區域等級的入場卷，愈難的區域等級愈高、價格愈貴。
+ * 新角色送 start 張銅入場卷；商店販售（只賣已解鎖區域用得到的等級）；每個獎勵禮包都會開出入場卷（gift 為各禮包等級的張數）。
+ * 每日練習：當天在其他遊戲完成任何一題，整個帳號可以領一次 daily 張入場卷（等級依領取角色目前的進度），禮包拿完後也有入場卷可用。
+ * 沒有免費入場：入場卷用完又沒有金幣時，要到其他遊戲過關取得獎勵禮包或每日練習的入場卷（鼓勵在其他遊戲學習）。
+ */
+export const TICKET = {
+  names: ['銅入場卷', '銀入場卷', '金入場卷', '白金入場卷', '鑽石入場卷'],
+  short: ['銅卷', '銀卷', '金卷', '白金卷', '鑽石卷'],
+  price: [100, 200, 300, 500, 800],
+  area: { grass: 1, easy: 1, medium: 2, hard: 2, sky: 3, necro: 3, desert: 4, sea: 4, clock: 4, dragon: 5, demon: 5, expert: 5 },
+  start: 5,
+  gift: [1, 2, 2, 3, 4],
+  daily: 3,
+  max: 999,
+};
+
+/**
  * 獎勵禮包（等級 1～5：銅、銀、金、白金、鑽石）：只能從其他遊戲的「第一次過關」與「第一次全對（沒用提示／三顆星）」取得，
- * 重複過關不會再給。開啟後得到金幣、裝備材料（數量與品質權重依等級）與技能書碎片（同一本技能書 3 片合成 1 本），
+ * 重複過關不會再給。開啟後得到金幣、入場卷（張數見 TICKET.gift，等級依角色目前的進度）、裝備材料（數量與品質權重依等級）與技能書碎片（同一本技能書 3 片合成 1 本），
  * 並有機會得到回復藥水、淨化藥水（機率與瓶數）與背包擴充袋（機率）；藥水超過持有上限、背包已擴充到上限時改為金幣（商店價格）。
  * games 為會寫入獲得紀錄的遊戲（目錄 → 名稱）。
  */

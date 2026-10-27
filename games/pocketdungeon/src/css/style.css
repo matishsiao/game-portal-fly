@@ -3729,3 +3729,190 @@ button:focus-visible {
 
 /* 地城入口攜帶道具：持有比每趟上限多時顯示持有數量 */
 .carry-have { font-size: 0.72rem; color: var(--text-muted); margin-left: 1px; }
+
+/* 地城入口的入場卷列：五種等級全部列出（沒有的變暗），點了看說明。 */
+.ticket-row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+  margin: -2px 0 12px;
+}
+
+.ticket-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  min-height: 56px;
+  padding: 6px 2px 4px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  box-shadow: var(--shadow);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.ticket-chip img {
+  width: 36px;
+  height: 21px;
+  image-rendering: pixelated;
+}
+
+.ticket-chip small {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  line-height: 1.1;
+}
+
+.ticket-chip b {
+  font-size: 0.95rem;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.ticket-chip.t1 { border-color: #c07a3a; }
+.ticket-chip.t2 { border-color: #9aa3b5; }
+.ticket-chip.t3 { border-color: #d8a020; }
+.ticket-chip.t4 { border-color: #7ac8d8; }
+.ticket-chip.t5 { border-color: #b070f0; }
+
+.ticket-chip.none {
+  opacity: 0.45;
+}
+
+/* 區域卡片與區域橫幅上的「每趟 1 張某某入場卷・持有 N 張」。 */
+.ticket-need {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 2px 8px 2px 4px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.28);
+  color: #fff;
+  font-size: 0.75rem;
+}
+
+.ticket-need img {
+  width: 24px;
+  height: 14px;
+  image-rendering: pixelated;
+}
+
+.ticket-need.lack {
+  background: rgba(198, 40, 40, 0.75);
+}
+
+/* 出發視窗的入場卷說明。 */
+.ticket-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 10px 0 0;
+  font-size: 0.9rem;
+}
+
+.ticket-line img {
+  width: 31px;
+  height: 18px;
+  image-rendering: pixelated;
+  flex: none;
+}
+
+.ticket-line.lack {
+  color: var(--wrong);
+}
+
+/* 入場卷用完又沒有金幣時：提示到其他遊戲過關拿禮包。 */
+.ticket-hint {
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(240, 192, 64, 0.16);
+  border: 1px solid rgba(240, 192, 64, 0.45);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+/* 獲得紀錄中的每日練習：入場卷圖示（橫長）。 */
+.ticket-cell {
+  border-color: #d8a020;
+}
+
+.ticket-cell img {
+  width: 82%;
+  height: auto;
+}
+
+/* 比目前穿的更好的裝備：金色發光外框與左上角的「▲」。 */
+.inv-cell.upgrade {
+  box-shadow: 0 0 0 2px #ffd04d, 0 0 12px rgba(255, 208, 77, 0.65);
+  animation: up-glow 1.6s ease-in-out infinite;
+}
+
+@keyframes up-glow {
+  50% { box-shadow: 0 0 0 2px #ffd04d, 0 0 18px rgba(255, 208, 77, 0.95); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inv-cell.upgrade {
+    animation: none;
+  }
+}
+
+.cell-up {
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  color: #ffd04d;
+  font-size: 12px;
+  line-height: 1;
+  text-shadow: 0 1px 0 #1a1020, 0 0 4px rgba(0, 0, 0, 0.6);
+}
+
+/* 「倉庫」分頁的提醒點。 */
+.village-tabs [data-tab].has-up {
+  position: relative;
+}
+
+.village-tabs [data-tab].has-up::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ffd04d;
+  box-shadow: 0 0 6px #ffd04d;
+}
+
+/* 背包上方：比較好的裝備數量與「一次賣出／分解」。 */
+.bag-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: -4px 0 8px;
+}
+
+.up-note {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.up-note b {
+  color: #ffd04d;
+}
+
+.bulk-grid {
+  max-height: 40vh;
+  overflow-y: auto;
+  margin-bottom: 8px;
+}
+
+.bulk-grid .inv-cell {
+  pointer-events: none;
+}

@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { World } from '../src/js/pd/world.js';
 import { seededRng, characterStats, gemBonus, parseGem, socketCount, makeItem, rollGem } from '../src/js/pd/rules.js';
-import { STATUS, GEMS, GEM_RULES, LIMITS, GIFT, BAG_EXPAND } from '../src/js/pd/data.js';
+import { STATUS, GEMS, GEM_RULES, LIMITS, GIFT, BAG_EXPAND, TICKET } from '../src/js/pd/data.js';
 import * as sk from '../src/js/pd/skills.js';
 import * as v from '../src/js/pd/village.js';
 import { isValidCharacter, newCharacter, loadRewards } from '../src/js/storage.js';
@@ -846,6 +846,58 @@ test('地城撿到回復藥水：身上帶滿 10 瓶時放進村莊庫存，庫�
   assert.equal(ch.gold - gold, LIMITS.potionPrice / 2);
 });
 
+test('入場卷：新角色 5 張銅卷；出發用掉 1 張該區域等級的卷；商店只賣用得到的等級；沒有卷就不能出發（沒有免費入場）', () => {
+  const ch = newCharacter('warrior', '測試');
+  assert.deepEqual(ch.tickets, { 1: TICKET.start });
+  assert.ok(v.useTicket(ch, 'grass').ok);
+  assert.equal(v.ticketCount(ch, 1), 4);
+  // 熔岩礦坑需要銀卷：還沒解鎖時商店不賣。
+  assert.equal(v.ticketTier('medium'), 2);
+  assert.equal(v.buyTicket(ch, 2).ok, false);
+  ch.unlocked.medium = 1;
+  ch.gold = 1000;
+  assert.equal(v.useTicket(ch, 'medium').ok, false, '沒有銀卷不能出發');
+  assert.ok(v.buyTicket(ch, 2).ok);
+  assert.equal(ch.gold, 1000 - TICKET.price[1]);
+  assert.ok(v.useTicket(ch, 'medium').ok);
+  assert.equal(v.ticketCount(ch, 2), 0);
+  // 價格隨等級提高；深淵用最高等級。
+  for (let k = 1; k < TICKET.price.length; k++) assert.ok(TICKET.price[k] > TICKET.price[k - 1]);
+  assert.equal(TICKET.price[0], 100);
+  assert.equal(v.ticketTier('expert'), 5);
+  // 沒有免費入場：沒有卷就不能出發（要買卷或到其他遊戲拿禮包）。
+  ch.tickets = {};
+  ch.gold = 0;
+  assert.equal(v.useTicket(ch, 'grass').ok, false);
+  assert.equal(v.useTicket(ch, 'easy').ok, false);
+});
+
+test('獎勵禮包每次都開出入場卷（等級依目前進度）', () => {
+  const ch = newCharacter('warrior', '測試');
+  ch.unlocked = { grass: 5, easy: 5, medium: 5, hard: 5, sky: 1 };
+  v.addGift(ch, 2, 1);
+  const r = v.openGift(ch, 2, seededRng(3));
+  assert.ok(r.ok);
+  assert.deepEqual(r.tickets, { tier: 3, n: TICKET.gift[1] });
+  assert.equal(v.ticketCount(ch, 3), TICKET.gift[1]);
+});
+
+test('地城會掉淨化藥水：身上帶滿 5 瓶時放進村莊庫存', () => {
+  const ch = hero('warrior');
+  ch.cures = 2;
+  const w = arena(ch, { cures: LIMITS.cures - 1 });
+  const drop = () => {
+    w.addPickup({ kind: 'cure', x: w.player.x, y: w.player.y, t: 1 });
+    w.updatePickups(0);
+  };
+  drop();
+  assert.equal(w.player.cures, LIMITS.cures);
+  drop();
+  assert.equal(w.player.cures, LIMITS.cures);
+  assert.equal(ch.cures, 3);
+  assert.ok(LIMITS.cureDrop > 0 && LIMITS.cureChestDrop > 0);
+});
+
 test('獲得紀錄：讀取其他遊戲寫入的紀錄，並從過關統計與 roll 進度回補（同一個 id 只算一次）', () => {
   const store = new Map();
   globalThis.localStorage = { getItem: (k) => (store.has(k) ? store.get(k) : null), setItem: (k, val) => store.set(k, String(val)), removeItem: (k) => store.delete(k) };
@@ -857,5 +909,12 @@ test('獲得紀錄：讀取其他遊戲寫入的紀錄，並從過關統計與 r
   assert.deepEqual(ids, ['roll:1-1:clear', 'roll:3-2:clear', 'roll:3-2:star3', 'sudoku:hard:clear', 'sudoku:hard:perfect']);
   assert.equal(list.find((r) => r.id === 'sudoku:hard:perfect').tier, 4);
   assert.equal(list.find((r) => r.id === 'roll:3-2:star3').tier, 4);
+  // 每日練習：一天一筆（daily:日期），格式不對的忽略。
+  store.set('games.rewards', JSON.stringify([
+    { id: 'daily:2026-10-27', game: 'idiom', type: 'daily', tier: 1, label: '今天第一次過關（簡單）', at: 9 },
+    { id: 'daily:bad', game: 'idiom', type: 'daily', tier: 1, label: 'x', at: 9 },
+  ]));
+  const daily = loadRewards().filter((r) => r.type === 'daily');
+  assert.deepEqual(daily.map((r) => r.id), ['daily:2026-10-27']);
   delete globalThis.localStorage;
 });

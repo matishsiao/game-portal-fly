@@ -736,6 +736,20 @@ export function monsterArt(type, evolved = false) {
   return cache.get(key);
 }
 
+/**
+ * 入場卷圖（ticket1～ticket5）：同一張票券造型，依等級換成銅、銀、金、白金、鑽石的顏色。
+ * @returns {Record<string, {palette: Record<string, string>, rows: string[]}>} 道具圖。
+ */
+function ticketArt() {
+  const colors = [['#c07a3a', '#f0b070'], ['#9aa3b5', '#e8eef5'], ['#d8a020', '#ffe080'], ['#7ac8d8', '#e0fbff'], ['#b070f0', '#f0d0ff']];
+  const rows = ['oooooooooooo', 'oTTTTTToTTTo', 'oTTtTTT.TtTo', '.TtttTToTtT.', 'oTTtTTT.TtTo', 'oTTTTTToTTTo', 'oooooooooooo'];
+  const out = {};
+  colors.forEach(([T, t], k) => {
+    out[`ticket${k + 1}`] = { palette: { o: O, T, t }, rows };
+  });
+  return out;
+}
+
 /** 道具圖：金幣、藥水、裝備袋、寶箱（關、開）、鑰匙、盾牌、劍（首頁裝飾）。 */
 export const ITEM_ART = {
   coin: { palette: { o: '#7a5a1a', Y: '#e8b84a', y: '#fff0a0' }, rows: ['.oooo.', 'oYyYYo', 'oyYYYo', 'oYYYYo', 'oYYYYo', '.oooo.'] },
@@ -766,6 +780,7 @@ export const ITEM_ART = {
   staff: { palette: { o: O, W: '#8a5a2a', G: '#c8a8ff', L: '#ffffff' }, rows: ['.....oo.', '....oGLo', '....oGGo', '...oWoo.', '..oWo...', '.oWo....', 'oWo.....', 'oo......'] },
   axe: { palette: { o: O, S: '#c0c6d0', D: '#7a808e', W: '#8a5a2a' }, rows: ['..oooo..', '.oSSSDo.', 'oSSSoWo.', 'oSDoWo..', '.ooWo...', '..oWo...', '.oWo....', '.oo.....'] },
   cure: { palette: { o: O, C: '#c8b8a0', B: '#5ab8e8', b: '#c8f0ff' }, rows: ['..oo..', '..CC..', '.oBBo.', 'oBbBBo', 'oBBBBo', '.oooo.'] },
+  ...ticketArt(),
   ...gemArt(),
 };
 

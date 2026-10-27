@@ -1,9 +1,9 @@
 // 村莊規則（純邏輯）：商店刷新與買賣、裝備穿脫、強化、區域與深度解鎖、探險開始與結算。
 // 所有函式直接修改傳入的角色資料，回傳結果與要顯示的訊息。
 
-import { AREAS, AREA_KEYS, LIMITS, MAX_DEPTH, RARITIES, ENHANCE, EQUIP_SLOTS, SHARED_SLOTS, CLASSES, REBIRTH, GEMS, GEM_RULES, MATERIALS, CRAFT, ITEM_SLOTS, BAG_EXPAND, SKILL_BOOK, GIFT } from './data.js';
-import { learnBook, SKILLS, bookSkillIds } from './skills.js';
-import { makeItem, itemValue, sellPrice, enhanceCost, tryEnhance, rollRarity, dungeonLevel, levelCap, parseGem, gemName, socketCount, weaponHands } from './rules.js';
+import { AREAS, AREA_KEYS, LIMITS, MAX_DEPTH, RARITIES, ENHANCE, EQUIP_SLOTS, SHARED_SLOTS, CLASSES, REBIRTH, GEMS, GEM_RULES, MATERIALS, CRAFT, ITEM_SLOTS, BAG_EXPAND, SKILL_BOOK, GIFT, TICKET } from './data.js';
+import { learnBook, SKILLS, bookSkillIds, passiveBonus } from './skills.js';
+import { makeItem, itemValue, sellPrice, enhanceCost, tryEnhance, rollRarity, dungeonLevel, levelCap, parseGem, gemName, socketCount, weaponHands, characterStats, powerScore } from './rules.js';
 
 /** 商店一次陳列的裝備數。 */
 export const SHOP_SIZE = 8;
@@ -337,6 +337,81 @@ export function skillBookPrice(id) {
 }
 
 /**
+ * 區域需要的入場卷等級。
+ * @param {string} area 區域代碼。
+ * @returns {number} 等級（1～5）。
+ */
+export function ticketTier(area) {
+  return TICKET.area[area] || 1;
+}
+
+/**
+ * 持有的入場卷張數。
+ * @param {object} ch 角色。
+ * @param {number} tier 等級（1～5）。
+ * @returns {number} 張數。
+ */
+export function ticketCount(ch, tier) {
+  return (ch.tickets && ch.tickets[String(tier)]) || 0;
+}
+
+/**
+ * 加入（或扣除）入場卷；入場卷不佔背包格子，每種最多 999 張。
+ * @param {object} ch 角色（會被修改）。
+ * @param {number} tier 等級（1～5）。
+ * @param {number} [n=1] 張數（負數為扣除）。
+ * @returns {number} 實際加入的張數（超過上限的部分不加入）。
+ */
+export function addTickets(ch, tier, n = 1) {
+  ch.tickets = ch.tickets || {};
+  const have = ticketCount(ch, tier);
+  const next = Math.max(0, Math.min(TICKET.max, have + n));
+  if (next > 0) ch.tickets[String(tier)] = next;
+  else delete ch.tickets[String(tier)];
+  return next - have;
+}
+
+/**
+ * 角色目前進度的入場卷等級：已解鎖區域中最高的等級（商店販售到這個等級，禮包也開出這個等級）。
+ * @param {object} ch 角色。
+ * @returns {number} 等級（1～5）。
+ */
+export function progressTicketTier(ch) {
+  return AREA_KEYS.filter((a) => areaUnlocked(ch, a)).reduce((t, a) => Math.max(t, ticketTier(a)), 1);
+}
+
+/**
+ * 購買 1 張入場卷（只賣已解鎖區域用得到的等級）。
+ * @param {object} ch 角色（會被修改）。
+ * @param {number} tier 等級（1～5）。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function buyTicket(ch, tier) {
+  const price = TICKET.price[tier - 1];
+  if (!price || tier > progressTicketTier(ch)) return { ok: false, message: '還沒有用得到這種入場卷的區域' };
+  if (ticketCount(ch, tier) >= TICKET.max) return { ok: false, message: `${TICKET.names[tier - 1]}最多持有 ${TICKET.max} 張` };
+  if (ch.gold < price) return { ok: false, message: `金幣不足（需要 ${price}G）` };
+  ch.gold -= price;
+  addTickets(ch, tier, 1);
+  return { ok: true, message: `買下${TICKET.names[tier - 1]}（持有 ${ticketCount(ch, tier)} 張）` };
+}
+
+/**
+ * 出發時用掉 1 張該區域等級的入場卷。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string} area 區域代碼。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function useTicket(ch, area) {
+  const tier = ticketTier(area);
+  if (ticketCount(ch, tier) > 0) {
+    addTickets(ch, tier, -1);
+    return { ok: true, message: `用掉 1 張${TICKET.names[tier - 1]}（剩 ${ticketCount(ch, tier)} 張）` };
+  }
+  return { ok: false, message: `需要 1 張${TICKET.names[tier - 1]}（商店 ${TICKET.price[tier - 1]}G）` };
+}
+
+/**
  * 加入獎勵禮包。
  * @param {object} ch 角色（會被修改）。
  * @param {number} tier 等級（1～5）。
@@ -353,7 +428,7 @@ export function addGift(ch, tier, n = 1) {
  * @param {object} ch 角色（會被修改）。
  * @param {number} tier 等級（1～5）。
  * @param {() => number} rng 亂數函式。
- * @returns {{ok: boolean, message: string, gold?: number, mats?: Record<string, number>, shards?: Record<string, number>, potions?: number, cures?: number, pouch?: number, converted?: number}} 結果與內容。
+ * @returns {{ok: boolean, message: string, gold?: number, mats?: Record<string, number>, shards?: Record<string, number>, potions?: number, cures?: number, pouch?: number, converted?: number, tickets?: {tier: number, n: number}}} 結果與內容。
  */
 export function openGift(ch, tier, rng) {
   if (!(ch.gifts && ch.gifts[String(tier)] > 0)) return { ok: false, message: '沒有這個禮包' };
@@ -384,14 +459,17 @@ export function openGift(ch, tier, rng) {
   const pouch = pouchRoll && bagLimit(ch) + ((ch.bagExpand || 0) + 1) * BAG_EXPAND.step <= BAG_EXPAND.max ? 1 : 0;
   const converted = (potionRoll - potions) * LIMITS.potionPrice + (cureRoll - cures) * LIMITS.curePrice + (pouchRoll - pouch) * BAG_EXPAND.basePrice;
   const gold = GIFT.gold[k] + converted;
+  // 入場卷：每個禮包都有，等級依角色目前的進度。
+  const ticketTierNow = progressTicketTier(ch);
   addGift(ch, tier, -1);
+  const tickets = { tier: ticketTierNow, n: addTickets(ch, ticketTierNow, TICKET.gift[k]) };
   ch.gold += gold;
   ch.potions = (ch.potions || 0) + potions;
   ch.cures = (ch.cures || 0) + cures;
   ch.bagExpand = (ch.bagExpand || 0) + pouch;
   for (const [m, n] of Object.entries(mats)) addMaterial(ch, m, n);
   for (const [id, n] of Object.entries(shards)) addStack(ch, 'shards', id, n);
-  return { ok: true, message: `開啟${GIFT.names[k]}：金幣 +${gold}`, gold, mats, shards, potions, cures, pouch, converted };
+  return { ok: true, message: `開啟${GIFT.names[k]}：金幣 +${gold}`, gold, mats, shards, potions, cures, pouch, converted, tickets };
 }
 
 /**
@@ -871,5 +949,117 @@ export function settleRun(ch, world, result) {
     result, area: world.area, depth: world.depth, ms, kills: loot.kills, damageTaken: loot.damageTaken, xp: loot.xp,
     gold: loot.gold - goldLost, goldLost, items: loot.items, gems: loot.gems || [], unlocks, levels: loot.levelsGained, potionsUsed: loot.potionsUsed,
     evolved: !!world.evolvedDefeated, clears: (ch.clears && ch.clears[world.stageKey()]) || 0,
+  };
+}
+
+/**
+ * 背包中的裝備是否比目前穿的更好：換上後（飾品比較兩個欄位中較好的結果）戰力提高。
+ * 不能裝備的（別的職業的武器、拿雙手武器時的副手）不算。
+ * @param {object} ch 角色。
+ * @param {object} item 背包中的裝備。
+ * @returns {boolean} 是否為升級。
+ */
+export function isUpgrade(ch, item) {
+  if (item.slot === 'weapon' && !canWield(ch, item)) return false;
+  if (item.slot === 'offhand' && weaponHands(ch.equipped.weapon) === 2) return false;
+  const score = (eq) => powerScore(characterStats(ch.cls, ch.level, Object.values(eq), ch.rebirth || 0, passiveBonus({ ...ch, equipped: eq })));
+  const now = score(ch.equipped);
+  return EQUIP_SLOTS.filter((e) => e.slot === item.slot).some((e) => {
+    const eq = { ...ch.equipped, [e.key]: item };
+    if (item.slot === 'weapon' && weaponHands(item) === 2) eq.offhand = null;
+    return score(eq) > now;
+  });
+}
+
+/**
+ * 批次處理的對象：背包中稀有度不超過 maxRarity 的裝備，排除比目前穿的更好的、強化過的。
+ * @param {object} ch 角色。
+ * @param {number} maxRarity 最高稀有度（0 普通、1 精良）。
+ * @returns {object[]} 裝備。
+ */
+export function bulkTargets(ch, maxRarity) {
+  return ch.bag.filter((it) => it.rarity <= maxRarity && !(it.enhance > 0) && !isUpgrade(ch, it));
+}
+
+/**
+ * 一次賣出多件背包中的裝備（鑲嵌的寶石自動放回寶石袋）。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string[]} ids 裝備 id。
+ * @returns {{ok: boolean, message: string, count: number, gold: number}} 結果。
+ */
+export function sellMany(ch, ids) {
+  let count = 0;
+  let gold = 0;
+  let gems = 0;
+  for (const id of ids) {
+    const it = ch.bag.find((i) => i.id === id);
+    if (!it) continue;
+    const price = sellPrice(it);
+    gems += (it.gems || []).length;
+    if (!sellItem(ch, id).ok) continue;
+    count++;
+    gold += price;
+  }
+  return { ok: count > 0, count, gold, message: count ? `賣出 ${count} 件裝備（+${gold}G）${gems ? `，${gems} 顆寶石放回寶石袋` : ''}` : '沒有可以賣出的裝備' };
+}
+
+/**
+ * 一次分解多件背包中的裝備；背包放不下新的材料種類時停止。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string[]} ids 裝備 id。
+ * @param {() => number} rng 亂數函式。
+ * @returns {{ok: boolean, message: string, count: number, mats: Record<string, number>}} 結果與得到的材料。
+ */
+export function salvageMany(ch, ids, rng) {
+  let count = 0;
+  const before = { ...(ch.mats || {}) };
+  let stopped = '';
+  for (const id of ids) {
+    const r = salvage(ch, id, rng);
+    if (!r.ok) {
+      stopped = r.message;
+      break;
+    }
+    count++;
+  }
+  const mats = {};
+  for (const [k, n] of Object.entries(ch.mats || {})) if (n > (before[k] || 0)) mats[k] = n - (before[k] || 0);
+  const list = Object.entries(mats).map(([k, n]) => `${MATERIALS.find((m) => m.key === k).name} ×${n}`).join('、');
+  return { ok: count > 0, count, mats, message: count ? `分解 ${count} 件裝備：${list}${stopped ? `（${stopped}，其餘沒有分解）` : ''}` : stopped || '沒有可以分解的裝備' };
+}
+
+/**
+ * 一次合成寶石到能到的最高等級：由低到高，每 3 顆同種同級合成 1 顆高一級（可以連續往上合成），金幣不足時停止。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string} [kind] 只合成這一種寶石（省略時全部持續型寶石）。
+ * @returns {{ok: boolean, message: string, fused: number, cost: number, made: Record<string, number>}} 合成次數、花費與做出的寶石（最後持有的增加量）。
+ */
+export function fuseAll(ch, kind) {
+  const kinds = Object.keys(GEMS).filter((k) => !GEMS[k].active && (!kind || k === kind));
+  const before = { ...(ch.gems || {}) };
+  let fused = 0;
+  let cost = 0;
+  let short = false;
+  for (const k of kinds) {
+    for (let tier = 1; tier < GEM_RULES.max; tier++) {
+      const key = `${k}-${tier}`;
+      while (((ch.gems && ch.gems[key]) || 0) >= GEM_RULES.fuse) {
+        const price = GEM_RULES.fuseCost[tier];
+        if (ch.gold < price) {
+          short = true;
+          break;
+        }
+        fuseGem(ch, key);
+        fused++;
+        cost += price;
+      }
+    }
+  }
+  const made = {};
+  for (const [key, n] of Object.entries(ch.gems || {})) if (n > (before[key] || 0)) made[key] = n - (before[key] || 0);
+  const list = Object.entries(made).map(([key, n]) => `${gemName(key)} ×${n}`).join('、');
+  return {
+    ok: fused > 0, fused, cost, made,
+    message: fused ? `合成 ${fused} 次（-${cost}G）：${list}${short ? '（金幣不足，沒有全部合成）' : ''}` : short ? '金幣不足，無法合成' : '沒有可以合成的寶石（需要 3 顆同種同級）',
   };
 }

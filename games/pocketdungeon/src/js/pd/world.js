@@ -1251,6 +1251,7 @@ export class World {
       for (let k = 0; k < EVOLVE.items; k++) this.dropItem(m.x + 0.3 + k * 0.5, m.y, 'evolved', EVOLVE.levelBonus);
     } else if (this.rng() < chance) this.dropItem(m.x + 0.3, m.y, m.boss ? 'boss' : m.elite ? 'elite' : 'monster');
     if (!m.boss && this.rng() < 0.05) this.addPickup({ kind: 'potion', x: m.x - 0.3, y: m.y, t: 0 });
+    if (!m.boss && this.rng() < LIMITS.cureDrop) this.addPickup({ kind: 'cure', x: m.x + 0.3, y: m.y, t: 0 });
     // 寶石：Boss 必掉（進化 Boss 掉 2 顆、等級 +1），菁英 25%，一般怪物 3%；分裂的小史萊姆不掉。
     if (m.boss) {
       for (let k = 0; k < (m.evolved ? 2 : 1); k++) this.dropGem(m.x - 0.4 - k * 0.4, m.y + 0.3, m.evolved ? 1 : 0);
@@ -1838,6 +1839,15 @@ export class World {
           this.loot.gold += LIMITS.potionPrice / 2;
         }
         this.events.push({ type: 'message', text: '撿到回復藥水' });
+      } else if (it.kind === 'cure') {
+        // 淨化藥水：身上帶滿 5 瓶時放進村莊庫存，庫存也滿了才換成金幣。
+        if (p.cures < LIMITS.cures) p.cures++;
+        else if ((this.ch.cures || 0) < LIMITS.cureHold) this.ch.cures = (this.ch.cures || 0) + 1;
+        else {
+          this.ch.gold += LIMITS.curePrice / 2;
+          this.loot.gold += LIMITS.curePrice / 2;
+        }
+        this.events.push({ type: 'message', text: '撿到淨化藥水' });
       } else if (it.kind === 'item') {
         this.takeItem(it.item);
       } else if (it.kind === 'gem') {
@@ -1858,6 +1868,7 @@ export class World {
       // Boss 寶箱有 25% 機會出現背包擴充袋（進化 Boss 50%）。
       if (c.boss && this.rng() < (c.evolved ? EVOLVE.pouch : 0.25)) this.addPickup({ kind: 'bagExpand', x: c.x, y: c.y + 0.5, t: 0 });
       if (this.rng() < 0.3) this.addPickup({ kind: 'potion', x: c.x - 0.4, y: c.y + 0.2, t: 0 });
+      if (this.rng() < LIMITS.cureChestDrop) this.addPickup({ kind: 'cure', x: c.x + 0.4, y: c.y - 0.2, t: 0 });
       if (!c.boss && this.rng() < GEM_RULES.drop.chest) this.dropGem(c.x, c.y + 0.5);
       this.effect('poof', c.x, c.y, { r: 0.4, color: '#e8b84a' });
     }

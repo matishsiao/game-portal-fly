@@ -1,8 +1,8 @@
 // 主程式：首頁、村莊、地城畫面、遊戲迴圈、輸入、存檔與 Service Worker。
 
 import * as store from './storage.js';
-import { CLASSES, CLASS_KEYS, AREAS, AREA_KEYS, RARITIES, LIMITS, EQUIP_SLOTS, ITEM_SLOTS, BAG_EXPAND, EVOLVE, SHARED_SLOTS, REBIRTH, STATUS, GEMS, GEM_RULES, MATERIALS, CRAFT, WEAPON_HANDS, BOSSES, GIFT } from './pd/data.js';
-import { xpToNext, characterStats, speedProfile, describeStats, sellPrice, enhanceCost, levelCap, gemName, gemEffect, parseGem, socketCount, statusText, gemBonus, itemStats, weaponHands, dungeonLevel } from './pd/rules.js';
+import { CLASSES, CLASS_KEYS, AREAS, AREA_KEYS, RARITIES, LIMITS, EQUIP_SLOTS, ITEM_SLOTS, BAG_EXPAND, EVOLVE, SHARED_SLOTS, REBIRTH, STATUS, GEMS, GEM_RULES, MATERIALS, CRAFT, WEAPON_HANDS, BOSSES, GIFT, TICKET } from './pd/data.js';
+import { xpToNext, characterStats, speedProfile, describeStats, sellPrice, enhanceCost, levelCap, gemName, gemEffect, parseGem, socketCount, statusText, gemBonus, itemStats, weaponHands, dungeonLevel, powerScore } from './pd/rules.js';
 import { World } from './pd/world.js';
 import { Renderer } from './pd/render.js';
 import { heroDataUrl, itemDataUrl, monsterDataUrl } from './pd/sprites.js';
@@ -443,6 +443,8 @@ function renderVillage() {
   $('gift-btn').classList.toggle('has', pending > 0);
   $('gift-count').textContent = pending ? pending : '';
   for (const b of els.villageTabs.querySelectorAll('button')) b.setAttribute('aria-selected', String(b.dataset.tab === app.tab));
+  // 倉庫裡有比目前穿的更好的裝備時，「倉庫」分頁加上提醒點。
+  els.villageTabs.querySelector('[data-tab="bag"]').classList.toggle('has-up', ch.bag.some((it) => village.isUpgrade(ch, it)));
   const panels = { gate: gatePanel, shop: shopPanel, smith: smithPanel, gem: gemPanel, bag: bagPanel, skill: skillPanel, hero: heroPanel };
   els.villagePanel.innerHTML = panels[app.tab](ch);
   // 剛進入區域畫面時，地圖捲到目前進度的關卡。
@@ -471,7 +473,13 @@ function gatePanel(ch) {
       const label = have > cap ? `${name}：這趟帶 ${n}，持有 ${have}` : `${name}：${n}`;
       return `<span class="carry-chip${n ? '' : ' none'}" title="${label}" aria-label="${label}"><img src="${itemDataUrl(icon)}" alt=""><b>${n}</b>${have > cap ? `<small class="carry-have">／${have}</small>` : ''}</span>`;
     }).join('');
-  const top = `${busy}<div class="gate-top"><div class="carry-chips">${carry}<small class="muted">在商店補充</small></div>${bonus}</div>`;
+  // 入場卷：五種等級全部列出（圖示、名稱與張數），沒有的變暗；點了說明哪些區域用得到。
+  const tickets = TICKET.names.map((name, k) => {
+    const n = village.ticketCount(ch, k + 1);
+    return `<button type="button" class="ticket-chip t${k + 1}${n ? '' : ' none'}" data-info="ticket${k + 1}" aria-label="${name} ${n} 張"><img src="${itemDataUrl(`ticket${k + 1}`)}" alt=""><small>${TICKET.short[k]}</small><b>${n}</b></button>`;
+  }).join('');
+  const top = `${busy}<div class="gate-top"><div class="carry-chips">${carry}<small class="muted">在商店補充</small></div>${bonus}</div>
+    <div class="ticket-row" aria-label="入場卷">${tickets}</div>`;
   if (app.gateArea && village.areaUnlocked(ch, app.gateArea)) return top + areaView(ch, app.gateArea);
   app.gateArea = null;
   // 第一層：區域由上往下排成卡片（進度條、破關次數；目前進度所在的區域標示「進行中」）。
@@ -489,10 +497,22 @@ function gatePanel(ch) {
       : `<small class="area-lock">🔒 擊敗${AREAS[prev].name}的 Boss 後解鎖</small>`;
     return `<button type="button" class="area-banner area-card-btn theme-${a.theme}${unlocked ? '' : ' locked'}" data-gate-area="${area}"${unlocked ? '' : ' aria-disabled="true"'}>
       <div class="area-top"><img class="area-boss" src="${monsterDataUrl(a.boss[0], 2)}" alt=""><div class="area-title"><b>${ai + 1}・${a.name}${area === current ? ' <em class="now-tag">進行中</em>' : ''}</b><small>${a.boss.length > 1 ? '隨機強化 Boss' : `Boss：${BOSSES[a.boss[0]].name}`}</small></div><span class="rec-chip">Lv.${a.recommend[0]}～${a.recommend[1]}</span>${unlocked ? '<span class="area-go">›</span>' : ''}</div>
-      ${sub}</button>`;
+      ${sub}${ticketNeed(ch, area)}</button>`;
   }).join('');
   return `${top}<div class="area-list">${cards}</div>
     <p class="muted small">點區域選擇深度並出發。同一關破關滿 ${EVOLVE.clears} 次後，打倒 Boss 有 ${Math.round(EVOLVE.chance * 100)}% 機率復活成進化 Boss。</p>`;
+}
+
+/**
+ * 區域需要的入場卷：等級圖示、名稱與持有張數（沒有時標紅）。
+ * @param {object} ch 角色。
+ * @param {string} area 區域代碼。
+ * @returns {string} HTML。
+ */
+function ticketNeed(ch, area) {
+  const t = village.ticketTier(area);
+  const n = village.ticketCount(ch, t);
+  return `<span class="ticket-need${n ? '' : ' lack'}"><img src="${itemDataUrl(`ticket${t}`)}" alt="">每趟 1 張${TICKET.names[t - 1]}・持有 ${n} 張</span>`;
 }
 
 /** 地圖上各區域的主題色（區域周圍的暈染）。 */
@@ -574,7 +594,7 @@ function areaView(ch, area) {
   });
   const bossImg = `<img class="map-boss big" style="${pct(boss.x, boss.y)}" src="${monsterDataUrl(a.boss[0], 3)}" alt="Boss"><span class="map-boss-tag" style="${pct(boss.x, boss.y + 34)}">Boss</span>`;
   return `<div class="area-head-bar"><button type="button" class="link-btn" data-gate-back="1">‹ 所有區域</button></div>
-    <div class="area-banner theme-${a.theme}"><div class="area-top"><img class="area-boss" src="${monsterDataUrl(a.boss[0], 2)}" alt=""><div class="area-title"><b>${ai + 1}・${a.name}</b><small>${a.boss.length > 1 ? '隨機強化 Boss' : `Boss：${BOSSES[a.boss[0]].name}`}・每趟 3 層＋Boss</small></div><span class="rec-chip">Lv.${a.recommend[0]}～${a.recommend[1]}</span></div></div>
+    <div class="area-banner theme-${a.theme}"><div class="area-top"><img class="area-boss" src="${monsterDataUrl(a.boss[0], 2)}" alt=""><div class="area-title"><b>${ai + 1}・${a.name}</b><small>${a.boss.length > 1 ? '隨機強化 Boss' : `Boss：${BOSSES[a.boss[0]].name}`}・每趟 3 層＋Boss</small></div><span class="rec-chip">Lv.${a.recommend[0]}～${a.recommend[1]}</span></div>${ticketNeed(ch, area)}</div>
     <div class="world-map" style="aspect-ratio:${width} / ${height}">${svg}${bossImg}${pins.join('')}</div>
     <p class="muted small">點關卡查看並出發：藍色為已破關、金色為目前可挑戰、墓碑為尚未開放。</p>`;
 }
@@ -601,12 +621,44 @@ async function openMapNode(ch, key) {
   }
   const clears = (ch.clears && ch.clears[`${area}-${depth}`]) || 0;
   const evo = clears >= EVOLVE.clears ? `<p class="evo-note">🔥 打倒 Boss 時有 ${Math.round(EVOLVE.chance * 100)}% 機率復活成進化 Boss（獎勵更好）</p>` : `<p class="muted small">再破關 ${EVOLVE.clears - clears} 次後，Boss 有機會進化。</p>`;
+  // 入場卷：有就出發（用掉 1 張）；沒有但金幣夠時可以「購買並出發」；都沒有時提示到其他遊戲過關拿禮包（禮包一定有入場卷）。
+  const tier = village.ticketTier(area);
+  const have = village.ticketCount(ch, tier);
+  const price = TICKET.price[tier - 1];
+  const pending = store.loadRewards().filter((r) => !app.claimed.includes(r.id)).length;
+  const ticketLine = have
+    ? `<p class="ticket-line"><img src="${itemDataUrl(`ticket${tier}`)}" alt="">出發時用掉 1 張${TICKET.names[tier - 1]}（持有 ${have} 張）</p>`
+    : ch.gold >= price
+      ? `<p class="ticket-line lack"><img src="${itemDataUrl(`ticket${tier}`)}" alt="">需要 1 張${TICKET.names[tier - 1]}（持有 0 張），可以花 ${price}G 購買並出發</p>`
+      : `<p class="ticket-line lack"><img src="${itemDataUrl(`ticket${tier}`)}" alt="">需要 1 張${TICKET.names[tier - 1]}（持有 0 張），金幣也不足 ${price}G</p>
+        <p class="ticket-hint">🎁 ${pending ? `你有 ${pending} 筆獲得紀錄還沒領取，裡面有入場卷！` : `到其他遊戲（數獨、數學填字、成語填字……）過關一題，<b>每天</b>可以領 ${TICKET.daily} 張入場卷；<b>第一次過關</b>或<b>第一次全對</b>還能拿到獎勵禮包，禮包裡一定有入場卷！`}</p>`;
+  const goLabel = have ? '出發' : `購買並出發（${price}G）`;
+  const canGo = have || ch.gold >= price;
+  const stuck = pending ? { label: `領取禮包（${pending}）`, value: 'gift', className: 'primary' } : { label: '前往商店', value: 'shop', className: 'primary' };
   const go = await openModal({
     title,
-    html: `${boss}<div class="mini-tiles"><span class="mini-tile"><small>樓層</small><b>3＋Boss</b></span><span class="mini-tile"><small>破關</small><b>${clears} 次</b></span><span class="mini-tile"><small>地城等級</small><b>${Math.round(dungeonLevel(area, depth, 0))}</b></span></div>${evo}${app.run ? '<p class="notice-inline">有探險尚未結束，請先完成或放棄那一趟。</p>' : ''}`,
-    actions: [{ label: '取消', value: false }, { label: '出發', value: true, className: 'primary' }],
+    html: `${boss}<div class="mini-tiles"><span class="mini-tile"><small>樓層</small><b>3＋Boss</b></span><span class="mini-tile"><small>破關</small><b>${clears} 次</b></span><span class="mini-tile"><small>地城等級</small><b>${Math.round(dungeonLevel(area, depth, 0))}</b></span></div>${ticketLine}${evo}${app.run ? '<p class="notice-inline">有探險尚未結束，請先完成或放棄那一趟。</p>' : ''}`,
+    actions: [{ label: '取消', value: false }, canGo ? { label: goLabel, value: true, className: 'primary' } : stuck],
   });
-  if (go && !app.run) startRun(area, depth);
+  if (go === 'gift') {
+    await openRewards(ch);
+    return;
+  }
+  if (go === 'shop') {
+    app.tab = 'shop';
+    renderVillage();
+    window.scrollTo(0, 0);
+    return;
+  }
+  if (!go || app.run) return;
+  if (!have) {
+    const r = village.buyTicket(ch, tier);
+    if (!r.ok) {
+      villageMessage(r.message, true);
+      return;
+    }
+  }
+  startRun(area, depth);
 }
 
 /**
@@ -620,6 +672,8 @@ function shopPanel(ch) {
     <div class="shop-row"><img src="${itemDataUrl('cure')}" alt="" class="icon"><div class="item-main"><b>淨化藥水</b><span class="item-stats">解除中毒、睡眠、暈眩（睡眠或暈眩中也能喝）・持有 ${ch.cures || 0}／${LIMITS.cureHold}・每趟帶 ${LIMITS.cures} 瓶</span></div><button type="button" class="buy-btn" data-buy="cure">${LIMITS.curePrice}G</button></div>
     <div class="shop-row"><img src="${itemDataUrl('key')}" alt="" class="icon"><div class="item-main"><b>回城卷軸</b><span class="item-stats">帶著全部所得返回村莊・持有 ${ch.scroll}／1</span></div><button type="button" class="buy-btn" data-buy="scroll">${LIMITS.scrollPrice}G</button></div>
     <div class="shop-row"><img src="${itemDataUrl('pouch')}" alt="" class="icon"><div class="item-main"><b>背包擴充袋</b><span class="item-stats">背包上限 +${BAG_EXPAND.step} 格・目前 ${village.bagLimit(ch)}／${BAG_EXPAND.max} 格${ch.bagExpand ? `・持有 ${ch.bagExpand} 個` : ''}・商店剩 ${Math.max(0, BAG_EXPAND.shopMax - village.pouchesBought(ch))}／${BAG_EXPAND.shopMax} 個（賣完後打怪取得）</span></div><button type="button" class="buy-btn" data-buy="pouch"${village.bagExpandPrice(ch) === Infinity ? ' disabled' : ''}>${village.bagExpandPrice(ch) !== Infinity ? `${village.bagExpandPrice(ch)}G` : village.pouchesBought(ch) >= BAG_EXPAND.shopMax ? '已賣完' : '已達上限'}</button></div>`;
+  // 入場卷：只賣已解鎖區域用得到的等級。
+  const ticketRows = Array.from({ length: village.progressTicketTier(ch) }, (_, k) => `<div class="shop-row"><img src="${itemDataUrl(`ticket${k + 1}`)}" alt="" class="icon"><div class="item-main"><b>${TICKET.names[k]}</b><span class="item-stats">${Object.keys(TICKET.area).filter((a) => TICKET.area[a] === k + 1 && village.areaUnlocked(ch, a)).map((a) => AREAS[a].name).join('、')}・持有 ${village.ticketCount(ch, k + 1)} 張</span></div><button type="button" class="buy-btn" data-buy-ticket="${k + 1}">${TICKET.price[k]}G</button></div>`).join('');
   const items = ch.shop.length
     ? ch.shop.map((e, i) => `<div class="shop-row">${itemHtml(e.item)}${compareHtml(ch, e.item)}<button type="button" class="buy-btn" data-buy-item="${i}">${e.price}G</button></div>`).join('')
     : '<p class="muted">今天的裝備都賣完了，下次回村莊時會進新貨。</p>';
@@ -632,7 +686,7 @@ function shopPanel(ch) {
   const books = ch.shopBooks.length
     ? ch.shopBooks.map((slot, i) => `<div class="shop-row"><img src="${itemDataUrl('book')}" alt="" class="icon"><div class="item-main"><b>${village.bookName(slot)}</b><span class="item-stats">在鐵匠用材料合成一件${ITEM_SLOTS[slot]}・持有 ${(ch.books && ch.books[slot]) || 0} 本</span></div><button type="button" class="buy-btn" data-buy-book="${i}">${CRAFT.bookPrice}G</button></div>`).join('')
     : '<p class="muted">今天的製作書都賣完了。</p>';
-  return `<h3>道具</h3>${goods}<h3>製作書 <small class="muted">（每次返回村莊時刷新）</small></h3>${books}<h3>今日裝備 <small class="muted">（每次返回村莊時刷新）</small></h3>${items}<h3>賣出 <small class="muted">背包 ${village.bagUsed(ch)}／${village.bagLimit(ch)} 格</small></h3>${sell}`;
+  return `<h3>入場卷 <small class="muted">（每趟出發用 1 張）</small></h3>${ticketRows}<h3>道具</h3>${goods}<h3>製作書 <small class="muted">（每次返回村莊時刷新）</small></h3>${books}<h3>今日裝備 <small class="muted">（每次返回村莊時刷新）</small></h3>${items}<h3>賣出 <small class="muted">背包 ${village.bagUsed(ch)}／${village.bagLimit(ch)} 格</small></h3>${sell}`;
 }
 
 /**
@@ -712,7 +766,8 @@ function gemPanel(ch) {
         <span class="socket-holes">${holes.join('')}</span></div>`;
     }).join('')
     : '<p class="muted">還沒有裝備。</p>';
-  return `<h3>寶石袋 <small class="muted">（點寶石查看效果與合成）</small></h3>${pouch}
+  const fusable = owned.some(([key, n]) => n >= GEM_RULES.fuse && !GEMS[parseGem(key).kind].active && parseGem(key).tier < GEM_RULES.max);
+  return `<div class="bag-head"><h3>寶石袋 <small class="muted">（點寶石查看效果與合成）</small></h3>${fusable ? '<button type="button" class="expand-btn ready" data-fuse-all="1"><span><b>全部合成</b><small>合成到最高等級</small></span></button>' : ''}</div>${pouch}
     <h3>鑲嵌 <small class="muted">（點「＋」鑲嵌，點寶石取下）</small></h3>${cards}
     <p class="muted small">普通與精良裝備 1 孔、稀有與傳說 2 孔。持續型寶石 ${GEM_RULES.fuse} 顆同級可合成高一級（Ⅰ～Ⅴ，效果 5%～15%）；寶石的吸血合計最多 ${GEM_RULES.leechCap}%。主動寶石在地城以按鈕使用，同種只算一個、最多 ${GEM_RULES.actives} 個按鈕。取下寶石免費，寶石不會損壞。</p>`;
 }
@@ -766,7 +821,7 @@ function bagPanel(ch) {
   const limit = village.bagLimit(ch);
   const used = village.bagUsed(ch);
   const cells = [
-    ...ch.bag.map((it) => itemCell(it, `item:${it.id}`)),
+    ...ch.bag.map((it) => itemCell(it, `item:${it.id}`, 'data-cell', village.isUpgrade(ch, it))),
     ...MATERIALS.filter((m) => ch.mats && ch.mats[m.key] > 0).map((m, k) => stackCell(m.key, ch.mats[m.key], `mat:${m.key}`, `r${MATERIALS.indexOf(m)}`, m.name)),
     ...CRAFT.books.filter((b) => ch.books && ch.books[b] > 0).map((b) => stackCell('book', ch.books[b], `book:${b}`, 'book', village.bookName(b))),
     ...Object.keys(ch.gifts || {}).filter((t) => ch.gifts[t] > 0).sort().map((t) => stackCell('gift', ch.gifts[t], `gift:${t}`, `gift-cell tier${t}`, `${GIFT.names[t - 1]}`)),
@@ -775,6 +830,7 @@ function bagPanel(ch) {
   ];
   // 空格：顯示剩下的容量（擴充背包時看得到成長）。
   for (let k = used; k < limit; k++) cells.push('<span class="inv-cell empty" aria-hidden="true"></span>');
+  const ups = ch.bag.filter((it) => village.isUpgrade(ch, it)).length;
   // 持有背包擴充袋時，在背包標題旁顯示「擴充」按鈕（已達上限時停用）。
   const full = limit >= BAG_EXPAND.max;
   const expand = ch.bagExpand > 0
@@ -785,6 +841,7 @@ function bagPanel(ch) {
   if (app.bagTab === 'shared') return `<div class="sub-tabs" role="tablist">${tabs}</div>${sharedHtml(ch)}`;
   return `<div class="sub-tabs" role="tablist">${tabs}</div><h3>裝備欄 <small class="muted">（點格子查看與卸下）</small></h3>${paperDoll(ch)}
     <div class="bag-head"><h3>背包 <small class="muted">${used}／${limit} 格${limit < BAG_EXPAND.max && !expand ? `・擴充袋最多到 ${BAG_EXPAND.max} 格` : ''}</small></h3>${expand}</div>
+    ${ch.bag.length ? `<div class="bag-tools">${ups ? `<span class="up-note"><b>▲</b> ${ups} 件比目前穿的好</span>` : '<span></span>'}<button type="button" class="link-btn" data-bulk="1">一次賣出／分解</button></div>` : ''}
     <div class="inv-grid">${cells.join('')}</div>
     <p class="muted small">點格子查看裝備資訊並操作（裝備、分解、存入共用、賣出）。每種材料與製作書只佔 1 格，最多疊 ${LIMITS.stack} 個。</p>`;
 }
@@ -800,16 +857,18 @@ function itemIconName(item) {
 }
 
 /**
- * 一件裝備的背包格子：圖示、稀有度外框、強化值與鑲嵌的寶石色點。
+ * 一件裝備的背包格子：圖示、稀有度外框、強化值與鑲嵌的寶石色點；比目前穿的更好時高亮。
  * @param {object} it 裝備。
  * @param {string} key 點擊時的代碼。
  * @param {string} [attr='data-cell'] 點擊代碼的屬性名稱。
+ * @param {boolean} [up=false] 是否比目前穿的更好。
  * @returns {string} HTML。
  */
-function itemCell(it, key, attr = 'data-cell') {
+function itemCell(it, key, attr = 'data-cell', up = false) {
   const gems = (it.gems || []).map((g) => `<i style="--gem:${GEMS[parseGem(g).kind].color}"></i>`).join('');
   const hands = weaponHands(it) === 2 ? '<b class="cell-tag">雙</b>' : '';
-  return `<button type="button" class="inv-cell r${it.rarity}" ${attr}="${key}" aria-label="${RARITIES[it.rarity].name}・${esc(it.name)}${it.enhance ? ` +${it.enhance}` : ''}"><img src="${itemDataUrl(itemIconName(it))}" alt="">${it.enhance ? `<b class="cell-plus">+${it.enhance}</b>` : ''}${hands}${gems ? `<span class="cell-gems">${gems}</span>` : ''}</button>`;
+  // 比目前穿的更好：發光外框與左上角的「▲」。
+  return `<button type="button" class="inv-cell r${it.rarity}${up ? ' upgrade' : ''}" ${attr}="${key}" aria-label="${RARITIES[it.rarity].name}・${esc(it.name)}${it.enhance ? ` +${it.enhance}` : ''}${up ? '（比目前的好）' : ''}"><img src="${itemDataUrl(itemIconName(it))}" alt="">${up ? '<b class="cell-up">▲</b>' : ''}${it.enhance ? `<b class="cell-plus">+${it.enhance}</b>` : ''}${hands}${gems ? `<span class="cell-gems">${gems}</span>` : ''}</button>`;
 }
 
 /**
@@ -840,14 +899,14 @@ async function openBagCell(ch, key) {
     const act = await openModal({
       title: `${GIFT.names[k]} ×${n}`,
       html: `<div class="gift-head"><span class="inv-cell stack static gift-cell tier${tier}"><img src="${itemDataUrl('gift')}" alt=""></span><p>來自其他遊戲的第一次過關或第一次全對。開啟可以得到：</p></div>
-        <ul><li>金幣 ${GIFT.gold[k]}G</li><li>裝備材料 ${GIFT.mats[k]} 個（等級愈高，高品質材料愈多）</li><li>技能書碎片 ${GIFT.shards[k]} 片（同一本的碎片 ${GIFT.shardNeed} 片合成 1 本技能書）</li>
+        <ul><li>金幣 ${GIFT.gold[k]}G</li><li>入場卷 ${TICKET.gift[k]} 張（${TICKET.names[village.progressTicketTier(ch) - 1]}，依目前進度）</li><li>裝備材料 ${GIFT.mats[k]} 個（等級愈高，高品質材料愈多）</li><li>技能書碎片 ${GIFT.shards[k]} 片（同一本的碎片 ${GIFT.shardNeed} 片合成 1 本技能書）</li>
         <li>機率：回復藥水 ${GIFT.potions[k]} 瓶（${Math.round(GIFT.potionChance[k] * 100)}%）、淨化藥水 ${GIFT.cures[k]} 瓶（${Math.round(GIFT.cureChance[k] * 100)}%）、背包擴充袋（${Math.round(GIFT.pouchChance[k] * 100)}%）</li></ul>
         <p class="muted">藥水超過持有上限（各 ${LIMITS.potionHold} 瓶）或背包已擴充到 ${BAG_EXPAND.max} 格時，改為金幣。</p>`,
       actions: [{ label: '關閉', value: null }, ...(n > 1 ? [{ label: `全部開啟（${n}）`, value: 'all' }] : []), { label: '開啟', value: 'one', className: 'primary' }],
     });
     if (!act) return null;
     // 開啟（可以連續開全部），彙整得到的內容。
-    const total = { gold: 0, mats: {}, shards: {}, potions: 0, cures: 0, pouch: 0, converted: 0 };
+    const total = { gold: 0, mats: {}, shards: {}, potions: 0, cures: 0, pouch: 0, converted: 0, tickets: {} };
     let opened = 0;
     let last = null;
     for (let i = 0; i < (act === 'all' ? n : 1); i++) {
@@ -856,6 +915,7 @@ async function openBagCell(ch, key) {
       opened++;
       total.gold += last.gold;
       for (const f of ['potions', 'cures', 'pouch', 'converted']) total[f] += last[f];
+      if (last.tickets.n) total.tickets[last.tickets.tier] = (total.tickets[last.tickets.tier] || 0) + last.tickets.n;
       for (const [m, c] of Object.entries(last.mats)) total.mats[m] = (total.mats[m] || 0) + c;
       for (const [s2, c] of Object.entries(last.shards)) total.shards[s2] = (total.shards[s2] || 0) + c;
     }
@@ -863,6 +923,7 @@ async function openBagCell(ch, key) {
     const matList = Object.entries(total.mats).map(([m, c]) => `<span class="loot-chip"><img src="${itemDataUrl(m)}" alt="">${MATERIALS.find((x) => x.key === m).name} ×${c}</span>`).join('');
     const shardList = Object.entries(total.shards).map(([s2, c]) => `<span class="loot-chip r${skills.SKILLS[s2].rarity || 0}"><img src="${itemDataUrl('shard')}" alt=""><b class="item-name r${skills.SKILLS[s2].rarity || 0}">${skills.SKILLS[s2].name}</b> 碎片 ×${c}<small class="muted">（持有 ${ch.shards[s2]}／${GIFT.shardNeed}）</small></span>`).join('');
     const extras = [
+      ...Object.entries(total.tickets).map(([t, n]) => `<span class="loot-chip"><img src="${itemDataUrl(`ticket${t}`)}" alt="">${TICKET.names[t - 1]} ×${n}</span>`),
       total.potions ? `<span class="loot-chip"><img src="${itemDataUrl('potion')}" alt="">回復藥水 ×${total.potions}</span>` : '',
       total.cures ? `<span class="loot-chip"><img src="${itemDataUrl('cure')}" alt="">淨化藥水 ×${total.cures}</span>` : '',
       total.pouch ? `<span class="loot-chip"><img src="${itemDataUrl('pouch')}" alt="">背包擴充袋 ×${total.pouch}</span>` : '',
@@ -1190,6 +1251,13 @@ const INFO = {
       <li>掉落的裝備等級 +${REBIRTH.dropLevel}，稀有度提高</li>
       <li>金幣與經驗值 +${Math.round(REBIRTH.reward * 100)}%</li></ul>`,
   },
+  // 入場卷說明：ticket1～ticket5。
+  ...Object.fromEntries(TICKET.names.map((name, k) => [`ticket${k + 1}`, {
+    title: name,
+    html: `<p>每趟探險出發時用掉 1 張。用在：${Object.keys(TICKET.area).filter((a) => TICKET.area[a] === k + 1).map((a) => AREAS[a].name).join('、')}。</p>
+      <ul><li>商店售價 ${TICKET.price[k]}G（解鎖用得到的區域後才會販售）</li><li>每個獎勵禮包都會開出入場卷（依目前進度的等級）</li><li>每天在其他遊戲過關一題，可以領 ${TICKET.daily} 張（依目前進度的等級）</li><li>新角色送 ${TICKET.start} 張銅入場卷</li></ul>
+      <p class="muted small">入場卷用完又沒有金幣時，到其他遊戲過關：每天可以領入場卷，第一次過關或第一次全對還有獎勵禮包。</p>`,
+  }])),
   leech: {
     title: '吸血',
     html: `<p>造成傷害時，依比例回復 HP。</p><ul>
@@ -1253,7 +1321,7 @@ function heroPanel(ch) {
  * @returns {number} 戰力。
  */
 function powerOf(s) {
-  return Math.round(s.hp / 4 + s.atk * 3 + s.def * 2 + s.spd / 2);
+  return powerScore(s);
 }
 
 /**
@@ -1397,10 +1465,11 @@ async function onVillageClick(e) {
     const act = await openModal({
       title: `${gemName(key)} ×${n}`,
       html: `<div class="gem-detail">${gemCell(key, n, 'disabled tabindex="-1"')}<p>${gemEffect(key)}</p></div>${note}`,
-      actions: [{ label: '關閉', value: null }, ...(canFuse ? [{ label: `合成（${GEM_RULES.fuse} 顆）`, value: 'fuse', className: 'primary' }] : [])],
+      actions: [{ label: '關閉', value: null }, ...(canFuse && n >= GEM_RULES.fuse ? [{ label: '合成到最高', value: 'all' }, { label: `合成 1 次`, value: 'fuse', className: 'primary' }] : canFuse ? [{ label: `合成（${GEM_RULES.fuse} 顆）`, value: 'fuse', className: 'primary' }] : [])],
     });
-    if (act !== 'fuse') return;
-    r = village.fuseGem(ch, key);
+    if (act === 'all') r = await fuseAllDialog(ch, g.kind);
+    else if (act === 'fuse') r = village.fuseGem(ch, key);
+    if (!r) return;
   } else if (d.unsocket) {
     const found = village.findItem(ch, d.unsocket);
     const key = found && found.item.gems[Number(d.index)];
@@ -1420,6 +1489,14 @@ async function onVillageClick(e) {
   }
   else if (d.buy === 'scroll') r = village.buyScroll(ch);
   else if (d.buy === 'pouch') r = village.buyBagExpand(ch);
+  else if (d.buyTicket) r = village.buyTicket(ch, Number(d.buyTicket));
+  else if (d.fuseAll) {
+    r = await fuseAllDialog(ch);
+    if (!r) return;
+  } else if (d.bulk) {
+    r = await bulkDialog(ch);
+    if (!r) return;
+  }
   else if (d.usePouch) r = village.useBagExpand(ch);
   else if (d.buyItem !== undefined) r = village.buyItem(ch, Number(d.buyItem));
   else if (d.sell) {
@@ -1471,6 +1548,63 @@ async function onVillageClick(e) {
 }
 
 /**
+ * 一次合成寶石到能到的最高等級：先預覽會做出哪些寶石與花費，確認後合成。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string} [kind] 只合成這一種（省略時全部持續型寶石）。
+ * @returns {Promise<{ok: boolean, message: string} | null>} 結果；取消時為 null。
+ */
+async function fuseAllDialog(ch, kind) {
+  // 預覽：在複製的寶石袋與金幣上試算。
+  const plan = village.fuseAll({ ...ch, gems: { ...(ch.gems || {}) }, gold: ch.gold }, kind);
+  if (!plan.ok) {
+    await openModal({ title: '全部合成', html: `<p>${plan.message}</p>`, actions: [{ label: '知道了', value: null, className: 'primary' }] });
+    return null;
+  }
+  const chips = Object.entries(plan.made).map(([key, n]) => `<span class="loot-chip">${gemIconImg(key)}${gemName(key)} ×${n}</span>`).join('');
+  const ok = await openModal({
+    title: kind ? `${GEMS[kind].name}合成到最高` : '全部合成',
+    html: `<p>由低到高，每 ${GEM_RULES.fuse} 顆同種同級合成 1 顆高一級，可以連續往上合成。</p><p>合成 <b>${plan.fused}</b> 次，花費 <b class="gold-text">${plan.cost}G</b>（持有 ${ch.gold}G），做出：</p><div class="loot-chips">${chips}</div>${/金幣不足/.test(plan.message) ? '<p class="notice-inline">金幣不足，只會合成到買得起的部分。</p>' : ''}`,
+    actions: [{ label: '取消', value: false }, { label: `合成（-${plan.cost}G）`, value: true, className: 'primary' }],
+  });
+  return ok ? village.fuseAll(ch, kind) : null;
+}
+
+/**
+ * 一次賣出或分解背包中的普通（或普通＋精良）裝備；比目前穿的更好的、強化過的不會被選進去。
+ * @param {object} ch 角色（會被修改）。
+ * @returns {Promise<{ok: boolean, message: string} | null>} 結果；取消時為 null。
+ */
+async function bulkDialog(ch) {
+  const groups = [[0, '普通'], [1, '普通＋精良']].map(([max, name]) => ({ max, name, list: village.bulkTargets(ch, max) }));
+  const pick = await openModal({
+    title: '一次賣出／分解',
+    html: '<p class="muted small">比目前穿的更好（▲）與強化過的裝備不會被選進去；鑲嵌的寶石會自動放回寶石袋。</p>',
+    menu: groups.map((g) => ({ label: `${g.name}裝備（${g.list.length} 件）`, value: g.max, disabled: !g.list.length })),
+    actions: [{ label: '取消', value: null }],
+  });
+  if (pick === null || pick === undefined) return null;
+  const list = groups.find((g) => g.max === pick).list;
+  const gold = list.reduce((n, it) => n + sellPrice(it), 0);
+  // 分解預估：依品質累計材料（不含 25% 的高一階加碼）。
+  const mats = {};
+  for (const it of list) {
+    const y = village.salvageYield(it);
+    mats[y.key] = (mats[y.key] || 0) + y.n;
+  }
+  const matText = Object.entries(mats).map(([k, n]) => `${MATERIALS.find((m) => m.key === k).name} ×${n}`).join('、');
+  const cells = list.map((it) => itemCell(it, it.id, 'data-none')).join('');
+  const act = await openModal({
+    title: `${groups.find((g) => g.max === pick).name}裝備 ${list.length} 件`,
+    html: `<div class="inv-grid bulk-grid">${cells}</div><p>賣出：<b class="gold-text">+${gold}G</b></p><p>分解：約 ${matText}（另有機會多得高一階材料）</p>`,
+    actions: [{ label: '取消', value: null }, { label: '全部分解', value: 'salvage' }, { label: `全部賣出（+${gold}G）`, value: 'sell', className: 'primary' }],
+  });
+  const ids = list.map((it) => it.id);
+  if (act === 'sell') return village.sellMany(ch, ids);
+  if (act === 'salvage') return village.salvageMany(ch, ids, Math.random);
+  return null;
+}
+
+/**
  * 獲得紀錄：列出其他遊戲的第一次過關與第一次全對；還沒領取的可以「全部領取」，禮包放進目前角色的背包（每個紀錄只能領一次）。
  * @param {object} ch 角色。
  * @returns {Promise<void>}
@@ -1478,21 +1612,30 @@ async function onVillageClick(e) {
 async function openRewards(ch) {
   const list = store.loadRewards();
   const pending = list.filter((r) => !app.claimed.includes(r.id));
-  const row = (r, done) => `<div class="reward-row${done ? ' done' : ''}"><span class="inv-cell stack static gift-cell tier${r.tier}"><img src="${itemDataUrl('gift')}" alt=""></span><div><b>${GIFT.games[r.game]}</b><small>${esc(r.label)}</small></div><em>${done ? '已領取' : GIFT.names[r.tier - 1]}</em></div>`;
+  // 每日練習的紀錄給入場卷（等級依目前角色的進度），其他紀錄給禮包。
+  const tier = village.progressTicketTier(ch);
+  const row = (r, done) => (r.type === 'daily'
+    ? `<div class="reward-row${done ? ' done' : ''}"><span class="inv-cell stack static ticket-cell"><img src="${itemDataUrl(`ticket${tier}`)}" alt=""></span><div><b>每日練習 ${r.id.slice(6)}</b><small>${esc(GIFT.games[r.game])}・${esc(r.label)}</small></div><em>${done ? '已領取' : `${TICKET.short[tier - 1]} ×${TICKET.daily}`}</em></div>`
+    : `<div class="reward-row${done ? ' done' : ''}"><span class="inv-cell stack static gift-cell tier${r.tier}"><img src="${itemDataUrl('gift')}" alt=""></span><div><b>${GIFT.games[r.game]}</b><small>${esc(r.label)}</small></div><em>${done ? '已領取' : GIFT.names[r.tier - 1]}</em></div>`);
   const done = list.filter((r) => app.claimed.includes(r.id)).slice(0, 30);
-  const html = `<p class="muted small">在其他遊戲<b>第一次過關</b>或<b>第一次全對</b>（沒用提示／三顆星）時取得獎勵禮包，難度或章節愈高，禮包等級愈高；重複過關不會再給。每個紀錄只能領一次，領取後放進目前角色的背包。</p>
+  const html = `<p class="muted small">在其他遊戲<b>第一次過關</b>或<b>第一次全對</b>（沒用提示／三顆星）時取得獎勵禮包，難度或章節愈高，禮包等級愈高；重複過關不會再給。<b>每天</b>在其他遊戲過關一題，還可以領 ${TICKET.daily} 張入場卷（目前進度的等級）。每個紀錄只能領一次，領取後放進目前角色。</p>
     ${pending.length ? pending.map((r) => row(r, false)).join('') : '<p class="muted">目前沒有可以領取的禮包。到大廳玩其他遊戲吧！</p>'}
     ${done.length ? `<h3>已領取</h3>${done.map((r) => row(r, true)).join('')}` : ''}`;
   const act = await openModal({ title: '獲得紀錄', html, actions: [{ label: '關閉', value: null }, ...(pending.length ? [{ label: `全部領取（${pending.length}）`, value: 'claim', className: 'primary' }] : [])] });
   if (act !== 'claim') return;
   let got = 0;
+  let gifts = 0;
+  let tickets = 0;
   for (const r of pending) {
-    if (!village.addGift(ch, r.tier)) break;
+    if (r.type === 'daily') tickets += village.addTickets(ch, tier, TICKET.daily);
+    else if (village.addGift(ch, r.tier)) gifts++;
+    else break;
     app.claimed.push(r.id);
     got++;
   }
   await store.saveClaimed(ch, app.claimed);
-  villageMessage(got === pending.length ? `領取了 ${got} 個獎勵禮包，到倉庫開啟` : `背包已滿，領取了 ${got}／${pending.length} 個`, got < pending.length);
+  const parts = [gifts ? `${gifts} 個獎勵禮包（到倉庫開啟）` : '', tickets ? `${tickets} 張${TICKET.names[tier - 1]}` : ''].filter(Boolean).join('、');
+  villageMessage(got === pending.length ? `領取了 ${parts}` : `背包已滿，領取了 ${got}／${pending.length} 筆：${parts}`, got < pending.length);
   renderVillage();
 }
 
@@ -1571,6 +1714,11 @@ async function pickGem(ch, id) {
 async function startRun(area, depth) {
   const ch = currentChar();
   if (!ch || app.run) return;
+  const ticket = village.useTicket(ch, area);
+  if (!ticket.ok) {
+    villageMessage(ticket.message, true);
+    return;
+  }
   const carry = village.packForRun(ch);
   const seed = (Math.floor(Math.random() * 0x7fffffff) ^ Date.now()) >>> 0;
   const world = new World(ch, { area, depth, seed, potions: carry.potions, scroll: carry.scroll, cures: carry.cures });

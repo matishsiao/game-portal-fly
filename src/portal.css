@@ -253,6 +253,57 @@ summary:focus-visible {
   gap: 10px;
 }
 
+/* 作答獎勵提示：在主打遊戲與遊戲列表之間，點了開啟口袋地城。 */
+.reward-tip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(240, 184, 64, 0.22), rgba(158, 42, 58, 0.14));
+  border: 1px solid rgba(232, 168, 48, 0.55);
+  box-shadow: var(--shadow);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.reward-tip-ico {
+  flex: none;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.reward-tip-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.reward-tip-text b {
+  font-size: 15px;
+}
+
+.reward-tip-text small {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.reward-tip-text em {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.reward-daily {
+  font-weight: 700;
+}
+
+.reward-daily.done {
+  color: var(--ready);
+}
+
 .continue-card {
   display: flex;
   align-items: center;

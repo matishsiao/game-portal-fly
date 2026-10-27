@@ -1,7 +1,7 @@
 // 本機儲存：角色、探險與設定存在 IndexedDB（資料庫 pocketdungeon）；大廳讀取用的摘要與統計存在 localStorage。
 // IndexedDB 無法使用時改存記憶體（關閉後遺失）。所有讀寫都容錯，任何儲存錯誤不讓遊戲停止。
 
-import { AREAS, AREA_KEYS, CLASS_KEYS, CLASSES, SHARED_SLOTS, STATUS, MATERIALS, CRAFT, LIMITS, GIFT, MAX_DEPTH } from './pd/data.js';
+import { AREAS, AREA_KEYS, CLASS_KEYS, CLASSES, SHARED_SLOTS, STATUS, MATERIALS, CRAFT, LIMITS, GIFT, MAX_DEPTH, TICKET } from './pd/data.js';
 import { newSkills, SKILLS, SKILL_SLOTS, bookSkillIds } from './pd/skills.js';
 import { levelCap, parseGem, socketCount } from './pd/rules.js';
 
@@ -159,7 +159,7 @@ export function isValidCharacter(ch) {
     && (ch.skills.learned === undefined || (Array.isArray(ch.skills.learned) && ch.skills.learned.every((id) => SKILLS[id] && SKILLS[id].book)))
     && ch.skills.slots.every((id) => id === null || (SKILLS[id] && (SKILLS[id].cls === ch.cls || (SKILLS[id].book && (ch.skills.learned || []).includes(id)))))
     && (ch.skillBooks === undefined || isStackMap(ch.skillBooks, bookSkillIds()))
-    && (ch.gifts === undefined || isStackMap(ch.gifts, ['1', '2', '3', '4', '5'])) && (ch.shards === undefined || isStackMap(ch.shards, bookSkillIds()))
+    && (ch.gifts === undefined || isStackMap(ch.gifts, ['1', '2', '3', '4', '5'])) && (ch.tickets === undefined || isStackMap(ch.tickets, ['1', '2', '3', '4', '5'])) && (ch.shards === undefined || isStackMap(ch.shards, bookSkillIds()))
     && (ch.cures === undefined || n(ch.cures))
     && (ch.mats === undefined || isStackMap(ch.mats, MATERIALS.map((m) => m.key))) && (ch.books === undefined || isStackMap(ch.books, CRAFT.books)) && (ch.gems === undefined || (typeof ch.gems === 'object' && Object.entries(ch.gems).every(([k, v]) => parseGem(k) && Number.isInteger(v) && v >= 0)));
 }
@@ -186,7 +186,7 @@ function isValidRun(run, characters) {
 export function newCharacter(cls, name) {
   return {
     id: cls, cls, name: [...(name.trim() || CLASSES[cls].name)].slice(0, 8).join(''), level: 1, xp: 0, gold: 50,
-    equipped: { weapon: null, offhand: null, helmet: null, armor: null, boots: null, acc1: null, acc2: null }, bag: [], bagSize: 20, bagExpand: 0, potions: 3, scroll: 1, cures: 1, gems: {}, mats: {}, books: {}, skillBooks: {}, gifts: {}, shards: {},
+    equipped: { weapon: null, offhand: null, helmet: null, armor: null, boots: null, acc1: null, acc2: null }, bag: [], bagSize: 20, bagExpand: 0, potions: 3, scroll: 1, cures: 1, gems: {}, mats: {}, books: {}, skillBooks: {}, gifts: {}, shards: {}, tickets: { 1: TICKET.start },
     unlocked: { grass: 1 }, clears: {}, rebirth: 0, shop: null, created: Date.now(), skills: newSkills(cls),
     stats: { playMs: 0, kills: 0, maxHit: 0, legends: 0, deaths: 0, runs: 0 },
   };
@@ -221,6 +221,12 @@ export async function loadAll() {
       // 獎勵禮包加入之前的角色：補上空的禮包與技能書碎片。
       if (!ch.gifts || typeof ch.gifts !== 'object') ch.gifts = {};
       if (!ch.shards || typeof ch.shards !== 'object') ch.shards = {};
+    }
+    // 入場卷加入之前的角色：送 5 張銅入場卷，以及 5 張目前進度等級的入場卷。
+    if (ch && ch.unlocked && !ch.tickets) {
+      ch.tickets = { 1: TICKET.start };
+      const top = AREA_KEYS.filter((k) => ch.unlocked[k] >= 1).reduce((t, k) => Math.max(t, TICKET.area[k] || 1), 1);
+      if (top > 1) ch.tickets[top] = TICKET.start;
     }
     // 區域插入主線前的角色：已解鎖較後面的區域時，前面（含新加入）的區域也一併解鎖深度 1。
     if (ch && ch.unlocked && typeof ch.unlocked === 'object') {
@@ -333,6 +339,11 @@ export function loadRewards() {
   const raw = readJson('games.rewards');
   for (const r of Array.isArray(raw) ? raw : []) {
     if (!r || typeof r.id !== 'string' || !GIFT.games[r.game] || !Number.isInteger(r.tier) || r.tier < 1 || r.tier > 5 || typeof r.label !== 'string') continue;
+    // 每日練習（daily:YYYY-MM-DD）：當天第一次在任何遊戲過關，領取時給入場卷而不是禮包。
+    if (r.type === 'daily') {
+      if (/^daily:\d{4}-\d{2}-\d{2}$/.test(r.id)) out.set(r.id, { id: r.id, game: r.game, type: 'daily', tier: 1, label: r.label, at: Number(r.at) || 0 });
+      continue;
+    }
     out.set(r.id, { id: r.id, game: r.game, type: r.type === 'perfect' ? 'perfect' : 'clear', tier: r.tier, label: r.label, at: Number(r.at) || 0 });
   }
   const tiers = { easy: 1, medium: 2, hard: 3, expert: 4 };

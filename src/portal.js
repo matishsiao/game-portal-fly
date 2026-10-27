@@ -664,9 +664,24 @@ function rememberPortal() {
   }
 }
 
+/**
+ * 作答獎勵提示：顯示今天的每日練習是否完成（各遊戲過關時在 `games.rewards` 寫入 `daily:日期`）。
+ */
+function renderRewardTip() {
+  const el = document.getElementById('reward-daily');
+  if (!el) return;
+  const d = new Date();
+  const id = `daily:${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const list = readJson('games.rewards');
+  const done = Array.isArray(list) && list.some((r) => r && r.id === id);
+  el.textContent = done ? '✓ 今天的每日練習完成了，到口袋地城點 🎁 領入場卷' : '今天還沒過關，玩一題就能拿到今天的入場卷';
+  el.classList.toggle('done', done);
+}
+
 /** 回到大廳（含從遊戲按返回、從背景切回）時更新進度與狀態。 */
 function refreshView() {
   renderGreeting();
+  renderRewardTip();
   renderProgress();
   refreshAll();
   checkPortalUpdate();
@@ -676,6 +691,7 @@ function refreshView() {
 /** 啟動大廳。 */
 function init() {
   renderGames();
+  renderRewardTip();
   rememberPortal();
   setupInstall();
   const platform = mobilePlatform();

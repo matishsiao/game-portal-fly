@@ -22,7 +22,7 @@ const REWARD_TIER = { easy: [1, '簡單'], medium: [2, '中等'], hard: [3, '困
 /**
  * 新增一筆獲得紀錄（同一個 id 只記一次，重複過關不會再記）。
  * @param {string} id 紀錄代碼（遊戲:項目:種類）。
- * @param {'clear' | 'perfect'} type 第一次過關或第一次全對。
+ * @param {'clear' | 'perfect' | 'daily'} type 第一次過關、第一次全對或當天第一次完成（每日練習）。
  * @param {number} tier 禮包等級（1～5）。
  * @param {string} label 顯示用的說明。
  */
@@ -32,6 +32,15 @@ function addReward(id, type, tier, label) {
   if (list.some((r) => r && r.id === id)) return;
   list.push({ id, game: GAME_DIR, type, tier: Math.min(5, tier), label, at: Date.now() });
   writeJson(REWARD_KEY, list.slice(-1000));
+}
+
+/**
+ * 今天的每日練習紀錄代碼（本機日期，例如 daily:2026-10-27）：所有遊戲共用，一天只記一次。
+ * @returns {string} 紀錄代碼。
+ */
+function dailyId() {
+  const d = new Date();
+  return `daily:${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 
@@ -185,6 +194,8 @@ export function recordComplete(difficulty, ms, hintsUsed) {
   const [tier, name] = REWARD_TIER[difficulty] || [1, difficulty];
   if (firstClear) addReward(`${GAME_DIR}:${difficulty}:clear`, 'clear', tier, `${name} 第一次過關`);
   if (firstPerfect) addReward(`${GAME_DIR}:${difficulty}:perfect`, 'perfect', tier + 1, `${name} 第一次全對（沒用提示）`);
+  // 每日練習：今天第一次在任何遊戲過關（口袋地城每天可領一次入場卷）。
+  addReward(dailyId(), 'daily', 1, `今天第一次過關（${name}）`);
   return { newRecord };
 }
 

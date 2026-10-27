@@ -281,3 +281,53 @@ test('區域主線：草原 → 苔蘚遺跡 → 熔岩礦坑 → 冰晶要塞 �
   assert.deepEqual(v.unlockAfterBoss(ch, 'expert', 5), [], '深淵最深 5');
   assert.equal(dungeonLevel('expert', 5, 3), 60);
 });
+
+test('比目前穿的更好的裝備會被標示；一次賣出／分解只處理普通（或普通＋精良）且不是升級、沒強化過的裝備', () => {
+  const ch = hero();
+  ch.cls = 'warrior';
+  ch.skills = { levels: {}, slots: [], passive: {}, learned: [] };
+  ch.mats = {};
+  ch.gems = {};
+  ch.bagSize = 40;
+  const armor = (rarity, level, id, enhance = 0) => ({ ...makeItem({ slot: 'armor', level, rarity }, () => 0.5), id, enhance });
+  ch.equipped.armor = armor(1, 5, 'worn');
+  const better = armor(3, 20, 'better');
+  const worse1 = armor(0, 1, 'w1');
+  const worse2 = armor(0, 1, 'w2', 2);
+  const fine = armor(1, 1, 'f1');
+  ch.bag = [better, worse1, worse2, fine];
+  assert.equal(v.isUpgrade(ch, better), true);
+  assert.equal(v.isUpgrade(ch, worse1), false);
+  assert.deepEqual(v.bulkTargets(ch, 0).map((i) => i.id), ['w1'], '強化過的不算');
+  assert.deepEqual(v.bulkTargets(ch, 1).map((i) => i.id), ['w1', 'f1']);
+  const gold = ch.gold;
+  const r = v.sellMany(ch, ['w1', 'f1']);
+  assert.equal(r.count, 2);
+  assert.ok(ch.gold > gold);
+  assert.deepEqual(ch.bag.map((i) => i.id), ['better', 'w2']);
+  ch.bag.push(armor(0, 1, 's1'), armor(0, 1, 's2'));
+  const s = v.salvageMany(ch, ['s1', 's2'], () => 0.99);
+  assert.equal(s.count, 2);
+  assert.ok(ch.mats.iron > 0);
+  // 別的職業的武器不算升級。
+  assert.equal(v.isUpgrade(ch, { ...makeItem({ slot: 'weapon', cls: 'mage', level: 30, rarity: 3 }, () => 0.5), id: 'staff' }), false);
+});
+
+test('寶石全部合成：由低到高連續往上合成，金幣不足時停在買得起的部分', () => {
+  const ch = hero();
+  ch.gems = { 'atk-1': 9, 'hp-1': 2, 'shield-1': 3 };
+  ch.gold = 10000;
+  const r = v.fuseAll(ch);
+  // 9 顆 1 級 → 3 顆 2 級 → 1 顆 3 級；翡翠不足 3 顆、主動寶石不能合成。
+  assert.equal(r.fused, 4);
+  assert.equal(r.cost, 3 * 100 + 300);
+  assert.equal(ch.gems['atk-3'], 1);
+  assert.equal(ch.gems['atk-1'] || 0, 0);
+  assert.equal(ch.gems['hp-1'], 2);
+  assert.equal(ch.gems['shield-1'], 3);
+  ch.gems = { 'def-1': 9 };
+  ch.gold = 250;
+  const s = v.fuseAll(ch, 'def');
+  assert.equal(s.fused, 2);
+  assert.match(s.message, /金幣不足/);
+});
