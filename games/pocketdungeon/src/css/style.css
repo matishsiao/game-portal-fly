@@ -667,6 +667,15 @@ button:focus-visible {
   font-weight: 700;
 }
 
+/* 角色分頁：屬性的增益數字。 */
+.result-list .up {
+  color: var(--good);
+}
+
+.result-list .down {
+  color: var(--wrong);
+}
+
 .compare .up {
   color: var(--good);
 }
@@ -1288,7 +1297,7 @@ button:focus-visible {
   to { transform: scale(1); }
 }
 
-.st-poison { background: #8ad04a; }
+.st-poison { background: #c07aff; }
 .st-sleep { background: #9ab8ff; }
 .st-stun { background: #ffe14d; }
 .st-shield { background: #e8f4ff; }

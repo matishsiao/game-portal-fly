@@ -85,14 +85,6 @@ export function buyCure(ch) {
 }
 
 /**
- * 商店販售的寶石：每種寶石的最低等級（持續型為碎裂的 1 級，主動型只有一種）。
- * @returns {{key: string, price: number}[]} 寶石代碼與售價。
- */
-export function shopGems() {
-  return Object.keys(GEMS).map((kind) => ({ key: `${kind}-1`, price: GEMS[kind].active ? GEM_RULES.activePrice : GEM_RULES.price }));
-}
-
-/**
  * 把寶石放進角色的寶石袋（同種同級疊在一起）。
  * @param {object} ch 角色（會被修改）。
  * @param {string} key 寶石代碼。
@@ -102,21 +94,6 @@ export function addGem(ch, key, n = 1) {
   ch.gems = ch.gems || {};
   ch.gems[key] = (ch.gems[key] || 0) + n;
   if (ch.gems[key] <= 0) delete ch.gems[key];
-}
-
-/**
- * 購買商店的寶石。
- * @param {object} ch 角色（會被修改）。
- * @param {string} key 寶石代碼（須為商店販售的種類）。
- * @returns {{ok: boolean, message: string}} 結果。
- */
-export function buyGem(ch, key) {
-  const entry = shopGems().find((g) => g.key === key);
-  if (!entry) return { ok: false, message: '商店沒有賣這種寶石' };
-  if (ch.gold < entry.price) return { ok: false, message: `金幣不足（需要 ${entry.price}G）` };
-  ch.gold -= entry.price;
-  addGem(ch, key);
-  return { ok: true, message: `買下${gemName(key)}，到「寶石」分頁鑲嵌` };
 }
 
 /**

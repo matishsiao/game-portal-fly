@@ -245,13 +245,12 @@ test('寶石掉落：等級 1～3，深處較容易出高等級；主動寶石�
   assert.ok(actives > 100 && actives < 300);
 });
 
-test('寶石商店、鑲嵌、取下、合成；賣出裝備時寶石放回寶石袋', () => {
+test('寶石鑲嵌、取下、合成；賣出裝備時寶石放回寶石袋；商店不賣寶石', () => {
   const ch = hero('warrior');
   ch.gold = 5000;
-  assert.ok(v.buyGem(ch, 'atk-1').ok);
-  assert.equal(v.buyGem(ch, 'atk-2').ok, false, '商店只賣 1 級');
-  assert.ok(v.buyGem(ch, 'shield-1').ok);
-  assert.equal(ch.gold, 5000 - GEM_RULES.price - GEM_RULES.activePrice);
+  assert.equal(v.buyGem, undefined);
+  v.addGem(ch, 'atk-1');
+  v.addGem(ch, 'shield-1');
   const item = makeItem({ slot: 'armor', level: 5, rarity: 0 }, seededRng(1));
   ch.bag.push(item);
   assert.ok(v.socketGem(ch, item.id, 'atk-1').ok);
@@ -313,21 +312,33 @@ test('主動寶石：血量護盾吸收傷害（25%、10 秒）、抗異常護�
   assert.equal(w.useActive(0), true, '60 秒後可再使用');
 });
 
-test('吸血：寶石最多 15%，嗜血技能另外疊加', () => {
+test('吸血：寶石最多 15%，嗜血技能另外疊加；每秒最多回復 2%（嗜血中 4%）最大 HP', () => {
   const ch = hero('warrior');
   ch.equipped.armor = { ...makeItem({ slot: 'armor', level: 5, rarity: 3 }, seededRng(3)), gems: ['leech-5'] };
   const w = arena(ch);
   const p = w.player;
-  p.hp = 10;
   const m = dummy(w, 1);
+  // 比例：額度充足時，寶石 15%、嗜血再疊加 40%。
+  p.leechBudget = 1e9;
+  p.hp = 10;
   w.hitMonster(m, 100);
   assert.equal(p.hp, 25);
-  // 嗜血技能疊加在寶石的 15% 上，不受上限限制。
   p.leechT = 5;
   p.leechPct = 0.4;
   p.hp = 10;
   w.hitMonster(m, 100);
   assert.equal(p.hp, 65);
+  // 每秒上限：連續 3 秒造成大量傷害，回復量不超過 3 秒 × 2% 最大 HP。
+  p.leechT = 0;
+  p.leechBudget = 0;
+  p.hp = 1;
+  for (let t = 0; t < 3; t += DT) {
+    p.invuln = 1;
+    w.update(DT, IDLE);
+    w.hitMonster(m, 1000);
+  }
+  assert.ok(p.hp - 1 <= Math.ceil(p.maxHp * 0.02 * 3) + 1, `回復 ${p.hp - 1}`);
+  assert.ok(p.hp - 1 >= Math.floor(p.maxHp * 0.02 * 3) - 2);
 });
 
 test('技能欄：未轉職 2 格，每轉職一次 +1，最多 4 格；轉職技能依轉職次數解鎖', () => {
@@ -399,4 +410,68 @@ test('存檔驗證：轉職後 Lv.31 以上的角色合法；新角色有寶石�
   ch.level = 10;
   ch.gems = { 'atk-9': 1 };
   assert.equal(isValidCharacter(ch), false);
+});
+
+test('難度：菁英詞綴（名稱、爆裂與射手的額外招式）、出招速度隨深度與轉職提高', () => {
+  const w = arena(hero('warrior'));
+  const nova = w.spawnMonster('skeleton', w.player.x + 2, w.player.y, { elite: true, affix: 'nova' });
+  assert.match(nova.name, /^爆裂菁英/);
+  nova.aggro = true;
+  nova.affixT = 0;
+  nova.cd = 99;
+  w.updateMonster(nova, DT);
+  assert.ok(w.telegraphs.some((t) => t.shape === 'circle' && t.dmg > 0));
+  const archer = w.spawnMonster('skeleton', w.player.x - 2, w.player.y, { elite: true, affix: 'volley' });
+  archer.aggro = true;
+  archer.affixT = 0;
+  archer.cd = 99;
+  w.updateMonster(archer, DT);
+  assert.equal(w.projectiles.filter((p) => p.team === 'e').length, 3);
+  const fast = w.spawnMonster('skeleton', w.player.x, w.player.y + 3, { elite: true, affix: 'frenzy' });
+  assert.equal(fast.speed, 1.9 * 1.3);
+  assert.equal(w.pace(fast), 1.4);
+  const deep = new World(hero('warrior', 10, 2), { area: 'easy', depth: 5, seed: 11 }, seededRng(1));
+  assert.ok(Math.abs(deep.pace({}) - 1.4) < 1e-9, '深度 5 +20%、轉職 2 次 +20%');
+  const abyss = new World(hero('warrior', 10, 3), { area: 'expert', depth: 17, seed: 11 }, seededRng(1));
+  assert.equal(abyss.pace({}), 1.5, '最多 1.5 倍');
+});
+
+test('Boss：HP 25% 以下狂暴；每個 Boss 的新招式都能施放', () => {
+  const w = new World(hero('warrior'), { area: 'easy', depth: 1, seed: 3, floor: 3 }, seededRng(2));
+  const b = w.boss();
+  b.hp = b.maxHp * 0.2;
+  w.updateFlow();
+  w.updateMonster(b, DT);
+  assert.ok(b.enraged && b.phase2);
+  for (const [type, move] of [['treant', 'thorns'], ['golem', 'fissure'], ['lich', 'blizzard'], ['bullKing', 'gore'], ['thunderbird', 'cross'], ['necromancer', 'grave']]) {
+    const v = new World(hero('warrior', 30), { area: 'expert', depth: 1, seed: 5, floor: 3 }, seededRng(4));
+    v.monsters = [];
+    const m = v.spawnMonster(type, v.player.x + 3, v.player.y, { boss: true });
+    m.aggro = true;
+    v.player.invuln = 1e9;
+    let seen = false;
+    for (let t = 0; t < 40 && !seen; t += DT) {
+      const before = m.pattern;
+      v.update(DT, IDLE);
+      if (m.pattern !== before && m.lastMove === undefined) {
+        const moves = { treant: 5, golem: 4, lich: 4, bullKing: 5, thunderbird: 4, necromancer: 4 }[type];
+        const idx = { treant: 2, golem: 2, lich: 2, bullKing: 2, thunderbird: 2, necromancer: 2 }[type];
+        if ((m.pattern - 1) % moves === idx) seen = v.telegraphs.length > 0 || v.projectiles.length > 0;
+      }
+    }
+    assert.ok(seen, `${type} 的 ${move}`);
+  }
+});
+
+test('每升到 5 的倍數等級送 1 顆隨機寶石（一次連升多級時每個都送）', () => {
+  const ch = hero('warrior', 3);
+  const w = arena(ch);
+  w.addXp(1e4);
+  const gifts = w.events.filter((e) => e.type === 'gem' && e.gift).map((e) => e.gift);
+  const expected = [];
+  for (let lv = 4; lv <= ch.level; lv++) if (lv % 5 === 0) expected.push(lv);
+  assert.ok(expected.length >= 1);
+  assert.deepEqual(gifts, expected);
+  assert.equal(Object.values(ch.gems).reduce((a, b) => a + b, 0), expected.length);
+  assert.equal(w.loot.gems.length, expected.length);
 });

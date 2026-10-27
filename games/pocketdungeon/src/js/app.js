@@ -471,8 +471,7 @@ function shopPanel(ch) {
   const sell = ch.bag.length
     ? ch.bag.map((it) => `<div class="shop-row">${itemHtml(it)}<button type="button" class="sell-btn" data-sell="${it.id}">賣 ${sellPrice(it)}G</button></div>`).join('')
     : '<p class="muted">背包是空的。</p>';
-  const gems = village.shopGems().map((g) => `<div class="shop-row">${gemIcon(g.key)}<div class="item-main"><b>${gemName(g.key)}</b><span class="item-stats">${gemEffect(g.key)}・持有 ${(ch.gems && ch.gems[g.key]) || 0} 顆</span></div><button type="button" class="buy-btn" data-buy-gem="${g.key}">${g.price}G</button></div>`).join('');
-  return `<h3>道具</h3>${goods}<h3>寶石 <small class="muted">（到「寶石」分頁鑲嵌與合成）</small></h3>${gems}<h3>今日裝備 <small class="muted">（每次返回村莊時刷新）</small></h3>${items}<h3>賣出 <small class="muted">背包 ${ch.bag.length}／${village.bagLimit(ch)}</small></h3>${sell}`;
+  return `<h3>道具</h3>${goods}<h3>今日裝備 <small class="muted">（每次返回村莊時刷新）</small></h3>${items}<h3>賣出 <small class="muted">背包 ${ch.bag.length}／${village.bagLimit(ch)}</small></h3>${sell}`;
 }
 
 /**
@@ -526,7 +525,7 @@ function gemPanel(ch) {
         : `<span class="muted small">${GEMS[g.kind].active ? '不能合成' : '最高等級'}</span>`;
       return `<div class="shop-row">${gemIcon(key)}<div class="item-main"><b>${gemName(key)} ×${n}</b><span class="item-stats">${gemEffect(key)}</span></div>${fuse}</div>`;
     }).join('')
-    : '<p class="muted">寶石袋是空的。打倒怪物、打開寶箱或在商店購買寶石。</p>';
+    : '<p class="muted">寶石袋是空的。打倒怪物、打開寶箱取得；每升到 5 的倍數等級也會送 1 顆。</p>';
   const list = [...EQUIP_SLOTS.map((e) => ch.equipped[e.key]).filter(Boolean), ...ch.bag];
   const rows = list.length
     ? list.map((it) => {
@@ -701,14 +700,31 @@ function heroPanel(ch) {
   const need = xpToNext(ch.level, cap);
   const xp = ch.level >= cap ? 'MAX' : `${ch.xp}／${need}`;
   const st = ch.stats;
+  // 增益拆成兩層：裝備（不含寶石）相對於沒穿裝備，寶石相對於只穿裝備。
+  const worn = Object.values(ch.equipped).filter(Boolean);
+  const bare = characterStats(ch.cls, ch.level, [], ch.rebirth || 0);
+  const noGem = characterStats(ch.cls, ch.level, worn.map((it) => ({ ...it, gems: [] })), ch.rebirth || 0);
+  /**
+   * 屬性值與組成，例如「297（基礎 204、裝備 +60、寶石 +33）」：最前面的數字就是最終值。
+   * @param {string} k 屬性（hp、atk、def、spd）。
+   * @returns {string} HTML。
+   */
+  const withBonus = (k) => {
+    const eq = noGem[k] - bare[k];
+    const gem = s[k] - noGem[k];
+    if (!eq && !gem) return `${s[k]}`;
+    const sign = (v) => `${v > 0 ? '+' : ''}${v}`;
+    const parts = [`基礎 ${bare[k]}`, eq ? `<span class="${eq > 0 ? 'up' : 'down'}">裝備 ${sign(eq)}</span>` : '', gem ? `<span class="up">寶石 ${sign(gem)}</span>` : ''].filter(Boolean).join('、');
+    return `${s[k]}<small class="muted">（${parts}）</small>`;
+  };
   return `<div class="hero-card"><img src="${heroDataUrl(ch.cls, 6)}" alt="" class="char-img big"><dl class="result-list">
       <dt>職業</dt><dd>${village.classTitle(ch)}<small class="muted">（轉職 ${ch.rebirth || 0}／${REBIRTH.max}）</small></dd>
       <dt>等級</dt><dd>Lv.${ch.level}${ch.level >= levelCap(ch.rebirth || 0) ? '（MAX）' : ''}</dd>
       <dt>經驗值</dt><dd>${xp}</dd>
-      <dt>HP</dt><dd>${s.hp}</dd>
-      <dt>攻擊</dt><dd>${s.atk}</dd>
-      <dt>防禦</dt><dd>${s.def}</dd>
-      <dt>速度</dt><dd>${s.spd}<small class="muted">（每秒 ${prof.move.toFixed(1)} 格、攻擊間隔 ${prof.interval.toFixed(2)} 秒）</small></dd>
+      <dt>HP</dt><dd>${withBonus('hp')}</dd>
+      <dt>攻擊</dt><dd>${withBonus('atk')}</dd>
+      <dt>防禦</dt><dd>${withBonus('def')}</dd>
+      <dt>速度</dt><dd>${withBonus('spd')}<small class="muted">（每秒 ${prof.move.toFixed(1)} 格、攻擊間隔 ${prof.interval.toFixed(2)} 秒）</small></dd>
     </dl></div>
     ${effectsHtml(ch)}
     <h3>角色統計</h3>
@@ -740,7 +756,6 @@ async function onVillageClick(e) {
   }
   if (d.buy === 'potion') r = village.buyPotion(ch);
   else if (d.buy === 'cure') r = village.buyCure(ch);
-  else if (d.buyGem) r = village.buyGem(ch, d.buyGem);
   else if (d.fuse) r = village.fuseGem(ch, d.fuse);
   else if (d.unsocket) r = village.unsocketGem(ch, d.unsocket, Number(d.index));
   else if (d.socket) {
@@ -965,7 +980,7 @@ function handleEvents() {
       toast(`${tips[e.kind]}${w.player.cures > 0 ? '（淨化藥水可以解除）' : ''}`, 'status-toast');
       buzz(30);
     } else if (e.type === 'gem') {
-      toast(`取得 ${e.name}`, 'gem-toast');
+      toast(e.gift ? `Lv.${e.gift} 獎勵：${e.name}` : `取得 ${e.name}`, 'gem-toast');
       saveRun();
     } else if (e.type === 'active') {
       buzz(15);
@@ -979,6 +994,9 @@ function handleEvents() {
     } else if (e.type === 'phase2') {
       toast(`${e.name} 發怒了！`);
       app.renderer.shake(3, 0.4);
+    } else if (e.type === 'enrage') {
+      toast(`${e.name} 狂暴了！出招變快`);
+      app.renderer.shake(4, 0.5);
     } else if (e.type === 'boss-evolved') {
       toast('Boss 進化了！更強，但獎勵也更好');
       app.renderer.shake(4, 0.5);
@@ -1248,10 +1266,10 @@ function updateHud(force) {
   }
   set('dodgeCd', Math.ceil(Math.max(0, p.dodgeCd) * 10), () => cooldown('dodge', p.dodgeCd, 1.2, p.dodgeCd.toFixed(1)));
   const boss = w.boss();
-  set('boss', boss ? `${boss.hp}/${boss.phase2}/${boss.state === 'healing'}` : 'none', () => {
+  set('boss', boss ? `${boss.hp}/${boss.phase2}/${boss.enraged}/${boss.state === 'healing'}` : 'none', () => {
     $('boss-bar').hidden = !boss;
     if (boss) {
-      $('boss-name').textContent = `${boss.abyss ? '強化・' : ''}${boss.name}${boss.state === 'healing' ? '（回復中）' : boss.phase2 ? '（第二階段）' : ''}`;
+      $('boss-name').textContent = `${boss.abyss ? '強化・' : ''}${boss.name}${boss.state === 'healing' ? '（回復中）' : boss.enraged ? '（狂暴）' : boss.phase2 ? '（第二階段）' : ''}`;
       $('boss-bar').classList.toggle('healing', boss.state === 'healing');
       $('boss-fill').style.width = `${(boss.hp / boss.maxHp) * 100}%`;
       $('boss-trail').style.width = `${(boss.hp / boss.maxHp) * 100}%`;

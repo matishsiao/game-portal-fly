@@ -575,6 +575,14 @@ export class Renderer {
         g.beginPath();
         g.ellipse(m.x * T, m.y * T + m.r * T * 0.5, m.r * T, m.r * T * 0.45, 0, 0, Math.PI * 2);
         g.stroke();
+        if (m.affix) {
+          // 菁英詞綴：內圈顏色（迅捷紅、爆裂橘、射手綠），爆裂快爆發時閃爍。
+          const warn = m.affix === 'nova' && m.affixT < 1 && Math.floor(world.time * 10) % 2;
+          g.strokeStyle = warn ? '#ffffff' : { frenzy: '#ff5a5a', nova: '#ff9a3a', volley: '#7ad06a' }[m.affix];
+          g.beginPath();
+          g.ellipse(m.x * T, m.y * T + m.r * T * 0.5, m.r * T * 0.7, m.r * T * 0.3, 0, 0, Math.PI * 2);
+          g.stroke();
+        }
       }
       if (m.evolved) {
         // 進化 Boss：腳下脈動的紅金色光環。

@@ -127,15 +127,28 @@ export const MONSTERS = {
  */
 export const BOSSES = {
   treant: { name: '古樹守衛', hp: 680, atk: 15, def: 6, r: 1.0, speed: 1.1, kind: 'treant', status: ['poison', 0.3] },
-  golem: { name: '熔岩魔像', hp: 760, atk: 16, def: 9, r: 1.05, speed: 1.2, kind: 'golem', status: ['stun', 0.12] },
+  golem: { name: '熔岩魔像', hp: 760, atk: 16, def: 9, r: 1.05, speed: 1.2, kind: 'golem', status: ['stun', 0.08] },
   lich: { name: '霜之巫妖', hp: 640, atk: 16, def: 6, r: 0.9, speed: 1.4, kind: 'lich', status: ['sleep', 0.1] },
   bullKing: { name: '巨角牛王', hp: 640, atk: 14, def: 6, r: 1.0, speed: 1.4, kind: 'bullKing' },
-  thunderbird: { name: '雷鳥', hp: 620, atk: 16, def: 6, r: 0.95, speed: 1.6, kind: 'thunderbird', status: ['stun', 0.12] },
+  thunderbird: { name: '雷鳥', hp: 620, atk: 16, def: 6, r: 0.95, speed: 1.6, kind: 'thunderbird', status: ['stun', 0.08] },
   necromancer: { name: '死靈法師', hp: 660, atk: 16, def: 6, r: 0.9, speed: 1.3, kind: 'necromancer', status: ['sleep', 0.1] },
 };
 
 /** Boss 回復：觸發的 HP 比例、機率、蓄力秒數、回復量、每場次數（深淵強化版另計）、打斷所需傷害與打斷後的暈眩秒數。 */
 export const BOSS_HEAL = { below: 0.7, chance: 0.35, channel: 2, pct: 0.15, abyssPct: 0.2, times: 2, abyssTimes: 3, breakPct: 0.08, stun: 1 };
+
+/**
+ * 難度：菁英詞綴（迅捷：移動 +30%、出招間隔 −30%；爆裂：每 6 秒在身邊爆發；射手：每 5 秒朝玩家射出 3 發投射物）、
+ * 怪物出招頻率（每深 1 層 +5%、每轉職 1 次 +10%，最多 +50%）、Boss 狂暴（HP 25% 以下出招間隔 −30%）。
+ */
+export const DIFFICULTY = {
+  affixes: { frenzy: '迅捷', nova: '爆裂', volley: '射手' },
+  depthPace: 0.05,
+  rebirthPace: 0.1,
+  maxPace: 1.5,
+  enrageBelow: 0.25,
+  enrageCd: 0.7,
+};
 
 /** Boss 進化：同一角色同一關（區域＋深度）破關幾次後可能進化、每次的機率、能力與獎勵倍率。 */
 export const EVOLVE = { clears: 5, chance: 0.3, hp: 1.6, atk: 1.25, cd: 0.85, scale: 1.15, gold: 2, xp: 1.5, items: 2, levelBonus: 3, pouch: 0.5 };
@@ -182,13 +195,13 @@ export const LIMITS = { bag: 20, potions: 10, potionPrice: 30, scrollPrice: 40, 
 
 /**
  * 異常狀態：名稱、持續秒數與顏色。玩家與怪物共用同一套規則，Boss 承受的持續時間為 bossMult 倍。
- * 中毒：每 0.5 秒失去最大 HP 的 1%（每秒 2%），持續 5 秒共 10%，可以毒死；Boss 持續 2.5 秒共 5%（bossDur）；睡眠：無法行動，被攻擊 3 次就醒來；暈眩：不能移動、閃避、攻擊或施放技能（被攻擊也不會解除）。
+ * 中毒：每 0.5 秒失去最大 HP 的 1%（每秒 2%），持續 5 秒共 10%，可以毒死；Boss 持續 2.5 秒共 5%（bossDur）；睡眠：無法行動，被攻擊 3 次就醒來；暈眩：不能移動、閃避、攻擊或施放技能（被攻擊也不會解除；玩家為 5 秒，見 playerDur）。
  * 重複中同一種狀態時重新計時；睡眠結束後 3 秒內不會再睡著（wakeGuard）。淨化藥水或抗異常護盾可以解除。
  */
 export const STATUS = {
-  poison: { name: '中毒', dur: 5, bossDur: 2.5, tick: 0.5, pct: 0.02, color: '#8ad04a' },
+  poison: { name: '中毒', dur: 5, bossDur: 2.5, tick: 0.5, pct: 0.02, color: '#c07aff' },
   sleep: { name: '睡眠', dur: 10, wake: 3, wakeGuard: 3, color: '#9ab8ff' },
-  stun: { name: '暈眩', dur: 10, color: '#ffe14d' },
+  stun: { name: '暈眩', dur: 10, playerDur: 5, color: '#ffe14d' },
 };
 
 /** Boss 承受睡眠與暈眩的持續時間倍率（中毒另見 STATUS.poison.bossDur）。 */
@@ -209,8 +222,8 @@ export const GEMS = {
 };
 
 /**
- * 寶石規則：等級名稱、最高等級、合成數量與費用（索引為合成前的等級）、吸血上限（%）、商店價格、
- * 主動按鈕上限，以及掉落機率（一般怪物、菁英、寶箱；Boss 必掉）。
+ * 寶石規則：等級名稱、最高等級、合成數量與費用（索引為合成前的等級）、吸血上限（%）、升級贈送的間隔（每 5 級送 1 顆，商店不販售寶石）、
+ * 主動按鈕上限，以及掉落機率（一般怪物、菁英、寶箱；Boss 必掉；平均每趟約 2.5 顆）。
  * 裝備的孔數：普通與精良 1 孔，稀有與傳說 2 孔。
  */
 export const GEM_RULES = {
@@ -219,10 +232,12 @@ export const GEM_RULES = {
   fuse: 3,
   fuseCost: [0, 100, 300, 800, 2000],
   leechCap: 15,
-  price: 150,
-  activePrice: 800,
+  /** 每秒吸血回復上限（最大 HP 的比例），嗜血技能生效中提高。 */
+  leechPerSec: 0.02,
+  leechPerSecSkill: 0.04,
+  levelGift: 5,
   actives: 2,
-  drop: { monster: 0.03, elite: 0.25, chest: 0.2 },
+  drop: { monster: 0.02, elite: 0.2, chest: 0.12 },
   activeChance: 0.06,
 };
 

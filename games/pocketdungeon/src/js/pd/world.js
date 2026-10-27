@@ -3,10 +3,10 @@
 //
 // 座標單位為「格」，(x, y) 為實體中心；地圖格子 (i, j) 的範圍為 [i, i + 1) × [j, j + 1)。
 
-import { CLASSES, MONSTERS, BOSSES, LIMITS, BOSS_HEAL, EVOLVE, REBIRTH, STATUS, STATUS_BOSS, GEMS, GEM_RULES } from './data.js';
+import { CLASSES, MONSTERS, BOSSES, LIMITS, BOSS_HEAL, EVOLVE, REBIRTH, STATUS, STATUS_BOSS, GEMS, GEM_RULES, DIFFICULTY } from './data.js';
 import { generateFloor, walkable, STAIRS, SPIKES, WALL } from './dungeon.js';
 import {
-  characterStats, speedProfile, damage, dungeonLevel, monsterStats, killReward, rollRarity, rarityWeights, makeItem, gainXp, sellPrice, rollGem, gemName,
+  characterStats, speedProfile, damage, dungeonLevel, monsterStats, killReward, rollRarity, rarityWeights, makeItem, gainXp, sellPrice, rollGem, gemName, pick,
 } from './rules.js';
 import { equippedSkills } from './skills.js';
 import { bagLimit } from './village.js';
@@ -106,7 +106,7 @@ export class World {
       // 異常狀態（剩餘秒數）、中毒計時、睡眠中被打的次數。
       status: { poison: 0, sleep: 0, stun: 0 }, poisonTick: 0, poisonLeft: 0, sleepHits: 0, sleepGuard: 0,
       // 技能與寶石的效果：護盾量與時間、抗異常護盾、減傷、吸血、加速；主動寶石的冷卻；連射。
-      shield: 0, shieldT: 0, wardT: 0, guardT: 0, guardPct: 0, leechT: 0, leechPct: 0, hasteT: 0, hastePct: 0, leechAcc: 0,
+      shield: 0, shieldT: 0, wardT: 0, guardT: 0, guardPct: 0, leechT: 0, leechPct: 0, hasteT: 0, hastePct: 0, leechAcc: 0, leechBudget: 0, leechShown: 0, leechShowT: 0,
       gemCd: [0, 0], volley: null, cureCd: 0,
       potions: Math.min(LIMITS.potions, potions), scroll, cures: Math.min(LIMITS.cures, cures), path: [],
     };
@@ -210,7 +210,7 @@ export class World {
    * @param {string} type 怪物或 Boss 代碼。
    * @param {number} x 座標 x。
    * @param {number} y 座標 y。
-   * @param {{elite?: boolean, boss?: boolean, abyss?: boolean, evolved?: boolean, small?: boolean}} [opts] 菁英、Boss、深淵強化版、進化 Boss、分裂後的小史萊姆。
+   * @param {{elite?: boolean, boss?: boolean, abyss?: boolean, evolved?: boolean, small?: boolean, affix?: string}} [opts] 菁英、Boss、深淵強化版、進化 Boss、分裂後的小史萊姆、菁英詞綴（省略時隨機）。
    * @returns {object} 怪物。
    */
   spawnMonster(type, x, y, opts = {}) {
@@ -226,6 +226,13 @@ export class World {
       state: 'idle', t: 0, cd: 1 + this.rng(), aggro: !!opts.boss, hurt: 0, facing: 0, invisible: false, intangible: false,
       vx: 0, vy: 0, phase2: false, pattern: 0, split: !!opts.small, summoned: false,
     };
+    // 菁英詞綴：迅捷、爆裂、射手（隨機一種，名稱前加上詞綴）。
+    if (opts.elite && !opts.boss) {
+      m.affix = opts.affix || pick(Object.keys(DIFFICULTY.affixes), this.rng);
+      m.affixT = 2 + this.rng() * 2;
+      m.name = DIFFICULTY.affixes[m.affix] + m.name;
+      if (m.affix === 'frenzy') m.speed *= 1.3;
+    }
     this.monsters.push(m);
     return m;
   }
@@ -489,6 +496,16 @@ export class World {
     p.shieldT -= dt;
     if (p.shieldT <= 0) p.shield = 0;
     for (let k = 0; k < p.skillCd.length; k++) p.skillCd[k] -= dt;
+    // 吸血的每秒回復上限：額度每秒補充最大 HP 的 2%（嗜血中 4%），最多累積 1 秒份。
+    const perSec = p.maxHp * (p.leechT > 0 ? GEM_RULES.leechPerSecSkill : GEM_RULES.leechPerSec);
+    p.leechBudget = Math.min(perSec, p.leechBudget + perSec * dt);
+    // 吸血回復的數字：每 0.4 秒合併顯示一次（綠色），避免連續命中時數字疊在一起。
+    p.leechShowT -= dt;
+    if (p.leechShown > 0 && p.leechShowT <= 0) {
+      this.effect('text', p.x + 0.3, p.y - 0.8, { text: `+${p.leechShown}`, color: '#5fd068' });
+      p.leechShown = 0;
+      p.leechShowT = 0.4;
+    }
     p.gemCd[0] -= dt;
     p.gemCd[1] -= dt;
     this.updatePlayerStatus(dt);
@@ -629,7 +646,8 @@ export class World {
     // 剛醒來的 3 秒內不會再睡著。
     if (kind === 'sleep' && target.sleepGuard > 0) return false;
     target.status = target.status || { poison: 0, sleep: 0, stun: 0 };
-    const dur = kind === 'poison' && target.boss ? STATUS.poison.bossDur : STATUS[kind].dur * (target.boss ? STATUS_BOSS : 1);
+    let dur = kind === 'poison' && target.boss ? STATUS.poison.bossDur : STATUS[kind].dur * (target.boss ? STATUS_BOSS : 1);
+    if (isPlayer && STATUS[kind].playerDur) dur = STATUS[kind].playerDur;
     const fresh = !(target.status[kind] > 0);
     target.status[kind] = Math.max(target.status[kind] || 0, dur);
     if (kind === 'sleep') target.sleepHits = 0;
@@ -1065,7 +1083,8 @@ export class World {
   }
 
   /**
-   * 吸血：寶石（最多 15%）加上嗜血技能的比例，把造成的傷害轉為 HP（不足 1 的部分累積到下次）。
+   * 吸血：寶石（最多 15%）加上嗜血技能的比例，把造成的傷害轉為 HP（不足 1 的部分累積到下次）；
+   * 每秒最多回復最大 HP 的 2%（嗜血中 4%）。
    * @param {number} dmg 造成的傷害。
    */
   leechHeal(dmg) {
@@ -1073,11 +1092,14 @@ export class World {
     // 寶石的吸血在計算屬性時已限制在 15% 以內；嗜血技能另外疊加，不受上限限制。
     const rate = p.leech + (p.leechT > 0 ? p.leechPct : 0);
     if (!(rate > 0) || p.hp <= 0 || p.hp >= p.maxHp) return;
-    p.leechAcc += dmg * rate;
+    p.leechAcc = Math.min(p.leechAcc + dmg * rate, p.leechBudget);
     const heal = Math.floor(p.leechAcc);
     if (heal < 1) return;
     p.leechAcc -= heal;
-    p.hp = Math.min(p.maxHp, p.hp + heal);
+    p.leechBudget -= heal;
+    const gained = Math.min(p.maxHp, p.hp + heal) - p.hp;
+    p.hp += gained;
+    p.leechShown += gained;
   }
 
   /**
@@ -1126,17 +1148,27 @@ export class World {
   }
 
   /**
-   * 加入經驗值；升級時補滿 HP 並發出事件。
+   * 加入經驗值；升級時補滿 HP 並發出事件，升到 5 的倍數等級時送 1 顆隨機寶石。
    * @param {number} xp 經驗值。
    */
   addXp(xp) {
     this.loot.xp += xp;
+    const from = this.ch.level;
     const ups = gainXp(this.ch, xp);
     if (ups > 0) {
       this.loot.levelsGained += ups;
       this.applyStats(this.player, true);
       this.effect('levelup', this.player.x, this.player.y);
       this.events.push({ type: 'levelup', level: this.ch.level });
+      // 每升到 5 的倍數等級，系統送 1 顆隨機寶石（等級依角色等級；轉職後重新升級也會再送）。
+      for (let lv = from + 1; lv <= this.ch.level; lv++) {
+        if (lv % GEM_RULES.levelGift) continue;
+        const gem = rollGem(lv, this.rng);
+        this.ch.gems = this.ch.gems || {};
+        this.ch.gems[gem] = (this.ch.gems[gem] || 0) + 1;
+        this.loot.gems.push(gem);
+        this.events.push({ type: 'gem', gem, name: gemName(gem), gift: lv });
+      }
     }
   }
 
@@ -1334,7 +1366,7 @@ export class World {
       dt *= 0.5;
     }
     m.t -= dt;
-    m.cd -= dt;
+    m.cd -= dt * this.pace(m);
     const d = dist(m.x, m.y, p.x, p.y);
     if (!m.aggro && d < AGGRO && (m.ai === 'wraith' || this.lineOfSight(m.x, m.y, p.x, p.y))) m.aggro = true;
     if (!m.aggro || p.hp <= 0) return;
@@ -1344,6 +1376,7 @@ export class World {
     const ai = this.ai[m.ai];
     this.acting = m;
     if (ai) ai.call(this, m, dt, d);
+    if (m.affix) this.eliteAffix(m, dt, d);
     this.acting = null;
     // 接觸傷害只用在「身體就是武器」的情況：衝刺、俯衝中的怪物，以及沒有其他招式的史萊姆（較輕）。
     // 其他攻擊一律經由有預警的招式造成，玩家貼身攻擊時不會無預警受傷。
@@ -1353,6 +1386,34 @@ export class World {
       this.hurtPlayer(this.monsterDamage(m, dashing ? 1.2 : 0.6), m.x, m.y, statusOf(m));
       m.contactCd = 1.2;
     }
+  }
+
+  /**
+   * 怪物的出招速度倍率：每深 1 層 +5%、玩家每轉職 1 次 +10%（最多 1.5 倍）；迅捷菁英再快 40%。
+   * @param {object} m 怪物。
+   * @returns {number} 冷卻減少的倍率。
+   */
+  pace(m) {
+    const base = Math.min(DIFFICULTY.maxPace, 1 + DIFFICULTY.depthPace * (this.depth - 1) + DIFFICULTY.rebirthPace * this.rebirth());
+    return base * (m.affix === 'frenzy' ? 1.4 : 1);
+  }
+
+  /**
+   * 菁英詞綴的額外招式：爆裂每 6 秒在身邊爆發（2.2 格，有預警）；射手每 5 秒朝玩家射出 3 發投射物。
+   * @param {object} m 菁英怪物（會被修改）。
+   * @param {number} dt 秒。
+   * @param {number} d 與玩家的距離。
+   */
+  eliteAffix(m, dt, d) {
+    m.affixT -= dt;
+    if (m.affixT > 0 || m.intangible || d > 7) return;
+    if (m.affix === 'nova') {
+      m.affixT = 6;
+      this.telegraph({ shape: 'circle', x: m.x, y: m.y, r: 2.2 + m.r, t: 0.9, dmg: this.monsterDamage(m, 1.2) });
+    } else if (m.affix === 'volley') {
+      m.affixT = 5;
+      for (const off of [-0.25, 0, 0.25]) this.shoot(m, 5, m.facing + off, 0.8, { kind: m.shot || 'arrow', r: 0.16 });
+    } else m.affixT = 99;
   }
 
   /**
@@ -1700,7 +1761,7 @@ export class World {
       area: this.area, depth: this.depth, seed: this.seed, floor: this.floorIndex, elapsed: this.elapsed, time: this.time,
       loot: { ...this.loot, items: this.loot.items.map((i) => i.id) },
       player: { x: p.x, y: p.y, hp: p.hp, potions: p.potions, scroll: p.scroll, cures: p.cures, facing: p.facing },
-      monsters: this.monsters.map((m) => ({ type: m.type, x: m.x, y: m.y, hp: m.hp, maxHp: m.maxHp, boss: m.boss, elite: m.elite, small: m.small, abyss: m.abyss, evolved: !!m.evolved, split: m.split, phase2: m.phase2, summoned: m.summoned, heals: m.heals || 0, awake: !!m.awake })),
+      monsters: this.monsters.map((m) => ({ type: m.type, x: m.x, y: m.y, hp: m.hp, maxHp: m.maxHp, boss: m.boss, elite: m.elite, small: m.small, abyss: m.abyss, evolved: !!m.evolved, split: m.split, phase2: m.phase2, summoned: m.summoned, heals: m.heals || 0, awake: !!m.awake, affix: m.affix, enraged: !!m.enraged })),
       pickups: this.pickups.map((it) => ({ ...it })),
       chests: this.chests.map((c) => ({ ...c })),
       portalOpen: this.portalOpen, bossDefeated: this.bossDefeated, explored,
@@ -1723,8 +1784,8 @@ export class World {
     Object.assign(w.player, { x: snap.player.x, y: snap.player.y, hp: Math.min(snap.player.hp, w.player.maxHp), facing: snap.player.facing });
     w.monsters = [];
     for (const m of snap.monsters) {
-      const n = w.spawnMonster(m.type, m.x, m.y, { boss: m.boss, elite: m.elite, small: m.small, abyss: m.abyss, evolved: m.evolved });
-      Object.assign(n, { hp: m.hp, maxHp: m.maxHp, split: m.split, phase2: m.phase2, summoned: m.summoned, heals: m.heals || 0, awake: !!m.awake });
+      const n = w.spawnMonster(m.type, m.x, m.y, { boss: m.boss, elite: m.elite, small: m.small, abyss: m.abyss, evolved: m.evolved, affix: m.affix });
+      Object.assign(n, { hp: m.hp, maxHp: m.maxHp, split: m.split, phase2: m.phase2, summoned: m.summoned, heals: m.heals || 0, awake: !!m.awake, enraged: !!m.enraged });
     }
     w.pickups = snap.pickups;
     w.chests = snap.chests;
@@ -2241,7 +2302,7 @@ World.prototype.ai = {
     if (m.state === 'attacking') {
       if (m.t <= 0) {
         m.state = 'move';
-        m.cd = (m.phase2 ? 1.0 : 1.5) * (m.abyss ? 0.8 : 1) * (m.evolved ? EVOLVE.cd : 1);
+        m.cd = bossCd(m);
       }
       return;
     }
@@ -2249,7 +2310,7 @@ World.prototype.ai = {
     if (m.cd > 0) return;
     const p = this.player;
     if (startHeal.call(this, m)) return;
-    const moves = ['roots', 'sweep', 'roots', 'summon'];
+    const moves = ['roots', 'sweep', 'thorns', 'roots', 'summon'];
     const move = moves[m.pattern++ % moves.length];
     const base = Math.atan2(p.y - m.y, p.x - m.x);
     m.state = 'attacking';
@@ -2267,6 +2328,13 @@ World.prototype.ai = {
     } else if (move === 'sweep') {
       this.telegraph({ shape: 'arc', x: m.x, y: m.y, r: 2.7, angle: base, arc: (200 * Math.PI) / 180, t: 0.9, dmg: this.monsterDamage(m, 1.2) });
       m.t = 1.1;
+    } else if (move === 'thorns') {
+      // 荊棘環：向四周射出一圈種子（第二階段兩圈交錯）。
+      this.telegraph({ shape: 'circle', x: m.x, y: m.y, r: m.r + 0.4, t: 0.5, dmg: 0 });
+      for (const off of m.phase2 ? [0, Math.PI / 16] : [0]) {
+        for (let k = 0; k < 16; k++) this.shoot(m, off ? 3.2 : 4, (k / 16) * Math.PI * 2 + off, 0.8, { kind: 'seed', life: 5, r: 0.16 });
+      }
+      m.t = 1.0;
     } else {
       const minions = this.monsters.filter((o) => o.summoned).length;
       for (let k = 0; k < 3 && minions + k < 6; k++) {
@@ -2308,14 +2376,14 @@ World.prototype.ai = {
     if (m.state === 'attacking') {
       if (m.t <= 0) {
         m.state = 'move';
-        m.cd = (m.phase2 ? 1.0 : 1.5) * (m.abyss ? 0.8 : 1) * (m.evolved ? EVOLVE.cd : 1);
+        m.cd = bossCd(m);
       }
       return;
     }
     this.chase(m, dt, 0.6);
     if (m.cd > 0) return;
     if (startHeal.call(this, m)) return;
-    const moves = ['erupt', 'charge', 'throw'];
+    const moves = ['erupt', 'charge', 'fissure', 'throw'];
     const move = moves[m.pattern++ % moves.length];
     if (move === 'erupt') {
       const n = m.phase2 ? 9 : 6;
@@ -2331,6 +2399,13 @@ World.prototype.ai = {
       m.state = 'charge';
       m.t = 0.8;
       this.telegraph({ shape: 'line', x: m.x, y: m.y, angle: m.dashAngle, len: 9, width: 1.8, t: 0.8, dmg: 0 });
+    } else if (move === 'fissure') {
+      // 地裂：朝玩家方向放射出 3 道（第二階段 5 道）裂縫。
+      const base = Math.atan2(p.y - m.y, p.x - m.x);
+      const offs = m.phase2 ? [-0.9, -0.45, 0, 0.45, 0.9] : [-0.6, 0, 0.6];
+      for (const o of offs) this.telegraph({ shape: 'line', x: m.x, y: m.y, angle: base + o, len: 9, width: 1.2, t: 0.9, dmg: this.monsterDamage(m, 1.2) });
+      m.state = 'attacking';
+      m.t = 1.2;
     } else {
       for (let k = 0; k < (m.phase2 ? 3 : 2); k++) {
         this.telegraph({ shape: 'circle', x: p.x + (k ? (this.rng() - 0.5) * 3 : 0), y: p.y + (k ? (this.rng() - 0.5) * 3 : 0), r: 1.0, t: 1.0, delay: k * 0.25, dmg: this.monsterDamage(m, 1.1) });
@@ -2357,7 +2432,7 @@ World.prototype.ai = {
       }
       if (m.t <= 0) {
         m.state = 'move';
-        m.cd = (m.phase2 ? 1.0 : 1.5) * (m.abyss ? 0.8 : 1) * (m.evolved ? EVOLVE.cd : 1);
+        m.cd = bossCd(m);
       }
       return;
     }
@@ -2383,7 +2458,7 @@ World.prototype.ai = {
     if (this.rng() < 0.5) this.keepRange(m, dt, dist(m.x, m.y, p.x, p.y), 3, 6);
     if (m.cd > 0) return;
     if (startHeal.call(this, m)) return;
-    const moves = ['ring', 'icicle', 'teleport'];
+    const moves = ['ring', 'icicle', 'blizzard', 'teleport'];
     const move = moves[m.pattern++ % moves.length];
     if (move === 'ring') {
       m.state = 'attacking';
@@ -2396,6 +2471,18 @@ World.prototype.ai = {
         for (let k = 0; k < 12; k++) this.shoot(m, 4, (k / 12) * Math.PI * 2, 0.9, { kind: 'ice', life: 5, r: 0.2 });
         m.t = 1.0;
       }
+    } else if (move === 'blizzard') {
+      // 暴風雪：玩家周圍 5 × 5 的冰柱，留一格安全區（圓與圓之間的縫也能躲）。
+      const safe = Math.floor(this.rng() * 25);
+      for (let k = 0; k < 25; k++) {
+        if (k === safe) continue;
+        const x = p.x + ((k % 5) - 2) * 1.6;
+        const y = p.y + (Math.floor(k / 5) - 2) * 1.6;
+        if (!walkable(this.tileAt(Math.floor(x), Math.floor(y)))) continue;
+        this.telegraph({ shape: 'circle', x, y, r: 0.75, t: 1.1, dmg: this.monsterDamage(m, 1.0) });
+      }
+      m.state = 'attacking';
+      m.t = 1.5;
     } else if (move === 'icicle') {
       for (let k = 0; k < 3; k++) {
         this.telegraph({ shape: 'circle', x: p.x, y: p.y, r: 0.9, t: 0.8, delay: k * 0.5, dmg: this.monsterDamage(m, 1.1), follow: true });
@@ -2447,14 +2534,14 @@ World.prototype.ai = {
     if (m.state === 'attacking') {
       if (m.t <= 0) {
         m.state = 'move';
-        m.cd = (m.phase2 ? 1.0 : 1.5) * (m.abyss ? 0.8 : 1) * (m.evolved ? EVOLVE.cd : 1);
+        m.cd = bossCd(m);
       }
       return;
     }
     this.chase(m, dt, 0.7);
     if (m.cd > 0) return;
     if (startHeal.call(this, m)) return;
-    const moves = ['charge', 'stomp', 'charge', 'call'];
+    const moves = ['charge', 'stomp', 'gore', 'charge', 'call'];
     const move = moves[m.pattern++ % moves.length];
     if (move === 'charge') {
       m.dashAngle = Math.atan2(p.y - m.y, p.x - m.x);
@@ -2462,6 +2549,15 @@ World.prototype.ai = {
       m.state = 'charge';
       m.t = 0.8;
       this.telegraph({ shape: 'line', x: m.x, y: m.y, angle: m.dashAngle, len: 9, width: 1.8, t: 0.8, dmg: 0 });
+    } else if (move === 'gore') {
+      // 角擊連段：朝玩家連續橫掃 2 次（第二階段 3 次），間隔 0.45 秒。
+      const base = Math.atan2(p.y - m.y, p.x - m.x);
+      const n = m.phase2 ? 3 : 2;
+      for (let k = 0; k < n; k++) {
+        this.telegraph({ shape: 'arc', x: m.x, y: m.y, r: 2.6, angle: base + (k % 2 ? 0.5 : -0.5), arc: (130 * Math.PI) / 180, t: 0.6, delay: k * 0.45, dmg: this.monsterDamage(m, 1.1) });
+      }
+      m.state = 'attacking';
+      m.t = 0.9 + n * 0.45;
     } else if (move === 'stomp') {
       // 三圈依序擴散的震地波：站在圈與圈之間或跳過波可以躲開。
       [1.8, 3.2, 4.6].forEach((r, k) => {
@@ -2494,7 +2590,7 @@ World.prototype.ai = {
     if (m.state === 'attacking') {
       if (m.t <= 0) {
         m.state = 'move';
-        m.cd = (m.phase2 ? 1.0 : 1.5) * (m.abyss ? 0.8 : 1) * (m.evolved ? EVOLVE.cd : 1);
+        m.cd = bossCd(m);
       }
       return;
     }
@@ -2509,7 +2605,7 @@ World.prototype.ai = {
     this.keepRange(m, dt, dist(m.x, m.y, p.x, p.y), 3, 6);
     if (m.cd > 0) return;
     if (startHeal.call(this, m)) return;
-    const moves = ['strikes', 'feathers', 'dive'];
+    const moves = ['strikes', 'feathers', 'cross', 'dive'];
     const move = moves[m.pattern++ % moves.length];
     if (move === 'strikes') {
       const n = m.phase2 ? 8 : 5;
@@ -2520,6 +2616,16 @@ World.prototype.ai = {
       }
       m.state = 'attacking';
       m.t = 0.9 + n * 0.15;
+    } else if (move === 'cross') {
+      // 雷網：十字閃電，接著轉 45° 再一次（第二階段再轉回來第三次）。
+      const n = m.phase2 ? 3 : 2;
+      for (let s2 = 0; s2 < n; s2++) {
+        for (let k = 0; k < 4; k++) {
+          this.telegraph({ shape: 'line', x: m.x, y: m.y, angle: (k * Math.PI) / 2 + (s2 % 2 ? Math.PI / 4 : 0), len: 8, width: 0.9, t: 0.8, delay: s2 * 0.7, dmg: this.monsterDamage(m, 1.1) });
+        }
+      }
+      m.state = 'attacking';
+      m.t = 1.0 + n * 0.7;
     } else if (move === 'feathers') {
       this.telegraph({ shape: 'circle', x: m.x, y: m.y, r: m.r + 0.4, t: 0.5, dmg: 0 });
       for (const off of m.phase2 ? [0, Math.PI / 14] : [0]) {
@@ -2553,14 +2659,14 @@ World.prototype.ai = {
       }
       if (m.t <= 0) {
         m.state = 'move';
-        m.cd = (m.phase2 ? 1.0 : 1.5) * (m.abyss ? 0.8 : 1) * (m.evolved ? EVOLVE.cd : 1);
+        m.cd = bossCd(m);
       }
       return;
     }
     this.keepRange(m, dt, dist(m.x, m.y, p.x, p.y), 3.5, 6);
     if (m.cd > 0) return;
     if (startHeal.call(this, m)) return;
-    const moves = ['bones', 'summon', 'curse'];
+    const moves = ['bones', 'summon', 'grave', 'curse'];
     const move = moves[m.pattern++ % moves.length];
     const base = Math.atan2(p.y - m.y, p.x - m.x);
     m.state = 'attacking';
@@ -2572,6 +2678,14 @@ World.prototype.ai = {
         }
       }
       m.t = 1.5;
+    } else if (move === 'grave') {
+      // 墓穴：玩家周圍一圈墓穴先爆開，0.6 秒後中央再爆一次（要先往外、再往內躲）。
+      for (let k = 0; k < 8; k++) {
+        const a = (k / 8) * Math.PI * 2;
+        this.telegraph({ shape: 'circle', x: p.x + Math.cos(a) * 2.2, y: p.y + Math.sin(a) * 2.2, r: 0.9, t: 0.8, dmg: this.monsterDamage(m, 1.0) });
+      }
+      this.telegraph({ shape: 'circle', x: p.x, y: p.y, r: 1.3, t: 0.8, delay: 0.6, dmg: this.monsterDamage(m, 1.2) });
+      m.t = 1.6;
     } else if (move === 'summon') {
       const minions = this.monsters.filter((o) => o.summoned).length;
       const types = m.phase2 ? ['zombie', 'skeleton', 'banshee'] : ['zombie', 'skeleton'];
@@ -2656,22 +2770,29 @@ function bossHealing(m) {
 }
 
 /**
- * Boss 進入第二階段（HP 50% 以下）：霜之巫妖召喚 2 個寒霜幽魂，熔岩魔像開始讓場地邊緣出現熔岩。
+ * Boss 進入第二階段（HP 50% 以下）：霜之巫妖召喚 2 個寒霜幽魂，熔岩魔像開始讓場地邊緣出現熔岩；HP 25% 以下狂暴。
  * @param {object} m Boss。
  */
 function bossPhase(m) {
-  if (m.phase2 || m.hp > m.maxHp / 2) return;
-  m.phase2 = true;
-  this.events.push({ type: 'phase2', name: m.name });
-  if (m.ai === 'lich') {
-    for (const s of [-1, 1]) {
-      const w = this.spawnMonster('wraith', m.x + s * 2, m.y, {});
-      w.summoned = true;
-      w.aggro = true;
-      w.xpMult = 0.5;
+  if (!m.phase2 && m.hp <= m.maxHp / 2) {
+    m.phase2 = true;
+    this.events.push({ type: 'phase2', name: m.name });
+    if (m.ai === 'lich') {
+      for (const s of [-1, 1]) {
+        const w = this.spawnMonster('wraith', m.x + s * 2, m.y, {});
+        w.summoned = true;
+        w.aggro = true;
+        w.xpMult = 0.5;
+      }
     }
+    if (m.ai === 'golem') this.hazards.push({ kind: 'edge', size: 1, max: 3.5, pct: 0.06 });
   }
-  if (m.ai === 'golem') this.hazards.push({ kind: 'edge', size: 1, max: 3.5, pct: 0.06 });
+  if (m.phase2 && !m.enraged && m.hp <= m.maxHp * DIFFICULTY.enrageBelow) {
+    // 狂暴：HP 25% 以下出招間隔縮短 30%。
+    m.enraged = true;
+    this.events.push({ type: 'enrage', name: m.name });
+    this.effect('levelup', m.x, m.y - m.r, { text: '狂暴！' });
+  }
 }
 
 /**
@@ -2682,4 +2803,13 @@ function bossPhase(m) {
 function statusOf(m) {
   const base = m.boss ? BOSSES[m.type] : MONSTERS[m.type];
   return base && base.status;
+}
+
+/**
+ * Boss 換招的間隔：基本 1.5 秒（第二階段 1 秒），深淵強化版 ×0.8、進化 ×0.85、狂暴 ×0.7。
+ * @param {object} m Boss。
+ * @returns {number} 秒。
+ */
+function bossCd(m) {
+  return (m.phase2 ? 1.0 : 1.5) * (m.abyss ? 0.8 : 1) * (m.evolved ? EVOLVE.cd : 1) * (m.enraged ? DIFFICULTY.enrageCd : 1);
 }
