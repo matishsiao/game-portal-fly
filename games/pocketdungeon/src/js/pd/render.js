@@ -282,7 +282,8 @@ export class Renderer {
   drawTelegraphs(world) {
     const g = this.ctx;
     for (const tg of world.telegraphs) {
-      if (tg.delay > 0) continue;
+      // 普通攻擊（hidden）不畫預警範圍。
+      if (tg.delay > 0 || tg.hidden) continue;
       const k = Math.max(0, Math.min(1, 1 - tg.t / tg.total));
       const x = tg.x * T;
       const y = tg.y * T;
@@ -440,7 +441,7 @@ export class Renderer {
     }
     for (const it of world.pickups) {
       const bob = Math.round(Math.sin(world.time * 5 + it.x) * 1);
-      const name = it.kind === 'gem' ? `gem-${it.gem.split('-')[0]}` : { gold: 'coin', potion: 'potion', bagExpand: 'pouch' }[it.kind] || 'bag';
+      const name = it.kind === 'gem' ? `gem-${it.gem.split('-')[0]}` : it.kind === 'mat' ? it.mat : { gold: 'coin', potion: 'potion', bagExpand: 'pouch', book: 'book', skillBook: 'skillbook' }[it.kind] || 'bag';
       const img = itemArt(name);
       const x = Math.round(it.x * T - img.width / 2);
       const y = Math.round(it.y * T - img.height / 2) + bob;
@@ -698,8 +699,9 @@ export class Renderer {
       g.arc(x, y, 9, Math.PI * 0.9, Math.PI * 2.1);
       g.stroke();
     }
-    if (p.leechT > 0 || p.hasteT > 0) {
-      g.fillStyle = p.leechT > 0 ? '#ff5a6a' : '#c8f0ff';
+    if (p.leechT > 0 || p.hasteT > 0 || p.regenT > 0 || p.imbueT > 0) {
+      // 嗜血紅、回春綠、毒刃紫、疾風白：上升的光點。
+      g.fillStyle = p.leechT > 0 ? '#ff5a6a' : p.regenT > 0 ? '#8af09a' : p.imbueT > 0 ? '#c07aff' : '#c8f0ff';
       for (let n = 0; n < 3; n++) {
         const ph = (t * 1.5 + n / 3) % 1;
         g.fillRect(Math.round(x + Math.cos(n * 2.1 + t) * 7), Math.round(y + 8 - ph * 18), 1, 2);
@@ -810,6 +812,31 @@ export class Renderer {
       g.fillRect(4, -3, 2, 6);
       g.fillStyle = '#6b4226';
       g.fillRect(2, -1, 2, 2);
+    } else if (world.ch.cls === 'thief') {
+      // 匕首：朝面向快速刺出再收回。
+      g.rotate(a);
+      const reach = 1 + 6 * Math.sin(Math.PI * k);
+      g.fillStyle = '#1a1020';
+      g.fillRect(reach - 1, -2, 10, 4);
+      g.fillStyle = '#e8eef5';
+      g.fillRect(reach + 3, -1, 6, 2);
+      g.fillStyle = '#ffffff';
+      g.fillRect(reach + 3, -1, 6, 1);
+      g.fillStyle = '#c0c6d0';
+      g.fillRect(reach + 2, -2, 1, 4);
+      g.fillStyle = '#4a2a1a';
+      g.fillRect(reach, -1, 2, 2);
+    } else if (world.ch.cls === 'monk') {
+      // 拳套：朝面向打出一拳（第三擊拳頭較大）。
+      g.rotate(a);
+      const big = world.player.combo === 3 ? 1.5 : 1;
+      const reach = 2 + 6 * Math.sin(Math.PI * k);
+      g.fillStyle = '#1a1020';
+      g.fillRect(reach - 1, -3 * big, 7 * big, 6 * big);
+      g.fillStyle = '#e8862a';
+      g.fillRect(reach, -2 * big, 5 * big, 4 * big);
+      g.fillStyle = '#ffd08a';
+      g.fillRect(reach + 3 * big, -2 * big, 2 * big, 1 * big);
     } else if (world.ch.cls === 'archer') {
       // 弓：前半段拉弓（弦往後），放箭後弦彈回。
       g.rotate(a);
@@ -942,16 +969,18 @@ export class Renderer {
         const inner = outer * 0.5;
         const fade = k < 0.4 ? 1 : 1 - (k - 0.4) / 0.6;
         const grad = g.createRadialGradient(x, y - 3, inner, x, y - 3, outer);
+        // 怪物的普通攻擊是紅色的揮砍，與玩家的白色刀光區分。
+        const [mid, edge] = e.enemy ? ['255,120,110', '255,200,190'] : ['200,225,255', '255,255,255'];
         grad.addColorStop(0, 'rgba(255,255,255,0)');
-        grad.addColorStop(0.7, `rgba(200,225,255,${0.45 * fade})`);
-        grad.addColorStop(1, `rgba(255,255,255,${0.95 * fade})`);
+        grad.addColorStop(0.7, `rgba(${mid},${0.45 * fade})`);
+        grad.addColorStop(1, `rgba(${edge},${0.95 * fade})`);
         g.fillStyle = grad;
         g.beginPath();
         g.arc(x, y - 3, outer, start, end);
         g.arc(x, y - 3, inner, end, start, true);
         g.closePath();
         g.fill();
-        g.strokeStyle = `rgba(255,236,170,${0.9 * fade})`;
+        g.strokeStyle = e.enemy ? `rgba(255,90,80,${0.9 * fade})` : `rgba(255,236,170,${0.9 * fade})`;
         g.lineWidth = 1;
         g.beginPath();
         g.arc(x, y - 3, outer, start, end);
@@ -1000,6 +1029,7 @@ export class Renderer {
         const looks = {
           nova: '150,210,255', spin: '255,255,255', slam: '210,170,110', rain: '240,224,176', beam: '255,240,170', meteor: '255,150,60',
           trap: '232,184,74', starfall: '255,230,140', hypnosis: '220,150,255', miasma: '120,200,80', thunder: '210,235,255', freeze: '170,200,255',
+          chi: '255,200,120', smoke: '190,190,205', shadow: '150,100,200',
         };
         g.fillStyle = e.friendly ? `rgba(${looks[e.look] || '200,168,255'},${0.6 * (1 - k)})` : `rgba(255,140,60,${0.55 * (1 - k)})`;
         if (e.shape === 'ring') {
@@ -1054,7 +1084,8 @@ export class Renderer {
       } else if (e.kind === 'text') {
         // 傷害數字：出現時先放大再縮回，之後往上飄並淡出。
         const pop = k < 0.12 ? 1.7 - (k / 0.12) * 0.7 : 1;
-        g.font = `bold ${(7 * pop).toFixed(1)}px system-ui, sans-serif`;
+        // 爆擊的數字較大。
+        g.font = `bold ${(7 * pop * (e.big ? 1.35 : 1)).toFixed(1)}px system-ui, sans-serif`;
         g.textAlign = 'center';
         g.globalAlpha = 1 - k * k;
         g.fillStyle = '#1a1020';

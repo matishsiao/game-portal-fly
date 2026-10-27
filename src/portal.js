@@ -2,8 +2,9 @@
 // 每個遊戲部署在與本頁同層的獨立目錄（例如 ./sudoku/），各自擁有 Service Worker 與快取。
 // 遊戲與大廳同網域，大廳以唯讀方式讀取各遊戲的 `<遊戲>.save`、`<遊戲>.stats` 顯示進度。
 
-/** 遊戲清單：新增遊戲時加一筆，並把建置結果放到同名目錄。 */
+/** 遊戲清單：新增遊戲時加一筆，並把建置結果放到同名目錄。`featured` 的遊戲顯示在最上方「主打遊戲」，不列在下方遊戲列表。 */
 const GAMES = [
+  { dir: 'pocketdungeon', title: '口袋地城', desc: '像素動作 RPG，闖地城打倒 Boss', tags: [['layers', '4 個地城'], ['sword', '3 種職業']], featured: true },
   { dir: 'sudoku', title: '數獨', desc: '9 × 9 經典數獨，邏輯推理', tags: [['layers', '4 種難度'], ['bulb', '提示・筆記']] },
   { dir: 'crossmath', title: '數學填字', desc: '交叉算式，用數字庫填滿空格', tags: [['layers', '4 種難度'], ['plus', '加減乘除']] },
   { dir: 'numberlink', title: '數字連線', desc: '連起相同數字，線不交叉並填滿棋盤', tags: [['layers', '4 種難度'], ['link', '4×4～10×10']] },
@@ -11,7 +12,6 @@ const GAMES = [
   { dir: 'roll', title: '滾滾解謎', desc: '推箱子、浮起來、滑過去、彈上去', tags: [['layers', '4 章 80 關'], ['sparkle', '物理小知識']] },
   { dir: 'words', title: '英文單字連線', desc: '旅行與生活單字，配對學英文', tags: [['layers', '34 個分類'], ['book', '單字卡・單字本']] },
   { dir: 'codebreaker', title: '密碼偵探', desc: '看回饋推理，破解保險箱的顏色密碼', tags: [['layers', '4 種難度'], ['lock', '推理回顧']] },
-  { dir: 'pocketdungeon', title: '口袋地城', desc: '像素動作 RPG，闖地城打倒 Boss', tags: [['layers', '4 個地城'], ['sword', '3 種職業']] },
 ];
 
 /** 難度代碼與名稱，依由易到難排列。 */
@@ -142,10 +142,11 @@ function renderGreeting() {
 /** 建立遊戲卡片與「即將推出」卡片。 */
 function renderGames() {
   const list = document.getElementById('games');
+  const featured = document.getElementById('featured');
   for (const game of GAMES) {
     const li = document.createElement('li');
     const a = document.createElement('a');
-    a.className = 'game-card';
+    a.className = game.featured ? 'game-card featured' : 'game-card';
     a.href = `./${game.dir}/`;
     a.dataset.theme = game.dir;
     a.innerHTML = `
@@ -171,8 +172,9 @@ function renderGames() {
     a.querySelector('.game-desc').textContent = game.desc;
     statusEls.set(game.dir, a.querySelector('.game-status'));
     li.appendChild(a);
-    list.appendChild(li);
+    (game.featured ? featured : list).appendChild(li);
   }
+  document.getElementById('featured-section').hidden = featured.children.length === 0;
   const soon = document.createElement('li');
   soon.className = 'coming-soon';
   soon.innerHTML = `${icon('plus')}<span>更多遊戲即將推出</span>`;
@@ -201,7 +203,8 @@ function renderProgress() {
     record.innerHTML = lines.join('');
     card.querySelector('.play-btn').innerHTML = `${icon('play')}${p.unfinished ? '繼續' : '開始'}`;
 
-    if (p.unfinished) {
+    // 主打遊戲的卡片已經在最上方顯示「繼續」，不再重複列在繼續遊戲。
+    if (p.unfinished && !game.featured) {
       const a = document.createElement('a');
       a.className = 'continue-card';
       a.href = `./${game.dir}/`;

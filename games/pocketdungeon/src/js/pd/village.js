@@ -1,8 +1,9 @@
 // 村莊規則（純邏輯）：商店刷新與買賣、裝備穿脫、強化、區域與深度解鎖、探險開始與結算。
 // 所有函式直接修改傳入的角色資料，回傳結果與要顯示的訊息。
 
-import { AREAS, AREA_KEYS, LIMITS, MAX_DEPTH, RARITIES, ENHANCE, BAG_EXPAND, EQUIP_SLOTS, SHARED_SLOTS, CLASSES, REBIRTH, GEMS, GEM_RULES } from './data.js';
-import { makeItem, itemValue, sellPrice, enhanceCost, tryEnhance, rollRarity, dungeonLevel, levelCap, parseGem, gemName, socketCount } from './rules.js';
+import { AREAS, AREA_KEYS, LIMITS, MAX_DEPTH, RARITIES, ENHANCE, EQUIP_SLOTS, SHARED_SLOTS, CLASSES, REBIRTH, GEMS, GEM_RULES, MATERIALS, CRAFT, ITEM_SLOTS, BAG_EXPAND, SKILL_BOOK, GIFT } from './data.js';
+import { learnBook, SKILLS, bookSkillIds } from './skills.js';
+import { makeItem, itemValue, sellPrice, enhanceCost, tryEnhance, rollRarity, dungeonLevel, levelCap, parseGem, gemName, socketCount, weaponHands } from './rules.js';
 
 /** 商店一次陳列的裝備數。 */
 export const SHOP_SIZE = 8;
@@ -17,18 +18,45 @@ function shopLevel(ch) {
 }
 
 /**
- * 刷新商店的 8 件裝備（每次返回村莊時呼叫）：武器、鎧甲、飾品各 2 件，頭盔、鞋子各 1 件，以普通與精良為主。
+ * 刷新商店的 8 件裝備（每次返回村莊時呼叫）：武器、飾品各 2 件，副手、頭盔、鎧甲、鞋子各 1 件，以普通與精良為主。
  * @param {object} ch 角色（會被修改）。
  * @param {() => number} rng 亂數函式。
  */
 export function refreshShop(ch, rng) {
   const level = shopLevel(ch);
-  const slots = ['weapon', 'weapon', 'helmet', 'armor', 'armor', 'boots', 'accessory', 'accessory'];
+  const slots = ['weapon', 'weapon', 'offhand', 'helmet', 'armor', 'boots', 'accessory', 'accessory'];
   ch.shop = slots.map((slot) => {
     const rarity = rollRarity([55, 40, 5, 0], rng);
     const item = makeItem({ slot, cls: ch.cls, level, rarity }, rng);
     return { item, price: shopPrice(item) };
   });
+  // 製作書：每次刷新隨機陳列 2 本（部位隨機）。
+  ch.shopBooks = Array.from({ length: CRAFT.shopBooks }, () => CRAFT.books[Math.floor(rng() * CRAFT.books.length)]);
+}
+
+/**
+ * 製作書的名稱，例如「頭盔製作書」。
+ * @param {string} slot 部位。
+ * @returns {string} 名稱。
+ */
+export function bookName(slot) {
+  return `${ITEM_SLOTS[slot]}製作書`;
+}
+
+/**
+ * 購買商店陳列的製作書。
+ * @param {object} ch 角色（會被修改）。
+ * @param {number} index 陳列位置。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function buyBook(ch, index) {
+  const slot = ch.shopBooks && ch.shopBooks[index];
+  if (!slot) return { ok: false, message: '這本製作書已經賣出' };
+  if (ch.gold < CRAFT.bookPrice) return { ok: false, message: `金幣不足（需要 ${CRAFT.bookPrice}G）` };
+  if (!addBook(ch, slot)) return { ok: false, message: `背包已滿（${bagLimit(ch)} 格）` };
+  ch.gold -= CRAFT.bookPrice;
+  ch.shopBooks.splice(index, 1);
+  return { ok: true, message: `買下${bookName(slot)}，到「鐵匠」合成裝備` };
 }
 
 /**
@@ -49,7 +77,7 @@ export function shopPrice(item) {
 export function buyItem(ch, index) {
   const entry = ch.shop && ch.shop[index];
   if (!entry) return { ok: false, message: '這件商品已經賣出' };
-  if (ch.bag.length >= bagLimit(ch)) return { ok: false, message: `背包已滿（${bagLimit(ch)} 件），請先賣出裝備或使用背包擴充袋` };
+  if (bagUsed(ch) >= bagLimit(ch)) return { ok: false, message: `背包已滿（${bagLimit(ch)} 格），請先賣出或分解裝備` };
   if (ch.gold < entry.price) return { ok: false, message: `金幣不足（需要 ${entry.price}G）` };
   ch.gold -= entry.price;
   ch.bag.push(entry.item);
@@ -203,12 +231,262 @@ export function sellItem(ch, id) {
 }
 
 /**
- * 背包目前的上限（初始 20 格，使用背包擴充袋後增加）。
+ * 背包目前的上限（初始 20 格，使用背包擴充袋後增加，最多 100 格）。
  * @param {object} ch 角色。
  * @returns {number} 格數。
  */
 export function bagLimit(ch) {
-  return Math.max(LIMITS.bag, ch.bagSize || LIMITS.bag);
+  return Math.min(BAG_EXPAND.max, Math.max(LIMITS.bag, ch.bagSize || LIMITS.bag));
+}
+
+/**
+ * 背包已使用的格數：每件裝備 1 格，每種材料、製作書、技能書、獎勵禮包（依等級）、技能書碎片各 1 格（數量不限，最多疊 9999）。
+ * @param {object} ch 角色。
+ * @returns {number} 格數。
+ */
+export function bagUsed(ch) {
+  const stacks = (obj) => Object.values(obj || {}).filter((n) => n > 0).length;
+  return ch.bag.length + stacks(ch.mats) + stacks(ch.books) + stacks(ch.skillBooks) + stacks(ch.gifts) + stacks(ch.shards);
+}
+
+/**
+ * 把堆疊類道具加進背包（材料或製作書）：已有同種時疊上去（最多 9999），沒有時需要 1 格空位。
+ * @param {object} ch 角色（會被修改）。
+ * @param {'mats' | 'books' | 'skillBooks' | 'gifts' | 'shards'} field 欄位。
+ * @param {string} key 種類。
+ * @param {number} n 數量（負數為扣除）。
+ * @returns {boolean} 是否成功（背包沒有空位時為 false）。
+ */
+function addStack(ch, field, key, n) {
+  ch[field] = ch[field] || {};
+  const have = ch[field][key] || 0;
+  if (n > 0 && have === 0 && bagUsed(ch) >= bagLimit(ch)) return false;
+  const next = Math.max(0, Math.min(LIMITS.stack, have + n));
+  if (next > 0) ch[field][key] = next;
+  else delete ch[field][key];
+  return true;
+}
+
+/**
+ * 加入合成材料。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string} key 材料代碼（MATERIALS 的 key）。
+ * @param {number} [n=1] 數量。
+ * @returns {boolean} 是否成功。
+ */
+export function addMaterial(ch, key, n = 1) {
+  return addStack(ch, 'mats', key, n);
+}
+
+/**
+ * 加入製作書。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string} slot 部位。
+ * @param {number} [n=1] 數量。
+ * @returns {boolean} 是否成功。
+ */
+export function addBook(ch, slot, n = 1) {
+  return addStack(ch, 'books', slot, n);
+}
+
+/**
+ * 加入技能書。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string} id 技能代碼（技能書技能）。
+ * @param {number} [n=1] 數量（負數為扣除）。
+ * @returns {boolean} 是否成功（背包沒有空位時為 false）。
+ */
+export function addSkillBook(ch, id, n = 1) {
+  return addStack(ch, 'skillBooks', id, n);
+}
+
+/**
+ * 使用技能書學會技能（用掉 1 本）。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string} id 技能代碼。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function useSkillBook(ch, id) {
+  if (!(ch.skillBooks && ch.skillBooks[id] > 0)) return { ok: false, message: '沒有這本技能書' };
+  const r = learnBook(ch, id);
+  if (r.ok) addSkillBook(ch, id, -1);
+  return r;
+}
+
+/**
+ * 賣出 1 本技能書。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string} id 技能代碼。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function sellSkillBook(ch, id) {
+  if (!(ch.skillBooks && ch.skillBooks[id] > 0)) return { ok: false, message: '沒有這本技能書' };
+  addSkillBook(ch, id, -1);
+  const price = skillBookPrice(id);
+  ch.gold += price;
+  return { ok: true, message: `賣出技能書（+${price}G）` };
+}
+
+/**
+ * 技能書的賣價（依稀有度：100、200、400、1,000G）。
+ * @param {string} id 技能代碼。
+ * @returns {number} 金幣。
+ */
+export function skillBookPrice(id) {
+  return SKILL_BOOK.sellPrice[SKILLS[id].rarity || 0];
+}
+
+/**
+ * 加入獎勵禮包。
+ * @param {object} ch 角色（會被修改）。
+ * @param {number} tier 等級（1～5）。
+ * @param {number} [n=1] 數量（負數為扣除）。
+ * @returns {boolean} 是否成功（背包沒有空位時為 false）。
+ */
+export function addGift(ch, tier, n = 1) {
+  return addStack(ch, 'gifts', String(tier), n);
+}
+
+/**
+ * 開啟 1 個獎勵禮包：金幣、裝備材料、技能書碎片（數量與品質依等級）。背包放不下新的材料或碎片種類時不開啟。
+ * @param {object} ch 角色（會被修改）。
+ * @param {number} tier 等級（1～5）。
+ * @param {() => number} rng 亂數函式。
+ * @returns {{ok: boolean, message: string, gold?: number, mats?: Record<string, number>, shards?: Record<string, number>}} 結果與內容。
+ */
+export function openGift(ch, tier, rng) {
+  if (!(ch.gifts && ch.gifts[String(tier)] > 0)) return { ok: false, message: '沒有這個禮包' };
+  const k = tier - 1;
+  const mats = {};
+  for (let i = 0; i < GIFT.mats[k]; i++) {
+    const key = MATERIALS[rollRarity(GIFT.matWeights[k], rng)].key;
+    mats[key] = (mats[key] || 0) + 1;
+  }
+  const shards = {};
+  const ids = bookSkillIds();
+  for (let i = 0; i < GIFT.shards[k]; i++) {
+    const r = rollRarity(GIFT.shardWeights[k], rng);
+    const pool = ids.filter((id) => (SKILLS[id].rarity || 0) === r);
+    const id = pool[Math.floor(rng() * pool.length)];
+    shards[id] = (shards[id] || 0) + 1;
+  }
+  // 空位：新的材料與碎片種類各需要 1 格；開完最後一個禮包會空出 1 格。
+  const fresh = Object.keys(mats).filter((m) => !(ch.mats && ch.mats[m] > 0)).length + Object.keys(shards).filter((id) => !(ch.shards && ch.shards[id] > 0)).length;
+  const freed = ch.gifts[String(tier)] === 1 ? 1 : 0;
+  if (bagUsed(ch) - freed + fresh > bagLimit(ch)) return { ok: false, message: `背包空間不足（需要 ${fresh - freed} 格）` };
+  addGift(ch, tier, -1);
+  ch.gold += GIFT.gold[k];
+  for (const [m, n] of Object.entries(mats)) addMaterial(ch, m, n);
+  for (const [id, n] of Object.entries(shards)) addStack(ch, 'shards', id, n);
+  return { ok: true, message: `開啟${GIFT.names[k]}：金幣 +${GIFT.gold[k]}`, gold: GIFT.gold[k], mats, shards };
+}
+
+/**
+ * 加入技能書碎片。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string} id 技能代碼。
+ * @param {number} [n=1] 數量（負數為扣除）。
+ * @returns {boolean} 是否成功。
+ */
+export function addShard(ch, id, n = 1) {
+  return addStack(ch, 'shards', id, n);
+}
+
+/**
+ * 用 3 片同一本的技能書碎片合成 1 本完整的技能書。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string} id 技能代碼。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function combineShards(ch, id) {
+  const have = (ch.shards && ch.shards[id]) || 0;
+  if (have < GIFT.shardNeed) return { ok: false, message: `碎片不足（需要 ${GIFT.shardNeed} 片，持有 ${have} 片）` };
+  // 用完碎片會空出格子；新的技能書種類需要 1 格。
+  const fresh = ch.skillBooks && ch.skillBooks[id] > 0 ? 0 : 1;
+  const freed = have === GIFT.shardNeed ? 1 : 0;
+  if (bagUsed(ch) - freed + fresh > bagLimit(ch)) return { ok: false, message: '背包已滿，無法放入技能書' };
+  addShard(ch, id, -GIFT.shardNeed);
+  addSkillBook(ch, id);
+  return { ok: true, message: `合成技能書「${SKILLS[id].name}」，到倉庫學習` };
+}
+
+/**
+ * 分解一件裝備會得到的材料（期望的數量；高一階材料依機率另外決定）。
+ * @param {object} item 裝備。
+ * @returns {{key: string, n: number, bonus: string | null}} 主要材料與數量、可能額外得到的高品質材料。
+ */
+export function salvageYield(item) {
+  const r = Math.min(MATERIALS.length - 1, item.rarity);
+  return {
+    key: MATERIALS[r].key,
+    n: 2 + Math.floor(item.level / 10) + item.enhance,
+    bonus: r + 1 < MATERIALS.length ? MATERIALS[r + 1].key : null,
+  };
+}
+
+/**
+ * 分解背包中的裝備：得到同品質的材料，25% 機率多得 1 個高一階的材料；鑲嵌的寶石放回寶石袋。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string} id 裝備 id。
+ * @param {() => number} rng 亂數函式。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function salvage(ch, id, rng) {
+  const idx = ch.bag.findIndex((i) => i.id === id);
+  if (idx < 0) return { ok: false, message: '只能分解背包中的裝備，請先卸下' };
+  const item = ch.bag[idx];
+  const y = salvageYield(item);
+  const bonus = y.bonus && rng() < CRAFT.bonus;
+  // 空位檢查：拿掉這件會空出 1 格，新的材料種類各需要 1 格。
+  const newStacks = [y.key, bonus ? y.bonus : null].filter((k) => k && !(ch.mats && ch.mats[k] > 0)).length;
+  if (bagUsed(ch) - 1 + newStacks > bagLimit(ch)) return { ok: false, message: '背包已滿，無法放入材料' };
+  ch.bag.splice(idx, 1);
+  addMaterial(ch, y.key, y.n);
+  if (bonus) addMaterial(ch, y.bonus, 1);
+  const gems = item.gems || [];
+  for (const key of gems) addGem(ch, key);
+  const name = (k) => MATERIALS.find((m) => m.key === k).name;
+  return {
+    ok: true,
+    message: `分解 ${item.name}：${name(y.key)} ×${y.n}${bonus ? `、${name(y.bonus)} ×1（高品質！）` : ''}${gems.length ? `，${gems.length} 顆寶石放回寶石袋` : ''}`,
+  };
+}
+
+/**
+ * 合成裝備的費用：同品質材料 12 個與金幣。
+ * @param {object} ch 角色。
+ * @param {number} tier 品質（0～3，與稀有度相同）。
+ * @returns {{mat: string, n: number, gold: number}} 材料代碼、數量與金幣。
+ */
+export function craftCost(ch, tier) {
+  return { mat: MATERIALS[tier].key, n: CRAFT.cost, gold: Math.round(CRAFT.gold * (tier + 1) * (1 + ch.level / 20)) };
+}
+
+/**
+ * 用製作書與材料合成一件裝備：等級為角色等級，稀有度保證為所選品質；武器可以指定類型。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string} slot 部位。
+ * @param {number} tier 品質（0～3）。
+ * @param {() => number} rng 亂數函式。
+ * @param {string} [type] 武器類型（省略時隨機）。
+ * @returns {{ok: boolean, message: string, item?: object}} 結果與合成的裝備。
+ */
+export function craftItem(ch, slot, tier, rng, type) {
+  if (!(ch.books && ch.books[slot] > 0)) return { ok: false, message: `沒有${bookName(slot)}` };
+  const cost = craftCost(ch, tier);
+  const have = (ch.mats && ch.mats[cost.mat]) || 0;
+  const matName = MATERIALS[tier].name;
+  if (have < cost.n) return { ok: false, message: `${matName}不足（需要 ${cost.n} 個，持有 ${have} 個）` };
+  if (ch.gold < cost.gold) return { ok: false, message: `金幣不足（需要 ${cost.gold}G）` };
+  // 空位：用完最後一本書或材料時會空出格子，新的裝備需要 1 格。
+  const freed = (ch.books[slot] === 1 ? 1 : 0) + (have === cost.n ? 1 : 0);
+  if (bagUsed(ch) - freed + 1 > bagLimit(ch)) return { ok: false, message: '背包已滿，無法放入新裝備' };
+  addBook(ch, slot, -1);
+  addMaterial(ch, cost.mat, -cost.n);
+  ch.gold -= cost.gold;
+  const item = makeItem({ slot, cls: ch.cls, level: ch.level, rarity: tier, type }, rng);
+  ch.bag.push(item);
+  return { ok: true, message: `合成成功：${RARITIES[tier].name}・${item.name}`, item };
 }
 
 /**
@@ -224,6 +502,7 @@ export function slotFor(ch, item) {
 
 /**
  * 穿上背包中的裝備（原本的裝備放回背包）。
+ * 雙手武器佔用兩隻手：穿上雙手武器時副手自動卸下放回背包；裝備雙手武器時不能穿副手。
  * @param {object} ch 角色。
  * @param {string} id 裝備 id。
  * @param {string} [key] 指定的裝備欄（飾品可選飾品 1 或 2；省略時自動選擇）。
@@ -237,10 +516,19 @@ export function equip(ch, id, key) {
   const def = EQUIP_SLOTS.find((e) => e.key === target);
   if (!def || def.slot !== item.slot) return { ok: false, message: `${item.name}不能裝在這個欄位` };
   if (item.slot === 'weapon' && !canWield(ch, item)) return { ok: false, message: `${item.name}是${weaponOwner(item)}的武器，${CLASSES[ch.cls].name}不能裝備` };
+  if (item.slot === 'offhand' && weaponHands(ch.equipped.weapon) === 2) return { ok: false, message: `${ch.equipped.weapon.name}是雙手武器，請先換成單手武器才能裝備副手` };
+  const dropOff = item.slot === 'weapon' && weaponHands(item) === 2 ? ch.equipped.offhand : null;
+  // 背包空間：拿出這件、放回原本的裝備，若要卸下副手再多 1 格。
+  if (dropOff && bagUsed(ch) - 1 + (ch.equipped[target] ? 1 : 0) + 1 > bagLimit(ch)) return { ok: false, message: '背包已滿，雙手武器需要先卸下副手' };
   ch.bag.splice(idx, 1);
   const old = ch.equipped[target];
   if (old) ch.bag.splice(idx, 0, old);
   ch.equipped[target] = item;
+  if (dropOff) {
+    ch.equipped.offhand = null;
+    ch.bag.push(dropOff);
+    return { ok: true, message: `${def.name}裝備 ${item.name}（雙手武器，${dropOff.name}卸下放回背包）` };
+  }
   return { ok: true, message: `${def.name}裝備 ${item.name}` };
 }
 
@@ -334,7 +622,7 @@ export function depositItem(ch, shared, id) {
 export function withdrawItem(ch, shared, id) {
   const idx = shared.items.findIndex((i) => i.id === id);
   if (idx < 0) return { ok: false, message: '共用倉庫裡沒有這件裝備' };
-  if (ch.bag.length >= bagLimit(ch)) return { ok: false, message: `背包已滿（${bagLimit(ch)} 件）` };
+  if (bagUsed(ch) >= bagLimit(ch)) return { ok: false, message: `背包已滿（${bagLimit(ch)} 格）` };
   const [item] = shared.items.splice(idx, 1);
   ch.bag.push(item);
   const note = canWield(ch, item) ? '' : `（${weaponOwner(item)}的武器，${CLASSES[ch.cls].name}不能裝備）`;
@@ -372,32 +660,47 @@ export function withdrawGold(ch, shared, amount) {
 }
 
 /**
- * 背包擴充袋的售價：依已擴充與持有的數量倍增。
+ * 商店已賣給這個角色的背包擴充袋數量（舊存檔沒有紀錄時，以已擴充的格數加上持有的數量估計，最多 5 個）。
  * @param {object} ch 角色。
- * @returns {number} 金幣；已達上限時為 Infinity。
+ * @returns {number} 個數。
  */
-export function bagExpandPrice(ch) {
-  const used = (bagLimit(ch) - LIMITS.bag) / BAG_EXPAND.step + (ch.bagExpand || 0);
-  if (bagLimit(ch) + (ch.bagExpand || 0) * BAG_EXPAND.step >= BAG_EXPAND.max) return Infinity;
-  return BAG_EXPAND.basePrice * 2 ** used;
+export function pouchesBought(ch) {
+  if (Number.isInteger(ch.pouchBought)) return ch.pouchBought;
+  return Math.min(BAG_EXPAND.shopMax, (bagLimit(ch) - LIMITS.bag) / BAG_EXPAND.step + (ch.bagExpand || 0));
 }
 
 /**
- * 購買背包擴充袋（放進道具欄，到倉庫使用）。
+ * 背包擴充袋的售價：依商店已賣出的數量倍增（200、400、800、1,600、3,200G）；
+ * 商店已賣滿 5 個，或背包加上持有的擴充袋已足夠到 100 格時不再販售。
+ * @param {object} ch 角色。
+ * @returns {number} 金幣；不再販售時為 Infinity。
+ */
+export function bagExpandPrice(ch) {
+  const bought = pouchesBought(ch);
+  if (bought >= BAG_EXPAND.shopMax) return Infinity;
+  if (bagLimit(ch) + (ch.bagExpand || 0) * BAG_EXPAND.step >= BAG_EXPAND.max) return Infinity;
+  return BAG_EXPAND.basePrice * 2 ** bought;
+}
+
+/**
+ * 購買背包擴充袋（到倉庫使用）。
  * @param {object} ch 角色（會被修改）。
  * @returns {{ok: boolean, message: string}} 結果。
  */
 export function buyBagExpand(ch) {
   const price = bagExpandPrice(ch);
-  if (price === Infinity) return { ok: false, message: `背包最多擴充到 ${BAG_EXPAND.max} 格` };
+  if (price === Infinity) {
+    return { ok: false, message: pouchesBought(ch) >= BAG_EXPAND.shopMax ? `商店的背包擴充袋已賣完（每個角色 ${BAG_EXPAND.shopMax} 個），之後要打怪取得` : `背包最多擴充到 ${BAG_EXPAND.max} 格` };
+  }
   if (ch.gold < price) return { ok: false, message: `金幣不足（需要 ${price}G）` };
+  ch.pouchBought = pouchesBought(ch) + 1;
   ch.gold -= price;
   ch.bagExpand = (ch.bagExpand || 0) + 1;
   return { ok: true, message: '買下背包擴充袋，到「倉庫」使用' };
 }
 
 /**
- * 使用背包擴充袋：背包上限 +5 格（最多 40 格）。
+ * 使用背包擴充袋：背包上限 +5 格（最多 100 格）。
  * @param {object} ch 角色（會被修改）。
  * @returns {{ok: boolean, message: string}} 結果。
  */
@@ -418,7 +721,7 @@ export function useBagExpand(ch) {
 export function unequip(ch, slot) {
   const item = ch.equipped[slot];
   if (!item) return { ok: false, message: '這個部位沒有裝備' };
-  if (ch.bag.length >= bagLimit(ch)) return { ok: false, message: '背包已滿，無法卸下' };
+  if (bagUsed(ch) >= bagLimit(ch)) return { ok: false, message: '背包已滿，無法卸下' };
   ch.equipped[slot] = null;
   ch.bag.push(item);
   return { ok: true, message: `卸下 ${item.name}` };
@@ -554,6 +857,6 @@ export function settleRun(ch, world, result) {
   return {
     result, area: world.area, depth: world.depth, ms, kills: loot.kills, damageTaken: loot.damageTaken, xp: loot.xp,
     gold: loot.gold - goldLost, goldLost, items: loot.items, gems: loot.gems || [], unlocks, levels: loot.levelsGained, potionsUsed: loot.potionsUsed,
-    evolved: !!world.bossDefeated && !!(world.ch.evolved && world.ch.evolved[world.stageKey()]), clears: (ch.clears && ch.clears[world.stageKey()]) || 0,
+    evolved: !!world.evolvedDefeated, clears: (ch.clears && ch.clears[world.stageKey()]) || 0,
   };
 }

@@ -71,6 +71,33 @@ const BODY = {
   },
 };
 
+// 盜賊：以弓箭手的上半身為基礎，深色兜帽、面罩與紅色圍巾。
+BODY.thief = {
+  palette: { o: O, G: '#4a4a5c', g: '#6e6e86', n: '#2c2c3a', s: '#f2c9a0', S: '#c8946a', e: O, m: '#1e1e28', R: '#a8283a', T: '#3a3a4c', t: '#56566e', K: '#2a1a14', a: '#c0c6d0', P: '#2a2a36', p: '#1a1a24', B: '#3a2a1e', b: '#5a4030' },
+  top: BODY.archer.top.map((row, i) => ({ 6: '...oGsmmmmmno...', 7: '....onRRRRno....' })[i] || row),
+};
+
+// 武僧：光頭、橘色武道服、念珠與黑腰帶。
+BODY.monk = {
+  palette: { o: O, s: '#f2c9a0', S: '#c8946a', e: O, Y: '#e8862a', y: '#a85a14', W: '#f0e6c8', a: '#7a3a1a', K: '#2a1a14', P: '#c0701e', p: '#8a4a14', B: '#5a3a22', b: '#8a5a34' },
+  top: [
+    '................',
+    '.....oooooo.....',
+    '....osssssso....',
+    '...osssssssSo...',
+    '...osssssssSo...',
+    '...osessesSSo...',
+    '...ossssssSSo...',
+    '....oSSSSSSo....',
+    '...oYYWWWWYYo...',
+    '..oyYYaWWaYYyo..',
+    '..osoYYaaYYoso..',
+    '..osoyYYYYyoso..',
+    '..osoKKKKKKoso..',
+    '...ooyyyyyyoo...',
+  ],
+};
+
 /** 側面出手：只替換上半身的幾列（列索引 → 新內容），手臂朝右伸出；面向左時整張翻轉。 */
 const ATTACK_ROWS = {
   warrior: {
@@ -142,6 +169,30 @@ const ATTACK_UP = {
     14: '..opPPPPPPPPqo..',
     15: '..oPPPPPPPPPqo..',
   },
+};
+
+// 盜賊的出手姿勢與弓箭手相同（同一個上半身骨架）；武僧另外畫出拳的手臂。
+ATTACK_ROWS.thief = ATTACK_ROWS.archer;
+ATTACK_DOWN.thief = ATTACK_DOWN.archer;
+ATTACK_UP.thief = ATTACK_UP.archer;
+ATTACK_ROWS.monk = {
+  9: '..oyYYaWWaYyooo.',
+  10: '..osoYYaaYYssso.',
+  11: '..osoyYYYYyoooo.',
+  12: '..osoKKKKKKo....',
+};
+ATTACK_DOWN.monk = {
+  10: '...osYYaaYYso...',
+  11: '...ooyYYYYyoo...',
+  12: '...oKKssssKKo...',
+};
+ATTACK_UP.monk = {
+  6: '...oSSSSSSSSo...',
+  7: '....oSSSSSSo....',
+  8: '.sooYYWWWWYYoos.',
+  10: '...oYYYaaYYYo...',
+  11: '...oyYYYYYYyo...',
+  12: '...oKKKKKKKKo...',
 };
 
 /** 一般職業的下半身（褲子與靴子）：站立、抬左腳、抬右腳。 */
@@ -544,6 +595,24 @@ export const ITEM_ART = {
   key: { palette: { o: O, Y: '#e8b84a' }, rows: ['.ooo......', 'oYYYo.....', 'oYoYoooooo', 'oYYYYYYYYo', '.ooo.oYoYo', '.....o.o.o'] },
   shield: { palette: { o: O, S: '#9aa3b5', R: '#9e2a3a', Y: '#e8b84a' }, rows: ['oooooooo', 'oSSSSSSo', 'oSRRRRSo', 'oSRYYRSo', 'oSRRRRSo', '.oSRRSo.', '..oSSo..', '...oo...'] },
   sword: { palette: { o: O, S: '#f0f0f0', D: '#9aa3b5', G: '#e8b84a', B: '#6b4226' }, rows: ['......oo', '.....oSo', '....oSDo', '.o.oSDo.', '.oGSDo..', '..oGo...', '.oBoGo..', 'oBo.oo..'] },
+  helmet: { palette: { o: O, S: '#9aa3b5', L: '#d8dde8', D: '#5a6478' }, rows: ['..oooo..', '.oLLSSo.', 'oLSSSSDo', 'oSSSSSDo', 'oSDDDDSo', 'oSo..oSo', 'ooo..ooo'] },
+  armor: { palette: { o: O, S: '#9aa3b5', L: '#d8dde8', R: '#9e2a3a' }, rows: ['oo.oo.oo', 'oSooooSo', 'oSLRRSSo', '.oLRRSo.', '.oSRRSo.', '.oSSSSo.', '.oooooo.'] },
+  boots: { palette: { o: O, B: '#8a5a2a', b: '#b8844a' }, rows: ['.ooo....', '.obBo...', '.oBBo...', '.oBBoooo', '.obBBBBo', '.oooooo.'] },
+  ring: { palette: { o: O, Y: '#e8b84a', R: '#e04a5a', r: '#ff9aa8' }, rows: ['..oo..', '.oRro.', 'oYooYo', 'oY..Yo', 'oYooYo', '.oYYo.', '..oo..'] },
+  book: { palette: { o: O, B: '#6a3a8a', b: '#9a6ac8', P: '#f0e6c8', Y: '#e8b84a' }, rows: ['oooooooo', 'oBbBBBPo', 'oBYYBBPo', 'oBBBBBPo', 'oBYYYBPo', 'oBBBBBPo', 'oooooooo'] },
+  gift: { palette: { o: O, B: '#c0402a', b: '#e86a4a', Y: '#ffe14d' }, rows: ['..o..o..', '.oYooYo.', 'ooooYooo', 'oBBBYBBo', 'oYYYYYYo', 'oBBBYBBo', 'obBBYBBo', 'oooooooo'] },
+  shard: { palette: { o: O, B: '#1e5a9a', b: '#4a8ae8', P: '#f0e6c8', Y: '#ffe14d' }, rows: ['oooo....', 'oBbBo...', 'oBYBPo..', 'oBBBBPo.', 'oBbBBBo.', '.oooooo.'] },
+  skillbook: { palette: { o: O, B: '#1e5a9a', b: '#4a8ae8', P: '#f0e6c8', Y: '#ffe14d' }, rows: ['oooooooo', 'oBbBBBPo', 'oBBYBBPo', 'oBYYYBPo', 'oBBYBBPo', 'oBBBBBPo', 'oooooooo'] },
+  iron: { palette: { o: O, D: '#5a6070', M: '#8a909e', L: '#c0c6d0' }, rows: ['........', '..ooo...', '.oLMMo..', 'oLMMDDo.', 'oMMDDDDo', '.ooooooo'] },
+  steel: { palette: { o: O, D: '#2a7a4a', M: '#4fc078', L: '#a8f0c0' }, rows: ['...oo...', '..oLMo..', '.oLMMDo.', 'oLMMMDDo', 'oMMDDDDo', '.oooooo.'] },
+  mithril: { palette: { o: O, D: '#1e4a9a', M: '#4a8ae8', L: '#c0e0ff' }, rows: ['...oo...', '..oLLo..', '.oLMMDo.', 'oLMMMMDo', '.oMMMDo.', '..oDDo..', '...oo...'] },
+  star: { palette: { o: O, D: '#a86a10', M: '#f2b84b', L: '#fff0b0' }, rows: ['...o....', '..oLo...', 'ooLMLoo.', 'oLMMMDo.', '.oMMDo..', 'oMDooDo.', 'oo...oo.'] },
+  dagger: { palette: { o: O, S: '#e8eef5', D: '#9aa3b5', G: '#e8b84a', B: '#4a2a1a' }, rows: ['........', '.....oo.', '....oSo.', '...oSDo.', '.oGSDo..', '..oGo...', '.oBo....', '.oo.....'] },
+  daggers: { palette: { o: O, S: '#e8eef5', D: '#9aa3b5', G: '#e8b84a', B: '#4a2a1a' }, rows: ['oo....oo', 'oSo..oSo', '.oSooSo.', '..oDDo..', '.oGooGo.', 'oBo..oBo', 'oo....oo', '........'] },
+  fist: { palette: { o: O, Y: '#e8862a', y: '#a85a14', W: '#f0e6c8' }, rows: ['.oooooo.', 'oYoYoYYo', 'oYoYoYYo', 'oYYYYYYo', 'oyYYYYyo', '.oWWWWo.', '.oyyyyo.', '..oooo..'] },
+    bow: { palette: { o: O, W: '#a06a3a', S: '#e8e8e8' }, rows: ['..ooo...', '.oWWoS..', 'oWo..S..', 'oW...S..', 'oWo..S..', '.oWWoS..', '..ooo...'] },
+  staff: { palette: { o: O, W: '#8a5a2a', G: '#c8a8ff', L: '#ffffff' }, rows: ['.....oo.', '....oGLo', '....oGGo', '...oWoo.', '..oWo...', '.oWo....', 'oWo.....', 'oo......'] },
+  axe: { palette: { o: O, S: '#c0c6d0', D: '#7a808e', W: '#8a5a2a' }, rows: ['..oooo..', '.oSSSDo.', 'oSSSoWo.', 'oSDoWo..', '.ooWo...', '..oWo...', '.oWo....', '.oo.....'] },
   cure: { palette: { o: O, C: '#c8b8a0', B: '#5ab8e8', b: '#c8f0ff' }, rows: ['..oo..', '..CC..', '.oBBo.', 'oBbBBo', 'oBBBBo', '.oooo.'] },
   ...gemArt(),
 };
@@ -598,6 +667,21 @@ export function itemDataUrl(name, scale = 4) {
  */
 export function heroDataUrl(cls, scale = 4) {
   const src = heroArt(cls).frames[0];
+  const c = makeCanvas(src.width * scale, src.height * scale);
+  const g = c.getContext('2d');
+  g.imageSmoothingEnabled = false;
+  g.drawImage(src, 0, 0, c.width, c.height);
+  return c.toDataURL();
+}
+
+/**
+ * 以 data URL 取得怪物或 Boss 圖（介面中的 <img> 用，例如地城入口的 Boss 頭像）。
+ * @param {string} type 種類。
+ * @param {number} [scale=3] 放大倍率。
+ * @returns {string} data URL。
+ */
+export function monsterDataUrl(type, scale = 3) {
+  const src = monsterArt(type).frames[0];
   const c = makeCanvas(src.width * scale, src.height * scale);
   const g = c.getContext('2d');
   g.imageSmoothingEnabled = false;

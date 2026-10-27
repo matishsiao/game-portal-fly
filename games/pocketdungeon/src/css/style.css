@@ -292,6 +292,8 @@ button:focus-visible {
 .char-card[data-cls="warrior"] { --c: #b23a48; }
 .char-card[data-cls="archer"] { --c: #3f8f4a; }
 .char-card[data-cls="mage"] { --c: #5b3a8f; }
+.char-card[data-cls="thief"] { --c: #4a4a5c; }
+.char-card[data-cls="monk"] { --c: #e8862a; }
 
 .char-card.empty {
   border: 2px dashed var(--line);
@@ -2163,3 +2165,1469 @@ button:focus-visible {
 .toast.gem-toast {
   color: #c8a8ff;
 }
+
+/* ---------- 人物裝備圖（倉庫分頁） ---------- */
+
+.paper-doll {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr 1fr;
+  grid-template-areas:
+    "acc1 helmet acc2"
+    "weapon hero offhand"
+    "armor hero boots";
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.doll-hero {
+  grid-area: hero;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: radial-gradient(circle at 50% 40%, var(--surface-2), var(--surface) 70%);
+  box-shadow: var(--shadow);
+}
+
+.doll-hero img {
+  width: 84px;
+  image-rendering: pixelated;
+}
+
+.doll-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  min-height: 92px;
+  padding: 8px 4px;
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  border: 2px solid transparent;
+  text-align: center;
+}
+
+.doll-slot:not(.empty) {
+  border-color: var(--rc, transparent);
+}
+
+.doll-slot.empty {
+  border: 2px dashed var(--text-muted);
+  opacity: 0.75;
+}
+
+.doll-slot.empty .doll-icon {
+  opacity: 0.35;
+}
+
+.doll-slot.blocked {
+  opacity: 0.5;
+}
+
+.doll-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.doll-slot small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.doll-name {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.25;
+  word-break: break-all;
+}
+
+.doll-gems {
+  display: flex;
+  gap: 3px;
+}
+
+.doll-gems i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gem);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+
+/* 說明按鈕（ⓘ）。 */
+.info-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  min-width: 0;
+  min-height: 0;
+  margin-left: 6px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--text-muted);
+  background: transparent;
+  color: var(--text-muted);
+  font: italic 700 12px/1 Georgia, serif;
+  vertical-align: middle;
+}
+
+.skill-card.passive {
+  border-left-color: #5aa7ff;
+}
+
+/* ---------- 背包與共用倉庫的格子 ---------- */
+
+.inv-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.inv-cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  border: 2px solid var(--rc, rgba(255, 255, 255, 0.15));
+}
+
+.inv-cell img {
+  width: 62%;
+  height: 62%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.inv-cell.empty {
+  border: 1.5px dashed rgba(128, 128, 128, 0.35);
+  background: transparent;
+  box-shadow: none;
+}
+
+.inv-cell.book,
+.inv-cell.pouch {
+  border-color: #9a6ac8;
+}
+
+.inv-cell:active:not(.empty) {
+  transform: scale(0.94);
+}
+
+.cell-plus,
+.cell-count,
+.cell-tag {
+  position: absolute;
+  padding: 0 3px;
+  border-radius: 6px;
+  background: rgba(10, 4, 16, 0.85);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 14px;
+}
+
+.cell-plus {
+  top: 2px;
+  right: 2px;
+  color: #ffe39a;
+}
+
+.cell-count {
+  right: 2px;
+  bottom: 2px;
+}
+
+.cell-tag {
+  top: 2px;
+  left: 2px;
+}
+
+.cell-gems {
+  position: absolute;
+  left: 4px;
+  bottom: 3px;
+  display: flex;
+  gap: 2px;
+}
+
+.cell-gems i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gem);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
+}
+
+/* ---------- 鐵匠：材料與製作 ---------- */
+
+.icon-inline {
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+  vertical-align: -3px;
+  image-rendering: pixelated;
+}
+
+.menu-list button small {
+  display: block;
+  font-weight: 400;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.menu-list button.primary {
+  background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
+  color: #fff;
+}
+
+/* ---------- 寶石格子（寶石袋、鑲嵌、選擇寶石） ---------- */
+
+.gem-cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border-radius: 10px;
+  background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--gem) 22%, var(--surface)), var(--surface) 70%);
+  border: 2px solid var(--gem);
+  box-shadow: var(--shadow);
+}
+
+.gem-cell img {
+  width: 58%;
+  height: 58%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.gem-cell.empty {
+  border: 2px dashed var(--text-muted);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.gem-cell:disabled {
+  opacity: 1;
+}
+
+.gem-cell.empty:disabled {
+  opacity: 0.4;
+}
+
+.cell-tier {
+  position: absolute;
+  left: 3px;
+  bottom: 2px;
+  padding: 0 3px;
+  border-radius: 6px;
+  background: rgba(10, 4, 16, 0.85);
+  color: #ffe39a;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 14px;
+}
+
+.gem-cell .cell-count {
+  top: 2px;
+  bottom: auto;
+}
+
+.socket-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  border-left: 4px solid var(--rc);
+}
+
+.socket-card .inv-cell.static {
+  width: 48px;
+  flex-shrink: 0;
+  box-shadow: none;
+}
+
+.socket-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 14px;
+}
+
+.socket-info b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.socket-holes {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.socket-holes .gem-cell {
+  width: 46px;
+}
+
+/* 選擇寶石的對話框：格子版面，格子下方顯示效果。 */
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  gap: 8px;
+}
+
+.menu-grid .gem-cell {
+  aspect-ratio: auto;
+  min-height: 84px;
+  padding: 6px 2px 4px;
+  align-content: start;
+  gap: 2px;
+}
+
+.menu-grid .gem-cell img {
+  width: 34px;
+  height: 34px;
+}
+
+.menu-grid .cell-tier {
+  bottom: auto;
+  top: 3px;
+}
+
+.gem-label {
+  font-size: 11px;
+  line-height: 1.2;
+  color: var(--text);
+}
+
+.gem-detail {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.gem-detail .gem-cell {
+  width: 64px;
+  flex-shrink: 0;
+}
+
+/* 鐵匠：材料與製作書的格子（下方顯示名稱）。 */
+.craft-grid {
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+}
+
+.craft-grid .inv-cell {
+  aspect-ratio: auto;
+  min-height: 76px;
+  padding: 8px 2px 4px;
+  align-content: start;
+  gap: 2px;
+}
+
+.craft-grid .inv-cell img {
+  width: 34px;
+  height: 34px;
+}
+
+.cell-name {
+  font-size: 11px;
+  line-height: 1.2;
+  color: var(--text);
+}
+
+.book-cell {
+  border-color: #9a6ac8;
+}
+
+.book-cell .book-badge {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.book-cell .cell-count {
+  top: 3px;
+  bottom: auto;
+}
+
+.inv-cell.none {
+  opacity: 0.45;
+}
+
+/* 合成：選品質與武器類型的格子。 */
+.menu-grid .craft-tier {
+  aspect-ratio: auto;
+  min-height: 96px;
+  padding: 8px 2px 6px;
+  align-content: start;
+  gap: 3px;
+}
+
+.menu-grid .craft-tier img {
+  width: 34px;
+  height: 34px;
+}
+
+.menu-grid .craft-tier:disabled {
+  opacity: 0.4;
+  filter: grayscale(0.8);
+}
+
+/* 分頁中的子頁面切換（鐵匠：製作／強化）。 */
+.sub-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+
+.sub-tabs button {
+  min-height: 40px;
+  border-radius: 9px;
+  background: transparent;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.sub-tabs button[aria-selected="true"] {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+/* ---------- 技能：圖示格子 ---------- */
+
+.skill-points {
+  margin: 0 0 8px;
+}
+
+.skill-slots {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.skill-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 6px 2px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(232, 184, 74, 0.25), var(--surface));
+  border: 2px solid #e8b84a;
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.skill-slot.empty {
+  border-style: dashed;
+  background: var(--surface);
+}
+
+.skill-slot.locked {
+  opacity: 0.5;
+  border: 2px dashed var(--text-muted);
+  background: transparent;
+}
+
+.skill-ico {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  color: #ffd27a;
+  font-size: 18px;
+}
+
+.skill-ico svg {
+  width: 100%;
+  height: 100%;
+}
+
+.skill-ico.big {
+  width: 48px;
+  height: 48px;
+  padding: 8px;
+  border-radius: 12px;
+  background: radial-gradient(circle at 50% 30%, #6a4a1a, #2a1a10 75%);
+  border: 2px solid #e8b84a;
+}
+
+.skill-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.skill-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+  min-height: 84px;
+  padding: 12px 2px 6px;
+  border-radius: 14px;
+  background: radial-gradient(circle at 50% 30%, rgba(232, 184, 74, 0.22), var(--surface) 70%);
+  border: 2px solid #c99a3a;
+  box-shadow: var(--shadow);
+}
+
+.skill-cell.passive {
+  background: radial-gradient(circle at 50% 30%, rgba(90, 167, 255, 0.22), var(--surface) 70%);
+  border-color: #5aa7ff;
+}
+
+.skill-cell.passive .skill-ico {
+  color: #a8d0ff;
+}
+
+.skill-cell.rebirth {
+  border-color: #c06a1a;
+}
+
+.skill-cell.dim {
+  opacity: 0.7;
+  border-style: dashed;
+}
+
+.skill-cell.locked {
+  opacity: 0.45;
+  border-style: dashed;
+  background: var(--surface);
+}
+
+.skill-name {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.skill-lv,
+.skill-slot-no {
+  position: absolute;
+  top: 3px;
+  padding: 0 4px;
+  border-radius: 6px;
+  background: rgba(10, 4, 16, 0.85);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 14px;
+}
+
+.skill-lv {
+  right: 3px;
+}
+
+.skill-slot-no {
+  left: 3px;
+  background: #e8b84a;
+  color: #2a1606;
+}
+
+.skill-up {
+  position: absolute;
+  right: 4px;
+  bottom: 3px;
+  color: #5fd068;
+  font-size: 10px;
+  font-style: normal;
+}
+
+.skill-star {
+  position: absolute;
+  left: 4px;
+  bottom: 2px;
+  color: #e8b84a;
+  font-size: 8px;
+  font-style: normal;
+}
+
+.skill-lock {
+  font-size: 10px;
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+
+.skill-detail {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.skill-detail > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-list button:disabled {
+  opacity: 0.5;
+}
+
+/* ---------- 角色分頁（手遊式） ---------- */
+
+.hero-banner {
+  --c: #b23a48;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+  border-radius: 18px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--c), #1a1020 85%);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35), inset 0 0 0 2px rgba(232, 184, 74, 0.55);
+}
+
+.hero-banner[data-cls="archer"] { --c: #3f8f4a; }
+.hero-banner[data-cls="mage"] { --c: #5b3a8f; }
+.hero-banner[data-cls="thief"] { --c: #4a4a5c; }
+.hero-banner[data-cls="monk"] { --c: #c0701e; }
+
+.hero-sprite {
+  width: 96px;
+  flex-shrink: 0;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.5));
+}
+
+.hero-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.hero-meta .muted {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.hero-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffe39a;
+}
+
+.hero-title .stars {
+  font-style: normal;
+  letter-spacing: -1px;
+}
+
+.hero-name {
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+.lv-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lv-chip {
+  padding: 0 8px;
+  border-radius: 999px;
+  background: #e8b84a;
+  color: #2a1606;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.xp-track {
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+.xp-track i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #5aa7ff, #a8e4ff);
+}
+
+.power {
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 1px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.4);
+  font-size: 12px;
+}
+
+.power b {
+  color: #ffd27a;
+  font-size: 16px;
+}
+
+.stat-tiles {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.stat-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  min-width: 0;
+  padding: 8px 2px 6px;
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  border: 1.5px solid rgba(232, 184, 74, 0.45);
+}
+
+.stat-ico {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  color: #ffd27a;
+}
+
+.stat-ico svg {
+  width: 100%;
+  height: 100%;
+}
+
+.stat-tile small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.stat-tile b {
+  font-size: 18px;
+  line-height: 1.1;
+}
+
+.stat-tile i {
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.stat-tile .up {
+  color: var(--good);
+}
+
+.stat-tile .down {
+  color: var(--wrong);
+}
+
+.rebirth-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 4px;
+  border-radius: 14px;
+  background: var(--surface-2);
+  border: 2px dashed var(--text-muted);
+  color: var(--text-muted);
+}
+
+.rebirth-btn b {
+  font-size: 17px;
+}
+
+.rebirth-btn small {
+  font-size: 12px;
+}
+
+.rebirth-btn.ready {
+  border: 2px solid #ffe39a;
+  background: linear-gradient(135deg, #e8b84a, #c06a1a);
+  color: #2a1606;
+  animation: rebirth-glow 1.6s ease-in-out infinite;
+}
+
+.rebirth-btn.done {
+  border-style: solid;
+  border-color: #e8b84a;
+  color: #e8b84a;
+}
+
+@keyframes rebirth-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 210, 122, 0.6); }
+  50% { box-shadow: 0 0 16px 4px rgba(255, 210, 122, 0.55); }
+}
+
+.fx-chips {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 6px;
+}
+
+.fx-chip {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  font-size: 13px;
+}
+
+.fx-chip small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.fx-chip b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fx-chip .info-btn {
+  align-self: flex-start;
+  margin: 2px 0 0;
+}
+
+.mini-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.mini-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 2px;
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.mini-tile small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ---------- 地城分頁（手遊式關卡） ---------- */
+
+.gate-top {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.carry-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.carry-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 8px 2px 4px;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.carry-chip img {
+  width: 22px;
+  height: 22px;
+  image-rendering: pixelated;
+}
+
+.carry-chip.none {
+  opacity: 0.45;
+}
+
+.rebirth-bonus {
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(232, 184, 74, 0.25), rgba(192, 106, 26, 0.2));
+  border: 1px solid rgba(232, 184, 74, 0.6);
+  font-size: 12px;
+  text-align: left;
+}
+
+.area-banner {
+  --a: #4a6a3a;
+  --b: #1e2a18;
+  margin-bottom: 10px;
+  padding: 10px 10px 12px;
+  border-radius: 16px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--a), var(--b) 80%);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), inset 0 0 0 1.5px rgba(255, 255, 255, 0.18);
+}
+
+.area-banner.theme-grass { --a: #5c8a3c; --b: #1c3214; }
+.area-banner.theme-moss { --a: #4f6a40; --b: #161e12; }
+.area-banner.theme-lava { --a: #b04a1a; --b: #2a1210; }
+.area-banner.theme-ice { --a: #4f7fa8; --b: #141e2c; }
+.area-banner.theme-sky { --a: #6aa0d8; --b: #24406a; }
+.area-banner.theme-necro { --a: #6a5a7a; --b: #141018; }
+.area-banner.theme-abyss { --a: #6a3f90; --b: #0e0916; }
+
+.area-banner.locked {
+  filter: grayscale(0.85) brightness(0.7);
+}
+
+.area-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.area-boss {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  object-fit: contain;
+  image-rendering: pixelated;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px;
+}
+
+.area-title {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.area-title b {
+  font-size: 18px;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+}
+
+.area-title small {
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.rec-chip {
+  flex-shrink: 0;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.4);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.area-lock {
+  margin: 8px 0 0;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.stage-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.stage-node {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 58px;
+  height: 58px;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.35), rgba(0, 0, 0, 0.45) 70%);
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  color: #fff;
+}
+
+.stage-node b {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.stage-node small {
+  font-size: 10px;
+  opacity: 0.9;
+}
+
+.stage-node.cleared {
+  border-color: #ffe39a;
+}
+
+.stage-node.evo {
+  border-color: #ff8a3a;
+  box-shadow: 0 0 10px rgba(255, 138, 58, 0.7);
+}
+
+.stage-node:disabled {
+  opacity: 0.5;
+}
+
+.stage-clears,
+.stage-evo {
+  position: absolute;
+  padding: 0 4px;
+  border-radius: 6px;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 13px;
+}
+
+.stage-clears {
+  top: -4px;
+  right: -4px;
+  background: #e8b84a;
+  color: #2a1606;
+}
+
+.stage-evo {
+  bottom: -5px;
+  background: #d8303f;
+  color: #fff;
+}
+
+/* ---------- 地城：世界地圖 ---------- */
+
+.world-map {
+  position: relative;
+  width: 100%;
+  margin-bottom: 10px;
+  border-radius: 18px;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 20% 15%, rgba(255, 255, 255, 0.35), transparent 40%),
+    radial-gradient(ellipse at 80% 70%, rgba(120, 80, 40, 0.18), transparent 45%),
+    radial-gradient(ellipse at 50% 50%, #e9d4a6, #d4b480 75%, #b8915a);
+  box-shadow: inset 0 0 0 3px #8a6038, inset 0 0 26px rgba(90, 55, 20, 0.55), 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.map-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.map-node {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 46px;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  transform: translate(-50%, -78%);
+  background: none;
+  z-index: 2;
+}
+
+/* 圖釘：上圓下尖的水滴形，依狀態上色。 */
+.map-node .pin {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  border: 2px solid #1a1020;
+  background: radial-gradient(circle at 60% 40%, #a8e0ff, #3f8fd8 70%);
+  box-shadow: 1px 3px 4px rgba(60, 30, 10, 0.5);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.map-node.open .pin {
+  background: radial-gradient(circle at 60% 40%, #fff2b0, #e8b84a 70%);
+}
+
+.map-node.current .pin {
+  animation: pin-bounce 1s ease-in-out infinite;
+  box-shadow: 0 0 0 4px rgba(255, 226, 120, 0.55), 1px 3px 6px rgba(60, 30, 10, 0.6);
+}
+
+@keyframes pin-bounce {
+  0%, 100% { transform: rotate(-45deg) translate(0, 0); }
+  50% { transform: rotate(-45deg) translate(3px, -3px); }
+}
+
+/* 尚未開放：灰色墓碑。 */
+.map-node.locked .pin {
+  width: 22px;
+  height: 24px;
+  border-radius: 11px 11px 3px 3px;
+  transform: none;
+  background: linear-gradient(180deg, #b8b4ac, #7a766e);
+  color: #4a463e;
+  font-size: 12px;
+}
+
+.pin-label {
+  margin-top: 4px;
+  padding: 0 5px;
+  border-radius: 6px;
+  background: rgba(40, 24, 10, 0.75);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 14px;
+  white-space: nowrap;
+}
+
+.pin-label i {
+  margin-left: 3px;
+  color: #ffe39a;
+  font-style: normal;
+}
+
+.map-node.locked .pin-label {
+  background: rgba(60, 50, 40, 0.5);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.pin-evo {
+  position: absolute;
+  top: -8px;
+  right: 0;
+  font-size: 12px;
+  font-style: normal;
+}
+
+.map-area {
+  position: absolute;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  padding: 2px 10px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--tint) 75%, #2a1a0a);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  text-align: center;
+  white-space: nowrap;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+  box-shadow: 0 2px 6px rgba(60, 30, 10, 0.4);
+  line-height: 1.2;
+}
+
+.map-area small {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.map-area.locked {
+  filter: grayscale(0.8);
+  opacity: 0.75;
+}
+
+.map-boss {
+  position: absolute;
+  z-index: 1;
+  width: 48px;
+  height: 48px;
+  transform: translate(-50%, -50%);
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 3px 2px rgba(60, 30, 10, 0.55));
+}
+
+.map-boss.locked {
+  filter: grayscale(1) brightness(0.6);
+  opacity: 0.6;
+}
+
+.node-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.node-head img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+
+.node-head > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.evo-note {
+  color: #ff9a3a;
+  font-weight: 700;
+}
+
+/* 技能書技能與背包中的技能書。 */
+.skill-cell.book {
+  background: radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--rc) 30%, transparent), var(--surface) 70%);
+  border-color: var(--rc);
+}
+
+.skill-off {
+  position: absolute;
+  left: 4px;
+  bottom: 2px;
+  padding: 0 3px;
+  border-radius: 5px;
+  background: #d8303f;
+  color: #fff;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.inv-cell.sbook {
+  border-color: var(--rc);
+  background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--rc) 22%, transparent), var(--surface) 70%);
+}
+
+.inv-cell.sbook.learned {
+  opacity: 0.6;
+}
+
+/* 地城第一層：區域卡片（整張可以點）。 */
+.area-card-btn {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  text-align: left;
+  font: inherit;
+}
+
+.area-card-btn > small {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.area-card-btn:active:not(.locked) {
+  transform: scale(0.98);
+}
+
+.area-progress {
+  display: block;
+  height: 7px;
+  margin-top: 10px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.area-progress i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #ffe39a, #e8b84a);
+}
+
+.area-go {
+  font-size: 26px;
+  font-weight: 800;
+  opacity: 0.85;
+}
+
+.now-tag {
+  margin-left: 4px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #e8b84a;
+  color: #2a1606;
+  font-size: 10px;
+  font-style: normal;
+  vertical-align: middle;
+}
+
+/* 地城第二層：返回列與區域地圖的 Boss。 */
+.area-head-bar {
+  margin-bottom: 6px;
+}
+
+.map-boss.big {
+  width: 64px;
+  height: 64px;
+}
+
+.map-boss-tag {
+  position: absolute;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  padding: 0 8px;
+  border-radius: 8px;
+  background: #a8243a;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* ---------- 獲得紀錄與獎勵禮包 ---------- */
+
+.gift-btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.25);
+  font-size: 20px;
+}
+
+.gift-btn.has {
+  animation: rebirth-glow 1.6s ease-in-out infinite;
+}
+
+.gift-btn b {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: #d8303f;
+  color: #fff;
+  font-size: 11px;
+  line-height: 18px;
+}
+
+.gift-btn b:empty {
+  display: none;
+}
+
+.gift-cell.tier1 { border-color: #c08040; }
+.gift-cell.tier2 { border-color: #c0c6d0; }
+.gift-cell.tier3 { border-color: #e8b84a; }
+.gift-cell.tier4 { border-color: #a8e4ff; }
+.gift-cell.tier5 { border-color: #e8a8ff; box-shadow: 0 0 10px rgba(232, 168, 255, 0.6); }
+
+.inv-cell.ready {
+  box-shadow: 0 0 10px rgba(255, 226, 120, 0.8);
+}
+
+.reward-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.reward-row .inv-cell {
+  width: 40px;
+  flex-shrink: 0;
+}
+
+.reward-row > div {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.reward-row small {
+  color: var(--text-muted);
+}
+
+.reward-row em {
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.reward-row.done {
+  opacity: 0.5;
+}
+
+.gift-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.gift-head .inv-cell {
+  width: 56px;
+  flex-shrink: 0;
+}
+
+.loot-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.loot-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px 2px 4px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  font-size: 13px;
+}
+
+.loot-chip img {
+  width: 22px;
+  height: 22px;
+  image-rendering: pixelated;
+}
+
+/* 首頁的獎勵禮包提示 */
+.home-gifts { display: flex; align-items: center; gap: 12px; margin: 0 0 16px; padding: 12px 14px; border-radius: 14px; background: linear-gradient(135deg, rgba(240, 192, 64, .18), rgba(160, 90, 220, .14)); border: 1px solid rgba(240, 192, 64, .45); }
+.home-gifts[hidden] { display: none; }
+.home-gifts img { width: 40px; height: 40px; image-rendering: pixelated; flex: none; }
+.home-gifts span { display: flex; flex-direction: column; gap: 2px; }
+.home-gifts small { color: var(--text-muted); }

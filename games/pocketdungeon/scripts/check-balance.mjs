@@ -1,7 +1,7 @@
 // 數值平衡檢查：以公式估算練到 Lv30 需要的探險次數、Boss 擊殺時間、Boss 與怪物的單次傷害。
 // 用法：node scripts/check-balance.mjs（不符合規格時以非 0 結束）。
 
-import { CLASSES, AREAS, AREA_KEYS, MONSTERS, BOSSES, FLOORS, MAX_LEVEL, MAX_DEPTH } from '../src/js/pd/data.js';
+import { CLASSES, AREAS, AREA_KEYS, MONSTERS, BOSSES, FLOORS, MAX_LEVEL, MAX_DEPTH, CRIT_MULT } from '../src/js/pd/data.js';
 import {
   characterStats, speedProfile, damage, dungeonLevel, monsterStats, killReward, makeItem, xpToNext,
 } from '../src/js/pd/rules.js';
@@ -26,14 +26,18 @@ function geared(cls, level) {
 }
 
 /**
- * 每秒傷害：普通攻擊對單一目標的期望值（法師法球與戰士扇形以單體計算）。
+ * 每秒傷害：普通攻擊對單一目標的期望值（法師法球與戰士扇形以單體計算；含盜賊的攻速與爆擊、武僧三連擊的平均）。
  * @param {string} cls 職業。
  * @param {object} s 屬性。
  * @param {number} def 目標防禦。
  * @returns {number} 每秒傷害。
  */
 function dps(cls, s, def) {
-  return damage(s.atk, def, CLASSES[cls].attack.mult) / speedProfile(s.spd).interval;
+  const a = CLASSES[cls].attack;
+  // 武僧三連擊取三下的平均倍率；盜賊出手較快並計入基本爆擊率的期望值。
+  const mult = a.kind === 'combo' ? (2 * a.mult + a.finisher) / 3 : a.mult;
+  const crit = 1 + (a.crit || 0) * (CRIT_MULT - 1);
+  return (damage(s.atk, def, mult) * crit) / (speedProfile(s.spd).interval * (a.rate || 1));
 }
 
 /**

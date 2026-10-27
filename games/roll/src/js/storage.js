@@ -8,6 +8,28 @@ const KEYS = {
   settings: 'roll.settings',
 };
 
+/** 遊戲目錄名稱（獲得紀錄的來源）。 */
+const GAME_DIR = 'roll';
+
+/** 獲得紀錄的共用鍵（大廳規格允許所有遊戲寫入；口袋地城讀取後發放獎勵禮包）。 */
+const REWARD_KEY = 'games.rewards';
+
+/**
+ * 新增一筆獲得紀錄（同一個 id 只記一次，重複過關不會再記）。
+ * @param {string} id 紀錄代碼（遊戲:項目:種類）。
+ * @param {'clear' | 'perfect'} type 第一次過關或第一次全對。
+ * @param {number} tier 禮包等級（1～5）。
+ * @param {string} label 顯示用的說明。
+ */
+function addReward(id, type, tier, label) {
+  const raw = readJson(REWARD_KEY);
+  const list = Array.isArray(raw) ? raw : [];
+  if (list.some((r) => r && r.id === id)) return;
+  list.push({ id, game: GAME_DIR, type, tier: Math.min(5, tier), label, at: Date.now() });
+  writeJson(REWARD_KEY, list.slice(-1000));
+}
+
+
 /** 存檔格式版本。 */
 export const SAVE_VERSION = 1;
 
@@ -166,6 +188,10 @@ export function recordLevel(id, stars, steps) {
     bestSteps: old ? Math.min(old.bestSteps, steps) : steps,
   };
   writeJson(KEYS.progress, progress);
+  // 獲得紀錄：每一關第一次過關、第一次三顆星（禮包等級依章節，三顆星 +1）。
+  const tier = Math.min(4, Number(String(id).split('-')[0]) || 1);
+  if (!old) addReward(`roll:${id}:clear`, 'clear', tier, `第 ${id} 關 第一次過關`);
+  if (stars === 3 && (!old || old.stars < 3)) addReward(`roll:${id}:star3`, 'perfect', tier + 1, `第 ${id} 關 第一次三顆星`);
   return { newBestStars: !old || stars > old.stars };
 }
 

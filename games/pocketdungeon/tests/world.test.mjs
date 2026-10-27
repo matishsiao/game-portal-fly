@@ -318,46 +318,58 @@ test('岩漿史萊姆死亡時留下熔岩，石像鬼靠近才甦醒', () => {
   assert.ok(g.awake);
 });
 
-test('Boss 進化：破關未滿 5 次不會進化；滿 5 次有機會進化，進化後同一角色這一關永遠是進化 Boss', () => {
+test('Boss 進化：破關未滿 5 次不會進化；滿 5 次後打倒 Boss 有 25% 機率復活成進化 Boss，下一趟又是原本的 Boss', () => {
   const ch = hero('warrior', 20);
   ch.clears = { 'easy-1': 4 };
   let w = new World(ch, { area: 'easy', depth: 1, seed: 3, floor: 3 }, () => 0);
-  assert.equal(w.boss().evolved, false);
+  assert.equal(w.boss().evolved, false, '一開始一定是原本的 Boss');
+  w.hitMonster(w.boss(), 1e7);
+  assert.ok(w.bossDefeated && !w.boss(), '未滿 5 次：直接打倒');
   ch.clears['easy-1'] = 5;
   w = new World(ch, { area: 'easy', depth: 1, seed: 3, floor: 3 }, () => 0.99);
-  assert.equal(w.boss().evolved, false, '沒擲中機率');
+  w.hitMonster(w.boss(), 1e7);
+  assert.ok(w.bossDefeated && !w.boss(), '沒擲中機率');
   w = new World(ch, { area: 'easy', depth: 1, seed: 3, floor: 3 }, () => 0);
+  const normal = w.boss();
+  assert.equal(normal.evolved, false);
+  w.hitMonster(normal, 1e7);
   const b = w.boss();
-  assert.equal(b.evolved, true);
+  assert.ok(b && b.evolved, '復活成進化 Boss');
   assert.match(b.name, /^進化・/);
-  assert.ok(ch.evolved['easy-1']);
+  assert.equal(b.hp, b.maxHp);
+  assert.ok(!w.bossDefeated && !w.portalOpen, '還沒打完');
+  assert.equal(w.pickups.filter((it) => it.kind === 'item' || it.kind === 'gem').length, 0, '原本的 Boss 不掉裝備與寶石');
+  assert.ok(w.pickups.some((it) => it.kind === 'gold'));
   assert.ok(w.events.some((e) => e.type === 'boss-evolved'));
-  // 之後即使機率沒擲中也一定是進化 Boss；其他關不受影響。
-  assert.equal(new World(ch, { area: 'easy', depth: 1, seed: 9, floor: 3 }, () => 0.99).boss().evolved, true);
-  assert.equal(new World(ch, { area: 'easy', depth: 2, seed: 9, floor: 3 }, () => 0).boss().evolved, false);
-  const normal = new World(hero('warrior', 20), { area: 'easy', depth: 1, seed: 3, floor: 3 }, () => 0.5).boss();
   assert.ok(Math.abs(b.maxHp / normal.maxHp - 1.6) < 0.02);
   assert.ok(b.atk > normal.atk);
+  w.hitMonster(b, 1e8);
+  assert.ok(w.bossDefeated && w.portalOpen && w.evolvedDefeated, '進化 Boss 打倒後才開傳送點');
+  assert.equal(ch.evolved, undefined, '不永久記錄');
+  assert.equal(new World(ch, { area: 'easy', depth: 1, seed: 9, floor: 3 }, () => 0).boss().evolved, false, '下一趟又是原本的 Boss');
 });
 
 test('進化 Boss 掉 2 件稀有以上、等級 +3 的裝備', () => {
   const ch = hero('warrior', 20);
-  ch.evolved = { 'easy-1': true };
   const w = new World(ch, { area: 'easy', depth: 1, seed: 3, floor: 3 }, seededRng(7));
-  w.hitMonster(w.boss(), 1e7);
+  w.monsters = [];
+  const b = w.spawnMonster('treant', w.player.x + 3, w.player.y, { boss: true, evolved: true });
+  w.hitMonster(b, 1e7);
   const items = w.pickups.filter((it) => it.kind === 'item').map((it) => it.item);
   assert.equal(items.length, 2);
   assert.ok(items.every((i) => i.rarity >= 2 && i.level === Math.round(w.level + 3)));
 });
 
-test('讀檔還原 Boss 層時不重新擲進化', () => {
+test('讀檔還原進化 Boss：仍是進化版並保留 HP', () => {
   const ch = hero('warrior', 20);
   ch.clears = { 'easy-1': 5 };
-  const w = new World(ch, { area: 'easy', depth: 1, seed: 3, floor: 3 }, () => 0.99);
+  const w = new World(ch, { area: 'easy', depth: 1, seed: 3, floor: 3 }, () => 0);
+  w.hitMonster(w.boss(), 1e7);
+  w.boss().hp = 1234;
   const snap = JSON.parse(JSON.stringify(w.snapshot()));
-  const r = World.restore(ch, snap, () => 0);
-  assert.equal(r.boss().evolved, false);
-  assert.ok(!(ch.evolved && ch.evolved['easy-1']));
+  const r = World.restore(ch, snap, () => 0.99);
+  assert.equal(r.boss().evolved, true);
+  assert.equal(r.boss().hp, 1234);
 });
 
 test('斜走補償：45° 斜走時水平、垂直各約為直走的 94%；藥水上限 10 瓶', () => {

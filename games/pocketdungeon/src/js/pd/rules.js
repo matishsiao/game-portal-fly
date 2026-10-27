@@ -1,6 +1,6 @@
 // 成長與裝備規則（純邏輯）：亂數、經驗曲線、角色屬性、傷害公式、怪物強度、裝備產生與強化、獎勵。
 
-import { CLASSES, MAX_LEVEL, MAX_DUNGEON_LEVEL, AREAS, MONSTERS, BOSSES, RARITIES, ACCESSORY_STATS, ITEM_NAMES, ENHANCE, EVOLVE, REBIRTH, STATUS, GEMS, GEM_RULES } from './data.js';
+import { CLASSES, MAX_LEVEL, MAX_DUNGEON_LEVEL, AREAS, MONSTERS, BOSSES, RARITIES, ACCESSORY_STATS, ITEM_NAMES, ENHANCE, EVOLVE, REBIRTH, STATUS, GEMS, GEM_RULES, WEAPON_HANDS, ONE_HAND_ATK } from './data.js';
 
 /**
  * 建立可重現的亂數產生器（mulberry32）。
@@ -89,16 +89,17 @@ export function rebirthBase(cls, rebirth = 0) {
  * @param {number} level 等級。
  * @param {object[]} [equipped=[]] 穿戴中的裝備。
  * @param {number} [rebirth=0] 轉職次數（決定起始屬性）。
+ * @param {{hpPct?: number, atkPct?: number, defPct?: number, spd?: number}} [passive={}] 被動技能的加成（百分比與飾品、寶石相加）。
  * @returns {{hp: number, atk: number, def: number, spd: number, goldPct: number, xpPct: number, leech: number, actives: string[]}} 屬性（四捨五入到整數）、吸血（%）與主動寶石。
  */
-export function characterStats(cls, level, equipped = [], rebirth = 0) {
+export function characterStats(cls, level, equipped = [], rebirth = 0, passive = {}) {
   const c = CLASSES[cls];
   const b = rebirthBase(cls, rebirth);
   const lv = level - 1;
   let hp = b.hp + c.growth.hp * lv;
   let atk = b.atk + c.growth.atk * lv;
   let def = b.def + c.growth.def * lv;
-  let spd = b.spd + c.growth.spd * lv;
+  let spd = b.spd + c.growth.spd * lv + (passive.spd || 0);
   const pct = { atkPct: 0, defPct: 0, hpPct: 0, goldPct: 0, xpPct: 0 };
   for (const item of equipped) {
     if (!item) continue;
@@ -111,15 +112,24 @@ export function characterStats(cls, level, equipped = [], rebirth = 0) {
   }
   const gem = gemBonus(equipped);
   return {
-    hp: Math.round(hp * (1 + (pct.hpPct + gem.hp) / 100)),
-    atk: Math.round(atk * (1 + (pct.atkPct + gem.atk) / 100)),
-    def: Math.round(def * (1 + (pct.defPct + gem.def) / 100)),
+    hp: Math.round(hp * (1 + (pct.hpPct + gem.hp + (passive.hpPct || 0)) / 100)),
+    atk: Math.round(atk * (1 + (pct.atkPct + gem.atk + (passive.atkPct || 0)) / 100)),
+    def: Math.round(def * (1 + (pct.defPct + gem.def + (passive.defPct || 0)) / 100)),
     spd: Math.round(spd * (1 + gem.spd / 100)),
     goldPct: pct.goldPct,
     xpPct: pct.xpPct,
     leech: Math.min(GEM_RULES.leechCap, gem.leech),
     actives: gem.actives,
   };
+}
+
+/**
+ * 武器佔用的手數（非武器為 0）。
+ * @param {object} item 裝備。
+ * @returns {number} 0、1 或 2。
+ */
+export function weaponHands(item) {
+  return item && item.slot === 'weapon' ? WEAPON_HANDS[item.type] || 2 : 0;
 }
 
 /**
@@ -335,19 +345,26 @@ export function rarityWeights(source, depth, rebirth = 0) {
 
 /**
  * 產生一件裝備。
- * 鎧甲：防禦＋HP；頭盔：約鎧甲一半的防禦與 HP；鞋子：少量防禦＋速度。
- * @param {{slot: 'weapon' | 'helmet' | 'armor' | 'boots' | 'accessory', cls?: string, level: number, rarity: number}} spec 部位、職業（武器用）、裝備等級、稀有度。
+ * 武器：單手武器的攻擊為雙手的 80%；鎧甲：防禦＋HP；頭盔：約鎧甲一半的防禦與 HP；鞋子：少量防禦＋速度；
+ * 副手（盾牌，只能搭配單手武器）：防禦與 HP 約為鎧甲的 70%。
+ * @param {{slot: 'weapon' | 'offhand' | 'helmet' | 'armor' | 'boots' | 'accessory', cls?: string, level: number, rarity: number, type?: string}} spec 部位、職業（武器用）、裝備等級、稀有度、指定的武器類型（合成用，須為該職業可用的類型）。
  * @param {() => number} rng 亂數函式。
  * @returns {object} 裝備 {id, slot, type, name, level, rarity, enhance, stats, gems, status?}。
  */
-export function makeItem({ slot, cls, level, rarity }, rng) {
+export function makeItem({ slot, cls, level, rarity, type: forceType }, rng) {
   const mult = RARITIES[rarity].mult;
   const lv = Math.max(1, Math.round(level));
   const stats = {};
   let type;
   if (slot === 'weapon') {
-    type = pick(CLASSES[cls || 'warrior'].weapon, rng);
-    stats.atk = Math.round((3 + 1.6 * lv) * mult * (0.9 + rng() * 0.2));
+    const types = CLASSES[cls || 'warrior'].weapon;
+    type = types.includes(forceType) ? forceType : pick(types, rng);
+    const hand = WEAPON_HANDS[type] === 1 ? ONE_HAND_ATK : 1;
+    stats.atk = Math.round((3 + 1.6 * lv) * mult * hand * (0.9 + rng() * 0.2));
+  } else if (slot === 'offhand') {
+    type = '盾牌';
+    stats.def = Math.round((1 + 0.65 * lv) * mult * (0.9 + rng() * 0.2));
+    stats.hp = Math.round((6 + 3.5 * lv) * mult * (0.9 + rng() * 0.2));
   } else if (slot === 'helmet') {
     type = '頭盔';
     stats.def = Math.round((1 + 0.45 * lv) * mult * (0.9 + rng() * 0.2));
@@ -365,7 +382,8 @@ export function makeItem({ slot, cls, level, rarity }, rng) {
     const keys = Object.keys(ACCESSORY_STATS);
     const count = rarity >= 2 ? 2 : 1;
     while (Object.keys(stats).length < count) {
-      const k = pick(keys, rng);
+      // 只從尚未選到的屬性中挑（不會重複，也不會因亂數固定而一直挑到同一個）。
+      const k = pick(keys.filter((key) => !(key in stats)), rng);
       const a = ACCESSORY_STATS[k];
       stats[k] = Math.round((a.base + a.per * lv) * mult);
     }

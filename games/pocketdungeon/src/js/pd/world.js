@@ -3,13 +3,13 @@
 //
 // 座標單位為「格」，(x, y) 為實體中心；地圖格子 (i, j) 的範圍為 [i, i + 1) × [j, j + 1)。
 
-import { CLASSES, MONSTERS, BOSSES, LIMITS, BOSS_HEAL, EVOLVE, REBIRTH, STATUS, STATUS_BOSS, GEMS, GEM_RULES, DIFFICULTY } from './data.js';
+import { CLASSES, MONSTERS, BOSSES, LIMITS, BOSS_HEAL, EVOLVE, REBIRTH, STATUS, STATUS_BOSS, GEMS, GEM_RULES, DIFFICULTY, CRAFT, BAG_EXPAND, CRIT_MULT, SKILL_BOOK, MAT_DROP, MATERIALS } from './data.js';
 import { generateFloor, walkable, STAIRS, SPIKES, WALL } from './dungeon.js';
 import {
   characterStats, speedProfile, damage, dungeonLevel, monsterStats, killReward, rollRarity, rarityWeights, makeItem, gainXp, sellPrice, rollGem, gemName, pick,
 } from './rules.js';
-import { equippedSkills } from './skills.js';
-import { bagLimit } from './village.js';
+import { equippedSkills, passiveBonus, bookSkillIds, SKILLS } from './skills.js';
+import { bagLimit, bagUsed, addBook, bookName, addSkillBook, addMaterial, skillBookPrice } from './village.js';
 
 /** 玩家半徑（格）。 */
 const PLAYER_R = 0.34;
@@ -78,14 +78,16 @@ export class World {
     this.depth = run.depth;
     this.seed = run.seed;
     this.floorIndex = run.floor || 0;
-    this.restoring = !!run.restoring;
     this.elapsed = 0;
     this.time = 0;
     this.events = [];
     this.loot = { gold: 0, xp: 0, items: [], gems: [], kills: 0, damageTaken: 0, potionsUsed: 0, levelsGained: 0, maxHit: 0 };
     this.player = this.makePlayer(run.potions ?? 3, run.scroll ?? 1, run.cures ?? 0);
     /** 帶進地城的技能（2～4 格，依角色在村莊的設定與轉職次數，探險中不變）。 */
-    this.skills = character.skills ? equippedSkills(character) : [null, null];
+    // 被動技能：技能傷害與冷卻在出發時套用（探險中不變）。
+    const pb = this.player.pb;
+    this.skills = (character.skills ? equippedSkills(character) : [null, null])
+      .map((sk) => (sk ? { ...sk, mult: sk.mult * (1 + pb.skillDmg / 100), cd: sk.cd * (1 - pb.skillCd / 100) } : null));
     /** 正在行動的怪物（怪物的預警與投射物據此附加異常狀態）。 */
     this.acting = null;
     this.loadFloor(this.floorIndex);
@@ -108,6 +110,8 @@ export class World {
       // 技能與寶石的效果：護盾量與時間、抗異常護盾、減傷、吸血、加速；主動寶石的冷卻；連射。
       shield: 0, shieldT: 0, wardT: 0, guardT: 0, guardPct: 0, leechT: 0, leechPct: 0, hasteT: 0, hastePct: 0, leechAcc: 0, leechBudget: 0, leechShown: 0, leechShowT: 0,
       gemCd: [0, 0], volley: null, cureCd: 0,
+      // 三連擊的段數與計時、毒刃與回春的剩餘時間、回復累積（不足 1 的部分）。
+      combo: 0, comboT: 0, imbueT: 0, imbuePct: 0, regenT: 0, regenPct: 0, regenAcc: 0,
       potions: Math.min(LIMITS.potions, potions), scroll, cures: Math.min(LIMITS.cures, cures), path: [],
     };
     this.applyStats(p, true);
@@ -120,7 +124,9 @@ export class World {
    * @param {boolean} heal 是否補滿 HP。
    */
   applyStats(p, heal) {
-    const s = characterStats(this.ch.cls, this.ch.level, Object.values(this.ch.equipped), this.ch.rebirth || 0);
+    const pb = passiveBonus(this.ch);
+    p.pb = pb;
+    const s = characterStats(this.ch.cls, this.ch.level, Object.values(this.ch.equipped), this.ch.rebirth || 0, pb);
     const ratio = p.maxHp ? p.hp / p.maxHp : 1;
     p.maxHp = s.hp;
     p.atk = s.atk;
@@ -131,10 +137,11 @@ export class World {
     p.leech = s.leech / 100;
     /** 主動寶石的種類（最多 2 個按鈕）。 */
     p.actives = s.actives;
-    p.weaponStatus = this.ch.equipped.weapon && this.ch.equipped.weapon.status;
+    // 普通攻擊命中時的異常狀態：武器附帶的，加上被動技能（毒塗箭、冰心）。
+    p.attackStatus = [this.ch.equipped.weapon && this.ch.equipped.weapon.status, pb.poisonProc && ['poison', pb.poisonProc / 100], pb.stunProc && ['stun', pb.stunProc / 100]].filter(Boolean);
     const prof = speedProfile(s.spd);
     p.move = prof.move;
-    p.interval = prof.interval;
+    p.interval = prof.interval * (1 - pb.interval / 100) * (CLASSES[this.ch.cls].attack.rate || 1);
     p.hp = heal ? s.hp : Math.max(1, Math.round(s.hp * ratio));
   }
 
@@ -160,7 +167,7 @@ export class World {
     this.bossDefeated = false;
     this.nextId = 1;
     for (const m of f.monsters) this.spawnMonster(m.type, m.x, m.y, { elite: m.elite });
-    if (f.boss) this.spawnMonster(f.boss.type, f.boss.x, f.boss.y, { boss: true, abyss: this.area === 'expert', evolved: this.rollEvolution() });
+    if (f.boss) this.spawnMonster(f.boss.type, f.boss.x, f.boss.y, { boss: true, abyss: this.area === 'expert' });
     this.player.x = f.start.x;
     this.player.y = f.start.y;
     this.player.path = [];
@@ -187,22 +194,28 @@ export class World {
   }
 
   /**
-   * 進入 Boss 層時決定 Boss 是否為進化版：這個角色在這一關已進化過就一定是；
-   * 否則破關滿 5 次後有 30% 機會進化，進化後永久記錄在角色上。
-   * @returns {boolean} 是否為進化 Boss。
+   * 這一關是否可能出現進化 Boss：同一角色在這一關破關滿 5 次。
+   * @returns {boolean} 可能進化時為 true。
    */
-  rollEvolution() {
-    const ch = this.ch;
-    const key = this.stageKey();
-    ch.evolved = ch.evolved || {};
-    if (ch.evolved[key]) return true;
-    // 讀檔還原時 Boss 由快照放回，不重新擲骰。
-    if (this.restoring) return false;
-    const clears = (ch.clears && ch.clears[key]) || 0;
-    if (clears < EVOLVE.clears || this.rng() >= EVOLVE.chance) return false;
-    ch.evolved[key] = true;
-    this.events.push({ type: 'boss-evolved' });
-    return true;
+  canEvolve() {
+    const clears = (this.ch.clears && this.ch.clears[this.stageKey()]) || 0;
+    return clears >= EVOLVE.clears;
+  }
+
+  /**
+   * Boss 復活成進化 Boss：原地出現滿血的進化版（短暫定身作為登場），清除場上的敵方攻擊。
+   * @param {object} m 被打倒的 Boss。
+   */
+  evolveBoss(m) {
+    this.telegraphs = [];
+    this.projectiles = this.projectiles.filter((pr) => pr.team === 'p');
+    const e = this.spawnMonster(m.type, m.x, m.y, { boss: true, abyss: m.abyss, evolved: true });
+    e.aggro = true;
+    e.stun = 1.5;
+    e.cd = 1;
+    this.effect('poof', m.x, m.y, { r: m.r * 1.6, color: '#ff9a3a' });
+    this.effect('levelup', m.x, m.y - m.r, { text: '進化！' });
+    this.events.push({ type: 'boss-evolved', name: e.name });
   }
 
   /**
@@ -494,6 +507,10 @@ export class World {
     p.hasteT -= dt;
     p.wardT -= dt;
     p.shieldT -= dt;
+    p.comboT -= dt;
+    p.imbueT -= dt;
+    p.regenT -= dt;
+    this.updateRegen(dt);
     if (p.shieldT <= 0) p.shield = 0;
     for (let k = 0; k < p.skillCd.length; k++) p.skillCd[k] -= dt;
     // 吸血的每秒回復上限：額度每秒補充最大 HP 的 2%（嗜血中 4%），最多累積 1 秒份。
@@ -546,7 +563,7 @@ export class World {
       p.dashHit = null;
       p.dodgeDir = { ...p.facing };
       p.invuln = Math.max(p.invuln, 0.3);
-      p.dodgeCd = 1.2;
+      p.dodgeCd = 1.2 * (1 - p.pb.dodgeCd / 100);
       this.effect('dust', p.x, p.y);
     }
     if (p.dodgeT > 0) {
@@ -648,6 +665,8 @@ export class World {
     target.status = target.status || { poison: 0, sleep: 0, stun: 0 };
     let dur = kind === 'poison' && target.boss ? STATUS.poison.bossDur : STATUS[kind].dur * (target.boss ? STATUS_BOSS : 1);
     if (isPlayer && STATUS[kind].playerDur) dur = STATUS[kind].playerDur;
+    // 鋼鐵意志：玩家受到的異常時間縮短。
+    if (isPlayer && target.pb && target.pb.statusResist) dur *= 1 - target.pb.statusResist / 100;
     const fresh = !(target.status[kind] > 0);
     target.status[kind] = Math.max(target.status[kind] || 0, dur);
     if (kind === 'sleep') target.sleepHits = 0;
@@ -665,11 +684,15 @@ export class World {
   /**
    * 依機率附加異常狀態。
    * @param {object} target 玩家或怪物。
-   * @param {[string, number] | undefined} status 狀態與機率。
+   * @param {[string, number] | [string, number][] | undefined} status 狀態與機率（或多組）。
    */
   rollStatus(target, status) {
-    if (status && this.rng() < status[1]) this.applyStatus(target, status[0]);
+    if (!status) return;
+    // 可以是一組 [狀態, 機率]，或多組的陣列（武器加上被動技能）。
+    const list = Array.isArray(status[0]) ? status : [status];
+    for (const st of list) if (st && this.rng() < st[1]) this.applyStatus(target, st[0]);
   }
+
 
   /**
    * 判斷玩家目前是否有任何異常狀態。
@@ -729,6 +752,23 @@ export class World {
   }
 
   /**
+   * 持續回復：回春技能（每秒最大 HP 的固定比例）與氣血被動（每秒 %），回復的數字與吸血一起合併顯示。
+   * @param {number} dt 秒。
+   */
+  updateRegen(dt) {
+    const p = this.player;
+    const rate = (p.regenT > 0 ? p.regenPct : 0) + (p.pb ? p.pb.regen / 100 : 0);
+    if (!(rate > 0) || p.hp <= 0) return;
+    p.regenAcc += p.maxHp * rate * dt;
+    const heal = Math.floor(p.regenAcc);
+    if (heal < 1) return;
+    p.regenAcc -= heal;
+    const gained = Math.min(p.maxHp, p.hp + heal) - p.hp;
+    p.hp += gained;
+    p.leechShown += gained;
+  }
+
+  /**
    * 連射：每 0.13 秒朝最近的敵人射出一支箭，直到射完。
    * @param {number} dt 秒。
    */
@@ -747,12 +787,14 @@ export class World {
   }
 
   /**
-   * 玩家目前的攻擊力（含戰吼加成）。
+   * 玩家目前的攻擊力（含戰吼與狂戰之血的加成）。
    * @returns {number} 攻擊力。
    */
   effAtk() {
     const p = this.player;
-    return p.atk * (1 + (p.buffT > 0 ? p.buffPct : 0));
+    // 狂戰之血：HP 低於 30% 時攻擊提升。
+    const rage = p.pb && p.pb.lowHpAtk && p.hp < p.maxHp * 0.3 ? p.pb.lowHpAtk / 100 : 0;
+    return p.atk * (1 + (p.buffT > 0 ? p.buffPct : 0) + rage + (p.imbueT > 0 ? p.imbuePct : 0));
   }
 
   /**
@@ -786,7 +828,7 @@ export class World {
   }
 
   /**
-   * 玩家普通攻擊：瞄準輔助轉向最近的怪物後，依職業出招。
+   * 玩家普通攻擊：瞄準輔助轉向最近的怪物後，依職業出招（扇形、箭、法球，或武僧的三連擊）。
    */
   playerAttack() {
     const p = this.player;
@@ -794,20 +836,39 @@ export class World {
     // 疾風步：攻擊間隔縮短 30%。
     p.atkCd = p.interval * (p.hasteT > 0 ? 0.7 : 1);
     p.attackAnim = 0.18;
-    this.aim(atk.kind === 'arc' ? 2.6 : 7);
+    this.aim(atk.kind === 'arc' || atk.kind === 'combo' ? 2.6 : 7);
     const ang = Math.atan2(p.facing.y, p.facing.x);
-    if (atk.kind === 'arc') {
-      this.effect('slash', p.x, p.y, { angle: ang, range: atk.range, arc: (atk.angle * Math.PI) / 180 });
+    // 致命毒刃：普通攻擊必定中毒。
+    const status = p.imbueT > 0 ? [...p.attackStatus, ['poison', 1]] : p.attackStatus;
+    if (atk.kind === 'combo') {
+      // 三連擊：停手超過 1.2 秒就從第一擊重來；第三擊是範圍重擊並擊退。
+      p.combo = p.comboT > 0 ? (p.combo % 3) + 1 : 1;
+      p.comboT = 1.2;
+      if (p.combo === 3) {
+        const r = atk.finishR;
+        this.effect('blast', p.x + p.facing.x * 0.6, p.y + p.facing.y * 0.6, { shape: 'circle', r, friendly: true, look: 'chi' });
+        const mult = atk.finisher * (1 + p.pb.comboDmg / 100);
+        for (const m of this.monsters.slice()) {
+          if (m.intangible || dist(p.x + p.facing.x * 0.6, p.y + p.facing.y * 0.6, m.x, m.y) > r + m.r) continue;
+          const d = dist(p.x, p.y, m.x, m.y) || 1;
+          this.hitMonster(m, damage(this.effAtk(), m.def, mult, this.rng()), { x: ((m.x - p.x) / d) * 3, y: ((m.y - p.y) / d) * 3 }, status);
+        }
+        this.events.push({ type: 'combo' });
+        return;
+      }
+    }
+    if (atk.kind === 'arc' || atk.kind === 'combo') {
+      this.effect('slash', p.x, p.y, { angle: ang, range: atk.range, arc: (atk.angle * Math.PI) / 180, look: atk.kind === 'combo' ? 'fist' : this.ch.cls });
       for (const m of this.monsters.slice()) {
         if (m.intangible) continue;
         const d = dist(p.x, p.y, m.x, m.y);
         if (d <= atk.range + m.r && (d < m.r + p.r || angleDiff(Math.atan2(m.y - p.y, m.x - p.x), ang) <= ((atk.angle / 2) * Math.PI) / 180)) {
-          this.hitMonster(m, damage(this.effAtk(), m.def, atk.mult, this.rng()), p.facing, p.weaponStatus);
+          this.hitMonster(m, damage(this.effAtk(), m.def, atk.mult, this.rng()), p.facing, status);
         }
       }
     } else {
       this.effect('cast', p.x + p.facing.x * 0.5, p.y + p.facing.y * 0.5 - 0.2, { angle: ang, look: atk.kind });
-      this.playerShot(Math.atan2(p.facing.y, p.facing.x), atk.kind, atk.mult, { explode: atk.kind === 'orb' ? atk.radius : 0, range: atk.range, speed: atk.speed, status: p.weaponStatus });
+      this.playerShot(Math.atan2(p.facing.y, p.facing.x), atk.kind, atk.mult, { explode: atk.kind === 'orb' ? atk.radius * (1 + p.pb.orbRadius / 100) : 0, range: atk.range, speed: atk.speed, status: p.attackStatus });
     }
   }
 
@@ -851,7 +912,7 @@ export class World {
       case 'spin':
       case 'slam':
       case 'nova':
-        this.strike({ x: p.x, y: p.y, r: sk.r, mult: sk.mult, stun: sk.stun || 0, slow: sk.slow || 0, look: sk.kind });
+        this.strike({ x: p.x, y: p.y, r: sk.r, mult: sk.mult, stun: sk.stun || 0, slow: sk.slow || 0, look: sk.kind, status: sk.status });
         break;
       case 'charge':
         p.dodgeT = 0.3;
@@ -885,7 +946,7 @@ export class World {
         break;
       }
       case 'snipe':
-        this.strike({ shape: 'line', x: p.x, y: p.y, angle: ang, len: sk.len, width: 0.7, mult: sk.mult, delay: 0.4, look: 'beam' });
+        this.strike({ shape: 'line', x: p.x, y: p.y, angle: ang, len: sk.len, width: sk.look === 'chi' ? 1.1 : 0.7, mult: sk.mult, delay: 0.4, look: sk.look || 'beam' });
         break;
       case 'blink': {
         const from = { x: p.x, y: p.y };
@@ -933,11 +994,11 @@ export class World {
         this.effect('slash', p.x, p.y, { angle: ang, range: sk.r, arc: (100 * Math.PI) / 180 });
         break;
       case 'fissure':
-        this.strike({ shape: 'line', x: p.x, y: p.y, angle: ang, len: sk.len, width: 1.2, mult: sk.mult, delay: 0.15, look: 'slam', status: sk.status });
+        this.strike({ shape: 'line', x: p.x, y: p.y, angle: ang, len: sk.len, width: 1.2, mult: sk.mult, delay: 0.15, look: sk.look || 'slam', status: sk.status });
         break;
       case 'storm':
         // 劍刃風暴：打擊範圍跟著玩家移動。
-        this.strike({ x: p.x, y: p.y, r: sk.r, mult: sk.mult, ticks: sk.ticks, interval: 0.3, follow: true, look: 'spin' });
+        this.strike({ x: p.x, y: p.y, r: sk.r, mult: sk.mult, ticks: sk.ticks, interval: 0.3, follow: true, look: sk.look || 'spin' });
         break;
       case 'guard':
         p.guardT = sk.dur;
@@ -980,10 +1041,59 @@ export class World {
           const m = near.length ? near[k % near.length] : null;
           const a = this.rng() * Math.PI * 2;
           const at = m ? { x: m.x, y: m.y } : { x: p.x + Math.cos(a) * 2.5, y: p.y + Math.sin(a) * 2.5 };
-          this.strike({ x: at.x, y: at.y, r: sk.r, mult: sk.mult, delay: 0.2 + k * 0.25, look: 'thunder', status: sk.status, track: m ? m.id : 0 });
+          this.strike({ x: at.x, y: at.y, r: sk.r, mult: sk.mult, delay: 0.2 + k * 0.25, look: sk.look || 'thunder', status: sk.status, track: m ? m.id : 0 });
         }
         break;
       }
+      case 'shadowstep': {
+        // 背刺：瞬間移到最近敵人的背後（背後是牆時改到側面）並刺擊。
+        const m = this.aim(sk.dist);
+        if (m) {
+          const ux = (m.x - p.x) / (dist(p.x, p.y, m.x, m.y) || 1);
+          const uy = (m.y - p.y) / (dist(p.x, p.y, m.x, m.y) || 1);
+          this.effect('poof', p.x, p.y, { r: 0.4, color: '#6a5a8a' });
+          for (const [vx, vy] of [[ux, uy], [-uy, ux], [uy, -ux]]) {
+            const nx = m.x + vx * (m.r + p.r + 0.2);
+            const ny = m.y + vy * (m.r + p.r + 0.2);
+            if (!this.hitsWall(nx, ny, p.r)) {
+              p.x = nx;
+              p.y = ny;
+              break;
+            }
+          }
+          const d = dist(p.x, p.y, m.x, m.y) || 1;
+          p.facing = { x: (m.x - p.x) / d, y: (m.y - p.y) / d };
+          p.path = [];
+          this.hitMonster(m, damage(this.effAtk(), m.def, sk.mult, this.rng()), p.facing, sk.status);
+          this.effect('slash', p.x, p.y, { angle: Math.atan2(p.facing.y, p.facing.x), range: 1.2, arc: 1.2 });
+        }
+        p.invuln = Math.max(p.invuln, 0.3);
+        break;
+      }
+      case 'smoke':
+        this.strike({ x: p.x, y: p.y, r: sk.r, mult: sk.mult, look: 'smoke', status: sk.status });
+        p.invuln = Math.max(p.invuln, 1.5);
+        this.effect('poof', p.x, p.y, { r: sk.r * 0.6, color: 'rgba(200,200,210,0.9)' });
+        break;
+      case 'imbue':
+        p.imbueT = sk.dur;
+        p.imbuePct = sk.pct;
+        this.effect('levelup', p.x, p.y, { text: '毒刃！' });
+        break;
+      case 'heal': {
+        const amount = Math.round(p.maxHp * sk.pct * (1 + p.pb.healBoost / 100));
+        const gained = Math.min(p.maxHp, p.hp + amount) - p.hp;
+        p.hp += gained;
+        if (sk.cleanse) this.cleanse();
+        this.effect('text', p.x, p.y - 0.6, { text: `+${gained}`, color: '#5fd068' });
+        this.effect('poof', p.x, p.y, { r: 0.7, color: '#8af09a' });
+        break;
+      }
+      case 'regen':
+        p.regenT = sk.dur;
+        p.regenPct = sk.pct * (1 + p.pb.healBoost / 100);
+        this.effect('levelup', p.x, p.y, { text: '回春！' });
+        break;
       case 'freeze':
         for (const m of this.monsters) {
           if (m.intangible || dist(p.x, p.y, m.x, m.y) > sk.r + m.r) continue;
@@ -1059,6 +1169,19 @@ export class World {
    */
   hitMonster(m, dmg, dir, status) {
     if (m.hp <= 0 || m.intangible) return;
+    // 被動技能：斬殺（對 HP 30% 以下的敵人）、獵人本能（對菁英與 Boss）。
+    const pb = this.player.pb;
+    let crit = false;
+    if (pb) {
+      const bonus = (m.hp < m.maxHp * 0.3 ? pb.execute : 0) + (m.elite || m.boss ? pb.eliteDmg : 0);
+      if (bonus) dmg = Math.round(dmg * (1 + bonus / 100));
+      // 爆擊：盜賊的基本爆擊率加上被動技能。
+      const rate = (CLASSES[this.ch.cls].attack.crit || 0) + pb.crit / 100;
+      if (rate > 0 && this.rng() < rate) {
+        crit = true;
+        dmg = Math.round(dmg * (CRIT_MULT + pb.critDmg / 100));
+      }
+    }
     m.hp -= dmg;
     m.hurt = 0.15;
     m.aggro = true;
@@ -1069,7 +1192,7 @@ export class World {
       m.sleepGuard = STATUS.sleep.wakeGuard;
     }
     if (m.hp > 0) this.rollStatus(m, status);
-    this.effect('text', m.x, m.y - m.r - 0.2, { text: String(dmg), color: '#fff' });
+    this.effect('text', m.x, m.y - m.r - 0.2, crit ? { text: `${dmg}!`, color: '#ffe14d', big: true } : { text: String(dmg), color: '#fff' });
     this.effect('hit', m.x, m.y - m.r * 0.4, { angle: dir ? Math.atan2(dir.y, dir.x) : this.rng() * Math.PI * 2 });
     if (dir && !m.boss && m.ai !== 'golemling') this.moveEntity(m, dir.x * 0.25, dir.y * 0.25, m.ai === 'wraith');
     if (m.ai === 'slime' && !m.split && m.hp > 0) {
@@ -1103,7 +1226,7 @@ export class World {
   }
 
   /**
-   * 怪物死亡：給予經驗值與金幣、掉落裝備或藥水；Boss 死亡時開啟回城傳送點與寶箱。
+   * 怪物死亡：給予經驗值與金幣、掉落裝備或藥水；Boss 死亡時可能復活成進化 Boss，否則開啟回城傳送點與寶箱。
    * @param {object} m 怪物。
    */
   killMonster(m) {
@@ -1117,6 +1240,11 @@ export class World {
     this.addXp(xp);
     const gold = Math.round(reward.gold * (1 + this.player.goldPct / 100) * (m.evolved ? EVOLVE.gold : 1));
     this.pickups.push({ kind: 'gold', x: m.x, y: m.y, amount: gold, t: 0 });
+    // 破關滿 5 次的關卡：打倒原本的 Boss 有 25% 機率復活成進化 Boss（這次只給經驗與金幣，裝備、寶石與寶箱留給進化 Boss）。
+    if (m.boss && !m.evolved && this.canEvolve() && this.rng() < EVOLVE.chance) {
+      this.evolveBoss(m);
+      return;
+    }
     const chance = m.boss ? 1 : m.elite ? 0.4 : 0.08;
     if (m.evolved) {
       // 進化 Boss：必掉 2 件更好的裝備（等級 +3）。
@@ -1127,6 +1255,24 @@ export class World {
     if (m.boss) {
       for (let k = 0; k < (m.evolved ? 2 : 1); k++) this.dropGem(m.x - 0.4 - k * 0.4, m.y + 0.3, m.evolved ? 1 : 0);
     } else if (!m.small && this.rng() < (m.elite ? GEM_RULES.drop.elite : GEM_RULES.drop.monster)) this.dropGem(m.x, m.y + 0.3);
+    // 背包擴充袋：菁英 3%（Boss 寶箱另計）。
+    if (m.elite && this.rng() < BAG_EXPAND.eliteDrop) this.pickups.push({ kind: 'bagExpand', x: m.x - 0.4, y: m.y + 0.4, t: 0 });
+    // 技能書：只有 Boss 會掉（一般 Boss 30%、進化 Boss 必掉），種類從 50 種中隨機。
+    if (m.boss && this.rng() < (m.evolved ? SKILL_BOOK.evolvedDrop : SKILL_BOOK.bossDrop)) {
+      // 先決定稀有度，再從該稀有度的技能書中隨機。
+      const rarity = rollRarity(m.evolved ? SKILL_BOOK.evolvedWeights : SKILL_BOOK.weights, this.rng);
+      const ids = bookSkillIds().filter((id) => (SKILLS[id].rarity || 0) === rarity);
+      this.pickups.push({ kind: 'skillBook', x: m.x + 0.6, y: m.y - 0.4, skill: ids[Math.floor(this.rng() * ids.length)], t: 0 });
+    }
+    // 材料：一般怪物 8%、菁英 40%（1～2 個）、Boss 必掉（2～4 個）；品質依裝備掉落的稀有度規則。
+    const src = m.boss ? 'boss' : m.elite ? 'elite' : 'monster';
+    if (!m.small && this.rng() < MAT_DROP[src]) {
+      const [lo, hi] = MAT_DROP.count[src];
+      const tier = rollRarity(rarityWeights(src, this.depth, this.rebirth()), this.rng);
+      this.pickups.push({ kind: 'mat', x: m.x - 0.5, y: m.y - 0.3, mat: MATERIALS[tier].key, n: lo + Math.floor(this.rng() * (hi - lo + 1)), t: 0 });
+    }
+    // 製作書：一般怪物 1%、菁英 10%、Boss 30%。
+    if (!m.small && this.rng() < (m.boss ? CRAFT.drop.boss : m.elite ? CRAFT.drop.elite : CRAFT.drop.monster)) this.dropBook(m.x + 0.4, m.y + 0.4);
     if (MONSTERS[m.type] && MONSTERS[m.type].deathPool && !m.small) {
       // 岩漿史萊姆：死亡處留下一灘 3 秒的熔岩。
       this.hazards.push({ kind: 'circle', x: m.x, y: m.y, r: 0.9, life: 3, pct: 0.04 });
@@ -1137,6 +1283,7 @@ export class World {
     this.effect('poof', m.x, m.y, { r: m.r });
     if (m.boss) {
       this.bossDefeated = true;
+      this.evolvedDefeated = !!m.evolved;
       this.portalOpen = true;
       this.telegraphs = [];
       this.hazards = [];
@@ -1183,6 +1330,15 @@ export class World {
   }
 
   /**
+   * 掉落一本製作書（部位隨機）。
+   * @param {number} x 座標 x。
+   * @param {number} y 座標 y。
+   */
+  dropBook(x, y) {
+    this.pickups.push({ kind: 'book', x, y, slot: CRAFT.books[Math.floor(this.rng() * CRAFT.books.length)], t: 0 });
+  }
+
+  /**
    * 掉落一件裝備（部位隨機，武器依玩家職業）。
    * @param {number} x 座標 x。
    * @param {number} y 座標 y。
@@ -1191,7 +1347,7 @@ export class World {
    */
   dropItem(x, y, source, levelBonus = 0) {
     const r = this.rng();
-    const slot = r < 0.3 ? 'weapon' : r < 0.5 ? 'armor' : r < 0.65 ? 'helmet' : r < 0.8 ? 'boots' : 'accessory';
+    const slot = r < 0.25 ? 'weapon' : r < 0.36 ? 'offhand' : r < 0.53 ? 'armor' : r < 0.67 ? 'helmet' : r < 0.81 ? 'boots' : 'accessory';
     const rb = this.rebirth();
     const rarity = rollRarity(rarityWeights(source, this.depth, rb), this.rng);
     const item = makeItem({ slot, cls: this.ch.cls, level: this.level + levelBonus + REBIRTH.dropLevel * rb, rarity }, this.rng);
@@ -1209,6 +1365,7 @@ export class World {
     const p = this.player;
     if (p.invuln > 0 || p.hp <= 0) return;
     if (p.guardT > 0) dmg = Math.max(1, Math.round(dmg * (1 - p.guardPct)));
+    if (p.pb.dmgReduce) dmg = Math.max(1, Math.round(dmg * (1 - p.pb.dmgReduce / 100)));
     if (p.status.sleep > 0 && ++p.sleepHits >= STATUS.sleep.wake) {
       p.status.sleep = 0;
       p.sleepGuard = STATUS.sleep.wakeGuard;
@@ -1252,7 +1409,7 @@ export class World {
 
   /**
    * 建立預警：時間到時判定玩家是否在範圍內並造成傷害。
-   * @param {{shape: 'circle' | 'ring' | 'line' | 'arc', x: number, y: number, r?: number, angle?: number, len?: number, width?: number, arc?: number, t: number, dmg: number, delay?: number, after?: string}} tg 預警。
+   * @param {{shape: 'circle' | 'ring' | 'line' | 'arc', x: number, y: number, r?: number, angle?: number, len?: number, width?: number, arc?: number, t: number, dmg: number, delay?: number, after?: string, hidden?: boolean}} tg 預警（hidden 為普通攻擊，不畫出預警範圍）。
    */
   telegraph(tg) {
     if (this.telegraphs.length > MAX_ENTITIES) return;
@@ -1298,7 +1455,9 @@ export class World {
       tg.t -= dt;
       if (tg.t > 0) continue;
       this.telegraphs.splice(this.telegraphs.indexOf(tg), 1);
-      this.effect('blast', tg.x, tg.y, { shape: tg.shape, r: tg.r, angle: tg.angle, len: tg.len, width: tg.width, arc: tg.arc });
+      // 普通攻擊（沒有預警）只畫出揮砍；技能畫出整個範圍的爆發。
+      if (tg.hidden) this.effect('slash', tg.x, tg.y, { angle: tg.angle, range: tg.r, arc: tg.arc, enemy: true });
+      else this.effect('blast', tg.x, tg.y, { shape: tg.shape, r: tg.r, angle: tg.angle, len: tg.len, width: tg.width, arc: tg.arc });
       if (tg.dmg && this.inShape(tg, p.x, p.y, p.r)) this.hurtPlayer(tg.dmg, tg.x, tg.y, tg.status);
       if (tg.after === 'land') {
         // 雷鳥俯衝：落在預警位置並現身。
@@ -1377,6 +1536,7 @@ export class World {
     this.acting = m;
     if (ai) ai.call(this, m, dt, d);
     if (m.affix) this.eliteAffix(m, dt, d);
+    if (m.boss) this.bossBasic(m, dt, d);
     this.acting = null;
     // 接觸傷害只用在「身體就是武器」的情況：衝刺、俯衝中的怪物，以及沒有其他招式的史萊姆（較輕）。
     // 其他攻擊一律經由有預警的招式造成，玩家貼身攻擊時不會無預警受傷。
@@ -1396,6 +1556,27 @@ export class World {
   pace(m) {
     const base = Math.min(DIFFICULTY.maxPace, 1 + DIFFICULTY.depthPace * (this.depth - 1) + DIFFICULTY.rebirthPace * this.rebirth());
     return base * (m.affix === 'frenzy' ? 1.4 : 1);
+  }
+
+  /**
+   * Boss 的普通攻擊：在兩招技能之間（移動中）約每 1.2 秒出手一次（狂暴時 0.9 秒）；
+   * 玩家在身邊時近戰揮擊（不顯示預警，只有短暫蓄力），較遠時射出一發投射物（間隔 ×1.4）。
+   * @param {object} m Boss（會被修改）。
+   * @param {number} dt 秒。
+   * @param {number} d 與玩家的距離。
+   */
+  bossBasic(m, dt, d) {
+    m.basicT = (m.basicT ?? 1.2) - dt * this.pace(m);
+    if (m.basicT > 0 || m.intangible || (m.state !== 'move' && m.state !== 'idle')) return;
+    m.basicT = (m.enraged ? 0.9 : 1.2) * (m.evolved ? EVOLVE.cd : 1);
+    if (d < m.r + 1.9) {
+      this.telegraph({ shape: 'arc', x: m.x, y: m.y, r: m.r + 1.5, angle: m.facing, arc: (110 * Math.PI) / 180, t: 0.35, dmg: this.monsterDamage(m, 0.45), hidden: true });
+    } else {
+      const kind = { treant: 'seed', golem: 'fire', lich: 'ice', bullKing: 'seed', thunderbird: 'feather', necromancer: 'curse' }[m.ai] || 'fire';
+      this.shoot(m, 6.5, m.facing, 0.45, { kind, r: 0.2, life: 3 });
+      // 遠距離射擊的間隔較長（約 1.7 秒），保持距離的 Boss 不會一直連射。
+      m.basicT *= 1.4;
+    }
   }
 
   /**
@@ -1445,7 +1626,7 @@ export class World {
   }
 
   /**
-   * 近戰蓄力攻擊：蓄力時顯示扇形預警，時間到時判定。
+   * 近戰蓄力攻擊（普通攻擊）：蓄力時怪物抖動、不顯示預警範圍，時間到時判定並畫出揮砍。
    * @param {object} m 怪物。
    * @param {number} range 範圍。
    * @param {number} arcDeg 角度（度）。
@@ -1455,7 +1636,7 @@ export class World {
   meleeWindup(m, range, arcDeg, windup, mult = 1) {
     m.state = 'windup';
     m.t = windup;
-    this.telegraph({ shape: 'arc', x: m.x, y: m.y, r: range + m.r, angle: m.facing, arc: (arcDeg * Math.PI) / 180, t: windup, dmg: this.monsterDamage(m, mult) });
+    this.telegraph({ shape: 'arc', x: m.x, y: m.y, r: range + m.r, angle: m.facing, arc: (arcDeg * Math.PI) / 180, t: windup, dmg: this.monsterDamage(m, mult), hidden: true });
   }
 
   /**
@@ -1580,6 +1761,36 @@ export class World {
       } else if (it.kind === 'bagExpand') {
         this.ch.bagExpand = (this.ch.bagExpand || 0) + 1;
         this.events.push({ type: 'message', text: '撿到背包擴充袋！回村莊到「倉庫」使用' });
+      } else if (it.kind === 'skillBook') {
+        const name = SKILLS[it.skill].name;
+        if (addSkillBook(this.ch, it.skill)) this.events.push({ type: 'message', text: `撿到技能書「${name}」！回村莊到「倉庫」學習` });
+        else {
+          const price = skillBookPrice(it.skill);
+          this.ch.gold += price;
+          this.loot.gold += price;
+          this.events.push({ type: 'message', text: `背包已滿，技能書「${name}」自動賣出（+${price}G）` });
+        }
+      } else if (it.kind === 'mat') {
+        // 材料：頭上飄出名稱與數量（不跳出訊息）；背包滿時換成金幣。
+        const name = MATERIALS.find((mt) => mt.key === it.mat).name;
+        if (addMaterial(this.ch, it.mat, it.n)) {
+          this.loot.mats = (this.loot.mats || 0) + it.n;
+          this.effect('text', p.x, p.y - 1, { text: `+${name}×${it.n}`, color: '#c8d0e0' });
+        } else {
+          const gold = MAT_DROP.matGold * it.n;
+          this.ch.gold += gold;
+          this.loot.gold += gold;
+        }
+      } else if (it.kind === 'book') {
+        if (addBook(this.ch, it.slot)) {
+          this.loot.books = (this.loot.books || 0) + 1;
+          this.events.push({ type: 'message', text: `撿到${bookName(it.slot)}！回村莊到「鐵匠」合成裝備` });
+        } else {
+          const price = Math.round(CRAFT.bookPrice / 4);
+          this.ch.gold += price;
+          this.loot.gold += price;
+          this.events.push({ type: 'message', text: `背包已滿，${bookName(it.slot)}自動賣出（+${price}G）` });
+        }
       } else if (it.kind === 'potion') {
         if (p.potions < LIMITS.potions) p.potions++;
         else {
@@ -1603,7 +1814,8 @@ export class World {
       this.pickups.push({ kind: 'gold', x: c.x, y: c.y + 0.3, amount: gold, t: 0 });
       if (c.evolved) this.dropItem(c.x + 0.4, c.y + 0.2, 'evolved', EVOLVE.levelBonus);
       else if (c.boss || this.rng() < 0.6) this.dropItem(c.x + 0.4, c.y + 0.2, c.boss ? 'boss' : 'chest');
-      // Boss 寶箱有 25% 機會出現背包擴充袋。
+      if (!c.boss && this.rng() < CRAFT.drop.chest) this.dropBook(c.x - 0.3, c.y + 0.6);
+      // Boss 寶箱有 25% 機會出現背包擴充袋（進化 Boss 50%）。
       if (c.boss && this.rng() < (c.evolved ? EVOLVE.pouch : 0.25)) this.pickups.push({ kind: 'bagExpand', x: c.x, y: c.y + 0.5, t: 0 });
       if (this.rng() < 0.3) this.pickups.push({ kind: 'potion', x: c.x - 0.4, y: c.y + 0.2, t: 0 });
       if (!c.boss && this.rng() < GEM_RULES.drop.chest) this.dropGem(c.x, c.y + 0.5);
@@ -1616,7 +1828,7 @@ export class World {
    * @param {object} item 裝備。
    */
   takeItem(item) {
-    if (this.ch.bag.length < bagLimit(this.ch)) {
+    if (bagUsed(this.ch) < bagLimit(this.ch)) {
       this.ch.bag.push(item);
       this.loot.items.push(item);
       this.events.push({ type: 'item', item });
@@ -1764,7 +1976,7 @@ export class World {
       monsters: this.monsters.map((m) => ({ type: m.type, x: m.x, y: m.y, hp: m.hp, maxHp: m.maxHp, boss: m.boss, elite: m.elite, small: m.small, abyss: m.abyss, evolved: !!m.evolved, split: m.split, phase2: m.phase2, summoned: m.summoned, heals: m.heals || 0, awake: !!m.awake, affix: m.affix, enraged: !!m.enraged })),
       pickups: this.pickups.map((it) => ({ ...it })),
       chests: this.chests.map((c) => ({ ...c })),
-      portalOpen: this.portalOpen, bossDefeated: this.bossDefeated, explored,
+      portalOpen: this.portalOpen, bossDefeated: this.bossDefeated, evolvedDefeated: !!this.evolvedDefeated, explored,
     };
   }
 
@@ -1776,8 +1988,7 @@ export class World {
    * @returns {World} 探險。
    */
   static restore(character, snap, rng = Math.random) {
-    const w = new World(character, { area: snap.area, depth: snap.depth, seed: snap.seed, floor: snap.floor, potions: snap.player.potions, scroll: snap.player.scroll, cures: snap.player.cures || 0, restoring: true }, rng);
-    w.restoring = false;
+    const w = new World(character, { area: snap.area, depth: snap.depth, seed: snap.seed, floor: snap.floor, potions: snap.player.potions, scroll: snap.player.scroll, cures: snap.player.cures || 0 }, rng);
     w.elapsed = snap.elapsed;
     w.time = snap.time || 0;
     w.loot = { ...snap.loot, items: character.bag.filter((i) => snap.loot.items.includes(i.id)), gems: snap.loot.gems || [] };
@@ -1791,6 +2002,7 @@ export class World {
     w.chests = snap.chests;
     w.portalOpen = snap.portalOpen;
     w.bossDefeated = snap.bossDefeated;
+    w.evolvedDefeated = !!snap.evolvedDefeated;
     for (let i = 0; i < snap.explored.length; i++) {
       const v = snap.explored.charCodeAt(i) - 48;
       for (let k = 0; k < 6; k++) if (i * 6 + k < w.explored.length) w.explored[i * 6 + k] = (v >> k) & 1;
@@ -1882,7 +2094,6 @@ World.prototype.ai = {
       m.state = 'aim';
       m.t = 0.7;
       m.aimAngle = m.facing;
-      this.telegraph({ shape: 'line', x: m.x, y: m.y, angle: m.facing, len: 8, width: 0.25, t: 0.7, dmg: 0 });
     }
   },
 
@@ -1960,7 +2171,6 @@ World.prototype.ai = {
     if (d < 7 && m.cd <= 0) {
       m.state = 'cast';
       m.t = 0.6;
-      this.telegraph({ shape: 'circle', x: m.x, y: m.y, r: m.r + 0.25, t: 0.6, dmg: 0 });
     }
   },
 
@@ -2123,7 +2333,6 @@ World.prototype.ai = {
       m.state = 'aim';
       m.t = 0.6;
       m.aimAngle = m.facing;
-      this.telegraph({ shape: 'line', x: m.x, y: m.y, angle: m.facing, len: 7, width: 0.3, t: 0.6, dmg: 0 });
     }
   },
 
@@ -2215,7 +2424,6 @@ World.prototype.ai = {
     if (d < 7 && m.cd <= 0) {
       m.state = 'cast';
       m.t = 0.6;
-      this.telegraph({ shape: 'circle', x: m.x, y: m.y, r: m.r + 0.25, t: 0.6, dmg: 0 });
     }
   },
 

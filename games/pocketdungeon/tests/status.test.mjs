@@ -7,7 +7,7 @@ import { seededRng, characterStats, gemBonus, parseGem, socketCount, makeItem, r
 import { STATUS, GEMS, GEM_RULES, LIMITS } from '../src/js/pd/data.js';
 import * as sk from '../src/js/pd/skills.js';
 import * as v from '../src/js/pd/village.js';
-import { isValidCharacter, newCharacter } from '../src/js/storage.js';
+import { isValidCharacter, newCharacter, loadRewards } from '../src/js/storage.js';
 
 const IDLE = { mx: 0, my: 0, attack: false, dodge: false, potion: false };
 const DT = 1 / 60;
@@ -369,13 +369,19 @@ test('每個轉職技能都能施放並產生效果', () => {
     windwalk: (w) => w.player.hasteT > 0,
     barrier: (w) => w.player.shield > 0,
     timestop: (w, m) => m.stun > 2,
+    evasion: (w) => w.player.guardT > 0,
+    shadowHaste: (w) => w.player.hasteT > 0,
+    rejuvenate: (w) => w.player.regenT > 0,
+    ironShirt: (w) => w.player.guardT > 0,
+    nirvana: (w) => w.player.hp >= w.player.maxHp * 0.85,
   };
-  for (const cls of ['warrior', 'archer', 'mage']) {
+  for (const cls of ['warrior', 'archer', 'mage', 'thief', 'monk']) {
     for (const id of sk.classSkills(cls).filter((k) => sk.SKILLS[k].rebirth)) {
       const ch = hero(cls, 1, 3);
       ch.skills.slots = [id, null, null, null];
       const w = arena(ch);
       const m = dummy(w, 1.3);
+      w.player.hp = Math.round(w.player.maxHp * 0.3);
       assert.equal(w.useSkill(0), true, id);
       const check = effects[id];
       if (check) {
@@ -474,4 +480,333 @@ test('每升到 5 的倍數等級送 1 顆隨機寶石（一次連升多級時�
   assert.deepEqual(gifts, expected);
   assert.equal(Object.values(ch.gems).reduce((a, b) => a + b, 0), expected.length);
   assert.equal(w.loot.gems.length, expected.length);
+});
+
+test('單手與雙手武器：單手攻擊為 80%；雙手武器卸下副手；拿雙手武器時不能裝副手', () => {
+  const rng = () => 0.5;
+  // 第一次亂數決定武器類型，之後固定 0.5（數值浮動相同）。
+  const seq = (first) => { let n = 0; return () => (n++ ? 0.5 : first); };
+  const sword = makeItem({ slot: 'weapon', cls: 'warrior', level: 10, rarity: 1 }, seq(0.1));
+  const axe = makeItem({ slot: 'weapon', cls: 'warrior', level: 10, rarity: 1 }, seq(0.9));
+  assert.equal(sword.type, '劍');
+  assert.equal(axe.type, '斧');
+  assert.ok(Math.abs(sword.stats.atk / axe.stats.atk - 0.8) < 0.05);
+  const shield = makeItem({ slot: 'offhand', level: 10, rarity: 1 }, rng);
+  assert.equal(shield.type, '盾牌');
+  assert.ok(shield.stats.def > 0 && shield.stats.hp > 0);
+  const ch = hero('warrior');
+  ch.equipped.offhand = null;
+  // 固定亂數產生的裝備 id 會相同，測試中另外指定。
+  sword.id = 'sword';
+  axe.id = 'axe';
+  shield.id = 'shield';
+  ch.bag.push(sword, axe, shield);
+  assert.ok(v.equip(ch, sword.id).ok);
+  assert.ok(v.equip(ch, shield.id).ok);
+  assert.equal(ch.equipped.offhand, shield);
+  const r = v.equip(ch, axe.id);
+  assert.ok(r.ok);
+  assert.match(r.message, /卸下/);
+  assert.equal(ch.equipped.offhand, null);
+  assert.ok(ch.bag.includes(shield) && ch.bag.includes(sword));
+  assert.equal(v.equip(ch, shield.id).ok, false, '雙手武器時不能裝副手');
+  for (const cls of ['archer', 'mage']) {
+    const types = new Set(Array.from({ length: 40 }, (_, k) => makeItem({ slot: 'weapon', cls, level: 5, rarity: 0 }, seededRng(k)).type));
+    assert.equal(types.size, 2, `${cls} 有單手與雙手兩種武器`);
+  }
+});
+
+test('被動技能：Lv.8／16 與轉職解鎖、花技能點學習、效果套用在戰鬥中', () => {
+  const ch = hero('warrior', 7);
+  assert.equal(sk.upgradePassive(ch, 'toughness').ok, false, 'Lv.8 才解鎖');
+  ch.level = 20;
+  const pts = sk.skillPoints(ch);
+  for (let k = 0; k < 5; k++) assert.ok(sk.upgradePassive(ch, 'toughness').ok);
+  assert.equal(sk.upgradePassive(ch, 'toughness').ok, false, '上限 Lv.5');
+  assert.equal(sk.skillPoints(ch), pts - 5);
+  assert.equal(sk.upgradePassive(ch, 'berserk').ok, false, '轉職被動');
+  const base = characterStats('warrior', 20);
+  let w = arena(ch);
+  assert.equal(w.player.maxHp, Math.round(base.hp * 1.2));
+  sk.resetSkills(ch);
+  assert.equal(sk.skillPoints(ch), pts);
+  // 戰士轉職被動：狂戰之血與斬殺。
+  ch.rebirth = 3;
+  ch.skills.passive = { berserk: 5, execute: 5 };
+  w = arena(ch);
+  const atk = w.effAtk();
+  w.player.hp = 1;
+  assert.ok(Math.abs(w.effAtk() / atk - 1.4) < 1e-9);
+  const m = dummy(w, 2);
+  m.hp = m.maxHp * 0.2;
+  const before = m.hp;
+  w.hitMonster(m, 100);
+  assert.equal(before - m.hp, 140);
+  // 法師：技能冷卻與減傷。
+  const mage = hero('mage', 20);
+  mage.skills.passive = { affinity: 5 };
+  w = arena(mage);
+  assert.ok(Math.abs(w.skills[0].cd / sk.skillStats('nova', 1).cd - 0.8) < 1e-9);
+  mage.rebirth = 1;
+  mage.skills.passive = { wardSkin: 5 };
+  w = arena(mage);
+  const hp = w.player.hp;
+  w.hurtPlayer(100);
+  assert.equal(hp - w.player.hp, 85);
+  // 弓箭手：毒塗箭（普通攻擊附加中毒）。
+  const archer = hero('archer', 20, 1);
+  archer.skills.passive = { venomTip: 5 };
+  w = arena(archer);
+  assert.deepEqual(w.player.attackStatus, [['poison', 0.2]]);
+});
+
+test('分解：同品質材料（2 ＋ 等級 ÷ 10 ＋ 強化），25% 機率多得高一階；寶石放回；材料堆疊只佔 1 格', () => {
+  const ch = hero('warrior', 20);
+  ch.mats = {};
+  const a = { ...makeItem({ slot: 'armor', level: 25, rarity: 1 }, seededRng(1)), id: 'a', enhance: 3, gems: ['atk-1'] };
+  const b = { ...makeItem({ slot: 'helmet', level: 5, rarity: 1 }, seededRng(2)), id: 'b' };
+  ch.bag.push(a, b);
+  assert.equal(v.bagUsed(ch), 2);
+  assert.ok(v.salvage(ch, 'a', () => 0.1).ok);
+  assert.equal(ch.mats.steel, 2 + 2 + 3);
+  assert.equal(ch.mats.mithril, 1, '高品質材料');
+  assert.equal(ch.gems['atk-1'], 1);
+  assert.ok(v.salvage(ch, 'b', () => 0.9).ok);
+  assert.equal(ch.mats.steel, 7 + 2);
+  assert.equal(ch.mats.mithril, 1);
+  assert.equal(v.bagUsed(ch), 2, '精鋼與秘銀各 1 格');
+  assert.equal(v.salvage(ch, 'nope', Math.random).ok, false);
+  ch.mats.steel = 9998;
+  v.addMaterial(ch, 'steel', 5);
+  assert.equal(ch.mats.steel, 9999, '最多疊 9999');
+});
+
+test('合成：製作書＋12 個同品質材料＋金幣，做出保證品質、角色等級的裝備；武器可指定類型；製作書會掉落與在商店販售', () => {
+  const ch = hero('mage', 18);
+  ch.gold = 1e5;
+  ch.mats = { mithril: 30 };
+  ch.books = {};
+  assert.equal(v.craftItem(ch, 'weapon', 2, seededRng(3)).ok, false, '沒有製作書');
+  v.addBook(ch, 'weapon', 2);
+  assert.equal(v.craftItem(ch, 'weapon', 3, seededRng(3)).ok, false, '星辰結晶不足');
+  const gold = ch.gold;
+  const r = v.craftItem(ch, 'weapon', 2, seededRng(3), '魔杖');
+  assert.ok(r.ok);
+  assert.equal(r.item.rarity, 2);
+  assert.equal(r.item.level, 18);
+  assert.equal(r.item.type, '魔杖');
+  assert.equal(ch.mats.mithril, 18);
+  assert.equal(ch.books.weapon, 1);
+  assert.equal(ch.gold, gold - v.craftCost(ch, 2).gold);
+  v.refreshShop(ch, seededRng(5));
+  assert.equal(ch.shopBooks.length, 2);
+  const slot = ch.shopBooks[0];
+  assert.ok(v.buyBook(ch, 0).ok);
+  assert.ok(ch.books[slot] >= 1);
+  const w = arena(ch);
+  w.dropBook(w.player.x, w.player.y);
+  const it = w.pickups.at(-1);
+  it.t = 1;
+  const before = ch.books[it.slot] || 0;
+  w.updatePickups(0);
+  assert.equal(ch.books[it.slot], before + 1);
+});
+
+test('背包已滿時：新材料種類無法放入；滿格時撿到的製作書自動賣出', () => {
+  const ch = hero('warrior', 20);
+  ch.mats = {};
+  ch.books = {};
+  ch.bag = Array.from({ length: 20 }, (_, i) => ({ ...makeItem({ slot: 'boots', level: 5, rarity: 0 }, seededRng(i)), id: `x${i}` }));
+  assert.equal(v.addMaterial(ch, 'iron', 3), false);
+  assert.ok(v.salvage(ch, 'x0', () => 0.9).ok, '分解空出 1 格放材料');
+  const w = arena(ch);
+  ch.bag.push({ ...makeItem({ slot: 'boots', level: 5, rarity: 0 }, seededRng(99)), id: 'y' });
+  w.pickups.push({ kind: 'book', slot: 'helmet', x: w.player.x, y: w.player.y, t: 1 });
+  const g = ch.gold;
+  w.updatePickups(0);
+  assert.ok(!ch.books.helmet && ch.gold > g);
+});
+
+test('盜賊：小刀類武器（匕首單手、雙匕雙手）、出手快 25%、爆擊；基本技能都能施放', () => {
+  const types = new Set(Array.from({ length: 40 }, (_, k) => makeItem({ slot: 'weapon', cls: 'thief', level: 5, rarity: 0 }, seededRng(k)).type));
+  assert.deepEqual([...types].sort(), ['匕首', '雙匕'].sort());
+  const ch = hero('thief', 20);
+  let w = arena(ch);
+  const warrior = arena(hero('warrior', 20));
+  assert.ok(w.player.interval < warrior.player.interval * 0.8);
+  // 爆擊：固定亂數 0 時必定爆擊（×1.8）。
+  w.rng = () => 0;
+  const m = dummy(w, 3);
+  w.hitMonster(m, 100);
+  assert.equal(m.maxHp - m.hp, 180);
+  for (const id of ['backstab', 'knives', 'smoke', 'venomBlade']) {
+    w = arena(hero('thief', 30));
+    w.player.skillCd = [0, 0, 0, 0];
+    w.skills = [sk.skillStats(id, 1)];
+    const t = dummy(w, 2);
+    assert.ok(w.useSkill(0), id);
+    run(w, 1);
+    if (id === 'venomBlade') assert.ok(w.player.imbueT > 0 && w.effAtk() > w.player.atk);
+    else assert.ok(t.hp < 1e6, `${id} 造成傷害`);
+  }
+});
+
+test('武僧：拳套（雙手）、三連擊（第三擊範圍重擊，停手 1.2 秒重來）；治癒之氣回復 HP', () => {
+  const ch = hero('monk', 20);
+  assert.equal(makeItem({ slot: 'weapon', cls: 'monk', level: 5, rarity: 0 }, seededRng(1)).type, '拳套');
+  const w = arena(ch);
+  w.aimAssist = false;
+  w.rng = () => 0.5;
+  const front = dummy(w, 1);
+  const side = dummy(w, 0.6, 1.2);
+  const hits = [];
+  for (let k = 0; k < 3; k++) {
+    const before = front.hp;
+    w.playerAttack();
+    hits.push(before - front.hp);
+  }
+  assert.equal(w.player.combo, 3);
+  assert.ok(hits[2] > hits[0] * 1.6, `第三擊較重（${hits}）`);
+  assert.ok(side.hp < 1e6, '第三擊是範圍攻擊');
+  run(w, 1.3);
+  w.playerAttack();
+  assert.equal(w.player.combo, 1, '停手後重來');
+  w.skills = [sk.skillStats('healChi', 1)];
+  w.player.skillCd = [0, 0, 0, 0];
+  w.player.hp = 10;
+  w.useSkill(0);
+  assert.equal(w.player.hp, 10 + Math.round(w.player.maxHp * 0.25));
+});
+
+test('技能書：每個職業 10 種＋通用 15 種；非適合職業強度 30%、通用 100%；學會後可裝備與升級', () => {
+  const ids = sk.bookSkillIds();
+  assert.equal(ids.length, 65);
+  for (const cls of ['warrior', 'archer', 'mage', 'thief', 'monk', 'all']) assert.equal(ids.filter((id) => sk.SKILLS[id].cls === cls).length, cls === 'all' ? 15 : 10, cls);
+  assert.equal(sk.classSkills('warrior').length, 10, '職業技能不含技能書');
+  const ch = hero('mage', 10);
+  ch.skillBooks = {};
+  assert.equal(sk.skillLevel(ch, 'cleave'), 0);
+  v.addSkillBook(ch, 'cleave');
+  v.addSkillBook(ch, 'renew');
+  v.addSkillBook(ch, 'fireNova');
+  assert.equal(v.bagUsed(ch), 3, '每種技能書 1 格');
+  assert.ok(v.useSkillBook(ch, 'cleave').ok);
+  assert.equal(v.useSkillBook(ch, 'cleave').ok, false, '用完了');
+  assert.ok(v.useSkillBook(ch, 'renew').ok);
+  assert.ok(v.useSkillBook(ch, 'fireNova').ok);
+  assert.equal(sk.skillLevel(ch, 'cleave'), 1);
+  assert.equal(sk.skillScale(ch, 'cleave'), 0.3);
+  assert.equal(sk.skillScale(ch, 'renew'), 1);
+  assert.equal(sk.skillScale(ch, 'fireNova'), 1);
+  assert.ok(sk.equipSkill(ch, 'cleave', 1).ok);
+  const eq = sk.equippedSkills(ch)[1];
+  assert.ok(Math.abs(eq.mult - sk.SKILLS.cleave.mult * 0.3) < 1e-9);
+  const pts = sk.skillPoints(ch);
+  assert.ok(sk.upgradeSkill(ch, 'cleave').ok);
+  assert.equal(sk.skillPoints(ch), pts - 1);
+  const w = arena(ch);
+  assert.equal(w.skills[1].id, 'cleave');
+  assert.ok(w.useSkill(1));
+  // 賣出
+  v.addSkillBook(ch, 'renew');
+  const g = ch.gold;
+  assert.ok(v.sellSkillBook(ch, 'renew').ok);
+  assert.ok(ch.gold > g);
+  assert.ok(isValidCharacter({ ...newCharacter('mage', 'x'), skills: ch.skills, skillBooks: {} }));
+});
+
+test('技能書只有 Boss 會掉（一般 30%、進化必掉）', () => {
+  const w = arena(hero('warrior', 20));
+  w.rng = () => 0.01;
+  const m = w.spawnMonster('skeleton', w.player.x + 3, w.player.y, { elite: true });
+  w.killMonster(m);
+  assert.equal(w.pickups.filter((p) => p.kind === 'skillBook').length, 0, '菁英不掉');
+  const v2 = new World(hero('warrior', 20), { area: 'easy', depth: 1, seed: 3, floor: 3 }, () => 0.01);
+  v2.killMonster(v2.boss());
+  assert.equal(v2.pickups.filter((p) => p.kind === 'skillBook').length, 1);
+});
+
+test('技能書稀有度：每職業普通 4、精良 3、稀有 2、傳說 1，通用 6／5／3／1；賣價依稀有度；掉落依權重', () => {
+  const ids = sk.bookSkillIds();
+  for (const cls of ['warrior', 'archer', 'mage', 'thief', 'monk', 'all']) {
+    const counts = [0, 0, 0, 0];
+    for (const id of ids.filter((k) => sk.SKILLS[k].cls === cls)) counts[sk.SKILLS[id].rarity]++;
+    assert.deepEqual(counts, cls === 'all' ? [6, 5, 3, 1] : [4, 3, 2, 1], cls);
+  }
+  assert.equal(v.skillBookPrice('cleave'), 100);
+  assert.equal(v.skillBookPrice('warGod'), 1000);
+  const tally = [0, 0, 0, 0];
+  const rng = seededRng(11);
+  for (let k = 0; k < 400; k++) {
+    const w = new World(hero('warrior', 20), { area: 'easy', depth: 1, seed: 3, floor: 3 }, rng);
+    w.monsters = [];
+    const b = w.spawnMonster('treant', w.player.x + 3, w.player.y, { boss: true, evolved: true });
+    w.killMonster(b);
+    const book = w.pickups.find((p) => p.kind === 'skillBook');
+    tally[sk.SKILLS[book.skill].rarity]++;
+  }
+  assert.ok(tally[3] > 30 && tally[3] < 100, `進化 Boss 傳說約 15%（${tally}）`);
+});
+
+test('打怪掉材料：一般 8%、菁英 40%（1～2 個）、Boss 必掉（2～4 個）；撿到加入背包', () => {
+  const w = arena(hero('warrior', 20));
+  w.rng = () => 0.01;
+  const m = w.spawnMonster('skeleton', w.player.x + 3, w.player.y);
+  w.killMonster(m);
+  const mat = w.pickups.find((p) => p.kind === 'mat');
+  assert.ok(mat && mat.n === 1);
+  mat.x = w.player.x;
+  mat.y = w.player.y;
+  mat.t = 1;
+  const before = (w.ch.mats && w.ch.mats[mat.mat]) || 0;
+  w.updatePickups(0);
+  assert.equal(w.ch.mats[mat.mat], before + 1);
+  const b = new World(hero('warrior', 20), { area: 'easy', depth: 1, seed: 3, floor: 3 }, () => 0.99);
+  b.killMonster(b.boss());
+  const bm = b.pickups.find((p) => p.kind === 'mat');
+  assert.ok(bm && bm.n >= 2 && bm.n <= 4);
+  const none = arena(hero('warrior', 20));
+  none.rng = () => 0.5;
+  none.killMonster(none.spawnMonster('skeleton', none.player.x + 3, none.player.y));
+  assert.equal(none.pickups.filter((p) => p.kind === 'mat').length, 0);
+});
+
+test('獎勵禮包：等級愈高金幣、材料、碎片愈多；碎片 3 片合成技能書', () => {
+  const ch = hero('warrior', 10);
+  ch.gold = 0;
+  ch.mats = {};
+  ch.shards = {};
+  ch.gifts = {};
+  assert.ok(v.addGift(ch, 1));
+  assert.ok(v.addGift(ch, 5));
+  const a = v.openGift(ch, 1, seededRng(1));
+  const b = v.openGift(ch, 5, seededRng(1));
+  assert.ok(a.ok && b.ok);
+  assert.ok(b.gold > a.gold);
+  const sum = (o) => Object.values(o).reduce((x, y) => x + y, 0);
+  assert.equal(sum(a.mats), 3);
+  assert.equal(sum(b.mats), 12);
+  assert.equal(sum(a.shards), 1);
+  assert.equal(sum(b.shards), 5);
+  assert.equal(v.openGift(ch, 1, seededRng(1)).ok, false, '沒有禮包了');
+  ch.shards = { cleave: 2 };
+  assert.equal(v.combineShards(ch, 'cleave').ok, false);
+  ch.shards.cleave = 3;
+  assert.ok(v.combineShards(ch, 'cleave').ok);
+  assert.equal(ch.skillBooks.cleave, 1);
+  assert.equal(ch.shards.cleave, undefined);
+});
+
+test('獲得紀錄：讀取其他遊戲寫入的紀錄，並從過關統計與 roll 進度回補（同一個 id 只算一次）', () => {
+  const store = new Map();
+  globalThis.localStorage = { getItem: (k) => (store.has(k) ? store.get(k) : null), setItem: (k, val) => store.set(k, String(val)), removeItem: (k) => store.delete(k) };
+  store.set('games.rewards', JSON.stringify([{ id: 'sudoku:hard:clear', game: 'sudoku', type: 'clear', tier: 3, label: '困難 第一次過關', at: 5 }, { id: 'bad', game: 'nope', tier: 1, label: 'x' }]));
+  store.set('sudoku.stats', JSON.stringify({ hard: { started: 3, completed: 2, noHint: 1 }, easy: { started: 1, completed: 0, noHint: 0 } }));
+  store.set('roll.progress', JSON.stringify({ '3-2': { stars: 3, bestSteps: 9 }, '1-1': { stars: 1, bestSteps: 4 } }));
+  const list = loadRewards();
+  const ids = list.map((r) => r.id).sort();
+  assert.deepEqual(ids, ['roll:1-1:clear', 'roll:3-2:clear', 'roll:3-2:star3', 'sudoku:hard:clear', 'sudoku:hard:perfect']);
+  assert.equal(list.find((r) => r.id === 'sudoku:hard:perfect').tier, 4);
+  assert.equal(list.find((r) => r.id === 'roll:3-2:star3').tier, 4);
+  delete globalThis.localStorage;
 });

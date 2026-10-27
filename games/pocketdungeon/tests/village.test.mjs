@@ -81,21 +81,24 @@ test('頭盔、鞋子各有自己的欄位；飾品可裝兩件並可指定欄�
   assert.equal(v.equip(ch, b.id, 'helmet').ok, false, '飾品不能放頭盔欄');
 });
 
-test('背包擴充袋：售價倍增、使用後 +5 格、最多 40 格', () => {
+test('背包擴充袋：商店只賣 5 個（售價倍增），之後靠打怪取得；使用後 +5 格、最多 100 格', () => {
   const ch = hero();
   ch.gold = 1e6;
   assert.equal(v.bagLimit(ch), 20);
   const prices = [];
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 5; i++) {
     prices.push(v.bagExpandPrice(ch));
     assert.ok(v.buyBagExpand(ch).ok);
   }
-  assert.deepEqual(prices, [200, 400, 800, 1600]);
-  assert.equal(v.buyBagExpand(ch).ok, false, '已買足 4 個');
-  for (let i = 0; i < 4; i++) assert.ok(v.useBagExpand(ch).ok);
-  assert.equal(v.bagLimit(ch), 40);
+  assert.deepEqual(prices, [200, 400, 800, 1600, 3200]);
+  const r = v.buyBagExpand(ch);
+  assert.equal(r.ok, false);
+  assert.match(r.message, /賣完/);
+  ch.bagExpand += 11;
+  for (let i = 0; i < 16; i++) assert.ok(v.useBagExpand(ch).ok);
+  assert.equal(v.bagLimit(ch), 100);
   assert.equal(v.useBagExpand(ch).ok, false);
-  ch.bag = Array.from({ length: 39 }, (_, i) => ({ id: `x${i}` }));
+  ch.bag = Array.from({ length: 99 }, (_, i) => ({ id: `x${i}` }));
   v.refreshShop(ch, seededRng(1));
   assert.ok(v.buyItem(ch, 0).ok, '擴充後可以超過 20 件');
   assert.equal(v.buyItem(ch, 0).ok, false);

@@ -378,6 +378,35 @@ summary:focus-visible {
   box-shadow: inset 0 0 0 1px rgba(232, 184, 74, 0.6);
 }
 
+/* 主打遊戲：放在最上方、單欄、卡片與圖示放大。 */
+.games.featured {
+  grid-template-columns: 1fr;
+}
+
+.game-card.featured {
+  min-height: 240px;
+  padding: 22px;
+}
+
+.game-card.featured .card-top img {
+  width: 76px;
+  height: 76px;
+  border-radius: 18px;
+}
+
+.game-card.featured .game-title {
+  font-size: 30px;
+}
+
+.game-card.featured .game-desc {
+  font-size: 15px;
+}
+
+.game-card.featured .watermark {
+  width: 220px;
+  height: 220px;
+}
+
 /* 卡片右上的大型浮水印圖示，營造主視覺。 */
 .game-card .watermark {
   position: absolute;
@@ -676,7 +705,7 @@ summary:focus-visible {
 
 /* 平板與橫向：遊戲卡片兩欄。 */
 @media (min-width: 680px) {
-  .games {
+  .games:not(.featured) {
     grid-template-columns: 1fr 1fr;
   }
 

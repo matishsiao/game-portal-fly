@@ -2,8 +2,9 @@
 // 距離單位為「格」（1 格 = 16 像素），時間單位為秒。
 
 /**
- * 職業：初始屬性、每級成長、普通攻擊與可用武器。
- * attack.kind：arc 前方扇形、arrow 直線箭矢、orb 法球（命中或飛完後爆炸）。
+ * 職業：初始屬性、每級成長、普通攻擊與可用武器類型（單手或雙手見 WEAPON_HANDS）。
+ * attack.kind：arc 前方扇形、arrow 直線箭矢、orb 法球（命中或飛完後爆炸）、combo 三連擊（第三擊為範圍重擊）。
+ * attack.rate 為攻擊間隔倍率（盜賊出手較快）；attack.crit 為基本爆擊率（爆擊傷害 ×CRIT_MULT）。
  */
 export const CLASSES = {
   warrior: {
@@ -18,16 +19,42 @@ export const CLASSES = {
     base: { hp: 90, atk: 10, def: 5, spd: 115 },
     growth: { hp: 8, atk: 2, def: 1, spd: 1 },
     attack: { kind: 'arrow', range: 7, speed: 12, mult: 1.0 },
-    weapon: ['弓'],
+    weapon: ['弓', '弩'],
   },
   mage: {
     name: '法師',
     base: { hp: 75, atk: 14, def: 4, spd: 100 },
     growth: { hp: 7, atk: 2.5, def: 0.8, spd: 0.5 },
     attack: { kind: 'orb', range: 5, speed: 7, radius: 1, mult: 1.0 },
-    weapon: ['法杖'],
+    weapon: ['法杖', '魔杖'],
+  },
+  thief: {
+    name: '盜賊',
+    base: { hp: 95, atk: 11, def: 5, spd: 125 },
+    growth: { hp: 8.5, atk: 2.1, def: 0.9, spd: 1.2 },
+    attack: { kind: 'arc', range: 1.25, angle: 90, mult: 0.8, rate: 0.75, crit: 0.1 },
+    weapon: ['匕首', '雙匕'],
+  },
+  monk: {
+    name: '武僧',
+    base: { hp: 110, atk: 11, def: 7, spd: 105 },
+    growth: { hp: 11, atk: 2, def: 1.3, spd: 0.6 },
+    attack: { kind: 'combo', range: 1.35, angle: 100, mult: 0.9, finisher: 1.6, finishR: 1.4 },
+    weapon: ['拳套'],
   },
 };
+
+/** 爆擊的傷害倍率。 */
+export const CRIT_MULT = 1.8;
+
+/**
+ * 武器類型佔用的手數：單手武器可以再裝備副手（盾牌），雙手武器佔用兩隻手。
+ * 單手武器的攻擊力為雙手的 ONE_HAND_ATK 倍，以盾牌的防禦與 HP 補足。
+ */
+export const WEAPON_HANDS = { 劍: 1, 斧: 2, 弓: 2, 弩: 1, 法杖: 2, 魔杖: 1, 匕首: 1, 雙匕: 2, 拳套: 2 };
+
+/** 單手武器的攻擊力倍率（相對於雙手武器）。 */
+export const ONE_HAND_ATK = 0.8;
 
 /** 職業代碼（角色欄位順序）。 */
 export const CLASS_KEYS = Object.keys(CLASSES);
@@ -56,6 +83,8 @@ export const REBIRTH = {
     warrior: ['戰士', '騎士', '聖騎士', '英雄'],
     archer: ['弓箭手', '遊俠', '神射手', '風之射手'],
     mage: ['法師', '術士', '大法師', '賢者'],
+    thief: ['盜賊', '刺客', '暗殺者', '夜之王'],
+    monk: ['武僧', '拳師', '宗師', '武聖'],
   },
 };
 
@@ -150,8 +179,11 @@ export const DIFFICULTY = {
   enrageCd: 0.7,
 };
 
-/** Boss 進化：同一角色同一關（區域＋深度）破關幾次後可能進化、每次的機率、能力與獎勵倍率。 */
-export const EVOLVE = { clears: 5, chance: 0.3, hp: 1.6, atk: 1.25, cd: 0.85, scale: 1.15, gold: 2, xp: 1.5, items: 2, levelBonus: 3, pouch: 0.5 };
+/**
+ * Boss 進化：同一角色同一關（區域＋深度）破關滿 5 次後，打倒 Boss 時有 25% 機率當場復活成進化 Boss（不會永久記錄，
+ * 下一次挑戰又是原本的 Boss）；以及進化 Boss 的能力與獎勵倍率。
+ */
+export const EVOLVE = { clears: 5, chance: 0.25, hp: 1.6, atk: 1.25, cd: 0.85, scale: 1.15, gold: 2, xp: 1.5, items: 2, levelBonus: 3, pouch: 0.5 };
 
 /** 稀有度：名稱、顏色（同時顯示名稱，不只靠顏色）、數值倍率與賣價倍率。 */
 export const RARITIES = [
@@ -177,6 +209,12 @@ export const ITEM_NAMES = {
   斧: ['手斧', '戰斧', '雙刃斧', '破城斧'],
   弓: ['短弓', '獵弓', '長弓', '星辰弓'],
   法杖: ['木杖', '水晶杖', '賢者杖', '星辰杖'],
+  弩: ['輕弩', '獵弩', '連弩', '星辰弩'],
+  魔杖: ['短杖', '水晶魔杖', '秘銀魔杖', '星辰魔杖'],
+  盾牌: ['木盾', '鐵盾', '騎士盾', '龍鱗盾'],
+  匕首: ['小刀', '鋼匕首', '影刃', '星辰匕首'],
+  雙匕: ['雙小刀', '雙鋼匕', '雙影刃', '星辰雙刃'],
+  拳套: ['布拳套', '鐵拳套', '龍爪拳套', '星辰拳套'],
   鎧甲: ['皮甲', '鎖子甲', '板甲', '龍鱗甲'],
   頭盔: ['皮帽', '鐵盔', '騎士盔', '龍鱗盔'],
   鞋子: ['布鞋', '皮靴', '鐵靴', '疾風靴'],
@@ -190,8 +228,8 @@ export const ENHANCE = {
   failRate: [0, 0, 0, 0, 0, 0, 0.1, 0.2, 0.3, 0.4, 0.5],
 };
 
-/** 背包初始上限、每趟藥水上限與道具價格。 */
-export const LIMITS = { bag: 20, potions: 10, potionPrice: 30, scrollPrice: 40, cures: 5, curePrice: 50 };
+/** 背包初始格數（裝備每件 1 格；每種材料、每種製作書各佔 1 格）、堆疊上限、每趟藥水上限與道具價格。 */
+export const LIMITS = { bag: 20, stack: 9999, potions: 10, potionPrice: 30, scrollPrice: 40, cures: 5, curePrice: 50 };
 
 /**
  * 異常狀態：名稱、持續秒數與顏色。玩家與怪物共用同一套規則，Boss 承受的持續時間為 bossMult 倍。
@@ -244,8 +282,59 @@ export const GEM_RULES = {
 /** 共用倉庫：所有角色共用的裝備格數（固定，不能擴充）。金幣另外共用，沒有上限。 */
 export const SHARED_SLOTS = 20;
 
-/** 背包擴充袋：每次使用 +5 格，最多擴充到 40 格；售價依已擴充次數倍增（200、400、800、1600）。 */
-export const BAG_EXPAND = { step: 5, max: 40, basePrice: 200 };
+/**
+ * 背包擴充袋：每次使用 +5 格，最多擴充到 100 格（16 個）。商店每個角色只賣 shopMax 個，售價倍增（200、400、800、1,600、3,200G）；
+ * 之後只能打怪取得（Boss 寶箱 25%、進化 Boss 50%、菁英 eliteDrop）。
+ */
+export const BAG_EXPAND = { step: 5, max: 100, basePrice: 200, shopMax: 5, eliteDrop: 0.03 };
+
+/**
+ * 技能書：只有打倒 Boss 會掉（一般 Boss 30%、進化 Boss 必掉），每種佔背包 1 格。
+ * 掉落時先依稀有度權重（一般 Boss、進化 Boss）決定稀有度，再從該稀有度的技能書中隨機；賣價依稀有度。
+ */
+export const SKILL_BOOK = { bossDrop: 0.3, evolvedDrop: 1, weights: [50, 30, 15, 5], evolvedWeights: [20, 35, 30, 15], sellPrice: [100, 200, 400, 1000] };
+
+/** 打怪掉落材料：機率與數量（一般怪物、菁英、Boss）；品質依裝備掉落的稀有度規則。背包滿時每個換成 matGold 金幣。 */
+export const MAT_DROP = { monster: 0.08, elite: 0.4, boss: 1, count: { monster: [1, 1], elite: [1, 2], boss: [2, 4] }, matGold: 5 };
+
+/**
+ * 獎勵禮包（等級 1～5：銅、銀、金、白金、鑽石）：只能從其他遊戲的「第一次過關」與「第一次全對（沒用提示／三顆星）」取得，
+ * 重複過關不會再給。開啟後得到金幣、裝備材料（數量與品質權重依等級）與技能書碎片（同一本技能書 3 片合成 1 本）。
+ * games 為會寫入獲得紀錄的遊戲（目錄 → 名稱）。
+ */
+export const GIFT = {
+  names: ['銅禮包', '銀禮包', '金禮包', '白金禮包', '鑽石禮包'],
+  gold: [150, 400, 900, 1800, 3500],
+  mats: [3, 5, 7, 9, 12],
+  matWeights: [[80, 20, 0, 0], [45, 40, 15, 0], [20, 40, 32, 8], [5, 30, 45, 20], [0, 15, 45, 40]],
+  shards: [1, 2, 3, 4, 5],
+  shardWeights: [[75, 22, 3, 0], [55, 32, 11, 2], [35, 38, 22, 5], [20, 35, 33, 12], [8, 27, 40, 25]],
+  shardNeed: 3,
+  games: { sudoku: '數獨', crossmath: '數學填字', numberlink: '數字連線', idiom: '成語填字', roll: '滾滾解謎', words: '英文單字連線', codebreaker: '密碼偵探' },
+};
+
+/** 合成材料（依品質，索引與稀有度相同）：分解裝備取得，用來合成裝備。 */
+export const MATERIALS = [
+  { key: 'iron', name: '鐵屑' },
+  { key: 'steel', name: '精鋼' },
+  { key: 'mithril', name: '秘銀' },
+  { key: 'star', name: '星辰結晶' },
+];
+
+/**
+ * 分解與合成：分解得到與裝備同品質的材料（2 ＋ 裝備等級 ÷ 10 ＋ 強化值），bonus 機率多得 1 個高一階的材料；
+ * 合成需要該部位的製作書 1 本、同品質材料 cost 個與金幣（gold ×（品質 ＋ 1）×（1 ＋ 角色等級 ÷ 20）），做出保證該品質的裝備。
+ * 製作書：打怪與寶箱掉落（drop），商店每次刷新陳列 shopBooks 本、售價 bookPrice。
+ */
+export const CRAFT = {
+  bonus: 0.25,
+  cost: 12,
+  gold: 100,
+  bookPrice: 300,
+  shopBooks: 2,
+  drop: { monster: 0.01, elite: 0.1, boss: 0.3, chest: 0.08 },
+  books: ['weapon', 'offhand', 'helmet', 'armor', 'boots', 'accessory'],
+};
 
 /**
  * 裝備欄：欄位代碼、名稱與可放入的裝備部位（兩個飾品欄都放飾品）。
@@ -253,6 +342,7 @@ export const BAG_EXPAND = { step: 5, max: 40, basePrice: 200 };
  */
 export const EQUIP_SLOTS = [
   { key: 'weapon', name: '武器', slot: 'weapon' },
+  { key: 'offhand', name: '副手', slot: 'offhand' },
   { key: 'helmet', name: '頭盔', slot: 'helmet' },
   { key: 'armor', name: '鎧甲', slot: 'armor' },
   { key: 'boots', name: '鞋子', slot: 'boots' },
@@ -261,4 +351,4 @@ export const EQUIP_SLOTS = [
 ];
 
 /** 裝備部位與名稱。 */
-export const ITEM_SLOTS = { weapon: '武器', helmet: '頭盔', armor: '鎧甲', boots: '鞋子', accessory: '飾品' };
+export const ITEM_SLOTS = { weapon: '武器', offhand: '副手', helmet: '頭盔', armor: '鎧甲', boots: '鞋子', accessory: '飾品' };

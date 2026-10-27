@@ -1,8 +1,8 @@
 // 本機儲存：角色、探險與設定存在 IndexedDB（資料庫 pocketdungeon）；大廳讀取用的摘要與統計存在 localStorage。
 // IndexedDB 無法使用時改存記憶體（關閉後遺失）。所有讀寫都容錯，任何儲存錯誤不讓遊戲停止。
 
-import { AREAS, AREA_KEYS, CLASS_KEYS, CLASSES, SHARED_SLOTS, STATUS } from './pd/data.js';
-import { newSkills, SKILLS, SKILL_SLOTS } from './pd/skills.js';
+import { AREAS, AREA_KEYS, CLASS_KEYS, CLASSES, SHARED_SLOTS, STATUS, MATERIALS, CRAFT, LIMITS, GIFT } from './pd/data.js';
+import { newSkills, SKILLS, SKILL_SLOTS, bookSkillIds } from './pd/skills.js';
 import { levelCap, parseGem, socketCount } from './pd/rules.js';
 
 /** IndexedDB 資料庫名稱。 */
@@ -128,10 +128,20 @@ function writeMany(ops) {
  * @returns {boolean} 合法時為 true。
  */
 function isValidItem(it) {
-  return !!it && typeof it.id === 'string' && ['weapon', 'helmet', 'armor', 'boots', 'accessory'].includes(it.slot) && Number.isInteger(it.rarity) && it.rarity >= 0 && it.rarity <= 3
+  return !!it && typeof it.id === 'string' && ['weapon', 'offhand', 'helmet', 'armor', 'boots', 'accessory'].includes(it.slot) && Number.isInteger(it.rarity) && it.rarity >= 0 && it.rarity <= 3
     && Number.isInteger(it.enhance) && it.enhance >= 0 && it.enhance <= 10 && it.stats && typeof it.stats === 'object' && typeof it.name === 'string'
     && (it.gems === undefined || (Array.isArray(it.gems) && it.gems.length <= socketCount(it) && it.gems.every((k) => parseGem(k))))
     && (it.status === undefined || (Array.isArray(it.status) && STATUS[it.status[0]] && Number.isFinite(it.status[1])));
+}
+
+/**
+ * 判斷是否為合法的堆疊道具資料（材料或製作書）：鍵必須是已知種類，數量為 0～9999 的整數。
+ * @param {any} obj 資料。
+ * @param {string[]} keys 允許的種類。
+ * @returns {boolean} 合法時為 true。
+ */
+function isStackMap(obj, keys) {
+  return !!obj && typeof obj === 'object' && Object.entries(obj).every(([k, v]) => keys.includes(k) && Number.isInteger(v) && v >= 0 && v <= LIMITS.stack);
 }
 
 /**
@@ -145,9 +155,13 @@ export function isValidCharacter(ch) {
     && n(ch.xp) && n(ch.gold) && Array.isArray(ch.bag) && ch.bag.every(isValidItem) && ch.equipped && typeof ch.equipped === 'object'
     && Object.values(ch.equipped).every((it) => it === null || isValidItem(it)) && ch.unlocked && typeof ch.unlocked === 'object' && AREA_KEYS.some((k) => Number.isInteger(ch.unlocked[k]))
     && n(ch.potions) && n(ch.scroll) && ch.stats && typeof ch.stats === 'object' && (ch.rebirth === undefined || (Number.isInteger(ch.rebirth) && ch.rebirth >= 0 && ch.rebirth <= 3))
-    && ch.skills && typeof ch.skills.lv === 'object' && Array.isArray(ch.skills.slots) && ch.skills.slots.length === SKILL_SLOTS
-    && ch.skills.slots.every((id) => id === null || (SKILLS[id] && SKILLS[id].cls === ch.cls))
-    && (ch.cures === undefined || n(ch.cures)) && (ch.gems === undefined || (typeof ch.gems === 'object' && Object.entries(ch.gems).every(([k, v]) => parseGem(k) && Number.isInteger(v) && v >= 0)));
+    && ch.skills && typeof ch.skills.lv === 'object' && (ch.skills.passive === undefined || typeof ch.skills.passive === 'object') && Array.isArray(ch.skills.slots) && ch.skills.slots.length === SKILL_SLOTS
+    && (ch.skills.learned === undefined || (Array.isArray(ch.skills.learned) && ch.skills.learned.every((id) => SKILLS[id] && SKILLS[id].book)))
+    && ch.skills.slots.every((id) => id === null || (SKILLS[id] && (SKILLS[id].cls === ch.cls || (SKILLS[id].book && (ch.skills.learned || []).includes(id)))))
+    && (ch.skillBooks === undefined || isStackMap(ch.skillBooks, bookSkillIds()))
+    && (ch.gifts === undefined || isStackMap(ch.gifts, ['1', '2', '3', '4', '5'])) && (ch.shards === undefined || isStackMap(ch.shards, bookSkillIds()))
+    && (ch.cures === undefined || n(ch.cures))
+    && (ch.mats === undefined || isStackMap(ch.mats, MATERIALS.map((m) => m.key))) && (ch.books === undefined || isStackMap(ch.books, CRAFT.books)) && (ch.gems === undefined || (typeof ch.gems === 'object' && Object.entries(ch.gems).every(([k, v]) => parseGem(k) && Number.isInteger(v) && v >= 0)));
 }
 
 /**
@@ -172,15 +186,15 @@ function isValidRun(run, characters) {
 export function newCharacter(cls, name) {
   return {
     id: cls, cls, name: [...(name.trim() || CLASSES[cls].name)].slice(0, 8).join(''), level: 1, xp: 0, gold: 50,
-    equipped: { weapon: null, helmet: null, armor: null, boots: null, acc1: null, acc2: null }, bag: [], bagSize: 20, bagExpand: 0, potions: 3, scroll: 1, cures: 1, gems: {},
-    unlocked: { grass: 1 }, clears: {}, evolved: {}, rebirth: 0, shop: null, created: Date.now(), skills: newSkills(cls),
+    equipped: { weapon: null, offhand: null, helmet: null, armor: null, boots: null, acc1: null, acc2: null }, bag: [], bagSize: 20, bagExpand: 0, potions: 3, scroll: 1, cures: 1, gems: {}, mats: {}, books: {}, skillBooks: {}, gifts: {}, shards: {},
+    unlocked: { grass: 1 }, clears: {}, rebirth: 0, shop: null, created: Date.now(), skills: newSkills(cls),
     stats: { playMs: 0, kills: 0, maxHit: 0, legends: 0, deaths: 0, runs: 0 },
   };
 }
 
 /**
  * 讀取全部資料並驗證。
- * @returns {Promise<{characters: Map<string, object>, run: object | null, meta: object, shared: {items: object[], gold: number}, problems: string[]}>} 角色、進行中的探險、設定、共用倉庫與資料損毀說明。
+ * @returns {Promise<{characters: Map<string, object>, run: object | null, meta: object, shared: {items: object[], gold: number}, claimed: string[], problems: string[]}>} 角色、進行中的探險、設定、共用倉庫、已領取的獲得紀錄與資料損毀說明。
  */
 export async function loadAll() {
   const problems = [];
@@ -189,12 +203,24 @@ export async function loadAll() {
   for (const [k, ch] of rawChars) {
     // 加入技能之前建立的角色沒有技能資料，補上預設值（技能點由等級計算，不會損失）。
     if (ch && !ch.skills && CLASS_KEYS.includes(ch.cls)) ch.skills = newSkills(ch.cls);
+    // 副手欄加入之前的角色：補上空的副手欄；被動技能加入之前：補上空的被動技能。
+    if (ch && ch.equipped && typeof ch.equipped === 'object' && !('offhand' in ch.equipped)) ch.equipped.offhand = null;
+    if (ch && ch.skills && typeof ch.skills === 'object' && !ch.skills.passive) ch.skills.passive = {};
     // 技能欄擴充為 4 格之前（2 格）的角色：補上空的技能 3、4。
     if (ch && ch.skills && Array.isArray(ch.skills.slots)) while (ch.skills.slots.length < SKILL_SLOTS) ch.skills.slots.push(null);
     // 寶石與淨化藥水加入之前的角色：補上空的寶石袋與 0 瓶淨化藥水。
     if (ch && typeof ch === 'object') {
       if (!ch.gems || typeof ch.gems !== 'object') ch.gems = {};
       if (!Number.isFinite(ch.cures)) ch.cures = 0;
+      // 分解與合成加入之前的角色：補上空的材料與製作書。
+      if (!ch.mats || typeof ch.mats !== 'object') ch.mats = {};
+      if (!ch.books || typeof ch.books !== 'object') ch.books = {};
+      // 技能書加入之前的角色：補上空的技能書與已學會清單。
+      if (!ch.skillBooks || typeof ch.skillBooks !== 'object') ch.skillBooks = {};
+      if (ch.skills && !Array.isArray(ch.skills.learned)) ch.skills.learned = [];
+      // 獎勵禮包加入之前的角色：補上空的禮包與技能書碎片。
+      if (!ch.gifts || typeof ch.gifts !== 'object') ch.gifts = {};
+      if (!ch.shards || typeof ch.shards !== 'object') ch.shards = {};
     }
     // 區域插入主線前的角色：已解鎖較後面的區域時，前面（含新加入）的區域也一併解鎖深度 1。
     if (ch && ch.unlocked && typeof ch.unlocked === 'object') {
@@ -226,7 +252,9 @@ export async function loadAll() {
     removeKey(KEYS.save);
   }
   if (!run) removeKey(KEYS.save);
-  return { characters, run, meta, shared, problems };
+  const giftMeta = metaMap.get('gifts');
+  const claimed = giftMeta && Array.isArray(giftMeta.claimed) ? giftMeta.claimed.filter((id) => typeof id === 'string') : [];
+  return { characters, run, meta, shared, claimed, problems };
 }
 
 /**
@@ -270,6 +298,64 @@ export function saveShared(ch, shared) {
     { store: 'characters', key: ch.id, value: ch },
     { store: 'meta', key: 'shared', value: shared },
   ]);
+}
+
+/**
+ * 領取獲得紀錄：在同一個交易中儲存角色（放進背包的禮包）與已領取的紀錄（整個帳號共用，不會重複領）。
+ * @param {object} ch 角色。
+ * @param {string[]} claimed 已領取的紀錄代碼。
+ * @returns {Promise<boolean>} 是否成功。
+ */
+export function saveClaimed(ch, claimed) {
+  return writeMany([
+    { store: 'characters', key: ch.id, value: ch },
+    { store: 'meta', key: 'gifts', value: { claimed } },
+  ]);
+}
+
+/** 難度代碼的名稱（獲得紀錄回補用）。 */
+const DIFF_NAME = { easy: '簡單', medium: '中等', hard: '困難', expert: '專家' };
+
+/**
+ * 讀取其他遊戲的獲得紀錄（第一次過關、第一次全對）：
+ * 1. 其他遊戲過關時寫入共用鍵 `games.rewards` 的紀錄；
+ * 2. 回補：從各遊戲的 `<目錄>.stats`（每個難度 completed／noHint）與 `roll.progress`（每關星數）補上更新前就達成的紀錄。
+ * 兩者以相同的 id 合併，同一個 id 只算一次。只讀取，不寫入其他遊戲的鍵。
+ * @returns {{id: string, game: string, type: 'clear' | 'perfect', tier: number, label: string, at: number}[]} 紀錄（新的在前）。
+ */
+export function loadRewards() {
+  const out = new Map();
+  const raw = readJson('games.rewards');
+  for (const r of Array.isArray(raw) ? raw : []) {
+    if (!r || typeof r.id !== 'string' || !GIFT.games[r.game] || !Number.isInteger(r.tier) || r.tier < 1 || r.tier > 5 || typeof r.label !== 'string') continue;
+    out.set(r.id, { id: r.id, game: r.game, type: r.type === 'perfect' ? 'perfect' : 'clear', tier: r.tier, label: r.label, at: Number(r.at) || 0 });
+  }
+  const tiers = { easy: 1, medium: 2, hard: 3, expert: 4 };
+  for (const game of Object.keys(GIFT.games)) {
+    if (game === 'roll') continue;
+    const stats = readJson(`${game}.stats`);
+    if (!stats || typeof stats !== 'object') continue;
+    for (const diff of Object.keys(tiers)) {
+      const s = stats[diff];
+      if (!s) continue;
+      const clear = `${game}:${diff}:clear`;
+      const perfect = `${game}:${diff}:perfect`;
+      if (s.completed > 0 && !out.has(clear)) out.set(clear, { id: clear, game, type: 'clear', tier: tiers[diff], label: `${DIFF_NAME[diff]} 第一次過關`, at: 0 });
+      if (s.noHint > 0 && !out.has(perfect)) out.set(perfect, { id: perfect, game, type: 'perfect', tier: tiers[diff] + 1, label: `${DIFF_NAME[diff]} 第一次全對（沒用提示）`, at: 0 });
+    }
+  }
+  const roll = readJson('roll.progress');
+  if (roll && typeof roll === 'object') {
+    for (const [lv, p] of Object.entries(roll)) {
+      if (!p || !/^\d+-\d+$/.test(lv)) continue;
+      const tier = Math.min(4, Number(lv.split('-')[0]) || 1);
+      const clear = `roll:${lv}:clear`;
+      const star = `roll:${lv}:star3`;
+      if (!out.has(clear)) out.set(clear, { id: clear, game: 'roll', type: 'clear', tier, label: `第 ${lv} 關 第一次過關`, at: 0 });
+      if (p.stars === 3 && !out.has(star)) out.set(star, { id: star, game: 'roll', type: 'perfect', tier: tier + 1, label: `第 ${lv} 關 第一次三顆星`, at: 0 });
+    }
+  }
+  return [...out.values()].sort((a, b) => b.at - a.at || a.id.localeCompare(b.id));
 }
 
 /**

@@ -12,6 +12,30 @@ const KEYS = {
   book: 'idiom.book',
 };
 
+/** 遊戲目錄名稱（獲得紀錄的來源）。 */
+const GAME_DIR = 'idiom';
+
+/** 獲得紀錄的共用鍵（大廳規格允許所有遊戲寫入；口袋地城讀取後發放獎勵禮包）。 */
+const REWARD_KEY = 'games.rewards';
+/** 難度代碼對應的禮包等級與名稱。 */
+const REWARD_TIER = { easy: [1, '簡單'], medium: [2, '中等'], hard: [3, '困難'], expert: [4, '專家'] };
+
+/**
+ * 新增一筆獲得紀錄（同一個 id 只記一次，重複過關不會再記）。
+ * @param {string} id 紀錄代碼（遊戲:項目:種類）。
+ * @param {'clear' | 'perfect'} type 第一次過關或第一次全對。
+ * @param {number} tier 禮包等級（1～5）。
+ * @param {string} label 顯示用的說明。
+ */
+function addReward(id, type, tier, label) {
+  const raw = readJson(REWARD_KEY);
+  const list = Array.isArray(raw) ? raw : [];
+  if (list.some((r) => r && r.id === id)) return;
+  list.push({ id, game: GAME_DIR, type, tier: Math.min(5, tier), label, at: Date.now() });
+  writeJson(REWARD_KEY, list.slice(-1000));
+}
+
+
 const RECENT_LIMIT = 50;
 
 /** localStorage 無法使用時的記憶體備援。 */
@@ -163,12 +187,18 @@ export function recordStart(difficulty) {
 export function recordComplete(difficulty, ms, hintsUsed) {
   const stats = loadStats();
   const s = stats[difficulty];
+  // 獲得紀錄：這個難度第一次過關、第一次沒用提示過關（重複過關不會再記）。
+  const firstClear = s.completed === 0;
+  const firstPerfect = hintsUsed === 0 && s.noHint === 0;
   const newRecord = s.bestMs === null || ms < s.bestMs;
   s.completed++;
   s.totalMs += ms;
   if (newRecord) s.bestMs = ms;
   if (hintsUsed === 0) s.noHint++;
   writeJson(KEYS.stats, stats);
+  const [tier, name] = REWARD_TIER[difficulty] || [1, difficulty];
+  if (firstClear) addReward(`${GAME_DIR}:${difficulty}:clear`, 'clear', tier, `${name} 第一次過關`);
+  if (firstPerfect) addReward(`${GAME_DIR}:${difficulty}:perfect`, 'perfect', tier + 1, `${name} 第一次全對（沒用提示）`);
   return { newRecord };
 }
 
