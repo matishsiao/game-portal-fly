@@ -2,9 +2,12 @@
 // 每個遊戲部署在與本頁同層的獨立目錄（例如 ./sudoku/），各自擁有 Service Worker 與快取。
 // 遊戲與大廳同網域，大廳以唯讀方式讀取各遊戲的 `<遊戲>.save`、`<遊戲>.stats` 顯示進度。
 
-/** 遊戲清單：新增遊戲時加一筆，並把建置結果放到同名目錄。`featured` 的遊戲顯示在最上方「主打遊戲」，不列在下方遊戲列表。 */
+/**
+ * 遊戲清單：新增遊戲時加一筆，並把建置結果放到同名目錄。
+ * `featured` 的遊戲顯示在最上方「主打遊戲」，不列在下方遊戲列表；`record: 'rpg'` 的卡片改顯示角色與冒險紀錄（見 rpgRecordLines）。
+ */
 const GAMES = [
-  { dir: 'pocketdungeon', title: '口袋地城', desc: '像素動作 RPG，闖地城打倒 Boss', tags: [['layers', '多個地城'], ['sword', '多種職業']], featured: true },
+  { dir: 'pocketdungeon', title: '口袋地城', desc: '像素動作 RPG，闖地城打倒 Boss', tags: [['layers', '多個地城'], ['sword', '多種職業']], featured: true, record: 'rpg' },
   { dir: 'sudoku', title: '數獨', desc: '9 × 9 經典數獨，邏輯推理', tags: [['layers', '4 種難度'], ['bulb', '提示・筆記']] },
   { dir: 'crossmath', title: '數學填字', desc: '交叉算式，用數字庫填滿空格', tags: [['layers', '4 種難度'], ['plus', '加減乘除']] },
   { dir: 'numberlink', title: '數字連線', desc: '連起相同數字，線不交叉並填滿棋盤', tags: [['layers', '4 種難度'], ['link', '4×4～10×10']] },
@@ -110,6 +113,44 @@ function readProgress(game) {
 }
 
 /**
+ * 跳脫 HTML 特殊字元（玩家自訂的角色名稱等）。
+ * @param {string} text 文字。
+ * @returns {string} 可安全放進 HTML 的文字。
+ */
+function esc(text) {
+  return String(text).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+}
+
+/**
+ * RPG 遊戲卡片的紀錄：冒險中時顯示角色、等級與所在樓層（按鈕顯示「繼續」），否則顯示擊敗 Boss、擊倒怪物與最深樓層。
+ * 只讀取遊戲寫給大廳的 localStorage 摘要（`<dir>.save` 與 `<dir>.areaStats`），不讀遊戲內部的資料庫。
+ * @param {{dir: string}} game 遊戲。
+ * @returns {string[]} 兩行紀錄的 HTML。
+ */
+function rpgRecordLines(game) {
+  const save = readJson(`${game.dir}.save`);
+  const stats = readJson(`${game.dir}.areaStats`);
+  let bosses = 0;
+  let kills = 0;
+  let depth = 0;
+  let started = 0;
+  for (const s of Object.values(stats && typeof stats === 'object' ? stats : {})) {
+    if (!s || typeof s !== 'object') continue;
+    if (Number.isFinite(s.completed)) bosses += s.completed;
+    if (Number.isFinite(s.kills)) kills += s.kills;
+    if (Number.isFinite(s.started)) started += s.started;
+    if (Number.isFinite(s.bestDepth)) depth = Math.max(depth, s.bestDepth);
+  }
+  const summary = `${icon('trophy')} 擊敗 Boss ${bosses} 次・擊倒 ${kills} 隻`;
+  if (save && !save.completed && typeof save.name === 'string' && Number.isInteger(save.level)) {
+    const floor = Number.isInteger(save.depth) ? `・第 ${save.depth} 層` : '';
+    return [`<span>${icon('sword')} ${esc(save.name)} Lv.${save.level}${floor}</span>`, `<span>${summary}</span>`];
+  }
+  if (!started) return [`<span>${icon('sword')} 建立角色，展開第一次冒險</span>`, `<span>${icon('star')} 深入地城，打倒 Boss 吧</span>`];
+  return [`<span>${summary}</span>`, `<span>${icon('layers')} 最深到達第 ${depth} 層</span>`];
+}
+
+/**
  * 取得遊戲目錄的完整網址（即該遊戲 Service Worker 的 scope）。
  * @param {{dir: string}} game 遊戲。
  * @returns {string} 以 / 結尾的網址。
@@ -197,9 +238,13 @@ function renderProgress() {
     const card = document.querySelector(`.game-card[data-theme="${game.dir}"]`);
     const record = card.querySelector('.game-record');
     const lines = [];
-    lines.push(`<span>${icon('trophy')} 已完成 ${p.completed} 局</span>`);
-    if (p.best) lines.push(`<span>${icon('star')} ${DIFFICULTY_LABEL[p.best.difficulty]}最佳 ${formatTime(p.best.ms)}</span>`);
-    else lines.push(`<span>${icon('star')} 挑戰第一個紀錄吧</span>`);
+    if (game.record === 'rpg') {
+      lines.push(...rpgRecordLines(game));
+    } else {
+      lines.push(`<span>${icon('trophy')} 已完成 ${p.completed} 局</span>`);
+      if (p.best) lines.push(`<span>${icon('star')} ${DIFFICULTY_LABEL[p.best.difficulty]}最佳 ${formatTime(p.best.ms)}</span>`);
+      else lines.push(`<span>${icon('star')} 挑戰第一個紀錄吧</span>`);
+    }
     record.innerHTML = lines.join('');
     card.querySelector('.play-btn').innerHTML = `${icon('play')}${p.unfinished ? '繼續' : '開始'}`;
 
@@ -480,6 +525,45 @@ async function renderPortalVersion(reg, activeLabel) {
   document.getElementById('version-line').textContent = text;
 }
 
+/** 大廳的 Service Worker 註冊資訊；註冊成功後才有值。 */
+let portalReg = null;
+let lastPortalCheck = 0;
+/** 玩家是否已在大廳點按過；點按過就不自動重新載入，改顯示更新列，避免打斷操作。 */
+let touched = false;
+/** 載入這個頁面的大廳版本（由當時的控制者回報）；用來排除版本沒變的 controllerchange。 */
+let loadVersion = Promise.resolve(null);
+
+/**
+ * 檢查大廳是否有新版本（最多每分鐘一次）。iOS 從主畫面開啟的 App 常是從背景恢復、不會重新載入，
+ * 所以除了開啟時，每次切回前景與恢復連線時也要檢查，否則要關掉 App 兩次才會看到新版。
+ */
+async function checkPortalUpdate() {
+  if (!portalReg || !navigator.onLine || Date.now() - lastPortalCheck < 60 * 1000) return;
+  lastPortalCheck = Date.now();
+  try {
+    await portalReg.update();
+  } catch {
+    // 忽略：網路不穩時下次再檢查。
+  }
+}
+
+/**
+ * 大廳的新版本已啟用（新版 Service Worker 接管這個頁面）：大廳本身沒有進行中的狀態，
+ * 玩家還沒操作或頁面在背景時直接重新載入；正在操作時顯示更新列，由玩家點按套用。
+ * 剛重新載入時瀏覽器偶爾會再觸發一次版本相同的 controllerchange，版本沒變就忽略，避免多餘的重新載入。
+ */
+async function onPortalUpdated() {
+  const controller = navigator.serviceWorker.controller;
+  if (!controller) return;
+  const [before, now] = await Promise.all([loadVersion, checkCache(controller).then((r) => r.version)]);
+  if (!now || now === before) return;
+  if (!touched || document.visibilityState === 'hidden') {
+    location.reload();
+    return;
+  }
+  document.getElementById('portal-update').hidden = false;
+}
+
 /**
  * 註冊大廳的 Service Worker（只快取大廳本身），並更新狀態。
  */
@@ -495,6 +579,13 @@ async function setupPortalWorker() {
     setPortalStatus('開發模式：大廳未啟用離線快取');
     return;
   }
+  portalReg = reg;
+  // 先前已有舊版控制這個頁面時，新版啟用會觸發 controllerchange；第一次安裝不會觸發。
+  const controller = navigator.serviceWorker.controller;
+  if (controller) {
+    loadVersion = checkCache(controller).then((r) => r.version || null);
+    navigator.serviceWorker.addEventListener('controllerchange', onPortalUpdated);
+  }
   if (await waitForActive(reg)) {
     const result = await checkCache(reg.active);
     setPortalStatus(result.ok ? '大廳已可離線開啟' : '大廳離線資源下載中…');
@@ -502,7 +593,7 @@ async function setupPortalWorker() {
   } else {
     setPortalStatus('大廳離線資源下載失敗，請連網後重新開啟');
   }
-  reg.update().catch(() => {});
+  checkPortalUpdate();
 }
 
 // ---------- 啟動 ----------
@@ -578,6 +669,7 @@ function refreshView() {
   renderGreeting();
   renderProgress();
   refreshAll();
+  checkPortalUpdate();
   checkGameUpdates();
 }
 
@@ -597,8 +689,16 @@ function init() {
     );
   }
   document.getElementById('download-btn').addEventListener('click', downloadAll);
+  /** 記錄玩家已操作過大廳。 */
+  const markTouched = () => {
+    touched = true;
+  };
+  document.addEventListener('pointerdown', markTouched, { capture: true, once: true });
+  document.addEventListener('keydown', markTouched, { capture: true, once: true });
+  document.getElementById('portal-update').addEventListener('click', () => location.reload());
   window.addEventListener('online', () => {
     refreshAll();
+    checkPortalUpdate();
     autoDownload();
     checkGameUpdates(true);
   });

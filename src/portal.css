@@ -768,3 +768,27 @@ summary:focus-visible {
   text-align: center;
   font-variant-numeric: tabular-nums;
 }
+
+/* 大廳新版本已就緒的更新列：固定在畫面下方，點按後重新載入。 */
+.portal-update {
+  position: fixed;
+  left: 50%;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 50;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100% - 32px);
+  min-height: 48px;
+  padding: 0 20px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 800;
+  box-shadow: var(--shadow-lg);
+}
+
+.portal-update[hidden] {
+  display: none;
+}
