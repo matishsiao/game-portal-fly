@@ -67,6 +67,7 @@
       <button type="button" role="tab" data-tab="gate">地城</button>
       <button type="button" role="tab" data-tab="shop">商店</button>
       <button type="button" role="tab" data-tab="smith">鐵匠</button>
+      <button type="button" role="tab" data-tab="gem">寶石</button>
       <button type="button" role="tab" data-tab="bag">倉庫</button>
       <button type="button" role="tab" data-tab="skill">技能</button>
       <button type="button" role="tab" data-tab="hero">角色</button>
@@ -86,12 +87,19 @@
             <div class="bar hp-bar" aria-label="HP"><span id="hp-trail" class="trail"></span><span id="hp-fill" class="fill"></span><b id="hp-text"></b></div>
             <div class="bar xp-bar" aria-label="經驗值"><span id="xp-fill" class="fill"></span></div>
             <div class="hud-line"><span id="hud-floor" class="pill"></span><span class="pill coin-pill"><i class="coin" aria-hidden="true"></i><b id="hud-gold"></b></span><span id="timer" class="pill">00:00</span></div>
+            <div id="hud-status" class="hud-status" aria-live="polite"></div>
           </div>
         </div>
         <div class="hud-right">
           <button type="button" id="pause-btn" class="glass-btn" aria-label="暫停"><span data-icon="pause"></span></button>
           <div id="minimap-frame" class="minimap-frame"><canvas id="minimap" class="minimap" aria-label="小地圖"></canvas></div>
           <button type="button" id="recall-btn" class="glass-pill" aria-label="使用回城卷軸"><span class="pill-ico" data-icon="scroll"></span>回城卷軸<b id="recall-count">0</b></button>
+          <div id="item-grid" class="item-grid">
+            <button type="button" id="potion-btn" class="item-btn potion-btn" aria-label="回復藥水"><span class="ico" data-icon="potion"></span><b id="potion-count" class="count">0</b><i id="potion-cd" class="cd"></i><kbd>L</kbd></button>
+            <button type="button" id="cure-btn" class="item-btn cure-btn" aria-label="淨化藥水"><span class="ico" data-icon="cure"></span><b id="cure-count" class="count">0</b><i id="cure-cd" class="cd"></i><kbd>H</kbd></button>
+            <button type="button" id="gem1-btn" class="item-btn gem-btn" hidden><span id="gem1-icon" class="ico"></span><i id="gem1-cd" class="cd"></i><b id="gem1-dur" class="gem-dur"></b><kbd>1</kbd></button>
+            <button type="button" id="gem2-btn" class="item-btn gem-btn" hidden><span id="gem2-icon" class="ico"></span><i id="gem2-cd" class="cd"></i><b id="gem2-dur" class="gem-dur"></b><kbd>2</kbd></button>
+          </div>
         </div>
       </div>
       <div id="boss-bar" class="boss-bar" hidden>
@@ -107,7 +115,8 @@
         <div class="buttons">
           <button type="button" id="skill1-btn" class="act-btn skill-btn" aria-label="技能 1"><span id="skill1-icon" class="ico"></span><i id="skill1-cd" class="cd"></i><em id="skill1-name" class="btn-label"></em><kbd>U</kbd></button>
           <button type="button" id="skill2-btn" class="act-btn skill-btn" aria-label="技能 2"><span id="skill2-icon" class="ico"></span><i id="skill2-cd" class="cd"></i><em id="skill2-name" class="btn-label"></em><kbd>I</kbd></button>
-          <button type="button" id="potion-btn" class="act-btn potion-btn" aria-label="藥水"><span class="ico" data-icon="potion"></span><b id="potion-count" class="count">0</b><i id="potion-cd" class="cd"></i><em class="btn-label">藥水</em><kbd>L</kbd></button>
+          <button type="button" id="skill3-btn" class="act-btn skill-btn" aria-label="技能 3" hidden><span id="skill3-icon" class="ico"></span><i id="skill3-cd" class="cd"></i><em id="skill3-name" class="btn-label"></em><kbd>O</kbd></button>
+          <button type="button" id="skill4-btn" class="act-btn skill-btn" aria-label="技能 4" hidden><span id="skill4-icon" class="ico"></span><i id="skill4-cd" class="cd"></i><em id="skill4-name" class="btn-label"></em><kbd>Y</kbd></button>
           <button type="button" id="dodge-btn" class="act-btn dodge-btn" aria-label="閃避"><span class="ico" data-icon="dodge"></span><i id="dodge-cd" class="cd"></i><em class="btn-label">閃避</em><kbd>K</kbd></button>
           <button type="button" id="attack-btn" class="act-btn attack-btn" aria-label="攻擊（按住連續攻擊）"><span class="ico" data-icon="attack"></span><em class="btn-label">攻擊</em><kbd>J</kbd></button>
         </div>

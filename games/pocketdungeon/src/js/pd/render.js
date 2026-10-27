@@ -1,7 +1,7 @@
 // 畫面繪製：把 World 的狀態畫到 canvas。內部單位為像素（1 格 = 16 像素），以整數倍放大、不平滑。
 // 只讀取 World 的狀態，不修改遊戲邏輯。
 
-import { AREAS, RARITIES } from './data.js';
+import { AREAS, RARITIES, STATUS } from './data.js';
 import { WALL, STAIRS, SPIKES, walkable } from './dungeon.js';
 import { heroArt, monsterArt, itemArt } from './sprites.js';
 
@@ -375,6 +375,25 @@ export class Renderer {
     g.lineWidth = 1;
     g.setLineDash([3, 2]);
     for (const st of world.strikes) {
+      if (st.trap > 0) {
+        // 捕獸夾：地上的鐵夾與淡淡的觸發範圍。
+        const x = Math.round(st.x * T);
+        const y = Math.round(st.y * T);
+        g.setLineDash([]);
+        g.strokeStyle = 'rgba(232,184,74,0.35)';
+        g.beginPath();
+        g.arc(x, y, st.r * 0.5 * T, 0, Math.PI * 2);
+        g.stroke();
+        g.fillStyle = '#1a1020';
+        g.fillRect(x - 5, y - 1, 11, 3);
+        g.fillStyle = '#9aa3b5';
+        for (let k = -4; k <= 4; k += 2) g.fillRect(x + k, y - 2 - (k % 4 === 0 ? 1 : 0), 1, 2);
+        g.fillRect(x - 4, y, 9, 1);
+        g.setLineDash([3, 2]);
+        g.strokeStyle = 'rgba(232,184,74,0.95)';
+        continue;
+      }
+      if (st.shape === 'arc') continue;
       if (st.shape === 'line') {
         this.linePath(st);
         g.fill();
@@ -421,7 +440,7 @@ export class Renderer {
     }
     for (const it of world.pickups) {
       const bob = Math.round(Math.sin(world.time * 5 + it.x) * 1);
-      const name = { gold: 'coin', potion: 'potion', bagExpand: 'pouch' }[it.kind] || 'bag';
+      const name = it.kind === 'gem' ? `gem-${it.gem.split('-')[0]}` : { gold: 'coin', potion: 'potion', bagExpand: 'pouch' }[it.kind] || 'bag';
       const img = itemArt(name);
       const x = Math.round(it.x * T - img.width / 2);
       const y = Math.round(it.y * T - img.height / 2) + bob;
@@ -431,6 +450,14 @@ export class Renderer {
         g.globalAlpha = 0.35;
         g.fillRect(x + 1, y - 8, img.width - 2, 8);
         g.globalAlpha = 1;
+      } else if (it.kind === 'gem') {
+        // 寶石：一閃一閃的白色十字光。
+        const tw = Math.floor(world.time * 4 + it.x * 3) % 4 === 0;
+        if (tw) {
+          g.fillStyle = '#ffffff';
+          g.fillRect(x + img.width - 2, y - 3, 1, 5);
+          g.fillRect(x + img.width - 4, y - 1, 5, 1);
+        }
       }
       g.drawImage(img, x, y);
     }
@@ -521,6 +548,8 @@ export class Renderer {
         if (!blink || p.dodgeT > 0) this.sprite(img, px / T, py / T, flip, 1, bob, sy);
         g.globalAlpha = 1;
         if (p.attackAnim > 0 && pose !== 'up') this.weapon(world, px + hand.x, py + hand.y);
+        this.drawPlayerAuras(world);
+        this.statusMarks(world, p.x * T, Math.round(p.y * T) - 24, p.status);
         continue;
       }
       const m = e.m;
@@ -598,6 +627,7 @@ export class Renderer {
       g.filter = 'none';
       g.shadowBlur = 0;
       const top = Math.round(m.y * T - (img.height * scale) / 2 - 10 - m.r * T * 0.3);
+      if (m.status) this.statusMarks(world, m.x * T, top - 4, m.status);
       if (m.stun > 0) {
         // 暈眩：頭上旋轉的星星。
         g.fillStyle = '#ffe14d';
@@ -619,6 +649,87 @@ export class Renderer {
         g.fillRect(x - 1, y - 1, w + 2, 4);
         g.fillStyle = m.elite ? '#e8b84a' : '#e04a5a';
         g.fillRect(x, y, Math.max(0, Math.round((w * m.hp) / m.maxHp)), 2);
+      }
+    }
+  }
+
+  /**
+   * 畫玩家身上的效果：血量護盾（藍白色泡泡與剩餘量）、抗異常護盾（紫色光環）、鐵壁、嗜血與疾風步。
+   * @param {object} world 探險。
+   */
+  drawPlayerAuras(world) {
+    const g = this.ctx;
+    const p = world.player;
+    const x = p.x * T;
+    const y = p.y * T - 6;
+    const t = world.time;
+    if (p.shield > 0) {
+      g.fillStyle = `rgba(200,230,255,${0.16 + 0.06 * Math.sin(t * 6)})`;
+      g.strokeStyle = 'rgba(232,244,255,0.85)';
+      g.lineWidth = 1;
+      g.beginPath();
+      g.arc(x, y, 11, 0, Math.PI * 2);
+      g.fill();
+      g.stroke();
+    }
+    if (p.wardT > 0) {
+      g.strokeStyle = `rgba(200,168,255,${0.55 + 0.3 * Math.sin(t * 5)})`;
+      g.lineWidth = 1;
+      g.setLineDash([2, 2]);
+      g.lineDashOffset = -t * 12;
+      g.beginPath();
+      g.arc(x, y, 13, 0, Math.PI * 2);
+      g.stroke();
+      g.setLineDash([]);
+      g.lineDashOffset = 0;
+    }
+    if (p.guardT > 0) {
+      g.strokeStyle = 'rgba(180,190,210,0.8)';
+      g.lineWidth = 2;
+      g.beginPath();
+      g.arc(x, y, 9, Math.PI * 0.9, Math.PI * 2.1);
+      g.stroke();
+    }
+    if (p.leechT > 0 || p.hasteT > 0) {
+      g.fillStyle = p.leechT > 0 ? '#ff5a6a' : '#c8f0ff';
+      for (let n = 0; n < 3; n++) {
+        const ph = (t * 1.5 + n / 3) % 1;
+        g.fillRect(Math.round(x + Math.cos(n * 2.1 + t) * 7), Math.round(y + 8 - ph * 18), 1, 2);
+      }
+    }
+  }
+
+  /**
+   * 頭上的異常狀態記號：中毒（上升的綠色泡泡）、睡眠（飄動的 z）、暈眩（旋轉的星星）。
+   * @param {object} world 探險。
+   * @param {number} cx 中心 x（像素）。
+   * @param {number} top 記號的高度（像素）。
+   * @param {{poison?: number, sleep?: number, stun?: number}} st 狀態。
+   */
+  statusMarks(world, cx, top, st) {
+    const g = this.ctx;
+    const t = world.time;
+    if (st.poison > 0) {
+      g.fillStyle = STATUS.poison.color;
+      for (let n = 0; n < 3; n++) {
+        const ph = (t * 1.2 + n / 3) % 1;
+        g.fillRect(Math.round(cx - 4 + n * 4), Math.round(top + 6 - ph * 8), 2, 2);
+      }
+    }
+    if (st.sleep > 0) {
+      g.font = 'bold 6px system-ui, sans-serif';
+      g.textAlign = 'center';
+      for (let n = 0; n < 2; n++) {
+        const ph = (t * 0.8 + n / 2) % 1;
+        g.fillStyle = `rgba(154,184,255,${1 - ph})`;
+        g.fillText('z', Math.round(cx + 3 + ph * 5), Math.round(top - ph * 7));
+      }
+    }
+    if (st.stun > 0) {
+      g.fillStyle = STATUS.stun.color;
+      for (let k = 0; k < 3; k++) {
+        const a = t * 6 + (k * Math.PI * 2) / 3;
+        g.fillRect(Math.round(cx + Math.cos(a) * 5) - 1, top + 2 + Math.round(Math.sin(a) * 2) - 1, 2, 2);
       }
     }
   }
@@ -750,7 +861,9 @@ export class Renderer {
         g.save();
         g.translate(x, y);
         g.rotate(a);
-        g.strokeStyle = mine ? 'rgba(255,240,200,0.35)' : 'rgba(255,120,120,0.35)';
+        // 毒箭是綠色、催眠箭是粉紫色的殘影與箭頭。
+        const tint = { venom: ['rgba(140,220,90,0.6)', '#9ae05a'], lullaby: ['rgba(230,170,255,0.6)', '#f0c8ff'] }[pr.look];
+        g.strokeStyle = tint ? tint[0] : mine ? 'rgba(255,240,200,0.35)' : 'rgba(255,120,120,0.35)';
         g.lineWidth = 1;
         g.beginPath();
         g.moveTo(-16, 0);
@@ -760,7 +873,7 @@ export class Renderer {
         g.fillRect(-7, -1, 11, 2);
         g.fillStyle = mine ? '#c89a5a' : '#8a6a5a';
         g.fillRect(-6, -0.5, 8, 1);
-        g.fillStyle = mine ? '#e8eef5' : '#ff8a8a';
+        g.fillStyle = tint ? tint[1] : mine ? '#e8eef5' : '#ff8a8a';
         g.beginPath();
         g.moveTo(5, 0);
         g.lineTo(1, -2);
@@ -773,7 +886,7 @@ export class Renderer {
         g.restore();
         continue;
       }
-      const colors = { orb: ['200,168,255', '#c8a8ff'], fire: ['255,120,40', '#ff8a3a'], ice: ['122,200,255', '#9ad8ff'], seed: ['140,200,90', '#8ac85a'], feather: ['240,240,250', '#e8e8f4'], curse: ['160,90,210', '#a05ad2'] }[pr.kind] || ['255,255,255', '#fff'];
+      const colors = { orb: ['200,168,255', '#c8a8ff'], fire: ['255,120,40', '#ff8a3a'], ice: ['122,200,255', '#9ad8ff'], seed: ['140,200,90', '#8ac85a'], feather: ['240,240,250', '#e8e8f4'], curse: ['160,90,210', '#a05ad2'] }[pr.look === 'fireball' ? 'fire' : pr.kind] || ['255,255,255', '#fff'];
       const r = pr.r * T;
       // 拖尾：沿飛行反方向的幾個淡色圓點。
       const sp = Math.hypot(pr.vx, pr.vy) || 1;
@@ -876,7 +989,10 @@ export class Renderer {
         g.arc(x, y, r * (0.4 + 0.7 * k), 0, Math.PI * 2);
         g.stroke();
       } else if (e.kind === 'blast') {
-        const looks = { nova: '150,210,255', spin: '255,255,255', slam: '210,170,110', rain: '240,224,176', beam: '255,240,170', meteor: '255,150,60' };
+        const looks = {
+          nova: '150,210,255', spin: '255,255,255', slam: '210,170,110', rain: '240,224,176', beam: '255,240,170', meteor: '255,150,60',
+          trap: '232,184,74', starfall: '255,230,140', hypnosis: '220,150,255', miasma: '120,200,80', thunder: '210,235,255', freeze: '170,200,255',
+        };
         g.fillStyle = e.friendly ? `rgba(${looks[e.look] || '200,168,255'},${0.6 * (1 - k)})` : `rgba(255,140,60,${0.55 * (1 - k)})`;
         if (e.shape === 'ring') {
           g.beginPath();

@@ -544,7 +544,25 @@ export const ITEM_ART = {
   key: { palette: { o: O, Y: '#e8b84a' }, rows: ['.ooo......', 'oYYYo.....', 'oYoYoooooo', 'oYYYYYYYYo', '.ooo.oYoYo', '.....o.o.o'] },
   shield: { palette: { o: O, S: '#9aa3b5', R: '#9e2a3a', Y: '#e8b84a' }, rows: ['oooooooo', 'oSSSSSSo', 'oSRRRRSo', 'oSRYYRSo', 'oSRRRRSo', '.oSRRSo.', '..oSSo..', '...oo...'] },
   sword: { palette: { o: O, S: '#f0f0f0', D: '#9aa3b5', G: '#e8b84a', B: '#6b4226' }, rows: ['......oo', '.....oSo', '....oSDo', '.o.oSDo.', '.oGSDo..', '..oGo...', '.oBoGo..', 'oBo.oo..'] },
+  cure: { palette: { o: O, C: '#c8b8a0', B: '#5ab8e8', b: '#c8f0ff' }, rows: ['..oo..', '..CC..', '.oBBo.', 'oBbBBo', 'oBBBBo', '.oooo.'] },
+  ...gemArt(),
 };
+
+/**
+ * 寶石圖（每種寶石一張，以 gem-種類 命名）：切面的菱形寶石，顏色依種類。
+ * @returns {Record<string, {palette: Record<string, string>, rows: string[]}>} 寶石圖。
+ */
+function gemArt() {
+  const colors = {
+    atk: ['#e04a5a', '#ff9aa8', '#8a1a2a'], hp: ['#3fae58', '#9af0aa', '#1a5a2a'], def: ['#3a7ae0', '#a8d0ff', '#1a3a7a'],
+    spd: ['#e8c030', '#fff0a0', '#8a6a10'], leech: ['#a8243a', '#ff6a80', '#4a0a18'], shield: ['#c8d8f0', '#ffffff', '#6a7a9a'], ward: ['#a888e8', '#e8d8ff', '#4a2a8a'],
+  };
+  const out = {};
+  for (const [kind, [m, l, d]] of Object.entries(colors)) {
+    out[`gem-${kind}`] = { palette: { o: O, M: m, L: l, D: d }, rows: ['..oooo..', '.oLLMMo.', 'oLLMMMDo', 'oMMMMDDo', '.oMMDDo.', '..oMDo..', '...oo...'] };
+  }
+  return out;
+}
 
 /**
  * 取得道具圖。

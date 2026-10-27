@@ -1,6 +1,6 @@
 // 成長與裝備規則（純邏輯）：亂數、經驗曲線、角色屬性、傷害公式、怪物強度、裝備產生與強化、獎勵。
 
-import { CLASSES, MAX_LEVEL, MAX_DUNGEON_LEVEL, AREAS, MONSTERS, BOSSES, RARITIES, ACCESSORY_STATS, ITEM_NAMES, ENHANCE, EVOLVE, REBIRTH } from './data.js';
+import { CLASSES, MAX_LEVEL, MAX_DUNGEON_LEVEL, AREAS, MONSTERS, BOSSES, RARITIES, ACCESSORY_STATS, ITEM_NAMES, ENHANCE, EVOLVE, REBIRTH, STATUS, GEMS, GEM_RULES } from './data.js';
 
 /**
  * 建立可重現的亂數產生器（mulberry32）。
@@ -89,7 +89,7 @@ export function rebirthBase(cls, rebirth = 0) {
  * @param {number} level 等級。
  * @param {object[]} [equipped=[]] 穿戴中的裝備。
  * @param {number} [rebirth=0] 轉職次數（決定起始屬性）。
- * @returns {{hp: number, atk: number, def: number, spd: number, goldPct: number, xpPct: number}} 屬性（四捨五入到整數）。
+ * @returns {{hp: number, atk: number, def: number, spd: number, goldPct: number, xpPct: number, leech: number, actives: string[]}} 屬性（四捨五入到整數）、吸血（%）與主動寶石。
  */
 export function characterStats(cls, level, equipped = [], rebirth = 0) {
   const c = CLASSES[cls];
@@ -109,14 +109,115 @@ export function characterStats(cls, level, equipped = [], rebirth = 0) {
     spd += s.spd || 0;
     for (const k of Object.keys(pct)) pct[k] += s[k] || 0;
   }
+  const gem = gemBonus(equipped);
   return {
-    hp: Math.round(hp * (1 + pct.hpPct / 100)),
-    atk: Math.round(atk * (1 + pct.atkPct / 100)),
-    def: Math.round(def * (1 + pct.defPct / 100)),
-    spd: Math.round(spd),
+    hp: Math.round(hp * (1 + (pct.hpPct + gem.hp) / 100)),
+    atk: Math.round(atk * (1 + (pct.atkPct + gem.atk) / 100)),
+    def: Math.round(def * (1 + (pct.defPct + gem.def) / 100)),
+    spd: Math.round(spd * (1 + gem.spd / 100)),
     goldPct: pct.goldPct,
     xpPct: pct.xpPct,
+    leech: Math.min(GEM_RULES.leechCap, gem.leech),
+    actives: gem.actives,
   };
+}
+
+/**
+ * 寶石代碼的組成：種類與等級，例如「atk-2」為普通的紅寶石。
+ * @param {string} key 寶石代碼。
+ * @returns {{kind: string, tier: number} | null} 種類與等級；格式不合時為 null。
+ */
+export function parseGem(key) {
+  const m = /^([a-z]+)-([1-5])$/.exec(String(key));
+  if (!m || !GEMS[m[1]]) return null;
+  const tier = Number(m[2]);
+  if (GEMS[m[1]].active && tier !== 1) return null;
+  return { kind: m[1], tier };
+}
+
+/**
+ * 寶石的顯示名稱，例如「無瑕的紅寶石」；主動寶石沒有等級。
+ * @param {string} key 寶石代碼。
+ * @returns {string} 名稱。
+ */
+export function gemName(key) {
+  const g = parseGem(key);
+  if (!g) return '未知的寶石';
+  return GEMS[g.kind].active ? GEMS[g.kind].name : `${GEM_RULES.tiers[g.tier - 1]}的${GEMS[g.kind].name}`;
+}
+
+/**
+ * 寶石效果的說明，例如「攻擊 +10%」或「血量護盾（按鈕使用）」。
+ * @param {string} key 寶石代碼。
+ * @returns {string} 說明。
+ */
+export function gemEffect(key) {
+  const g = parseGem(key);
+  if (!g) return '';
+  const d = GEMS[g.kind];
+  if (g.kind === 'shield') return `${d.label}：護盾量為最大 HP 的 ${Math.round(d.pct * 100)}%，持續 ${d.dur} 秒，冷卻 ${d.cd} 秒`;
+  if (g.kind === 'ward') return `${d.label}：${d.dur} 秒內不受異常狀態影響，冷卻 ${d.cd} 秒`;
+  return `${d.stat} +${d.values[g.tier - 1]}%${g.kind === 'leech' ? '（造成傷害的比例回復 HP）' : ''}`;
+}
+
+/**
+ * 裝備的孔數：普通與精良 1 孔，稀有與傳說 2 孔。
+ * @param {object} item 裝備。
+ * @returns {number} 孔數。
+ */
+export function socketCount(item) {
+  return item.rarity >= 2 ? 2 : 1;
+}
+
+/**
+ * 穿戴中裝備的寶石加成：持續型寶石的百分比加總，以及主動寶石的種類（同種只算一個，最多 2 個）。
+ * @param {object[]} equipped 穿戴中的裝備。
+ * @returns {{atk: number, hp: number, def: number, spd: number, leech: number, actives: string[]}} 加成（%）與主動寶石。
+ */
+export function gemBonus(equipped) {
+  const out = { atk: 0, hp: 0, def: 0, spd: 0, leech: 0, actives: [] };
+  for (const item of equipped) {
+    if (!item || !Array.isArray(item.gems)) continue;
+    for (const key of item.gems) {
+      const g = parseGem(key);
+      if (!g) continue;
+      if (GEMS[g.kind].active) {
+        if (!out.actives.includes(g.kind) && out.actives.length < GEM_RULES.actives) out.actives.push(g.kind);
+      } else out[g.kind] += GEMS[g.kind].values[g.tier - 1];
+    }
+  }
+  // 按鈕順序固定：血量護盾在前。
+  out.actives.sort((a, b) => Object.keys(GEMS).indexOf(a) - Object.keys(GEMS).indexOf(b));
+  return out;
+}
+
+/**
+ * 隨機決定掉落的寶石：主動寶石 6%；持續型寶石的等級依地城等級，愈深愈容易出現 2、3 級。
+ * @param {number} level 地城等級。
+ * @param {() => number} rng 亂數函式。
+ * @param {number} [bonus=0] 等級加成（Boss、進化 Boss 用）。
+ * @returns {string} 寶石代碼。
+ */
+export function rollGem(level, rng, bonus = 0) {
+  if (rng() < GEM_RULES.activeChance) return rng() < 0.5 ? 'shield-1' : 'ward-1';
+  const kinds = Object.keys(GEMS).filter((k) => !GEMS[k].active);
+  const kind = pick(kinds, rng);
+  const r = rng();
+  const t3 = Math.min(0.15, Math.max(0, (level - 25) / 100));
+  const t2 = Math.min(0.45, Math.max(0.05, level / 80));
+  const tier = Math.min(GEM_RULES.max, (r < t3 ? 3 : r < t3 + t2 ? 2 : 1) + bonus);
+  return `${kind}-${tier}`;
+}
+
+/**
+ * 武器附帶的異常狀態說明，例如「15% 機率中毒」。
+ * @param {[string, number] | undefined} status 狀態與機率。
+ * @returns {string} 說明；沒有時為空字串。
+ */
+export function statusText(status) {
+  if (!status) return '';
+  const [kind, chance] = status;
+  return `${chance >= 1 ? '' : `${Math.round(chance * 100)}% 機率`}使敵人${STATUS[kind].name}`;
 }
 
 /**
@@ -237,7 +338,7 @@ export function rarityWeights(source, depth, rebirth = 0) {
  * 鎧甲：防禦＋HP；頭盔：約鎧甲一半的防禦與 HP；鞋子：少量防禦＋速度。
  * @param {{slot: 'weapon' | 'helmet' | 'armor' | 'boots' | 'accessory', cls?: string, level: number, rarity: number}} spec 部位、職業（武器用）、裝備等級、稀有度。
  * @param {() => number} rng 亂數函式。
- * @returns {object} 裝備 {id, slot, type, name, level, rarity, enhance, stats}。
+ * @returns {object} 裝備 {id, slot, type, name, level, rarity, enhance, stats, gems, status?}。
  */
 export function makeItem({ slot, cls, level, rarity }, rng) {
   const mult = RARITIES[rarity].mult;
@@ -271,7 +372,12 @@ export function makeItem({ slot, cls, level, rarity }, rng) {
   }
   const name = ITEM_NAMES[type][Math.min(3, rarity)];
   const id = `${Date.now().toString(36)}${Math.floor(rng() * 1e9).toString(36)}`;
-  return { id, slot, type, name, level: lv, rarity, enhance: 0, stats };
+  const item = { id, slot, type, name, level: lv, rarity, enhance: 0, stats, gems: [] };
+  // 武器有機會附帶異常狀態（稀有度愈高機會與機率愈高）：普通攻擊命中時觸發。
+  if (slot === 'weapon' && rng() < 0.15 + 0.1 * rarity) {
+    item.status = [pick(Object.keys(STATUS), rng), Math.round((0.1 + 0.03 * rarity) * 100) / 100];
+  }
+  return item;
 }
 
 /**

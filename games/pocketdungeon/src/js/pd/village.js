@@ -1,8 +1,8 @@
 // 村莊規則（純邏輯）：商店刷新與買賣、裝備穿脫、強化、區域與深度解鎖、探險開始與結算。
 // 所有函式直接修改傳入的角色資料，回傳結果與要顯示的訊息。
 
-import { AREAS, AREA_KEYS, LIMITS, MAX_DEPTH, RARITIES, ENHANCE, BAG_EXPAND, EQUIP_SLOTS, SHARED_SLOTS, CLASSES, REBIRTH } from './data.js';
-import { makeItem, itemValue, sellPrice, enhanceCost, tryEnhance, rollRarity, dungeonLevel, levelCap } from './rules.js';
+import { AREAS, AREA_KEYS, LIMITS, MAX_DEPTH, RARITIES, ENHANCE, BAG_EXPAND, EQUIP_SLOTS, SHARED_SLOTS, CLASSES, REBIRTH, GEMS, GEM_RULES } from './data.js';
+import { makeItem, itemValue, sellPrice, enhanceCost, tryEnhance, rollRarity, dungeonLevel, levelCap, parseGem, gemName, socketCount } from './rules.js';
 
 /** 商店一次陳列的裝備數。 */
 export const SHOP_SIZE = 8;
@@ -71,6 +71,116 @@ export function buyPotion(ch) {
 }
 
 /**
+ * 購買淨化藥水（解除所有異常狀態，最多持有 5 瓶）。
+ * @param {object} ch 角色（會被修改）。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function buyCure(ch) {
+  const have = ch.cures || 0;
+  if (have >= LIMITS.cures) return { ok: false, message: `淨化藥水最多持有 ${LIMITS.cures} 瓶` };
+  if (ch.gold < LIMITS.curePrice) return { ok: false, message: `金幣不足（需要 ${LIMITS.curePrice}G）` };
+  ch.gold -= LIMITS.curePrice;
+  ch.cures = have + 1;
+  return { ok: true, message: `買下淨化藥水（持有 ${ch.cures} 瓶）` };
+}
+
+/**
+ * 商店販售的寶石：每種寶石的最低等級（持續型為碎裂的 1 級，主動型只有一種）。
+ * @returns {{key: string, price: number}[]} 寶石代碼與售價。
+ */
+export function shopGems() {
+  return Object.keys(GEMS).map((kind) => ({ key: `${kind}-1`, price: GEMS[kind].active ? GEM_RULES.activePrice : GEM_RULES.price }));
+}
+
+/**
+ * 把寶石放進角色的寶石袋（同種同級疊在一起）。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string} key 寶石代碼。
+ * @param {number} [n=1] 數量。
+ */
+export function addGem(ch, key, n = 1) {
+  ch.gems = ch.gems || {};
+  ch.gems[key] = (ch.gems[key] || 0) + n;
+  if (ch.gems[key] <= 0) delete ch.gems[key];
+}
+
+/**
+ * 購買商店的寶石。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string} key 寶石代碼（須為商店販售的種類）。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function buyGem(ch, key) {
+  const entry = shopGems().find((g) => g.key === key);
+  if (!entry) return { ok: false, message: '商店沒有賣這種寶石' };
+  if (ch.gold < entry.price) return { ok: false, message: `金幣不足（需要 ${entry.price}G）` };
+  ch.gold -= entry.price;
+  addGem(ch, key);
+  return { ok: true, message: `買下${gemName(key)}，到「寶石」分頁鑲嵌` };
+}
+
+/**
+ * 合成寶石：3 顆同種同級的持續型寶石，花費金幣合成 1 顆高一級的寶石（最高 5 級）。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string} key 要合成的寶石代碼。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function fuseGem(ch, key) {
+  const g = parseGem(key);
+  if (!g) return { ok: false, message: '找不到這種寶石' };
+  if (GEMS[g.kind].active) return { ok: false, message: `${gemName(key)}不能合成` };
+  if (g.tier >= GEM_RULES.max) return { ok: false, message: `${gemName(key)}已經是最高等級` };
+  const have = (ch.gems && ch.gems[key]) || 0;
+  if (have < GEM_RULES.fuse) return { ok: false, message: `需要 ${GEM_RULES.fuse} 顆${gemName(key)}（目前 ${have} 顆）` };
+  const cost = GEM_RULES.fuseCost[g.tier];
+  if (ch.gold < cost) return { ok: false, message: `金幣不足（需要 ${cost}G）` };
+  ch.gold -= cost;
+  addGem(ch, key, -GEM_RULES.fuse);
+  const next = `${g.kind}-${g.tier + 1}`;
+  addGem(ch, next);
+  return { ok: true, message: `合成成功：${gemName(next)}` };
+}
+
+/**
+ * 把寶石袋中的寶石鑲嵌到裝備（背包或裝備欄中的裝備）的空孔。同一件裝備不能鑲兩顆相同的主動寶石。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string} id 裝備 id。
+ * @param {string} key 寶石代碼。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function socketGem(ch, id, key) {
+  const found = findItem(ch, id);
+  if (!found) return { ok: false, message: '找不到這件裝備' };
+  const item = found.item;
+  const g = parseGem(key);
+  if (!g || !(ch.gems && ch.gems[key] > 0)) return { ok: false, message: '寶石袋裡沒有這顆寶石' };
+  item.gems = item.gems || [];
+  if (item.gems.length >= socketCount(item)) return { ok: false, message: `${item.name}的 ${socketCount(item)} 個孔都已經鑲滿` };
+  if (GEMS[g.kind].active && item.gems.includes(key)) return { ok: false, message: `同一件裝備不能鑲兩顆${gemName(key)}` };
+  addGem(ch, key, -1);
+  item.gems.push(key);
+  return { ok: true, message: `${item.name}鑲上${gemName(key)}` };
+}
+
+/**
+ * 取下裝備上的寶石放回寶石袋（免費，寶石不會損壞）。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string} id 裝備 id。
+ * @param {number} index 孔的位置。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function unsocketGem(ch, id, index) {
+  const found = findItem(ch, id);
+  if (!found) return { ok: false, message: '找不到這件裝備' };
+  const item = found.item;
+  const key = item.gems && item.gems[index];
+  if (!key) return { ok: false, message: '這個孔是空的' };
+  item.gems.splice(index, 1);
+  addGem(ch, key);
+  return { ok: true, message: `取下${gemName(key)}，放回寶石袋` };
+}
+
+/**
  * 購買回城卷軸（每趟只能帶 1 張，因此最多持有 1 張）。
  * @param {object} ch 角色。
  * @returns {{ok: boolean, message: string}} 結果。
@@ -108,7 +218,11 @@ export function sellItem(ch, id) {
   const [item] = ch.bag.splice(idx, 1);
   const price = sellPrice(item);
   ch.gold += price;
-  return { ok: true, message: `賣出 ${item.name}（+${price}G）` };
+  // 鑲在裝備上的寶石自動取下，放回寶石袋。
+  const gems = item.gems || [];
+  for (const key of gems) addGem(ch, key);
+  item.gems = [];
+  return { ok: true, message: `賣出 ${item.name}（+${price}G）${gems.length ? `，${gems.length} 顆寶石放回寶石袋` : ''}` };
 }
 
 /**
@@ -414,16 +528,18 @@ export function depthLabel(area, depth) {
 }
 
 /**
- * 開始探險前，從角色身上取出要攜帶的藥水與卷軸。
+ * 開始探險前，從角色身上取出要攜帶的藥水、淨化藥水與卷軸。
  * @param {object} ch 角色（會被修改）。
- * @returns {{potions: number, scroll: number}} 攜帶的數量。
+ * @returns {{potions: number, scroll: number, cures: number}} 攜帶的數量。
  */
 export function packForRun(ch) {
   const potions = Math.min(LIMITS.potions, ch.potions);
   const scroll = Math.min(1, ch.scroll);
+  const cures = Math.min(LIMITS.cures, ch.cures || 0);
   ch.potions -= potions;
   ch.scroll -= scroll;
-  return { potions, scroll };
+  ch.cures = (ch.cures || 0) - cures;
+  return { potions, scroll, cures };
 }
 
 /**
@@ -442,6 +558,7 @@ export function settleRun(ch, world, result) {
   }
   ch.potions = Math.min(LIMITS.potions, ch.potions + world.player.potions);
   ch.scroll = Math.min(1, ch.scroll + world.player.scroll);
+  ch.cures = Math.min(LIMITS.cures, (ch.cures || 0) + (world.player.cures || 0));
   const ms = Math.round(world.elapsed * 1000);
   const s = ch.stats;
   s.playMs += ms;
@@ -459,7 +576,7 @@ export function settleRun(ch, world, result) {
   }
   return {
     result, area: world.area, depth: world.depth, ms, kills: loot.kills, damageTaken: loot.damageTaken, xp: loot.xp,
-    gold: loot.gold - goldLost, goldLost, items: loot.items, unlocks, levels: loot.levelsGained, potionsUsed: loot.potionsUsed,
+    gold: loot.gold - goldLost, goldLost, items: loot.items, gems: loot.gems || [], unlocks, levels: loot.levelsGained, potionsUsed: loot.potionsUsed,
     evolved: !!world.bossDefeated && !!(world.ch.evolved && world.ch.evolved[world.stageKey()]), clears: (ch.clears && ch.clears[world.stageKey()]) || 0,
   };
 }

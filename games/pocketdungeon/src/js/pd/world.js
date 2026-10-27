@@ -3,10 +3,10 @@
 //
 // 座標單位為「格」，(x, y) 為實體中心；地圖格子 (i, j) 的範圍為 [i, i + 1) × [j, j + 1)。
 
-import { CLASSES, MONSTERS, BOSSES, LIMITS, BOSS_HEAL, EVOLVE, REBIRTH } from './data.js';
+import { CLASSES, MONSTERS, BOSSES, LIMITS, BOSS_HEAL, EVOLVE, REBIRTH, STATUS, STATUS_BOSS, GEMS, GEM_RULES } from './data.js';
 import { generateFloor, walkable, STAIRS, SPIKES, WALL } from './dungeon.js';
 import {
-  characterStats, speedProfile, damage, dungeonLevel, monsterStats, killReward, rollRarity, rarityWeights, makeItem, gainXp, sellPrice,
+  characterStats, speedProfile, damage, dungeonLevel, monsterStats, killReward, rollRarity, rarityWeights, makeItem, gainXp, sellPrice, rollGem, gemName,
 } from './rules.js';
 import { equippedSkills } from './skills.js';
 import { bagLimit } from './village.js';
@@ -68,7 +68,7 @@ export class World {
   /**
    * 建立探險。
    * @param {object} character 角色資料（會被修改：經驗、等級、金幣、背包）。
-   * @param {{area: string, depth: number, seed: number, floor?: number, potions?: number, scroll?: number}} run 探險設定。
+   * @param {{area: string, depth: number, seed: number, floor?: number, potions?: number, scroll?: number, cures?: number}} run 探險設定。
    * @param {() => number} [rng=Math.random] 戰鬥用亂數。
    */
   constructor(character, run, rng = Math.random) {
@@ -82,10 +82,12 @@ export class World {
     this.elapsed = 0;
     this.time = 0;
     this.events = [];
-    this.loot = { gold: 0, xp: 0, items: [], kills: 0, damageTaken: 0, potionsUsed: 0, levelsGained: 0, maxHit: 0 };
-    this.player = this.makePlayer(run.potions ?? 3, run.scroll ?? 1);
-    /** 帶進地城的 2 個技能（依角色在村莊的設定，探險中不變）。 */
+    this.loot = { gold: 0, xp: 0, items: [], gems: [], kills: 0, damageTaken: 0, potionsUsed: 0, levelsGained: 0, maxHit: 0 };
+    this.player = this.makePlayer(run.potions ?? 3, run.scroll ?? 1, run.cures ?? 0);
+    /** 帶進地城的技能（2～4 格，依角色在村莊的設定與轉職次數，探險中不變）。 */
     this.skills = character.skills ? equippedSkills(character) : [null, null];
+    /** 正在行動的怪物（怪物的預警與投射物據此附加異常狀態）。 */
+    this.acting = null;
     this.loadFloor(this.floorIndex);
   }
 
@@ -93,14 +95,20 @@ export class World {
    * 依角色資料建立玩家實體（屬性含裝備）。
    * @param {number} potions 攜帶的藥水數。
    * @param {number} scroll 回城卷軸數。
+   * @param {number} cures 攜帶的淨化藥水數。
    * @returns {object} 玩家。
    */
-  makePlayer(potions, scroll) {
+  makePlayer(potions, scroll, cures) {
     const p = {
       x: 0, y: 0, r: PLAYER_R, facing: { x: 0, y: 1 }, moving: false,
       atkCd: 0, dodgeCd: 0, dodgeT: 0, dodgeDir: { x: 0, y: 1 }, dodgeSpeed: 12, dashHit: null, invuln: 0, potionCd: 0, hurt: 0, attackAnim: 0,
-      skillCd: [0, 0], buffT: 0, buffPct: 0, skillAnim: 0,
-      potions: Math.min(LIMITS.potions, potions), scroll, path: [],
+      skillCd: [0, 0, 0, 0], buffT: 0, buffPct: 0, skillAnim: 0,
+      // 異常狀態（剩餘秒數）、中毒計時、睡眠中被打的次數。
+      status: { poison: 0, sleep: 0, stun: 0 }, poisonTick: 0, poisonLeft: 0, sleepHits: 0, sleepGuard: 0,
+      // 技能與寶石的效果：護盾量與時間、抗異常護盾、減傷、吸血、加速；主動寶石的冷卻；連射。
+      shield: 0, shieldT: 0, wardT: 0, guardT: 0, guardPct: 0, leechT: 0, leechPct: 0, hasteT: 0, hastePct: 0, leechAcc: 0,
+      gemCd: [0, 0], volley: null, cureCd: 0,
+      potions: Math.min(LIMITS.potions, potions), scroll, cures: Math.min(LIMITS.cures, cures), path: [],
     };
     this.applyStats(p, true);
     return p;
@@ -120,6 +128,10 @@ export class World {
     p.spd = s.spd;
     p.goldPct = s.goldPct;
     p.xpPct = s.xpPct;
+    p.leech = s.leech / 100;
+    /** 主動寶石的種類（最多 2 個按鈕）。 */
+    p.actives = s.actives;
+    p.weaponStatus = this.ch.equipped.weapon && this.ch.equipped.weapon.status;
     const prof = speedProfile(s.spd);
     p.move = prof.move;
     p.interval = prof.interval;
@@ -434,7 +446,7 @@ export class World {
   /**
    * 推進一個時間步。
    * @param {number} dt 秒（固定時間步 1/60）。
-   * @param {{mx: number, my: number, attack: boolean, dodge: boolean, potion: boolean, skill1?: boolean, skill2?: boolean}} input 輸入：移動向量（長度 ≤ 1）、攻擊按住、閃避、藥水與技能按下。
+   * @param {{mx: number, my: number, attack: boolean, dodge: boolean, potion: boolean, cure?: boolean, skill1?: boolean, skill2?: boolean, skill3?: boolean, skill4?: boolean, gem1?: boolean, gem2?: boolean}} input 輸入：移動向量（長度 ≤ 1）、攻擊按住、閃避、藥水、淨化藥水、技能與主動寶石按下。
    */
   update(dt, input) {
     this.time += dt;
@@ -464,15 +476,32 @@ export class World {
     p.atkCd -= dt;
     p.dodgeCd -= dt;
     p.potionCd -= dt;
+    p.cureCd -= dt;
     p.invuln -= dt;
     p.hurt -= dt;
     p.attackAnim -= dt;
     p.skillAnim -= dt;
     p.buffT -= dt;
-    p.skillCd[0] -= dt;
-    p.skillCd[1] -= dt;
+    p.guardT -= dt;
+    p.leechT -= dt;
+    p.hasteT -= dt;
+    p.wardT -= dt;
+    p.shieldT -= dt;
+    if (p.shieldT <= 0) p.shield = 0;
+    for (let k = 0; k < p.skillCd.length; k++) p.skillCd[k] -= dt;
+    p.gemCd[0] -= dt;
+    p.gemCd[1] -= dt;
+    this.updatePlayerStatus(dt);
+    const asleep = p.status.sleep > 0;
+    const stunned = p.status.stun > 0;
     let mx = input.mx || 0;
     let my = input.my || 0;
+    // 睡眠與暈眩都不能移動或閃避（暈眩被攻擊也不會解除）。
+    if (asleep || stunned) {
+      mx = 0;
+      my = 0;
+      p.path = [];
+    }
     if (mx || my) p.path = [];
     else if (p.path.length) {
       const wp = p.path[0];
@@ -493,8 +522,8 @@ export class World {
     // 斜走補償：方格地圖上斜走時水平、垂直各只剩 70%，看起來像變慢；
     // 依偏離軸線的程度加速，45° 時總速度 ×1.33（各軸約為直走的 94%）。
     const diag = Math.abs(Math.sin(2 * Math.atan2(my, mx)));
-    const boost = 1 + DIAGONAL_BOOST * diag;
-    if (input.dodge && p.dodgeCd <= 0) {
+    const boost = (1 + DIAGONAL_BOOST * diag) * (p.hasteT > 0 ? 1 + p.hastePct : 1);
+    if (input.dodge && p.dodgeCd <= 0 && !asleep && !stunned) {
       p.dodgeT = 0.25;
       p.dodgeSpeed = 12;
       p.dashHit = null;
@@ -518,6 +547,7 @@ export class World {
     } else if (p.moving) {
       this.slideMove(p, mx * p.move * boost * dt, my * p.move * boost * dt);
     }
+    // 藥水、淨化藥水與主動寶石在睡眠或暈眩中也能使用。
     if (input.potion && p.potions > 0 && p.potionCd <= 0 && p.hp < p.maxHp) {
       p.potions--;
       p.potionCd = 3;
@@ -526,9 +556,176 @@ export class World {
       this.loot.potionsUsed++;
       this.effect('text', p.x, p.y - 0.6, { text: `+${heal}`, color: '#5fd068' });
     }
-    if (input.skill1) this.useSkill(0);
-    if (input.skill2) this.useSkill(1);
+    if (input.cure) this.useCure();
+    if (input.gem1) this.useActive(0);
+    if (input.gem2) this.useActive(1);
+    this.updateVolley(dt);
+    if (asleep || stunned) return;
+    for (let k = 0; k < this.skills.length; k++) if (input[`skill${k + 1}`]) this.useSkill(k);
     if (input.attack && p.atkCd <= 0 && p.dodgeT <= 0) this.playerAttack();
+  }
+
+  /**
+   * 更新玩家的異常狀態：倒數計時；中毒扣血（可以毒死，護盾不吸收中毒傷害）。
+   * @param {number} dt 秒。
+   */
+  updatePlayerStatus(dt) {
+    const p = this.player;
+    const st = p.status;
+    const dmg = this.poisonStep(p, dt);
+    if (dmg > 0) {
+      p.hp -= dmg;
+      this.loot.damageTaken += dmg;
+      this.effect('text', p.x, p.y - 0.6, { text: String(dmg), color: STATUS.poison.color });
+      if (p.hp <= 0) {
+        p.hp = 0;
+        this.events.push({ type: 'dead' });
+        return;
+      }
+    }
+    if (st.sleep > 0) {
+      st.sleep -= dt;
+      if (st.sleep <= 0) p.sleepGuard = STATUS.sleep.wakeGuard;
+    }
+    if (p.sleepGuard > 0) p.sleepGuard -= dt;
+    if (st.stun > 0) st.stun -= dt;
+  }
+
+  /**
+   * 中毒的計時（玩家與怪物共用）：每 0.5 秒扣一次最大 HP 的 1%，以剩餘次數計算（不受浮點誤差影響），扣完即解除。
+   * status.poison 為顯示用的剩餘秒數。
+   * @param {object} t 玩家或怪物（會被修改）。
+   * @param {number} dt 秒。
+   * @returns {number} 這一步要扣的 HP（0 表示這一步不扣）。
+   */
+  poisonStep(t, dt) {
+    const st = t.status;
+    if (!st || !(t.poisonLeft > 0)) return 0;
+    const tick = STATUS.poison.tick;
+    t.poisonTick -= dt;
+    let dmg = 0;
+    if (t.poisonTick <= 1e-9) {
+      t.poisonTick += tick;
+      t.poisonLeft--;
+      dmg = Math.max(1, Math.round(t.maxHp * STATUS.poison.pct * tick));
+    }
+    st.poison = t.poisonLeft > 0 ? (t.poisonLeft - 1) * tick + t.poisonTick : 0;
+    return dmg;
+  }
+
+  /**
+   * 對玩家或怪物附加異常狀態（重複時重新計時）。玩家在抗異常護盾中免疫；Boss 的睡眠與暈眩為 30%，中毒為 2.5 秒。
+   * @param {object} target 玩家或怪物。
+   * @param {string} kind 'poison'、'sleep' 或 'stun'。
+   * @returns {boolean} 是否成功附加。
+   */
+  applyStatus(target, kind) {
+    const isPlayer = target === this.player;
+    if (isPlayer && (target.wardT > 0 || target.hp <= 0)) {
+      this.effect('text', target.x, target.y - 0.9, { text: '免疫', color: GEMS.ward.color });
+      return false;
+    }
+    if (!isPlayer && (target.hp <= 0 || target.intangible)) return false;
+    // 剛醒來的 3 秒內不會再睡著。
+    if (kind === 'sleep' && target.sleepGuard > 0) return false;
+    target.status = target.status || { poison: 0, sleep: 0, stun: 0 };
+    const dur = kind === 'poison' && target.boss ? STATUS.poison.bossDur : STATUS[kind].dur * (target.boss ? STATUS_BOSS : 1);
+    const fresh = !(target.status[kind] > 0);
+    target.status[kind] = Math.max(target.status[kind] || 0, dur);
+    if (kind === 'sleep') target.sleepHits = 0;
+    if (kind === 'poison') {
+      if (fresh) target.poisonTick = STATUS.poison.tick;
+      target.poisonLeft = Math.max(fresh ? 0 : target.poisonLeft || 0, Math.round(dur / STATUS.poison.tick));
+    }
+    if (fresh) {
+      this.effect('text', target.x, target.y - (isPlayer ? 0.9 : target.r + 0.5), { text: STATUS[kind].name, color: STATUS[kind].color });
+      if (isPlayer) this.events.push({ type: 'status', kind });
+    }
+    return true;
+  }
+
+  /**
+   * 依機率附加異常狀態。
+   * @param {object} target 玩家或怪物。
+   * @param {[string, number] | undefined} status 狀態與機率。
+   */
+  rollStatus(target, status) {
+    if (status && this.rng() < status[1]) this.applyStatus(target, status[0]);
+  }
+
+  /**
+   * 判斷玩家目前是否有任何異常狀態。
+   * @returns {boolean} 有時為 true。
+   */
+  playerAfflicted() {
+    const st = this.player.status;
+    return st.poison > 0 || st.sleep > 0 || st.stun > 0;
+  }
+
+  /** 解除玩家身上所有的異常狀態。 */
+  cleanse() {
+    const st = this.player.status;
+    if (st.sleep > 0) this.player.sleepGuard = STATUS.sleep.wakeGuard;
+    st.poison = 0;
+    this.player.poisonLeft = 0;
+    st.sleep = 0;
+    st.stun = 0;
+  }
+
+  /**
+   * 使用淨化藥水：解除所有異常狀態（沒有異常狀態時不消耗）。
+   * @returns {boolean} 是否使用。
+   */
+  useCure() {
+    const p = this.player;
+    if (p.cures <= 0 || p.cureCd > 0 || !this.playerAfflicted()) return false;
+    p.cures--;
+    p.cureCd = 1;
+    this.cleanse();
+    this.effect('poof', p.x, p.y, { r: 0.6, color: '#c8f0ff' });
+    this.effect('text', p.x, p.y - 0.9, { text: '淨化', color: '#c8f0ff' });
+    return true;
+  }
+
+  /**
+   * 使用主動寶石：血量護盾（最大 HP 25% 的護盾，10 秒）或抗異常護盾（30 秒免疫異常狀態，展開時一併解除）。冷卻 60 秒。
+   * @param {number} index 按鈕位置（0 或 1）。
+   * @returns {boolean} 是否使用。
+   */
+  useActive(index) {
+    const p = this.player;
+    const kind = p.actives[index];
+    if (!kind || p.gemCd[index] > 0) return false;
+    const g = GEMS[kind];
+    p.gemCd[index] = g.cd;
+    if (kind === 'shield') {
+      p.shield = Math.max(p.shield, Math.round(p.maxHp * g.pct));
+      p.shieldT = Math.max(p.shieldT, g.dur);
+    } else {
+      p.wardT = g.dur;
+      this.cleanse();
+    }
+    this.effect('levelup', p.x, p.y, { text: g.label });
+    this.events.push({ type: 'active', kind });
+    return true;
+  }
+
+  /**
+   * 連射：每 0.13 秒朝最近的敵人射出一支箭，直到射完。
+   * @param {number} dt 秒。
+   */
+  updateVolley(dt) {
+    const p = this.player;
+    const v = p.volley;
+    if (!v) return;
+    v.t -= dt;
+    if (v.t > 0) return;
+    this.aim(8);
+    p.attackAnim = 0.12;
+    this.playerShot(Math.atan2(p.facing.y, p.facing.x), 'arrow', v.mult, { range: 8 });
+    v.left--;
+    v.t = 0.13;
+    if (v.left <= 0) p.volley = null;
   }
 
   /**
@@ -576,7 +773,8 @@ export class World {
   playerAttack() {
     const p = this.player;
     const atk = CLASSES[this.ch.cls].attack;
-    p.atkCd = p.interval;
+    // 疾風步：攻擊間隔縮短 30%。
+    p.atkCd = p.interval * (p.hasteT > 0 ? 0.7 : 1);
     p.attackAnim = 0.18;
     this.aim(atk.kind === 'arc' ? 2.6 : 7);
     const ang = Math.atan2(p.facing.y, p.facing.x);
@@ -586,12 +784,12 @@ export class World {
         if (m.intangible) continue;
         const d = dist(p.x, p.y, m.x, m.y);
         if (d <= atk.range + m.r && (d < m.r + p.r || angleDiff(Math.atan2(m.y - p.y, m.x - p.x), ang) <= ((atk.angle / 2) * Math.PI) / 180)) {
-          this.hitMonster(m, damage(this.effAtk(), m.def, atk.mult, this.rng()), p.facing);
+          this.hitMonster(m, damage(this.effAtk(), m.def, atk.mult, this.rng()), p.facing, p.weaponStatus);
         }
       }
     } else {
       this.effect('cast', p.x + p.facing.x * 0.5, p.y + p.facing.y * 0.5 - 0.2, { angle: ang, look: atk.kind });
-      this.playerShot(Math.atan2(p.facing.y, p.facing.x), atk.kind, atk.mult, { explode: atk.kind === 'orb' ? atk.radius : 0, range: atk.range, speed: atk.speed });
+      this.playerShot(Math.atan2(p.facing.y, p.facing.x), atk.kind, atk.mult, { explode: atk.kind === 'orb' ? atk.radius : 0, range: atk.range, speed: atk.speed, status: p.weaponStatus });
     }
   }
 
@@ -600,7 +798,7 @@ export class World {
    * @param {number} angle 方向（弧度）。
    * @param {string} kind 'arrow' 或 'orb'。
    * @param {number} mult 傷害倍率。
-   * @param {{explode?: number, range?: number, speed?: number, pierce?: boolean}} [opts] 爆炸半徑、射程、速度、是否貫穿。
+   * @param {{explode?: number, range?: number, speed?: number, pierce?: boolean, status?: [string, number], look?: string}} [opts] 爆炸半徑、射程、速度、是否貫穿、命中時的異常狀態、外觀。
    */
   playerShot(angle, kind, mult, opts = {}) {
     const p = this.player;
@@ -610,24 +808,25 @@ export class World {
     this.projectiles.push({
       x: p.x + c * 0.4, y: p.y + s * 0.4, vx: c * speed, vy: s * speed,
       r: kind === 'orb' ? 0.22 : 0.12, team: 'p', life: (opts.range || 7) / speed, kind,
-      mult, explode: opts.explode || 0, pierce: !!opts.pierce, hit: new Set(),
+      mult, explode: opts.explode || 0, pierce: !!opts.pierce, hit: new Set(), status: opts.status, look: opts.look,
     });
   }
 
   // ---------- 技能 ----------
 
   /**
-   * 使用技能（冷卻中、翻滾中或倒下時無效）。
-   * @param {number} index 技能欄位（0 或 1）。
+   * 使用技能（冷卻中、翻滾中、倒下、睡眠或暈眩時無效）。
+   * @param {number} index 技能欄位（0～3）。
    * @returns {boolean} 是否成功施放。
    */
   useSkill(index) {
     const p = this.player;
     const sk = this.skills[index];
-    if (!sk || p.skillCd[index] > 0 || p.dodgeT > 0 || p.hp <= 0) return false;
+    if (!sk || p.skillCd[index] > 0 || p.dodgeT > 0 || p.hp <= 0 || p.status.sleep > 0 || p.status.stun > 0) return false;
     p.skillCd[index] = sk.cd;
     p.skillAnim = 0.25;
-    const target = this.aim(sk.kind === 'spin' || sk.kind === 'slam' || sk.kind === 'nova' ? 3 : 8);
+    const close = ['spin', 'slam', 'nova', 'bash', 'storm', 'freeze', 'trap'].includes(sk.kind);
+    const target = this.aim(close ? 3 : 8);
     const ang = Math.atan2(p.facing.y, p.facing.x);
     const ahead = (d) => ({ x: p.x + p.facing.x * d, y: p.y + p.facing.y * d });
     switch (sk.kind) {
@@ -647,10 +846,11 @@ export class World {
       case 'buff':
         p.buffT = sk.dur;
         p.buffPct = sk.pct;
-        this.effect('levelup', p.x, p.y, { text: '戰吼！' });
+        if (sk.cleanse) this.cleanse();
+        this.effect('levelup', p.x, p.y, { text: `${sk.short}！` });
         break;
       case 'fan':
-        for (let k = 0; k < sk.count; k++) this.playerShot(ang + ((k - (sk.count - 1) / 2) * 10 * Math.PI) / 180, 'arrow', sk.mult, { range: 7 });
+        for (let k = 0; k < sk.count; k++) this.playerShot(ang + ((k - (sk.count - 1) / 2) * 10 * Math.PI) / 180, 'arrow', sk.mult, { range: 7, status: sk.status });
         break;
       case 'leap':
         this.playerShot(ang, 'arrow', sk.mult, { range: 9, speed: 14, pierce: true });
@@ -663,7 +863,7 @@ export class World {
         break;
       case 'rain': {
         const at = target || ahead(4);
-        this.strike({ x: at.x, y: at.y, r: sk.r, mult: sk.mult, ticks: sk.ticks, interval: 0.33, delay: 0.3, look: 'rain' });
+        this.strike({ x: at.x, y: at.y, r: sk.r, mult: sk.mult, ticks: sk.ticks, interval: sk.interval || 0.33, delay: 0.3, look: sk.look || 'rain', status: sk.status });
         break;
       }
       case 'snipe':
@@ -691,7 +891,7 @@ export class World {
         for (let k = 0; cur && k <= sk.jumps; k++) {
           hit.add(cur);
           points.push({ x: cur.x, y: cur.y });
-          this.hitMonster(cur, damage(this.effAtk(), cur.def, sk.mult, this.rng()));
+          this.hitMonster(cur, damage(this.effAtk(), cur.def, sk.mult, this.rng()), null, sk.status);
           const from = cur;
           let next = null;
           for (const m of this.monsters) {
@@ -710,6 +910,69 @@ export class World {
         this.strike({ x: at.x, y: at.y, r: sk.r, mult: sk.mult, delay: 0.8, look: 'meteor' });
         break;
       }
+      case 'bash':
+        this.strike({ shape: 'arc', x: p.x, y: p.y, r: sk.r, angle: ang, arc: (100 * Math.PI) / 180, mult: sk.mult, look: 'slam', status: sk.status });
+        this.effect('slash', p.x, p.y, { angle: ang, range: sk.r, arc: (100 * Math.PI) / 180 });
+        break;
+      case 'fissure':
+        this.strike({ shape: 'line', x: p.x, y: p.y, angle: ang, len: sk.len, width: 1.2, mult: sk.mult, delay: 0.15, look: 'slam', status: sk.status });
+        break;
+      case 'storm':
+        // 劍刃風暴：打擊範圍跟著玩家移動。
+        this.strike({ x: p.x, y: p.y, r: sk.r, mult: sk.mult, ticks: sk.ticks, interval: 0.3, follow: true, look: 'spin' });
+        break;
+      case 'guard':
+        p.guardT = sk.dur;
+        p.guardPct = sk.pct;
+        this.effect('levelup', p.x, p.y, { text: '鐵壁！' });
+        break;
+      case 'leech':
+        p.leechT = sk.dur;
+        p.leechPct = sk.pct;
+        this.effect('levelup', p.x, p.y, { text: '嗜血！' });
+        break;
+      case 'haste':
+        p.hasteT = sk.dur;
+        p.hastePct = sk.pct;
+        this.effect('levelup', p.x, p.y, { text: '疾風！' });
+        break;
+      case 'barrier':
+        p.shield = Math.max(p.shield, Math.round(p.maxHp * sk.pct));
+        p.shieldT = Math.max(p.shieldT, sk.dur);
+        this.effect('levelup', p.x, p.y, { text: '護盾！' });
+        break;
+      case 'shot':
+        this.playerShot(ang, sk.explode ? 'orb' : 'arrow', sk.mult, { range: 9, speed: sk.explode ? 9 : 14, pierce: !!sk.pierce, explode: sk.explode || 0, status: sk.status, look: sk.look });
+        break;
+      case 'volley':
+        p.volley = { left: sk.count, t: 0, mult: sk.mult };
+        break;
+      case 'trap':
+        this.strike({ x: p.x, y: p.y, r: sk.r, mult: sk.mult, trap: 15, look: 'trap', status: sk.status });
+        break;
+      case 'zone': {
+        const at = target || ahead(3);
+        this.strike({ x: at.x, y: at.y, r: sk.r, mult: sk.mult, delay: 0.3, look: sk.look, status: sk.status });
+        break;
+      }
+      case 'thunder': {
+        // 雷霆風暴：依序落在附近的敵人身上（沒有敵人時落在周圍隨機位置）。
+        const near = this.monsters.filter((m) => !m.intangible && dist(p.x, p.y, m.x, m.y) < 6);
+        for (let k = 0; k < sk.count; k++) {
+          const m = near.length ? near[k % near.length] : null;
+          const a = this.rng() * Math.PI * 2;
+          const at = m ? { x: m.x, y: m.y } : { x: p.x + Math.cos(a) * 2.5, y: p.y + Math.sin(a) * 2.5 };
+          this.strike({ x: at.x, y: at.y, r: sk.r, mult: sk.mult, delay: 0.2 + k * 0.25, look: 'thunder', status: sk.status, track: m ? m.id : 0 });
+        }
+        break;
+      }
+      case 'freeze':
+        for (const m of this.monsters) {
+          if (m.intangible || dist(p.x, p.y, m.x, m.y) > sk.r + m.r) continue;
+          m.stun = Math.max(m.stun || 0, sk.dur * (m.boss ? 0.3 : 1));
+        }
+        this.effect('blast', p.x, p.y, { shape: 'circle', r: sk.r, friendly: true, look: 'freeze' });
+        break;
       default:
         break;
     }
@@ -718,8 +981,9 @@ export class World {
   }
 
   /**
-   * 建立玩家的範圍打擊：延遲後對範圍內的怪物造成傷害，可多次打擊並附加暈眩或緩速。
-   * @param {{shape?: 'circle' | 'line', x: number, y: number, r?: number, angle?: number, len?: number, width?: number, mult: number, delay?: number, ticks?: number, interval?: number, stun?: number, slow?: number, look: string}} st 打擊。
+   * 建立玩家的範圍打擊：延遲後對範圍內的怪物造成傷害，可多次打擊並附加定身、緩速或異常狀態。
+   * follow 時範圍跟著玩家移動；trap 為陷阱的存在秒數（有怪物進入範圍才引爆）；track 為落點追蹤的怪物 id。
+   * @param {{shape?: 'circle' | 'line' | 'arc', x: number, y: number, r?: number, angle?: number, len?: number, width?: number, arc?: number, mult: number, delay?: number, ticks?: number, interval?: number, stun?: number, slow?: number, status?: [string, number], follow?: boolean, trap?: number, track?: number, look: string}} st 打擊。
    */
   strike(st) {
     this.strikes.push({ shape: 'circle', delay: 0, ticks: 1, interval: 0, ...st, total: st.delay || 0 });
@@ -730,13 +994,35 @@ export class World {
    * @param {number} dt 秒。
    */
   updateStrikes(dt) {
+    const p = this.player;
     for (const st of this.strikes.slice()) {
+      if (st.follow) {
+        st.x = p.x;
+        st.y = p.y;
+      }
+      if (st.track) {
+        const m = this.monsters.find((o) => o.id === st.track);
+        if (m) {
+          st.x = m.x;
+          st.y = m.y;
+        }
+      }
+      if (st.trap) {
+        // 陷阱：時間到消失；有怪物踩進範圍的一半以內才引爆。
+        st.trap -= dt;
+        if (st.trap <= 0) {
+          this.strikes.splice(this.strikes.indexOf(st), 1);
+          continue;
+        }
+        if (!this.monsters.some((m) => !m.intangible && dist(m.x, m.y, st.x, st.y) < st.r * 0.5 + m.r)) continue;
+        st.trap = 0;
+      }
       st.delay -= dt;
       if (st.delay > 0) continue;
-      this.effect('blast', st.x, st.y, { shape: st.shape, r: st.r, angle: st.angle, len: st.len, width: st.width, friendly: true, look: st.look });
+      this.effect('blast', st.x, st.y, { shape: st.shape, r: st.r, angle: st.angle, len: st.len, width: st.width, arc: st.arc, friendly: true, look: st.look });
       for (const m of this.monsters.slice()) {
         if (m.intangible || !this.inShape(st, m.x, m.y, m.r)) continue;
-        this.hitMonster(m, damage(this.effAtk(), m.def, st.mult, this.rng()));
+        this.hitMonster(m, damage(this.effAtk(), m.def, st.mult, this.rng()), null, st.status);
         if (st.stun) m.stun = Math.max(m.stun || 0, st.stun * (m.boss ? 0.3 : 1));
         if (st.slow) m.slow = Math.max(m.slow || 0, st.slow);
       }
@@ -747,17 +1033,24 @@ export class World {
   }
 
   /**
-   * 對怪物造成傷害：受擊閃爍、擊退、史萊姆分裂、死亡處理。
+   * 對怪物造成傷害：受擊閃爍、擊退、史萊姆分裂、吸血、睡眠中被打醒、附加異常狀態、死亡處理。
    * @param {object} m 怪物。
    * @param {number} dmg 傷害（已計入防禦時直接使用）。
-   * @param {{x: number, y: number}} [dir] 擊退方向。
+   * @param {{x: number, y: number} | null} [dir] 擊退方向。
+   * @param {[string, number]} [status] 命中時的異常狀態與機率。
    */
-  hitMonster(m, dmg, dir) {
+  hitMonster(m, dmg, dir, status) {
     if (m.hp <= 0 || m.intangible) return;
     m.hp -= dmg;
     m.hurt = 0.15;
     m.aggro = true;
     this.loot.maxHit = Math.max(this.loot.maxHit, dmg);
+    this.leechHeal(dmg);
+    if (m.status && m.status.sleep > 0 && ++m.sleepHits >= STATUS.sleep.wake) {
+      m.status.sleep = 0;
+      m.sleepGuard = STATUS.sleep.wakeGuard;
+    }
+    if (m.hp > 0) this.rollStatus(m, status);
     this.effect('text', m.x, m.y - m.r - 0.2, { text: String(dmg), color: '#fff' });
     this.effect('hit', m.x, m.y - m.r * 0.4, { angle: dir ? Math.atan2(dir.y, dir.x) : this.rng() * Math.PI * 2 });
     if (dir && !m.boss && m.ai !== 'golemling') this.moveEntity(m, dir.x * 0.25, dir.y * 0.25, m.ai === 'wraith');
@@ -769,6 +1062,22 @@ export class World {
       }
     }
     if (m.hp <= 0) this.killMonster(m);
+  }
+
+  /**
+   * 吸血：寶石（最多 15%）加上嗜血技能的比例，把造成的傷害轉為 HP（不足 1 的部分累積到下次）。
+   * @param {number} dmg 造成的傷害。
+   */
+  leechHeal(dmg) {
+    const p = this.player;
+    // 寶石的吸血在計算屬性時已限制在 15% 以內；嗜血技能另外疊加，不受上限限制。
+    const rate = p.leech + (p.leechT > 0 ? p.leechPct : 0);
+    if (!(rate > 0) || p.hp <= 0 || p.hp >= p.maxHp) return;
+    p.leechAcc += dmg * rate;
+    const heal = Math.floor(p.leechAcc);
+    if (heal < 1) return;
+    p.leechAcc -= heal;
+    p.hp = Math.min(p.maxHp, p.hp + heal);
   }
 
   /**
@@ -792,6 +1101,10 @@ export class World {
       for (let k = 0; k < EVOLVE.items; k++) this.dropItem(m.x + 0.3 + k * 0.5, m.y, 'evolved', EVOLVE.levelBonus);
     } else if (this.rng() < chance) this.dropItem(m.x + 0.3, m.y, m.boss ? 'boss' : m.elite ? 'elite' : 'monster');
     if (!m.boss && this.rng() < 0.05) this.pickups.push({ kind: 'potion', x: m.x - 0.3, y: m.y, t: 0 });
+    // 寶石：Boss 必掉（進化 Boss 掉 2 顆、等級 +1），菁英 25%，一般怪物 3%；分裂的小史萊姆不掉。
+    if (m.boss) {
+      for (let k = 0; k < (m.evolved ? 2 : 1); k++) this.dropGem(m.x - 0.4 - k * 0.4, m.y + 0.3, m.evolved ? 1 : 0);
+    } else if (!m.small && this.rng() < (m.elite ? GEM_RULES.drop.elite : GEM_RULES.drop.monster)) this.dropGem(m.x, m.y + 0.3);
     if (MONSTERS[m.type] && MONSTERS[m.type].deathPool && !m.small) {
       // 岩漿史萊姆：死亡處留下一灘 3 秒的熔岩。
       this.hazards.push({ kind: 'circle', x: m.x, y: m.y, r: 0.9, life: 3, pct: 0.04 });
@@ -828,6 +1141,16 @@ export class World {
   }
 
   /**
+   * 掉落一顆寶石（種類隨機，等級依地城等級）。
+   * @param {number} x 座標 x。
+   * @param {number} y 座標 y。
+   * @param {number} [bonus=0] 等級加成。
+   */
+  dropGem(x, y, bonus = 0) {
+    this.pickups.push({ kind: 'gem', x, y, gem: rollGem(this.level, this.rng, bonus), t: 0 });
+  }
+
+  /**
    * 掉落一件裝備（部位隨機，武器依玩家職業）。
    * @param {number} x 座標 x。
    * @param {number} y 座標 y。
@@ -844,14 +1167,31 @@ export class World {
   }
 
   /**
-   * 對玩家造成傷害（無敵中忽略）；HP 歸零時發出倒下事件。
+   * 對玩家造成傷害（無敵中忽略）：鐵壁減傷、護盾先吸收、睡眠中被打 3 次醒來、附加異常狀態；HP 歸零時發出倒下事件。
    * @param {number} dmg 傷害（已計入防禦）。
    * @param {number} [fromX] 傷害來源 x（擊退用）。
    * @param {number} [fromY] 傷害來源 y。
+   * @param {[string, number]} [status] 命中時的異常狀態與機率。
    */
-  hurtPlayer(dmg, fromX, fromY) {
+  hurtPlayer(dmg, fromX, fromY, status) {
     const p = this.player;
     if (p.invuln > 0 || p.hp <= 0) return;
+    if (p.guardT > 0) dmg = Math.max(1, Math.round(dmg * (1 - p.guardPct)));
+    if (p.status.sleep > 0 && ++p.sleepHits >= STATUS.sleep.wake) {
+      p.status.sleep = 0;
+      p.sleepGuard = STATUS.sleep.wakeGuard;
+    }
+    this.rollStatus(p, status);
+    if (p.shield > 0) {
+      const absorbed = Math.min(p.shield, dmg);
+      p.shield -= absorbed;
+      dmg -= absorbed;
+      if (dmg <= 0) {
+        p.invuln = 0.6;
+        this.effect('text', p.x, p.y - 0.6, { text: `護盾 −${absorbed}`, color: GEMS.shield.color });
+        return;
+      }
+    }
     p.hp -= dmg;
     p.invuln = 0.6;
     p.hurt = 0.3;
@@ -884,7 +1224,9 @@ export class World {
    */
   telegraph(tg) {
     if (this.telegraphs.length > MAX_ENTITIES) return;
-    this.telegraphs.push({ ...tg, total: tg.t, delay: tg.delay || 0 });
+    // 怪物行動中建立的有傷害預警，附帶該怪物的異常狀態攻擊。
+    const status = tg.status || (tg.dmg && this.acting ? statusOf(this.acting) : undefined);
+    this.telegraphs.push({ ...tg, status, total: tg.t, delay: tg.delay || 0 });
   }
 
   /**
@@ -925,7 +1267,7 @@ export class World {
       if (tg.t > 0) continue;
       this.telegraphs.splice(this.telegraphs.indexOf(tg), 1);
       this.effect('blast', tg.x, tg.y, { shape: tg.shape, r: tg.r, angle: tg.angle, len: tg.len, width: tg.width, arc: tg.arc });
-      if (tg.dmg && this.inShape(tg, p.x, p.y, p.r)) this.hurtPlayer(tg.dmg, tg.x, tg.y);
+      if (tg.dmg && this.inShape(tg, p.x, p.y, p.r)) this.hurtPlayer(tg.dmg, tg.x, tg.y, tg.status);
       if (tg.after === 'land') {
         // 雷鳥俯衝：落在預警位置並現身。
         const m = this.monsters.find((o) => o.id === tg.owner);
@@ -962,7 +1304,27 @@ export class World {
   updateMonster(m, dt) {
     const p = this.player;
     m.hurt -= dt;
-    // 暈眩時完全停止行動；緩速時行為與計時都以一半速度進行。
+    const st = m.status;
+    if (st) {
+      // 中毒：可以被毒死（擊倒獎勵照常給）。睡眠：完全停止，被打 3 次醒來。
+      const dmg = this.poisonStep(m, dt);
+      if (dmg > 0) {
+        m.hp -= dmg;
+        this.effect('text', m.x, m.y - m.r - 0.2, { text: String(dmg), color: STATUS.poison.color });
+        if (m.hp <= 0) {
+          this.killMonster(m);
+          return;
+        }
+      }
+      if (st.stun > 0) st.stun -= dt;
+      if (m.sleepGuard > 0) m.sleepGuard -= dt;
+      if (st.sleep > 0) {
+        st.sleep -= dt;
+        if (st.sleep <= 0) m.sleepGuard = STATUS.sleep.wakeGuard;
+        return;
+      }
+    }
+    // 定身時完全停止行動；緩速時行為與計時都以一半速度進行。
     if (m.stun > 0) {
       m.stun -= dt;
       return;
@@ -977,14 +1339,18 @@ export class World {
     if (!m.aggro && d < AGGRO && (m.ai === 'wraith' || this.lineOfSight(m.x, m.y, p.x, p.y))) m.aggro = true;
     if (!m.aggro || p.hp <= 0) return;
     m.facing = Math.atan2(p.y - m.y, p.x - m.x);
+    // 暈眩：原地不動、不能出招（已經發出的預警照常生效）。
+    if (st && st.stun > 0) return;
     const ai = this.ai[m.ai];
+    this.acting = m;
     if (ai) ai.call(this, m, dt, d);
+    this.acting = null;
     // 接觸傷害只用在「身體就是武器」的情況：衝刺、俯衝中的怪物，以及沒有其他招式的史萊姆（較輕）。
     // 其他攻擊一律經由有預警的招式造成，玩家貼身攻擊時不會無預警受傷。
     m.contactCd = (m.contactCd || 0) - dt;
     const dashing = m.state === 'dash' || m.state === 'dive';
     if (!m.intangible && (dashing || m.ai === 'slime') && d < m.r + p.r + 0.05 && m.contactCd <= 0) {
-      this.hurtPlayer(this.monsterDamage(m, dashing ? 1.2 : 0.6), m.x, m.y);
+      this.hurtPlayer(this.monsterDamage(m, dashing ? 1.2 : 0.6), m.x, m.y, statusOf(m));
       m.contactCd = 1.2;
     }
   }
@@ -1043,7 +1409,7 @@ export class World {
     if (this.projectiles.length > MAX_ENTITIES) return;
     this.projectiles.push({
       x: m.x + Math.cos(angle) * m.r, y: m.y + Math.sin(angle) * m.r, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
-      r: opts.r || 0.16, team: 'e', life: opts.life || 4, kind: opts.kind || 'arrow', dmg: this.monsterDamage(m, mult), homing: opts.homing || 0, speed,
+      r: opts.r || 0.16, team: 'e', life: opts.life || 4, kind: opts.kind || 'arrow', dmg: this.monsterDamage(m, mult), homing: opts.homing || 0, speed, status: statusOf(m),
     });
   }
 
@@ -1075,20 +1441,20 @@ export class World {
         const hit = this.monsters.find((m) => !m.intangible && !pr.hit.has(m.id) && dist(m.x, m.y, pr.x, pr.y) < m.r + pr.r);
         if (hit) {
           pr.hit.add(hit.id);
-          if (!pr.explode) this.hitMonster(hit, damage(this.effAtk(), hit.def, pr.mult, this.rng()), { x: pr.vx / 12, y: pr.vy / 12 });
+          if (!pr.explode) this.hitMonster(hit, damage(this.effAtk(), hit.def, pr.mult, this.rng()), { x: pr.vx / 12, y: pr.vy / 12 }, pr.status);
           // 貫穿箭繼續飛行，其他投射物命中即消失。
           if (!pr.pierce) done = true;
         }
       } else if (!done && pr.team === 'e' && dist(p.x, p.y, pr.x, pr.y) < p.r + pr.r) {
-        this.hurtPlayer(pr.dmg, pr.x - pr.vx, pr.y - pr.vy);
+        this.hurtPlayer(pr.dmg, pr.x - pr.vx, pr.y - pr.vy, pr.status);
         done = true;
       }
       if (done) {
         this.projectiles.splice(this.projectiles.indexOf(pr), 1);
         if (pr.explode) {
-          this.effect('blast', pr.x, pr.y, { shape: 'circle', r: pr.explode, friendly: true });
+          this.effect('blast', pr.x, pr.y, { shape: 'circle', r: pr.explode, friendly: true, look: pr.look === 'fireball' ? 'meteor' : undefined });
           for (const m of this.monsters.slice()) {
-            if (!m.intangible && dist(m.x, m.y, pr.x, pr.y) < pr.explode + m.r) this.hitMonster(m, damage(this.effAtk(), m.def, pr.mult, this.rng()));
+            if (!m.intangible && dist(m.x, m.y, pr.x, pr.y) < pr.explode + m.r) this.hitMonster(m, damage(this.effAtk(), m.def, pr.mult, this.rng()), null, pr.status);
           }
         }
       }
@@ -1162,6 +1528,11 @@ export class World {
         this.events.push({ type: 'message', text: '撿到回復藥水' });
       } else if (it.kind === 'item') {
         this.takeItem(it.item);
+      } else if (it.kind === 'gem') {
+        this.ch.gems = this.ch.gems || {};
+        this.ch.gems[it.gem] = (this.ch.gems[it.gem] || 0) + 1;
+        this.loot.gems.push(it.gem);
+        this.events.push({ type: 'gem', gem: it.gem, name: gemName(it.gem) });
       }
     }
     for (const c of this.chests) {
@@ -1174,6 +1545,7 @@ export class World {
       // Boss 寶箱有 25% 機會出現背包擴充袋。
       if (c.boss && this.rng() < (c.evolved ? EVOLVE.pouch : 0.25)) this.pickups.push({ kind: 'bagExpand', x: c.x, y: c.y + 0.5, t: 0 });
       if (this.rng() < 0.3) this.pickups.push({ kind: 'potion', x: c.x - 0.4, y: c.y + 0.2, t: 0 });
+      if (!c.boss && this.rng() < GEM_RULES.drop.chest) this.dropGem(c.x, c.y + 0.5);
       this.effect('poof', c.x, c.y, { r: 0.4, color: '#e8b84a' });
     }
   }
@@ -1327,7 +1699,7 @@ export class World {
     return {
       area: this.area, depth: this.depth, seed: this.seed, floor: this.floorIndex, elapsed: this.elapsed, time: this.time,
       loot: { ...this.loot, items: this.loot.items.map((i) => i.id) },
-      player: { x: p.x, y: p.y, hp: p.hp, potions: p.potions, scroll: p.scroll, facing: p.facing },
+      player: { x: p.x, y: p.y, hp: p.hp, potions: p.potions, scroll: p.scroll, cures: p.cures, facing: p.facing },
       monsters: this.monsters.map((m) => ({ type: m.type, x: m.x, y: m.y, hp: m.hp, maxHp: m.maxHp, boss: m.boss, elite: m.elite, small: m.small, abyss: m.abyss, evolved: !!m.evolved, split: m.split, phase2: m.phase2, summoned: m.summoned, heals: m.heals || 0, awake: !!m.awake })),
       pickups: this.pickups.map((it) => ({ ...it })),
       chests: this.chests.map((c) => ({ ...c })),
@@ -1343,11 +1715,11 @@ export class World {
    * @returns {World} 探險。
    */
   static restore(character, snap, rng = Math.random) {
-    const w = new World(character, { area: snap.area, depth: snap.depth, seed: snap.seed, floor: snap.floor, potions: snap.player.potions, scroll: snap.player.scroll, restoring: true }, rng);
+    const w = new World(character, { area: snap.area, depth: snap.depth, seed: snap.seed, floor: snap.floor, potions: snap.player.potions, scroll: snap.player.scroll, cures: snap.player.cures || 0, restoring: true }, rng);
     w.restoring = false;
     w.elapsed = snap.elapsed;
     w.time = snap.time || 0;
-    w.loot = { ...snap.loot, items: character.bag.filter((i) => snap.loot.items.includes(i.id)) };
+    w.loot = { ...snap.loot, items: character.bag.filter((i) => snap.loot.items.includes(i.id)), gems: snap.loot.gems || [] };
     Object.assign(w.player, { x: snap.player.x, y: snap.player.y, hp: Math.min(snap.player.hp, w.player.maxHp), facing: snap.player.facing });
     w.monsters = [];
     for (const m of snap.monsters) {
@@ -2300,4 +2672,14 @@ function bossPhase(m) {
     }
   }
   if (m.ai === 'golem') this.hazards.push({ kind: 'edge', size: 1, max: 3.5, pct: 0.06 });
+}
+
+/**
+ * 怪物或 Boss 攻擊命中時附加的異常狀態（資料表中的 status 欄位）。
+ * @param {object} m 怪物。
+ * @returns {[string, number] | undefined} 狀態與機率。
+ */
+function statusOf(m) {
+  const base = m.boss ? BOSSES[m.type] : MONSTERS[m.type];
+  return base && base.status;
 }

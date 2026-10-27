@@ -448,8 +448,8 @@ button:focus-visible {
 
 .village-tabs {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 5px;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
 }
 
 .village-tabs button {
@@ -1131,6 +1131,174 @@ button:focus-visible {
   transform: scale(0.94);
 }
 
+/* 道具與主動寶石（右上 2 × 2）：藥水、淨化藥水、血量護盾、抗異常護盾。圓形圖示，冷卻以放射狀遮罩加秒數表示；
+   藥水顯示剩餘數量，護盾生效中右上角倒數剩餘秒數。 */
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 46px);
+  gap: 8px;
+}
+
+.item-btn {
+  --rim: #c8a8ff;
+  position: relative;
+  pointer-events: auto;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 30%, #6a5aa8, #2a1a4a 75%);
+  border: 2px solid var(--rim);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45);
+  color: #fff;
+  touch-action: none;
+}
+
+.potion-btn {
+  --rim: #8af0b4;
+  background: radial-gradient(circle at 50% 30%, #3fae78, #154a30 75%);
+}
+
+.cure-btn {
+  --rim: #a8e4ff;
+  background: radial-gradient(circle at 50% 30%, #3a8ac8, #12304a 75%);
+}
+
+.item-btn.empty {
+  filter: grayscale(0.85);
+  opacity: 0.55;
+}
+
+.item-btn .count {
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  font-size: 10px;
+  line-height: 14px;
+}
+
+.gem-btn[data-kind="shield"] {
+  --rim: #e8f4ff;
+  background: radial-gradient(circle at 50% 30%, #7a9ac8, #1e2e4a 75%);
+}
+
+.item-btn[hidden] {
+  display: none;
+}
+
+.item-btn .ico {
+  display: grid;
+  width: 55%;
+  height: 55%;
+}
+
+.item-btn .ico svg {
+  width: 100%;
+  height: 100%;
+}
+
+.item-btn .cd {
+  font-size: 15px;
+}
+
+.item-btn:active {
+  transform: scale(0.92);
+}
+
+.gem-btn.active {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.25), 0 0 12px var(--rim);
+}
+
+.gem-dur {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+  border-radius: 10px;
+  background: var(--rim);
+  color: #10081a;
+  font-size: 11px;
+  line-height: 20px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.gem-dur:empty {
+  display: none;
+}
+
+.item-btn.ready::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 236, 160, 0.95);
+  animation: ready 0.45s ease-out forwards;
+  pointer-events: none;
+}
+
+.item-btn kbd {
+  position: absolute;
+  bottom: -6px;
+  left: -4px;
+  padding: 0 3px;
+  border-radius: 3px;
+  background: rgba(10, 4, 16, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font: 700 9px/12px system-ui, sans-serif;
+}
+
+@media (hover: none) {
+  .item-btn kbd {
+    display: none;
+  }
+}
+
+/* 異常狀態與護盾的小標籤。 */
+.hud-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.hud-status:empty {
+  display: none;
+}
+
+.st-chip {
+  padding: 0 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 17px;
+  color: #10081a;
+  font-variant-numeric: tabular-nums;
+  animation: chip-in 0.2s ease-out;
+}
+
+@keyframes chip-in {
+  from { transform: scale(1.4); }
+  to { transform: scale(1); }
+}
+
+.st-poison { background: #8ad04a; }
+.st-sleep { background: #9ab8ff; }
+.st-stun { background: #ffe14d; }
+.st-shield { background: #e8f4ff; }
+.st-ward { background: #c8a8ff; }
+
+/* 睡眠中畫面四周變暗。 */
+.stage.asleep .vignette {
+  box-shadow: inset 0 0 120px 40px rgba(30, 20, 70, 0.75);
+}
+
 .minimap-frame {
   border-radius: 10px;
   padding: 2px;
@@ -1195,7 +1363,8 @@ button:focus-visible {
 .toast {
   position: absolute;
   left: 50%;
-  top: 26%;
+  /* 角色（畫面高度 40%）下方、操作區上方，不遮住右上的道具按鈕。 */
+  top: 47%;
   transform: translate(-50%, -8px) scale(0.96);
   margin: 0;
   padding: 7px 18px;
@@ -1377,9 +1546,13 @@ button:focus-visible {
 
 .buttons {
   position: relative;
-  width: 216px;
-  height: 176px;
+  width: 150px;
+  height: 225px;
   flex-shrink: 0;
+  pointer-events: none;
+}
+
+.buttons .act-btn {
   pointer-events: auto;
 }
 
@@ -1516,13 +1689,13 @@ button:focus-visible {
   --c2: #a8243a;
   right: 0;
   bottom: 0;
-  width: 96px;
-  height: 96px;
+  width: 72px;
+  height: 72px;
 }
 
 .attack-btn .ico {
-  width: 46%;
-  height: 46%;
+  width: 54%;
+  height: 54%;
 }
 
 .skill-btn {
@@ -1540,35 +1713,44 @@ button:focus-visible {
   opacity: 0.5;
 }
 
+/* 技能 2 × 2：下排技能 1、2（離拇指近），上排技能 3、4（轉職後才出現）。 */
+#skill1-btn,
+#skill2-btn,
+#skill3-btn,
+#skill4-btn {
+  width: 60px;
+  height: 60px;
+}
+
 #skill1-btn {
-  right: 4px;
-  bottom: 108px;
+  right: 6px;
+  bottom: 86px;
 }
 
 #skill2-btn {
   right: 80px;
-  bottom: 92px;
+  bottom: 86px;
+}
+
+#skill3-btn {
+  right: 6px;
+  bottom: 158px;
+}
+
+#skill4-btn {
+  right: 80px;
+  bottom: 158px;
+}
+
+.act-btn[hidden] {
+  display: none;
 }
 
 .dodge-btn {
   --c1: #c7adff;
   --c2: #4f2c94;
-  right: 108px;
-  bottom: 0;
-}
-
-.potion-btn {
-  --c1: #8af0b4;
-  --c2: #1f6a44;
-  right: 156px;
-  bottom: 76px;
-  width: 60px;
-  height: 60px;
-}
-
-.potion-btn.empty {
-  filter: grayscale(0.85);
-  opacity: 0.6;
+  right: 84px;
+  bottom: 4px;
 }
 
 /* 橫向：搖桿在左、按鈕在右，操作區佔畫面下方較高的比例。 */
@@ -1596,6 +1778,66 @@ button:focus-visible {
 
   .hud-player {
     width: min(30%, 230px);
+  }
+
+  /* 右上：暫停與小地圖一欄，回城卷軸與道具按鈕在左側一欄，避免往下壓到按鈕。 */
+  .hud-right {
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-items: end;
+    align-items: start;
+    column-gap: 8px;
+    row-gap: 6px;
+  }
+
+  #pause-btn {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  #minimap-frame {
+    grid-column: 2;
+    grid-row: 2 / span 3;
+  }
+
+  #recall-btn,
+  #item-grid {
+    grid-column: 1;
+  }
+
+  /* 橫向高度不足：技能 2 × 2 移到攻擊鈕左側，閃避移到攻擊鈕上方。 */
+  .buttons {
+    width: 226px;
+    height: 160px;
+  }
+
+  .dodge-btn {
+    right: 4px;
+    bottom: 86px;
+  }
+
+  #skill1-btn {
+    right: 84px;
+    bottom: 6px;
+  }
+
+  #skill2-btn {
+    right: 158px;
+    bottom: 6px;
+  }
+
+  #skill3-btn {
+    right: 84px;
+    bottom: 80px;
+  }
+
+  #skill4-btn {
+    right: 158px;
+    bottom: 80px;
+  }
+
+  .toast {
+    top: 56%;
   }
 }
 
@@ -1822,4 +2064,93 @@ button:focus-visible {
   .hurt-flash.on {
     animation-duration: 0.15s;
   }
+}
+
+/* ---------- 寶石與異常狀態（村莊） ---------- */
+
+.sockets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.socket {
+  padding: 0 6px;
+  border-radius: 999px;
+  border: 1px dashed var(--text-muted);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--text-muted);
+}
+
+.socket.on {
+  border: 1px solid var(--gem);
+  color: inherit;
+  box-shadow: inset 4px 0 0 var(--gem);
+}
+
+.status-line {
+  color: #6aa83a;
+}
+
+.socket-btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.2;
+}
+
+.socket-btn[style] {
+  box-shadow: inset 0 -3px 0 var(--gem);
+}
+
+.socket-btn small {
+  font-size: 10px;
+  opacity: 0.8;
+}
+
+.rebirth-tag {
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #e8b84a, #c06a1a);
+  color: #2a1606;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 800;
+  vertical-align: middle;
+}
+
+.skill-card.rebirth {
+  border-left-color: #c06a1a;
+}
+
+.slot-chip.locked {
+  opacity: 0.6;
+}
+
+.menu-gem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.menu-gem > span {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-gem small {
+  font-weight: 400;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.toast.status-toast {
+  color: #ffe14d;
+}
+
+.toast.gem-toast {
+  color: #c8a8ff;
 }

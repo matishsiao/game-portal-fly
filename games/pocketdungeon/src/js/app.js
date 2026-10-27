@@ -1,8 +1,8 @@
 // 主程式：首頁、村莊、地城畫面、遊戲迴圈、輸入、存檔與 Service Worker。
 
 import * as store from './storage.js';
-import { CLASSES, CLASS_KEYS, AREAS, AREA_KEYS, RARITIES, LIMITS, EQUIP_SLOTS, ITEM_SLOTS, BAG_EXPAND, EVOLVE, SHARED_SLOTS, REBIRTH } from './pd/data.js';
-import { xpToNext, characterStats, speedProfile, describeStats, sellPrice, enhanceCost, levelCap } from './pd/rules.js';
+import { CLASSES, CLASS_KEYS, AREAS, AREA_KEYS, RARITIES, LIMITS, EQUIP_SLOTS, ITEM_SLOTS, BAG_EXPAND, EVOLVE, SHARED_SLOTS, REBIRTH, STATUS, GEMS, GEM_RULES } from './pd/data.js';
+import { xpToNext, characterStats, speedProfile, describeStats, sellPrice, enhanceCost, levelCap, gemName, gemEffect, parseGem, socketCount, statusText, gemBonus, itemStats } from './pd/rules.js';
 import { World } from './pd/world.js';
 import { Renderer } from './pd/render.js';
 import { heroDataUrl, itemDataUrl } from './pd/sprites.js';
@@ -77,7 +77,7 @@ const app = {
   saveTimer: 0,
   transition: false,
   ending: false,
-  input: { keys: new Set(), stick: { x: 0, y: 0 }, attackHeld: false, dodge: false, potion: false, skill: [false, false] },
+  input: { keys: new Set(), stick: { x: 0, y: 0 }, attackHeld: false, dodge: false, potion: false, cure: false, skill: [false, false, false, false], gem: [false, false] },
   stickPointer: null,
   toastTimer: 0,
   hudCache: {},
@@ -136,7 +136,32 @@ function itemTitle(item) {
  * @returns {string} HTML。
  */
 function itemHtml(item) {
-  return `<div class="item-main">${itemTitle(item)}<span class="item-stats">${ITEM_SLOTS[item.slot]}・${describeStats(item)}</span></div>`;
+  const extra = item.status ? `<span class="item-stats status-line">附帶：${statusText(item.status)}</span>` : '';
+  return `<div class="item-main">${itemTitle(item)}<span class="item-stats">${ITEM_SLOTS[item.slot]}・${describeStats(item)}</span>${extra}${socketsHtml(item)}</div>`;
+}
+
+/**
+ * 裝備的寶石孔：已鑲的寶石（名稱與效果）與空孔。
+ * @param {object} item 裝備。
+ * @returns {string} HTML。
+ */
+function socketsHtml(item) {
+  const gems = item.gems || [];
+  const holes = [];
+  for (let k = 0; k < socketCount(item); k++) {
+    const key = gems[k];
+    holes.push(key ? `<span class="socket on" style="--gem:${GEMS[parseGem(key).kind].color}">${gemName(key)}</span>` : '<span class="socket">空孔</span>');
+  }
+  return `<span class="sockets">${holes.join('')}</span>`;
+}
+
+/**
+ * 寶石的小圖示（像素圖）。
+ * @param {string} key 寶石代碼。
+ * @returns {string} HTML。
+ */
+function gemIcon(key) {
+  return `<img src="${itemDataUrl(`gem-${parseGem(key).kind}`)}" alt="" class="icon">`;
 }
 
 // ---------- 主題 ----------
@@ -391,7 +416,7 @@ function renderVillage() {
   $('village-level').textContent = `${village.classTitle(ch)}・Lv.${ch.level}${ch.level >= levelCap(ch.rebirth || 0) ? '（MAX）' : ''}`;
   $('village-gold').textContent = `${ch.gold}G`;
   for (const b of els.villageTabs.querySelectorAll('button')) b.setAttribute('aria-selected', String(b.dataset.tab === app.tab));
-  const panels = { gate: gatePanel, shop: shopPanel, smith: smithPanel, bag: bagPanel, skill: skillPanel, hero: heroPanel };
+  const panels = { gate: gatePanel, shop: shopPanel, smith: smithPanel, gem: gemPanel, bag: bagPanel, skill: skillPanel, hero: heroPanel };
   els.villagePanel.innerHTML = panels[app.tab](ch);
 }
 
@@ -406,7 +431,7 @@ function gatePanel(ch) {
   const bonus = rb
     ? `<p class="notice-inline rebirth-note">轉職 ${'★'.repeat(rb)}：怪物與 Boss 的 HP、攻擊 +${Math.round(REBIRTH.monster * rb * 100)}%；掉落裝備等級 +${REBIRTH.dropLevel * rb}、稀有度提高；金幣與經驗值 +${Math.round(REBIRTH.reward * rb * 100)}%</p>`
     : '';
-  const carry = `${bonus}<p class="carry">攜帶：回復藥水 ${Math.min(LIMITS.potions, ch.potions)} 瓶・回城卷軸 ${Math.min(1, ch.scroll)} 張 <small class="muted">（在商店補充）</small></p>`;
+  const carry = `${bonus}<p class="carry">攜帶：回復藥水 ${Math.min(LIMITS.potions, ch.potions)} 瓶・淨化藥水 ${Math.min(LIMITS.cures, ch.cures || 0)} 瓶・回城卷軸 ${Math.min(1, ch.scroll)} 張 <small class="muted">（在商店補充）</small></p>`;
   const areas = AREA_KEYS.map((area) => {
     const a = AREAS[area];
     const unlocked = village.areaUnlocked(ch, area);
@@ -437,6 +462,7 @@ function gatePanel(ch) {
 function shopPanel(ch) {
   if (!ch.shop) village.refreshShop(ch, Math.random);
   const goods = `<div class="shop-row"><img src="${itemDataUrl('potion')}" alt="" class="icon"><div class="item-main"><b>回復藥水</b><span class="item-stats">回復 40% HP・持有 ${ch.potions}／${LIMITS.potions}</span></div><button type="button" class="buy-btn" data-buy="potion">${LIMITS.potionPrice}G</button></div>
+    <div class="shop-row"><img src="${itemDataUrl('cure')}" alt="" class="icon"><div class="item-main"><b>淨化藥水</b><span class="item-stats">解除中毒、睡眠、暈眩（睡眠或暈眩中也能喝）・持有 ${ch.cures || 0}／${LIMITS.cures}</span></div><button type="button" class="buy-btn" data-buy="cure">${LIMITS.curePrice}G</button></div>
     <div class="shop-row"><img src="${itemDataUrl('key')}" alt="" class="icon"><div class="item-main"><b>回城卷軸</b><span class="item-stats">帶著全部所得返回村莊・持有 ${ch.scroll}／1</span></div><button type="button" class="buy-btn" data-buy="scroll">${LIMITS.scrollPrice}G</button></div>
     <div class="shop-row"><img src="${itemDataUrl('pouch')}" alt="" class="icon"><div class="item-main"><b>背包擴充袋</b><span class="item-stats">背包上限 +${BAG_EXPAND.step} 格・目前 ${village.bagLimit(ch)}／${BAG_EXPAND.max} 格${ch.bagExpand ? `・持有 ${ch.bagExpand} 個` : ''}</span></div><button type="button" class="buy-btn" data-buy="pouch"${village.bagExpandPrice(ch) === Infinity ? ' disabled' : ''}>${village.bagExpandPrice(ch) === Infinity ? '已達上限' : `${village.bagExpandPrice(ch)}G`}</button></div>`;
   const items = ch.shop.length
@@ -445,7 +471,8 @@ function shopPanel(ch) {
   const sell = ch.bag.length
     ? ch.bag.map((it) => `<div class="shop-row">${itemHtml(it)}<button type="button" class="sell-btn" data-sell="${it.id}">賣 ${sellPrice(it)}G</button></div>`).join('')
     : '<p class="muted">背包是空的。</p>';
-  return `<h3>道具</h3>${goods}<h3>今日裝備 <small class="muted">（每次返回村莊時刷新）</small></h3>${items}<h3>賣出 <small class="muted">背包 ${ch.bag.length}／${village.bagLimit(ch)}</small></h3>${sell}`;
+  const gems = village.shopGems().map((g) => `<div class="shop-row">${gemIcon(g.key)}<div class="item-main"><b>${gemName(g.key)}</b><span class="item-stats">${gemEffect(g.key)}・持有 ${(ch.gems && ch.gems[g.key]) || 0} 顆</span></div><button type="button" class="buy-btn" data-buy-gem="${g.key}">${g.price}G</button></div>`).join('');
+  return `<h3>道具</h3>${goods}<h3>寶石 <small class="muted">（到「寶石」分頁鑲嵌與合成）</small></h3>${gems}<h3>今日裝備 <small class="muted">（每次返回村莊時刷新）</small></h3>${items}<h3>賣出 <small class="muted">背包 ${ch.bag.length}／${village.bagLimit(ch)}</small></h3>${sell}`;
 }
 
 /**
@@ -481,6 +508,42 @@ function smithPanel(ch) {
     return `<div class="shop-row">${itemHtml(it)}${worn}<button type="button" class="buy-btn" data-enhance="${it.id}">+${it.enhance + 1}<small>${enhanceCost(it)}G・${chance}%</small></button></div>`;
   });
   return `<p class="muted small">每級主屬性 +8%；+6 起可能失敗，失敗時等級不變、金幣照扣。</p>${rows.join('')}`;
+}
+
+/**
+ * 寶石分頁：寶石袋（合成）與裝備的寶石孔（鑲嵌、取下）。
+ * @param {object} ch 角色。
+ * @returns {string} HTML。
+ */
+function gemPanel(ch) {
+  const owned = Object.entries(ch.gems || {}).filter(([, n]) => n > 0).sort(([a], [b]) => a.localeCompare(b));
+  const pouch = owned.length
+    ? owned.map(([key, n]) => {
+      const g = parseGem(key);
+      const canFuse = !GEMS[g.kind].active && g.tier < GEM_RULES.max;
+      const fuse = canFuse
+        ? `<button type="button" class="buy-btn" data-fuse="${key}"${n < GEM_RULES.fuse ? ' disabled' : ''}>合成<small>${GEM_RULES.fuse} 顆・${GEM_RULES.fuseCost[g.tier]}G</small></button>`
+        : `<span class="muted small">${GEMS[g.kind].active ? '不能合成' : '最高等級'}</span>`;
+      return `<div class="shop-row">${gemIcon(key)}<div class="item-main"><b>${gemName(key)} ×${n}</b><span class="item-stats">${gemEffect(key)}</span></div>${fuse}</div>`;
+    }).join('')
+    : '<p class="muted">寶石袋是空的。打倒怪物、打開寶箱或在商店購買寶石。</p>';
+  const list = [...EQUIP_SLOTS.map((e) => ch.equipped[e.key]).filter(Boolean), ...ch.bag];
+  const rows = list.length
+    ? list.map((it) => {
+      const worn = Object.values(ch.equipped).includes(it) ? '<em class="worn">裝備中</em>' : '';
+      const gems = it.gems || [];
+      const holes = [];
+      for (let k = 0; k < socketCount(it); k++) {
+        const key = gems[k];
+        holes.push(key
+          ? `<button type="button" class="sell-btn socket-btn" data-unsocket="${it.id}" data-index="${k}" style="--gem:${GEMS[parseGem(key).kind].color}">${gemName(key)}<small>取下</small></button>`
+          : `<button type="button" class="buy-btn socket-btn" data-socket="${it.id}"${owned.length ? '' : ' disabled'}>空孔<small>鑲嵌</small></button>`);
+      }
+      return `<div class="shop-row">${itemHtml(it)}${worn}<span class="row-actions">${holes.join('')}</span></div>`;
+    }).join('')
+    : '<p class="muted">還沒有裝備。</p>';
+  return `<p class="muted small">普通與精良裝備 1 孔、稀有與傳說 2 孔。持續型寶石 ${GEM_RULES.fuse} 顆同級可合成高一級（最高 ${GEM_RULES.max} 級，效果 5%～15%）；寶石的吸血合計最多 ${GEM_RULES.leechCap}%（嗜血技能另外疊加）。主動寶石在地城以按鈕使用，同種只算一個、最多 ${GEM_RULES.actives} 個按鈕。取下寶石免費，寶石不會損壞。</p>
+    <h3>寶石袋</h3>${pouch}<h3>鑲嵌</h3>${rows}`;
 }
 
 /**
@@ -523,17 +586,21 @@ function bagPanel(ch) {
  */
 function skillPanel(ch) {
   const points = skills.skillPoints(ch);
-  const slots = ch.skills.slots.map((id, n) => `<span class="slot-chip">技能 ${n + 1}：<b>${id ? skills.SKILLS[id].name : '（未裝備）'}</b></span>`).join('');
+  const count = skills.skillSlotCount(ch);
+  const slots = ch.skills.slots.map((id, n) => (n < count
+    ? `<span class="slot-chip">技能 ${n + 1}：<b>${id ? skills.SKILLS[id].name : '（未裝備）'}</b></span>`
+    : `<span class="slot-chip locked">🔒 技能 ${n + 1}：轉職 ${n + 1 - skills.SKILL_BASE_SLOTS} 次後開放</span>`)).join('');
   const rows = skills.classSkills(ch.cls).map((id) => {
     const s = skills.SKILLS[id];
     const lv = skills.skillLevel(ch, id);
+    const tag = s.rebirth ? `<em class="rebirth-tag">轉職 ${'★'.repeat(s.rebirth)}</em>` : '';
     if (!lv) {
-      return `<div class="skill-card locked"><div class="skill-head"><b>🔒 ${s.name}</b><small>Lv.${s.unlock} 解鎖</small></div><p class="item-stats">${skills.describeSkill(id, 1)}</p></div>`;
+      return `<div class="skill-card locked"><div class="skill-head"><b>🔒 ${s.name}${tag}</b><small>${skills.unlockText(id)}</small></div><p class="item-stats">${skills.describeSkill(id, 1)}</p></div>`;
     }
     const st = skills.skillStats(id, lv);
     const next = lv < skills.SKILL_MAX ? `<p class="item-stats next">下一級：${skills.describeSkill(id, lv + 1)}・冷卻 ${skills.skillStats(id, lv + 1).cd.toFixed(1)} 秒</p>` : '';
-    const slotBtns = [0, 1].map((n) => `<button type="button" class="sell-btn${ch.skills.slots[n] === id ? ' on' : ''}" data-skill-slot="${n}" data-skill="${id}">${ch.skills.slots[n] === id ? `✓ 技能 ${n + 1}` : `裝到技能 ${n + 1}`}</button>`).join('');
-    return `<div class="skill-card"><div class="skill-head"><b>${s.name}</b><small>Lv.${lv}／${skills.SKILL_MAX}・冷卻 ${st.cd.toFixed(1)} 秒</small></div>
+    const slotBtns = Array.from({ length: count }, (_, n) => n).map((n) => `<button type="button" class="sell-btn${ch.skills.slots[n] === id ? ' on' : ''}" data-skill-slot="${n}" data-skill="${id}" aria-label="裝到技能 ${n + 1}">${ch.skills.slots[n] === id ? '✓ ' : ''}技能 ${n + 1}</button>`).join('');
+    return `<div class="skill-card${s.rebirth ? ' rebirth' : ''}"><div class="skill-head"><b>${s.name}${tag}</b><small>Lv.${lv}／${skills.SKILL_MAX}・冷卻 ${st.cd.toFixed(1)} 秒</small></div>
       <p class="item-stats">${skills.describeSkill(id, lv)}</p>${next}
       <div class="row-actions">${slotBtns}<button type="button" class="buy-btn" data-skill-up="${id}"${lv >= skills.SKILL_MAX || !points ? ' disabled' : ''}>${lv >= skills.SKILL_MAX ? '已滿級' : '升級（1 點）'}</button></div></div>`;
   }).join('');
@@ -579,6 +646,50 @@ function rebirthHtml(ch) {
 }
 
 /**
+ * 整體效果：裝備（飾品）與寶石的百分比加成、吸血（含上限說明）、主動寶石、武器的異常狀態、金幣與經驗加成、技能欄格數。
+ * @param {object} ch 角色。
+ * @returns {string} HTML。
+ */
+function effectsHtml(ch) {
+  const worn = Object.values(ch.equipped).filter(Boolean);
+  const gem = gemBonus(worn);
+  const acc = { atkPct: 0, hpPct: 0, defPct: 0, goldPct: 0, xpPct: 0 };
+  for (const it of worn) {
+    const st = itemStats(it);
+    for (const k of Object.keys(acc)) acc[k] += st[k] || 0;
+  }
+  /**
+   * 一項百分比加成的說明：合計與來源（飾品、寶石）。
+   * @param {number} a 飾品的百分比。
+   * @param {number} g 寶石的百分比。
+   * @returns {string} 例如「+17%（飾品 7%＋寶石 10%）」；沒有時為「—」。
+   */
+  const pct = (a, g) => {
+    if (!a && !g) return '<span class="muted">—</span>';
+    const from = [a ? `飾品 ${a}%` : '', g ? `寶石 ${g}%` : ''].filter(Boolean).join('＋');
+    return `+${a + g}%${a && g ? `<small class="muted">（${from}）</small>` : `<small class="muted">（${from.split(' ')[0]}）</small>`}`;
+  };
+  const cap = GEM_RULES.leechCap;
+  const leech = gem.leech
+    ? `${Math.min(cap, gem.leech)}%${gem.leech > cap ? `<small class="muted">（寶石合計 ${gem.leech}%，超過上限的部分無效）</small>` : ''}`
+    : '<span class="muted">—</span>';
+  const weapon = ch.equipped.weapon && ch.equipped.weapon.status ? statusText(ch.equipped.weapon.status) : '<span class="muted">—</span>';
+  const actives = gem.actives.length ? gem.actives.map((k) => GEMS[k].label).join('、') : '<span class="muted">—（鑲守護鑽石或月光石）</span>';
+  return `<h3>整體效果</h3><dl class="result-list effects-list">
+      <dt>攻擊</dt><dd>${pct(acc.atkPct, gem.atk)}</dd>
+      <dt>HP</dt><dd>${pct(acc.hpPct, gem.hp)}</dd>
+      <dt>防禦</dt><dd>${pct(acc.defPct, gem.def)}</dd>
+      <dt>速度</dt><dd>${pct(0, gem.spd)}</dd>
+      <dt>吸血</dt><dd>${leech}<small class="muted">・寶石上限 ${cap}%，嗜血技能另外疊加</small></dd>
+      <dt>武器</dt><dd>${weapon}</dd>
+      <dt>主動寶石</dt><dd>${actives}</dd>
+      <dt>金幣</dt><dd>${pct(acc.goldPct, 0)}</dd>
+      <dt>經驗</dt><dd>${pct(acc.xpPct, 0)}</dd>
+      <dt>技能欄</dt><dd>${skills.skillSlotCount(ch)}／${skills.SKILL_SLOTS} 格${(ch.rebirth || 0) < 2 ? '<small class="muted">（每轉職一次 +1）</small>' : ''}</dd>
+    </dl>`;
+}
+
+/**
  * 角色分頁：等級、屬性與角色統計。
  * @param {object} ch 角色。
  * @returns {string} HTML。
@@ -589,9 +700,6 @@ function heroPanel(ch) {
   const cap = levelCap(ch.rebirth || 0);
   const need = xpToNext(ch.level, cap);
   const xp = ch.level >= cap ? 'MAX' : `${ch.xp}／${need}`;
-  const extra = [];
-  if (s.goldPct) extra.push(`金幣 +${s.goldPct}%`);
-  if (s.xpPct) extra.push(`經驗 +${s.xpPct}%`);
   const st = ch.stats;
   return `<div class="hero-card"><img src="${heroDataUrl(ch.cls, 6)}" alt="" class="char-img big"><dl class="result-list">
       <dt>職業</dt><dd>${village.classTitle(ch)}<small class="muted">（轉職 ${ch.rebirth || 0}／${REBIRTH.max}）</small></dd>
@@ -601,8 +709,8 @@ function heroPanel(ch) {
       <dt>攻擊</dt><dd>${s.atk}</dd>
       <dt>防禦</dt><dd>${s.def}</dd>
       <dt>速度</dt><dd>${s.spd}<small class="muted">（每秒 ${prof.move.toFixed(1)} 格、攻擊間隔 ${prof.interval.toFixed(2)} 秒）</small></dd>
-      ${extra.length ? `<dt>其他</dt><dd>${extra.join('、')}</dd>` : ''}
     </dl></div>
+    ${effectsHtml(ch)}
     <h3>角色統計</h3>
     <dl class="result-list">
       <dt>遊玩時間</dt><dd>${formatTime(st.playMs)}</dd>
@@ -631,13 +739,27 @@ async function onVillageClick(e) {
     return;
   }
   if (d.buy === 'potion') r = village.buyPotion(ch);
+  else if (d.buy === 'cure') r = village.buyCure(ch);
+  else if (d.buyGem) r = village.buyGem(ch, d.buyGem);
+  else if (d.fuse) r = village.fuseGem(ch, d.fuse);
+  else if (d.unsocket) r = village.unsocketGem(ch, d.unsocket, Number(d.index));
+  else if (d.socket) {
+    const key = await pickGem(ch, d.socket);
+    if (!key) return;
+    r = village.socketGem(ch, d.socket, key);
+  }
   else if (d.buy === 'scroll') r = village.buyScroll(ch);
   else if (d.buy === 'pouch') r = village.buyBagExpand(ch);
   else if (d.usePouch) r = village.useBagExpand(ch);
   else if (d.buyItem !== undefined) r = village.buyItem(ch, Number(d.buyItem));
   else if (d.sell) {
     const found = village.findItem(ch, d.sell);
-    if (found && found.item.rarity >= 2 && !(await confirmDialog('賣出裝備', `確定要賣出 ${RARITIES[found.item.rarity].name}裝備「${esc(found.item.name)}」嗎？`, '賣出'))) return;
+    // 稀有以上或鑲有寶石的裝備先確認；鑲有寶石時說明寶石會放回寶石袋。
+    const gems = (found && found.item.gems) || [];
+    if (found && (found.item.rarity >= 2 || gems.length)) {
+      const note = gems.length ? `<br><small>上面的 ${gems.length} 顆寶石（${gemSummary(gems)}）會自動卸下，放回寶石袋。</small>` : '';
+      if (!(await confirmDialog('賣出裝備', `確定要賣出 ${RARITIES[found.item.rarity].name}裝備「${esc(found.item.name)}」嗎？${note}`, '賣出'))) return;
+    }
     r = village.sellItem(ch, d.sell);
   } else if (d.equip) r = village.equip(ch, d.equip, d.slot);
   else if (d.unequip) r = village.unequip(ch, d.unequip);
@@ -678,6 +800,21 @@ async function onVillageClick(e) {
   renderVillage();
 }
 
+/**
+ * 選擇要鑲嵌的寶石（對話框列出寶石袋中的寶石）。
+ * @param {object} ch 角色。
+ * @param {string} id 裝備 id。
+ * @returns {Promise<string | null>} 寶石代碼；取消時為 null。
+ */
+async function pickGem(ch, id) {
+  const found = village.findItem(ch, id);
+  if (!found) return null;
+  const menu = Object.entries(ch.gems || {}).filter(([, n]) => n > 0).sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, n]) => ({ label: `<span class="menu-gem">${gemIcon(key)}<span><b>${gemName(key)} ×${n}</b><small>${gemEffect(key)}</small></span></span>`, value: key }));
+  if (!menu.length) return null;
+  return openModal({ title: `鑲嵌到 ${esc(found.item.name)}`, menu, actions: [{ label: '取消', value: null }] });
+}
+
 // ---------- 探險 ----------
 
 /**
@@ -690,7 +827,7 @@ async function startRun(area, depth) {
   if (!ch || app.run) return;
   const carry = village.packForRun(ch);
   const seed = (Math.floor(Math.random() * 0x7fffffff) ^ Date.now()) >>> 0;
-  const world = new World(ch, { area, depth, seed, potions: carry.potions, scroll: carry.scroll });
+  const world = new World(ch, { area, depth, seed, potions: carry.potions, scroll: carry.scroll, cures: carry.cures });
   store.recordStart(area, depth);
   enterWorld(world, ch, false);
   await saveRun();
@@ -781,7 +918,9 @@ function frame(ts) {
       w.update(STEP, readInput());
       app.input.dodge = false;
       app.input.potion = false;
-      app.input.skill = [false, false];
+      app.input.cure = false;
+      app.input.skill = [false, false, false, false];
+      app.input.gem = [false, false];
       handleEvents();
     }
     app.saveTimer += dt;
@@ -821,6 +960,15 @@ function handleEvents() {
       buzz(12);
     } else if (e.type === 'message') {
       toast(e.text);
+    } else if (e.type === 'status') {
+      const tips = { poison: '中毒了！', sleep: '睡著了！被攻擊 3 次會醒來', stun: '暈眩了！暫時不能行動' };
+      toast(`${tips[e.kind]}${w.player.cures > 0 ? '（淨化藥水可以解除）' : ''}`, 'status-toast');
+      buzz(30);
+    } else if (e.type === 'gem') {
+      toast(`取得 ${e.name}`, 'gem-toast');
+      saveRun();
+    } else if (e.type === 'active') {
+      buzz(15);
     } else if (e.type === 'boss-heal-start') {
       toast(`${e.name} 開始回復！快攻擊打斷它`);
     } else if (e.type === 'boss-heal-break') {
@@ -910,13 +1058,24 @@ async function finishRun(w, ch, result, { silent }) {
       <dt>金幣</dt><dd>+${r.gold}G${r.goldLost ? `<small class="muted">（倒下失去 ${r.goldLost}G）</small>` : ''}</dd>
     </dl>
     ${r.unlocks.length ? `<p class="unlock">解鎖：${r.unlocks.join('、')}</p>` : ''}
-    <h3>取得的裝備</h3>${items}`;
+    <h3>取得的裝備</h3>${items}${r.gems.length ? `<h3>取得的寶石</h3><p>${gemSummary(r.gems)}</p>` : ''}`;
   await openModal({ title, html, actions: [{ label: '回村莊', value: true, className: 'primary' }], dismissValue: true });
   app.ending = false;
   app.current = ch.id;
   app.tab = r.items.length ? 'bag' : 'gate';
   showScreen('village');
   renderVillage();
+}
+
+/**
+ * 寶石清單的摘要，例如「普通的紅寶石 ×2、月光石」。
+ * @param {string[]} gems 寶石代碼。
+ * @returns {string} 摘要。
+ */
+function gemSummary(gems) {
+  const count = new Map();
+  for (const key of gems) count.set(key, (count.get(key) || 0) + 1);
+  return [...count].map(([key, n]) => `${gemName(key)}${n > 1 ? ` ×${n}` : ''}`).join('、');
 }
 
 /** 暫停：停止迴圈、遮住畫面並存檔。 */
@@ -1040,11 +1199,47 @@ function updateHud(force) {
   set('potionCd', Math.ceil(Math.max(0, p.potionCd) * 10), () => {
     cooldown('potion', p.potionCd, 3, Math.ceil(p.potionCd));
   });
+  set('cures', p.cures, () => {
+    $('cure-count').textContent = p.cures;
+    $('cure-btn').classList.toggle('empty', p.cures <= 0);
+  });
+  set('cureCd', Math.ceil(Math.max(0, p.cureCd) * 10), () => cooldown('cure', p.cureCd, 1, ''));
+  // 異常狀態與護盾：HP 條下方的小標籤（剩餘秒數）。
+  const st = p.status;
+  const chips = [];
+  for (const k of ['poison', 'sleep', 'stun']) if (st[k] > 0) chips.push(`<span class="st-chip st-${k}">${STATUS[k].name} ${Math.ceil(st[k])}</span>`);
+  if (p.shield > 0) chips.push(`<span class="st-chip st-shield">護盾 ${p.shield}</span>`);
+  if (p.wardT > 0) chips.push(`<span class="st-chip st-ward">免疫 ${Math.ceil(p.wardT)}</span>`);
+  const chipHtml = chips.join('');
+  set('status', chipHtml, () => {
+    $('hud-status').innerHTML = chipHtml;
+    els.stage.classList.toggle('asleep', st.sleep > 0);
+  });
   for (const n of [0, 1]) {
+    const kind = p.actives[n];
+    const cd = kind ? Math.max(0, p.gemCd[n]) : 0;
+    // 護盾效果的剩餘秒數（右上角的小標籤）。
+    const left = kind === 'shield' ? (p.shield > 0 ? p.shieldT : 0) : kind === 'ward' ? Math.max(0, p.wardT) : 0;
+    set(`gemKind${n}`, kind || 'none', () => {
+      $(`gem${n + 1}-btn`).hidden = !kind;
+      if (!kind) return;
+      $(`gem${n + 1}-icon`).innerHTML = ICONS[kind];
+      $(`gem${n + 1}-btn`).setAttribute('aria-label', GEMS[kind].label);
+      $(`gem${n + 1}-btn`).dataset.kind = kind;
+    });
+    set(`gemCd${n}`, Math.ceil(cd * 10), () => cooldown(`gem${n + 1}`, cd, kind ? GEMS[kind].cd : 1, Math.ceil(cd)));
+    set(`gemDur${n}`, Math.ceil(left), () => {
+      $(`gem${n + 1}-dur`).textContent = left > 0 ? Math.ceil(left) : '';
+      $(`gem${n + 1}-btn`).classList.toggle('active', left > 0);
+    });
+  }
+  for (const n of [0, 1, 2, 3]) {
     const sk = w.skills[n];
     const cd = sk ? Math.max(0, p.skillCd[n]) : 0;
-    set(`skillId${n}`, sk ? sk.id : 'none', () => {
+    set(`skillId${n}`, sk ? sk.id : n < w.skills.length ? 'none' : 'locked', () => {
       const btn = $(`skill${n + 1}-btn`);
+      // 第 3、4 格在轉職後才出現。
+      btn.hidden = n >= w.skills.length;
       btn.classList.toggle('empty', !sk);
       $(`skill${n + 1}-icon`).innerHTML = sk ? ICONS[sk.id] : '';
       $(`skill${n + 1}-name`).textContent = sk ? sk.short : '未裝備';
@@ -1066,7 +1261,7 @@ function updateHud(force) {
 
 /**
  * 更新按鈕的放射狀冷卻遮罩與秒數；冷卻結束的瞬間閃一下提示可再使用。
- * @param {string} name 按鈕名稱（potion、dodge、skill1、skill2）。
+ * @param {string} name 按鈕名稱（potion、cure、dodge、skill1～skill4、gem1、gem2）。
  * @param {number} left 剩餘秒數。
  * @param {number} total 冷卻總秒數。
  * @param {string | number} label 顯示的秒數。
@@ -1103,7 +1298,9 @@ function resetInput() {
   i.attackHeld = false;
   i.dodge = false;
   i.potion = false;
-  i.skill = [false, false];
+  i.cure = false;
+  i.skill = [false, false, false, false];
+  i.gem = [false, false];
   app.stickPointer = null;
   app.attackPointer = null;
   idleStick();
@@ -1112,7 +1309,7 @@ function resetInput() {
 
 /**
  * 合併鍵盤與搖桿輸入。
- * @returns {{mx: number, my: number, attack: boolean, dodge: boolean, potion: boolean, skill1: boolean, skill2: boolean}} 輸入。
+ * @returns {{mx: number, my: number, attack: boolean, dodge: boolean, potion: boolean, cure: boolean, skill1: boolean, skill2: boolean, skill3: boolean, skill4: boolean, gem1: boolean, gem2: boolean}} 輸入。
  */
 function readInput() {
   const i = app.input;
@@ -1127,7 +1324,10 @@ function readInput() {
     mx = i.stick.x;
     my = i.stick.y;
   }
-  return { mx, my, attack: i.attackHeld || k.has('attack'), dodge: i.dodge, potion: i.potion, skill1: i.skill[0], skill2: i.skill[1] };
+  return {
+    mx, my, attack: i.attackHeld || k.has('attack'), dodge: i.dodge, potion: i.potion, cure: i.cure,
+    skill1: i.skill[0], skill2: i.skill[1], skill3: i.skill[2], skill4: i.skill[3], gem1: i.gem[0], gem2: i.gem[1],
+  };
 }
 
 /** 持續按住的按鍵與對應動作。 */
@@ -1159,8 +1359,13 @@ function onKeyDown(e) {
   }
   if (e.code === 'KeyK' || e.key === 'Shift') app.input.dodge = true;
   else if (e.code === 'KeyL') app.input.potion = true;
+  else if (e.code === 'KeyH') pressCure();
   else if (e.code === 'KeyU') pressSkill(0);
   else if (e.code === 'KeyI') pressSkill(1);
+  else if (e.code === 'KeyO') pressSkill(2);
+  else if (e.code === 'KeyY') pressSkill(3);
+  else if (e.code === 'Digit1') pressGem(0);
+  else if (e.code === 'Digit2') pressGem(1);
   else if (e.code === 'KeyM') {
     app.settings.minimap = !app.settings.minimap;
     store.saveSettings(app.settings);
@@ -1309,16 +1514,40 @@ function tapMoveAt(clientX, clientY) {
 }
 
 /**
- * 按下技能鈕或技能鍵：沒有裝備或冷卻中時以短訊息說明。
- * @param {number} n 技能欄位（0 或 1）。
+ * 按下技能鈕或技能鍵：沒有裝備、冷卻中、睡眠或暈眩時以短訊息說明。
+ * @param {number} n 技能欄位（0～3）。
  */
 function pressSkill(n) {
   const w = app.world;
-  if (!w) return;
+  if (!w || n >= w.skills.length) return;
   const sk = w.skills[n];
+  const st = w.player.status;
   if (!sk) toast(`技能 ${n + 1} 沒有裝備技能（在村莊的「技能」分頁設定）`);
   else if (w.player.skillCd[n] > 0) toast(`${sk.name}冷卻中（${Math.ceil(w.player.skillCd[n])} 秒）`);
+  else if (st.sleep > 0 || st.stun > 0) toast(`${st.sleep > 0 ? '睡眠' : '暈眩'}中不能使用技能`);
   else app.input.skill[n] = true;
+}
+
+/** 按下淨化藥水鈕或按鍵：沒有藥水或沒有異常狀態時以短訊息說明。 */
+function pressCure() {
+  const w = app.world;
+  if (!w) return;
+  if (w.player.cures <= 0) toast('沒有淨化藥水了（可在村莊的商店購買）');
+  else if (!w.playerAfflicted()) toast('現在沒有異常狀態');
+  else app.input.cure = true;
+}
+
+/**
+ * 按下主動寶石鈕或按鍵：冷卻中時以短訊息說明。
+ * @param {number} n 按鈕位置（0 或 1）。
+ */
+function pressGem(n) {
+  const w = app.world;
+  if (!w) return;
+  const kind = w.player.actives[n];
+  if (!kind) return;
+  if (w.player.gemCd[n] > 0) toast(`${GEMS[kind].label}冷卻中（${Math.ceil(w.player.gemCd[n])} 秒）`);
+  else app.input.gem[n] = true;
 }
 
 /** 動作按鈕：攻擊按住連續、閃避與藥水為點按；點地移動模式下點地圖設定目的地。 */
@@ -1381,10 +1610,21 @@ function bindButtons() {
     else if (p.potionCd > 0) toast(`藥水冷卻中（${Math.ceil(p.potionCd)} 秒）`);
     else app.input.potion = true;
   });
-  for (const n of [0, 1]) {
+  for (const n of [0, 1, 2, 3]) {
     $(`skill${n + 1}-btn`).addEventListener('pointerdown', (e) => {
       e.preventDefault();
       pressSkill(n);
+    });
+  }
+  $('cure-btn').addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    pressCure();
+  });
+  for (const n of [0, 1]) {
+    $(`gem${n + 1}-btn`).addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      pressGem(n);
     });
   }
   els.canvas.addEventListener('pointerdown', (e) => {
@@ -1422,13 +1662,15 @@ function openRules() {
       <li>地上出現<b>紅色範圍</b>或<b>虛線</b>時，代表怪物即將攻擊那裡，趕快閃避！</li>
       <li>倒下時保留經驗值與裝備，但會失去一半本趟撿到的金幣。回城卷軸可以帶著全部所得回村。</li>
       <li>擊敗 Boss 後解鎖更深的深度與下一個地城。</li>
-      <li>每個職業有 4 個技能，在 Lv.1、5、12、20 解鎖；每升 1 級得到 1 技能點。在村莊的「技能」分頁升級技能，並選 2 個帶進地城。</li>
+      <li>每個職業有 4 個基本技能，在 Lv.1、5、12、20 解鎖；每轉職一次再解鎖 2 個轉職技能。每升 1 級得到 1 技能點。技能欄 2 格，每轉職一次多 1 格（最多 4 格）。</li>
+      <li><b>異常狀態</b>：中毒（5 秒內每秒失去 2% HP，會被毒死）、睡眠（10 秒不能行動，被攻擊 3 次醒來）、暈眩（10 秒不能行動，被攻擊也不會醒）。喝<b>淨化藥水</b>可以解除。你的武器和部分技能也能讓敵人陷入這些狀態（Boss 只受 30% 的時間）。</li>
+      <li><b>寶石</b>：鑲在裝備的孔裡（普通、精良 1 孔；稀有、傳說 2 孔）。紅寶石＝攻擊、翡翠＝HP、藍寶石＝防禦、黃玉＝速度、血石＝吸血；3 顆同級可以合成高一級。守護鑽石（血量護盾）與月光石（抗異常護盾）會在地城右上出現按鈕。</li>
     </ol>
     <h3>操作</h3>
     <ul>
-      <li>手機：左下按住拖曳移動；右下「攻擊」按住連續攻擊、「閃避」翻滾（短暫無敵）、「藥水」回復 40% HP；上方兩顆金色按鈕是技能。</li>
+      <li>手機：左下按住拖曳移動；右下「攻擊」按住連續攻擊、「閃避」翻滾（短暫無敵）；金色按鈕是技能（2 × 2，轉職後最多 4 顆）；右上是回城卷軸與道具按鈕（藥水回復 40% HP、淨化藥水解除異常狀態、主動寶石）。</li>
       <li>設定中可開啟「點地移動」：點地圖上的位置，角色自動走過去。</li>
-      <li>鍵盤：WASD／方向鍵移動、J／空白鍵攻擊、K／Shift 閃避、L 藥水、U／I 技能、M 小地圖、P／Esc 暫停。</li>
+      <li>鍵盤：WASD／方向鍵移動、J／空白鍵攻擊、K／Shift 閃避、L 藥水、H 淨化藥水、U／I／O／Y 技能 1～4、1／2 主動寶石、M 小地圖、P／Esc 暫停。</li>
     </ul>
     <h3>注意</h3>
     <ul>

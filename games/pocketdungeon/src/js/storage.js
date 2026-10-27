@@ -1,8 +1,9 @@
 // 本機儲存：角色、探險與設定存在 IndexedDB（資料庫 pocketdungeon）；大廳讀取用的摘要與統計存在 localStorage。
 // IndexedDB 無法使用時改存記憶體（關閉後遺失）。所有讀寫都容錯，任何儲存錯誤不讓遊戲停止。
 
-import { AREAS, AREA_KEYS, CLASS_KEYS, CLASSES, SHARED_SLOTS } from './pd/data.js';
+import { AREAS, AREA_KEYS, CLASS_KEYS, CLASSES, SHARED_SLOTS, STATUS } from './pd/data.js';
 import { newSkills, SKILLS, SKILL_SLOTS } from './pd/skills.js';
+import { levelCap, parseGem, socketCount } from './pd/rules.js';
 
 /** IndexedDB 資料庫名稱。 */
 const DB_NAME = 'pocketdungeon';
@@ -128,7 +129,9 @@ function writeMany(ops) {
  */
 function isValidItem(it) {
   return !!it && typeof it.id === 'string' && ['weapon', 'helmet', 'armor', 'boots', 'accessory'].includes(it.slot) && Number.isInteger(it.rarity) && it.rarity >= 0 && it.rarity <= 3
-    && Number.isInteger(it.enhance) && it.enhance >= 0 && it.enhance <= 10 && it.stats && typeof it.stats === 'object' && typeof it.name === 'string';
+    && Number.isInteger(it.enhance) && it.enhance >= 0 && it.enhance <= 10 && it.stats && typeof it.stats === 'object' && typeof it.name === 'string'
+    && (it.gems === undefined || (Array.isArray(it.gems) && it.gems.length <= socketCount(it) && it.gems.every((k) => parseGem(k))))
+    && (it.status === undefined || (Array.isArray(it.status) && STATUS[it.status[0]] && Number.isFinite(it.status[1])));
 }
 
 /**
@@ -138,12 +141,13 @@ function isValidItem(it) {
  */
 export function isValidCharacter(ch) {
   const n = (v) => Number.isFinite(v) && v >= 0;
-  return !!ch && CLASS_KEYS.includes(ch.cls) && ch.id === ch.cls && typeof ch.name === 'string' && Number.isInteger(ch.level) && ch.level >= 1 && ch.level <= 30
+  return !!ch && CLASS_KEYS.includes(ch.cls) && ch.id === ch.cls && typeof ch.name === 'string' && Number.isInteger(ch.level) && ch.level >= 1 && ch.level <= levelCap(ch.rebirth || 0)
     && n(ch.xp) && n(ch.gold) && Array.isArray(ch.bag) && ch.bag.every(isValidItem) && ch.equipped && typeof ch.equipped === 'object'
     && Object.values(ch.equipped).every((it) => it === null || isValidItem(it)) && ch.unlocked && typeof ch.unlocked === 'object' && AREA_KEYS.some((k) => Number.isInteger(ch.unlocked[k]))
     && n(ch.potions) && n(ch.scroll) && ch.stats && typeof ch.stats === 'object' && (ch.rebirth === undefined || (Number.isInteger(ch.rebirth) && ch.rebirth >= 0 && ch.rebirth <= 3))
     && ch.skills && typeof ch.skills.lv === 'object' && Array.isArray(ch.skills.slots) && ch.skills.slots.length === SKILL_SLOTS
-    && ch.skills.slots.every((id) => id === null || (SKILLS[id] && SKILLS[id].cls === ch.cls));
+    && ch.skills.slots.every((id) => id === null || (SKILLS[id] && SKILLS[id].cls === ch.cls))
+    && (ch.cures === undefined || n(ch.cures)) && (ch.gems === undefined || (typeof ch.gems === 'object' && Object.entries(ch.gems).every(([k, v]) => parseGem(k) && Number.isInteger(v) && v >= 0)));
 }
 
 /**
@@ -168,7 +172,7 @@ function isValidRun(run, characters) {
 export function newCharacter(cls, name) {
   return {
     id: cls, cls, name: [...(name.trim() || CLASSES[cls].name)].slice(0, 8).join(''), level: 1, xp: 0, gold: 50,
-    equipped: { weapon: null, helmet: null, armor: null, boots: null, acc1: null, acc2: null }, bag: [], bagSize: 20, bagExpand: 0, potions: 3, scroll: 1,
+    equipped: { weapon: null, helmet: null, armor: null, boots: null, acc1: null, acc2: null }, bag: [], bagSize: 20, bagExpand: 0, potions: 3, scroll: 1, cures: 1, gems: {},
     unlocked: { grass: 1 }, clears: {}, evolved: {}, rebirth: 0, shop: null, created: Date.now(), skills: newSkills(cls),
     stats: { playMs: 0, kills: 0, maxHit: 0, legends: 0, deaths: 0, runs: 0 },
   };
@@ -185,6 +189,13 @@ export async function loadAll() {
   for (const [k, ch] of rawChars) {
     // 加入技能之前建立的角色沒有技能資料，補上預設值（技能點由等級計算，不會損失）。
     if (ch && !ch.skills && CLASS_KEYS.includes(ch.cls)) ch.skills = newSkills(ch.cls);
+    // 技能欄擴充為 4 格之前（2 格）的角色：補上空的技能 3、4。
+    if (ch && ch.skills && Array.isArray(ch.skills.slots)) while (ch.skills.slots.length < SKILL_SLOTS) ch.skills.slots.push(null);
+    // 寶石與淨化藥水加入之前的角色：補上空的寶石袋與 0 瓶淨化藥水。
+    if (ch && typeof ch === 'object') {
+      if (!ch.gems || typeof ch.gems !== 'object') ch.gems = {};
+      if (!Number.isFinite(ch.cures)) ch.cures = 0;
+    }
     // 區域插入主線前的角色：已解鎖較後面的區域時，前面（含新加入）的區域也一併解鎖深度 1。
     if (ch && ch.unlocked && typeof ch.unlocked === 'object') {
       const last = AREA_KEYS.reduce((idx, k, i) => (Number.isInteger(ch.unlocked[k]) && ch.unlocked[k] >= 1 ? i : idx), -1);

@@ -58,11 +58,13 @@ function dummy(w, dx, dy = 0) {
   return m;
 }
 
-test('每個職業 4 個技能，在 Lv.1、5、12、20 解鎖', () => {
+test('每個職業 4 個基本技能在 Lv.1、5、12、20 解鎖，另有 6 個轉職技能（每次轉職 2 個）', () => {
   for (const cls of ['warrior', 'archer', 'mage']) {
-    const ids = sk.classSkills(cls);
-    assert.equal(ids.length, 4);
+    const all = sk.classSkills(cls);
+    assert.equal(all.length, 10);
+    const ids = all.slice(0, 4);
     assert.deepEqual(ids.map((id) => sk.SKILLS[id].unlock), [1, 5, 12, 20]);
+    assert.deepEqual(all.slice(4).map((id) => sk.SKILLS[id].rebirth), [1, 1, 2, 2, 3, 3]);
     const ch = hero(cls, 4);
     assert.equal(sk.skillLevel(ch, ids[0]), 1);
     assert.equal(sk.skillLevel(ch, ids[1]), 0);
@@ -90,9 +92,9 @@ test('裝備技能：未解鎖不能裝；已在另一格時交換', () => {
   const ch = hero('mage', 5);
   assert.equal(sk.equipSkill(ch, 'chain', 1).ok, false);
   assert.ok(sk.equipSkill(ch, 'blink', 1).ok);
-  assert.deepEqual(ch.skills.slots, ['nova', 'blink']);
+  assert.deepEqual(ch.skills.slots, ['nova', 'blink', null, null]);
   sk.equipSkill(ch, 'blink', 0);
-  assert.deepEqual(ch.skills.slots, ['blink', 'nova']);
+  assert.deepEqual(ch.skills.slots, ['blink', 'nova', null, null]);
 });
 
 test('等級提升倍率與縮短冷卻；說明文字填入數值', () => {

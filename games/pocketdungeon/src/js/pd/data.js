@@ -86,7 +86,7 @@ export const FLOORS = 3;
 
 /**
  * 怪物（29 種）：名稱、地城等級 1 時的屬性、半徑、移動速度（格／秒）、行為與經驗值倍率；
- * deathPool 為死亡時留下熔岩；shot 為投射物外觀（省略時依行為預設）。
+ * deathPool 為死亡時留下熔岩；shot 為投射物外觀（省略時依行為預設）；status 為攻擊命中時附加的異常狀態與機率。
  * 行為細節在 world.js 依 ai 代碼實作。
  */
 export const MONSTERS = {
@@ -98,40 +98,40 @@ export const MONSTERS = {
   lavaWorm: { name: '熔岩蟲', hp: 36, atk: 12, def: 5, r: 0.42, speed: 2.4, ai: 'worm', xp: 1.3 },
   fireSpirit: { name: '火焰精靈', hp: 26, atk: 10, def: 2, r: 0.36, speed: 1.6, ai: 'caster', xp: 1.2 },
   iceWolf: { name: '冰原狼', hp: 38, atk: 12, def: 4, r: 0.4, speed: 2.8, ai: 'wolf', xp: 1.3 },
-  wraith: { name: '寒霜幽魂', hp: 30, atk: 11, def: 3, r: 0.38, speed: 2.2, ai: 'wraith', xp: 1.3 },
-  crystal: { name: '水晶傀儡', hp: 62, atk: 14, def: 12, r: 0.48, speed: 1.0, ai: 'golemling', xp: 1.6 },
-  mushroom: { name: '毒菇人', hp: 38, atk: 8, def: 3, r: 0.38, speed: 1.0, ai: 'spore', xp: 1.1 },
-  vineflower: { name: '藤蔓食人花', hp: 30, atk: 9, def: 2, r: 0.4, speed: 0, ai: 'turret', xp: 1.1 },
-  spider: { name: '礦坑蜘蛛', hp: 24, atk: 9, def: 2, r: 0.32, speed: 3.0, ai: 'leaper', xp: 1 },
-  bomber: { name: '炸彈哥布林', hp: 26, atk: 11, def: 2, r: 0.34, speed: 2.2, ai: 'bomber', xp: 1.2 },
+  wraith: { name: '寒霜幽魂', hp: 30, atk: 11, def: 3, r: 0.38, speed: 2.2, ai: 'wraith', xp: 1.3, status: ['sleep', 0.12] },
+  crystal: { name: '水晶傀儡', hp: 62, atk: 14, def: 12, r: 0.48, speed: 1.0, ai: 'golemling', xp: 1.6, status: ['stun', 0.15] },
+  mushroom: { name: '毒菇人', hp: 38, atk: 8, def: 3, r: 0.38, speed: 1.0, ai: 'spore', xp: 1.1, status: ['poison', 0.5] },
+  vineflower: { name: '藤蔓食人花', hp: 30, atk: 9, def: 2, r: 0.4, speed: 0, ai: 'turret', xp: 1.1, status: ['poison', 0.35] },
+  spider: { name: '礦坑蜘蛛', hp: 24, atk: 9, def: 2, r: 0.32, speed: 3.0, ai: 'leaper', xp: 1, status: ['poison', 0.4] },
+  bomber: { name: '炸彈哥布林', hp: 26, atk: 11, def: 2, r: 0.34, speed: 2.2, ai: 'bomber', xp: 1.2, status: ['stun', 0.2] },
   magmaSlime: { name: '岩漿史萊姆', hp: 40, atk: 10, def: 4, r: 0.42, speed: 1.3, ai: 'slime', xp: 1.2, deathPool: true },
-  yeti: { name: '雪怪', hp: 70, atk: 15, def: 8, r: 0.5, speed: 1.5, ai: 'brute', xp: 1.6 },
+  yeti: { name: '雪怪', hp: 70, atk: 15, def: 8, r: 0.5, speed: 1.5, ai: 'brute', xp: 1.6, status: ['stun', 0.2] },
   frostSprite: { name: '冰霜妖精', hp: 28, atk: 11, def: 3, r: 0.34, speed: 1.6, ai: 'tri', xp: 1.3 },
   gargoyle: { name: '石像鬼', hp: 50, atk: 14, def: 10, r: 0.44, speed: 2.6, ai: 'gargoyle', xp: 1.5 },
-  shade: { name: '暗影刺客', hp: 32, atk: 13, def: 3, r: 0.36, speed: 2.8, ai: 'assassin', xp: 1.4 },
-  voidEye: { name: '虛空之眼', hp: 34, atk: 13, def: 4, r: 0.4, speed: 1.2, ai: 'beam', xp: 1.4 },
+  shade: { name: '暗影刺客', hp: 32, atk: 13, def: 3, r: 0.36, speed: 2.8, ai: 'assassin', xp: 1.4, status: ['poison', 0.3] },
+  voidEye: { name: '虛空之眼', hp: 34, atk: 13, def: 4, r: 0.4, speed: 1.2, ai: 'beam', xp: 1.4, status: ['stun', 0.2] },
   boar: { name: '野豬', hp: 32, atk: 8, def: 3, r: 0.4, speed: 2.2, ai: 'leaper', xp: 1 },
-  hornet: { name: '大黃蜂', hp: 16, atk: 6, def: 1, r: 0.28, speed: 2.8, ai: 'bat', xp: 0.8 },
+  hornet: { name: '大黃蜂', hp: 16, atk: 6, def: 1, r: 0.28, speed: 2.8, ai: 'bat', xp: 0.8, status: ['poison', 0.4] },
   scarecrow: { name: '稻草人', hp: 36, atk: 9, def: 3, r: 0.4, speed: 1.5, ai: 'melee', xp: 1.1 },
-  harpy: { name: '鷹身女妖', hp: 30, atk: 11, def: 3, r: 0.38, speed: 2.4, ai: 'tri', xp: 1.3, shot: 'feather' },
-  thunderSprite: { name: '雷霆精靈', hp: 28, atk: 12, def: 3, r: 0.34, speed: 1.6, ai: 'beam', xp: 1.3 },
-  skyKnight: { name: '天空守衛', hp: 64, atk: 14, def: 10, r: 0.46, speed: 1.6, ai: 'brute', xp: 1.6 },
-  zombie: { name: '殭屍', hp: 58, atk: 12, def: 5, r: 0.42, speed: 1.1, ai: 'melee', xp: 1.3 },
-  boneMage: { name: '骷髏法師', hp: 30, atk: 13, def: 3, r: 0.36, speed: 1.5, ai: 'caster', xp: 1.4, shot: 'curse' },
-  banshee: { name: '怨靈', hp: 34, atk: 13, def: 3, r: 0.38, speed: 2.4, ai: 'wraith', xp: 1.4 },
+  harpy: { name: '鷹身女妖', hp: 30, atk: 11, def: 3, r: 0.38, speed: 2.4, ai: 'tri', xp: 1.3, shot: 'feather', status: ['sleep', 0.12] },
+  thunderSprite: { name: '雷霆精靈', hp: 28, atk: 12, def: 3, r: 0.34, speed: 1.6, ai: 'beam', xp: 1.3, status: ['stun', 0.2] },
+  skyKnight: { name: '天空守衛', hp: 64, atk: 14, def: 10, r: 0.46, speed: 1.6, ai: 'brute', xp: 1.6, status: ['stun', 0.2] },
+  zombie: { name: '殭屍', hp: 58, atk: 12, def: 5, r: 0.42, speed: 1.1, ai: 'melee', xp: 1.3, status: ['poison', 0.4] },
+  boneMage: { name: '骷髏法師', hp: 30, atk: 13, def: 3, r: 0.36, speed: 1.5, ai: 'caster', xp: 1.4, shot: 'curse', status: ['sleep', 0.15] },
+  banshee: { name: '怨靈', hp: 34, atk: 13, def: 3, r: 0.38, speed: 2.4, ai: 'wraith', xp: 1.4, status: ['sleep', 0.15] },
 };
 
 /**
  * Boss：名稱、地城等級 1 時的屬性與半徑。招式在 world.js 依 kind 實作。
- * 所有 Boss 在 HP 70% 以下時，換招時有 35% 機會開始回復（見 BOSS_HEAL）。
+ * 所有 Boss 在 HP 70% 以下時，換招時有 35% 機會開始回復（見 BOSS_HEAL）；status 為招式命中時附加的異常狀態與機率。
  */
 export const BOSSES = {
-  treant: { name: '古樹守衛', hp: 680, atk: 15, def: 6, r: 1.0, speed: 1.1, kind: 'treant' },
-  golem: { name: '熔岩魔像', hp: 760, atk: 16, def: 9, r: 1.05, speed: 1.2, kind: 'golem' },
-  lich: { name: '霜之巫妖', hp: 640, atk: 16, def: 6, r: 0.9, speed: 1.4, kind: 'lich' },
+  treant: { name: '古樹守衛', hp: 680, atk: 15, def: 6, r: 1.0, speed: 1.1, kind: 'treant', status: ['poison', 0.3] },
+  golem: { name: '熔岩魔像', hp: 760, atk: 16, def: 9, r: 1.05, speed: 1.2, kind: 'golem', status: ['stun', 0.12] },
+  lich: { name: '霜之巫妖', hp: 640, atk: 16, def: 6, r: 0.9, speed: 1.4, kind: 'lich', status: ['sleep', 0.1] },
   bullKing: { name: '巨角牛王', hp: 640, atk: 14, def: 6, r: 1.0, speed: 1.4, kind: 'bullKing' },
-  thunderbird: { name: '雷鳥', hp: 620, atk: 16, def: 6, r: 0.95, speed: 1.6, kind: 'thunderbird' },
-  necromancer: { name: '死靈法師', hp: 660, atk: 16, def: 6, r: 0.9, speed: 1.3, kind: 'necromancer' },
+  thunderbird: { name: '雷鳥', hp: 620, atk: 16, def: 6, r: 0.95, speed: 1.6, kind: 'thunderbird', status: ['stun', 0.12] },
+  necromancer: { name: '死靈法師', hp: 660, atk: 16, def: 6, r: 0.9, speed: 1.3, kind: 'necromancer', status: ['sleep', 0.1] },
 };
 
 /** Boss 回復：觸發的 HP 比例、機率、蓄力秒數、回復量、每場次數（深淵強化版另計）、打斷所需傷害與打斷後的暈眩秒數。 */
@@ -178,7 +178,53 @@ export const ENHANCE = {
 };
 
 /** 背包初始上限、每趟藥水上限與道具價格。 */
-export const LIMITS = { bag: 20, potions: 10, potionPrice: 30, scrollPrice: 40 };
+export const LIMITS = { bag: 20, potions: 10, potionPrice: 30, scrollPrice: 40, cures: 5, curePrice: 50 };
+
+/**
+ * 異常狀態：名稱、持續秒數與顏色。玩家與怪物共用同一套規則，Boss 承受的持續時間為 bossMult 倍。
+ * 中毒：每 0.5 秒失去最大 HP 的 1%（每秒 2%），持續 5 秒共 10%，可以毒死；Boss 持續 2.5 秒共 5%（bossDur）；睡眠：無法行動，被攻擊 3 次就醒來；暈眩：不能移動、閃避、攻擊或施放技能（被攻擊也不會解除）。
+ * 重複中同一種狀態時重新計時；睡眠結束後 3 秒內不會再睡著（wakeGuard）。淨化藥水或抗異常護盾可以解除。
+ */
+export const STATUS = {
+  poison: { name: '中毒', dur: 5, bossDur: 2.5, tick: 0.5, pct: 0.02, color: '#8ad04a' },
+  sleep: { name: '睡眠', dur: 10, wake: 3, wakeGuard: 3, color: '#9ab8ff' },
+  stun: { name: '暈眩', dur: 10, color: '#ffe14d' },
+};
+
+/** Boss 承受睡眠與暈眩的持續時間倍率（中毒另見 STATUS.poison.bossDur）。 */
+export const STATUS_BOSS = 0.3;
+
+/**
+ * 寶石：鑲嵌在裝備的孔裡。持續型寶石（攻擊、HP、防禦、速度、吸血）依等級 1～5 提升 5%～15%；
+ * 主動型寶石（血量護盾、抗異常護盾）在地城中以按鈕使用，只有一個等級，不能合成。
+ */
+export const GEMS = {
+  atk: { name: '紅寶石', stat: '攻擊', values: [5, 7, 10, 12, 15], color: '#e04a5a' },
+  hp: { name: '翡翠', stat: 'HP', values: [5, 7, 10, 12, 15], color: '#5fd068' },
+  def: { name: '藍寶石', stat: '防禦', values: [5, 7, 10, 12, 15], color: '#5aa7ff' },
+  spd: { name: '黃玉', stat: '速度', values: [5, 7, 10, 12, 15], color: '#f2d04b' },
+  leech: { name: '血石', stat: '吸血', values: [5, 7, 10, 12, 15], color: '#a8243a' },
+  shield: { name: '守護鑽石', active: true, label: '血量護盾', pct: 0.25, dur: 10, cd: 60, color: '#e8f4ff' },
+  ward: { name: '月光石', active: true, label: '抗異常護盾', dur: 30, cd: 60, color: '#c8a8ff' },
+};
+
+/**
+ * 寶石規則：等級名稱、最高等級、合成數量與費用（索引為合成前的等級）、吸血上限（%）、商店價格、
+ * 主動按鈕上限，以及掉落機率（一般怪物、菁英、寶箱；Boss 必掉）。
+ * 裝備的孔數：普通與精良 1 孔，稀有與傳說 2 孔。
+ */
+export const GEM_RULES = {
+  tiers: ['碎裂', '普通', '無瑕', '完美', '璀璨'],
+  max: 5,
+  fuse: 3,
+  fuseCost: [0, 100, 300, 800, 2000],
+  leechCap: 15,
+  price: 150,
+  activePrice: 800,
+  actives: 2,
+  drop: { monster: 0.03, elite: 0.25, chest: 0.2 },
+  activeChance: 0.06,
+};
 
 /** 共用倉庫：所有角色共用的裝備格數（固定，不能擴充）。金幣另外共用，沒有上限。 */
 export const SHARED_SLOTS = 20;

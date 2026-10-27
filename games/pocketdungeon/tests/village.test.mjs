@@ -133,7 +133,7 @@ test('結算：倒下失去一半本趟金幣；回城保留全部；剩餘藥�
   ch.potions = 4;
   ch.scroll = 1;
   const carry = v.packForRun(ch);
-  assert.deepEqual(carry, { potions: 4, scroll: 1 });
+  assert.deepEqual(carry, { potions: 4, scroll: 1, cures: 0 });
   const w = new World(ch, { area: 'easy', depth: 1, seed: 1, potions: carry.potions, scroll: carry.scroll }, seededRng(1));
   w.loot.gold = 101;
   ch.gold += 101;

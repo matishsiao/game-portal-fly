@@ -28,9 +28,9 @@ test('經驗值可連升數級，Lv.30 不再累積', () => {
 });
 
 test('職業初始屬性與每級成長', () => {
-  assert.deepEqual(characterStats('warrior', 1), { hp: 120, atk: 12, def: 8, spd: 100, goldPct: 0, xpPct: 0 });
-  assert.deepEqual(characterStats('archer', 1), { hp: 90, atk: 10, def: 5, spd: 115, goldPct: 0, xpPct: 0 });
-  assert.deepEqual(characterStats('mage', 1), { hp: 75, atk: 14, def: 4, spd: 100, goldPct: 0, xpPct: 0 });
+  assert.deepEqual(characterStats('warrior', 1), { hp: 120, atk: 12, def: 8, spd: 100, goldPct: 0, xpPct: 0, leech: 0, actives: [] });
+  assert.deepEqual(characterStats('archer', 1), { hp: 90, atk: 10, def: 5, spd: 115, goldPct: 0, xpPct: 0, leech: 0, actives: [] });
+  assert.deepEqual(characterStats('mage', 1), { hp: 75, atk: 14, def: 4, spd: 100, goldPct: 0, xpPct: 0, leech: 0, actives: [] });
   const w = characterStats('warrior', 11);
   assert.equal(w.hp, 120 + 12 * 10);
   assert.equal(w.atk, 12 + 2 * 10);
