@@ -32,6 +32,8 @@
   --olympiad-2: #4a527f;
   --science-1: #5f7a52;
   --science-2: #4b6440;
+  --writing-1: #527b70;
+  --writing-2: #365d55;
   --social-1: #8f6a50;
   --social-2: #6f5240;
   --codebreaker-1: #4b5058;
@@ -76,6 +78,8 @@
     --olympiad-2: #3d4466;
     --science-1: #55704a;
     --science-2: #3e5035;
+    --writing-1: #527b70;
+    --writing-2: #365d55;
     --social-1: #7f5f48;
     --social-2: #5a4334;
     --codebreaker-1: #454a52;
@@ -1120,4 +1124,9 @@ summary:focus-visible {
 
 .portal-update[hidden] {
   display: none;
+}
+
+/* 作文工坊卡片沿用遊戲的墨綠主色。 */
+.game-card[data-theme="writing"] {
+  background: linear-gradient(135deg, var(--writing-1), var(--writing-2));
 }

@@ -17,6 +17,7 @@
 | 密碼偵探 | <https://matishsiao.github.io/game-portal-fly/codebreaker/> |
 | 奧數挑戰 | <https://matishsiao.github.io/game-portal-fly/olympiad/> |
 | 自然探險 | <https://matishsiao.github.io/game-portal-fly/science/> |
+| 作文工坊（試玩版） | <https://matishsiao.github.io/game-portal-fly/writing/> |
 | 社會科學 | <https://matishsiao.github.io/game-portal-fly/social/> |
 | 口袋地城 | <https://matishsiao.github.io/game-portal-fly/pocketdungeon/> |
 
@@ -39,6 +40,7 @@ game-portal/
 │   ├── spelling/        英文單字拼圖（自成一個專案：src/、scripts/、tests/、data/、spec.md；單字清單取自大考中心詞彙表，僅供非營利使用）
 │   ├── olympiad/        奧數挑戰（自成一個專案：src/、scripts/、tests/、spec.md；題庫在 src/data/questions.json）
 │   ├── science/         自然探險（自成一個專案：src/、scripts/、tests/、spec.md；題庫與科學卡在 src/data/）
+│   ├── writing/        作文工坊（試玩版，國小到國中的寫作練習）
 │   ├── social/          社會科學（自成一個專案：src/、scripts/、tests/、data/、spec.md；審閱定稿在 data/bank/，合併後的題庫與知識卡在 src/data/）
 │   └── pocketdungeon/   口袋地城（自成一個專案：src/、scripts/、tests/、spec.md）
 └── site/                組合結果（不進版本控制），內容即網站根目錄
@@ -58,6 +60,7 @@ game-portal/
 ├── spelling/     ← games/spelling 的 dist/
 ├── olympiad/     ← games/olympiad 的 dist/
 ├── science/      ← games/science 的 dist/
+├── writing/      ← games/writing 的 dist/（試玩版）
 ├── social/       ← games/social 的 dist/
 └── pocketdungeon/ ← games/pocketdungeon 的 dist/
 ```
@@ -65,7 +68,7 @@ game-portal/
 ## 功能
 
 - 遊戲大廳：依時段的問候、離線就緒標記、「繼續遊戲」卡片、各遊戲主視覺卡片（完成局數、最佳紀錄）與戰績總覽（完成局數、無提示完成、累計遊玩時間）。
-- 獎勵遊戲與益智遊戲：遊戲列表分成「獎勵遊戲」（學習遊戲：數學填字、成語填字、英文單字連線、英文單字拼圖、奧數挑戰、自然探險，過關可拿口袋地城的獎勵禮包與每日入場卷）與「益智遊戲」（過關不送獎勵）。
+- 獎勵遊戲與益智遊戲：遊戲列表分成「獎勵遊戲」（學習遊戲：數學填字、成語填字、英文單字連線、英文單字拼圖、奧數挑戰、自然探險、社會科學、作文工坊（試玩版），過關可拿口袋地城的獎勵禮包與每日入場卷）與「益智遊戲」（過關不送獎勵）。
 - 遊戲歷程：最近 100 筆遊玩紀錄（開始時間、玩多久、玩哪個遊戲），由各遊戲記錄在共用的 `games.history`。
 - 凍結帳號：設定凍結時數（小時）與密碼後，大廳與所有遊戲都被凍結畫面蓋住；不論時間是否已到，都要輸入密碼才能解除。遊玩歷程與凍結由共用模組 `src/playlog.js` 處理，各遊戲的 `src/js/playlog.js` 為逐字相同的複本，規格見 [`games/spec.md`「遊玩歷程與帳號凍結」](games/spec.md#遊玩歷程與帳號凍結)。
   進度與戰績以唯讀方式讀取各遊戲在同網域 localStorage 的 `<目錄>.save`、`<目錄>.stats`，資料不完整時忽略。
@@ -88,7 +91,7 @@ game-portal/
 | --- | --- |
 | `npm test` | 執行共用模組與所有遊戲的單元測試 |
 | `npm run check:puzzles` | 所有遊戲各難度批次出題驗收（口袋地城為地城生成與數值平衡檢查） |
-| `npm run dev:sudoku`／`npm run dev:crossmath`／`npm run dev:numberlink`／`npm run dev:idiom`／`npm run dev:roll`／`npm run dev:codebreaker`／`npm run dev:spelling`／`npm run dev:olympiad`／`npm run dev:science`／`npm run dev:social`／`npm run dev:pocketdungeon` | 單獨開發某個遊戲（不啟用離線快取） |
+| `npm run dev:sudoku`／`npm run dev:crossmath`／`npm run dev:numberlink`／`npm run dev:idiom`／`npm run dev:roll`／`npm run dev:codebreaker`／`npm run dev:spelling`／`npm run dev:olympiad`／`npm run dev:science`／`npm run dev:social`／`npm run dev:writing`／`npm run dev:pocketdungeon` | 單獨開發某個遊戲（不啟用離線快取） |
 | `npm run preview` | 建置大廳與所有遊戲、組合成 `site/`，以 `http://localhost:5180/` 預覽 |
 | `npm run assemble` | 只建置並組合成 `site/`（加 `-- --no-build` 則不重新建置遊戲） |
 | `npm run build` | 只建置大廳到 `dist/` |
@@ -98,13 +101,15 @@ game-portal/
 
 ## 新增遊戲
 
+「作文工坊」（[規格](games/writing/spec.md)）依使用者要求先以試玩版加入大廳，每級 10 題；正式題量、獨立審題與手機離線驗收仍待完成。
+
 開發中的遊戲放在 `games/<目錄>/` 單獨開發，不加入大廳；**遊戲完成後必須加入大廳才算上架**。上架前提、步驟（大廳清單、組合清單、卡片圖示與主色、根目錄指令、文件）與驗證方式見 [`games/spec.md`「上架到大廳」](games/spec.md#上架到大廳遊戲完成後)。
 
 ## 部署（GitHub Pages）
 
 推送到 `main` 後，`.github/workflows/pages.yml` 會自動執行所有遊戲的單元測試、組合 `site/`，並部署到 GitHub Pages：
 
-- 網址：`https://matishsiao.github.io/game-portal-fly/`（大廳），遊戲在 `/sudoku/`、`/crossmath/`、`/numberlink/`、`/idiom/`、`/roll/`、`/codebreaker/`、`/spelling/`、`/olympiad/`、`/science/`、`/social/`、`/pocketdungeon/`。
+- 網址：`https://matishsiao.github.io/game-portal-fly/`（大廳），遊戲在 `/sudoku/`、`/crossmath/`、`/numberlink/`、`/idiom/`、`/roll/`、`/codebreaker/`、`/spelling/`、`/olympiad/`、`/science/`、`/social/`、`/writing/`、`/pocketdungeon/`。
 - HTTPS 憑證由 GitHub 自動提供與續期。
 - 首次使用需在 repo 的 **Settings → Pages** 把 Source 設為 **GitHub Actions**。公開 repo 使用 GitHub Actions 與 Pages 不需付費。
 - 也可在 Actions 分頁對「Deploy to GitHub Pages」按 **Run workflow** 手動重新部署。
