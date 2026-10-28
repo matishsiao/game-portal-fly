@@ -26,6 +26,10 @@
   --roll-2: #3f9a4a;
   --words-1: #3aa7e0;
   --words-2: #22b39a;
+  --spelling-1: #7c5cf0;
+  --spelling-2: #d9468f;
+  --olympiad-1: #5f6aa0;
+  --olympiad-2: #4a527f;
   --codebreaker-1: #4b5058;
   --codebreaker-2: #1f2226;
   --pocketdungeon-1: #9e2a3a;
@@ -62,6 +66,10 @@
     --roll-2: #2b6b34;
     --words-1: #1d5f86;
     --words-2: #157564;
+    --spelling-1: #4e36a8;
+    --spelling-2: #93285e;
+    --olympiad-1: #56608f;
+    --olympiad-2: #3d4466;
     --codebreaker-1: #454a52;
     --codebreaker-2: #17191c;
     --pocketdungeon-1: #8a2433;
@@ -296,6 +304,16 @@ summary:focus-visible {
   color: var(--text);
 }
 
+.section-note {
+  margin: -4px 0 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.reward-chip {
+  font-weight: 800;
+}
+
 .reward-daily {
   font-weight: 700;
 }
@@ -408,9 +426,19 @@ summary:focus-visible {
   background: linear-gradient(135deg, var(--words-1), var(--words-2));
 }
 
+/* 英文單字拼圖：葡萄紫到桃紅。 */
+.game-card[data-theme="spelling"] {
+  background: linear-gradient(135deg, var(--spelling-1), var(--spelling-2));
+}
+
 /* 滾滾解謎：上方天空藍、下方草地綠。 */
 .game-card[data-theme="roll"] {
   background: linear-gradient(180deg, var(--roll-1) 0%, var(--roll-1) 45%, var(--roll-2) 100%);
+}
+
+/* 奧數挑戰：低彩度的霧藍紫（護眼配色）。 */
+.game-card[data-theme="olympiad"] {
+  background: linear-gradient(135deg, var(--olympiad-1), var(--olympiad-2));
 }
 
 /* 密碼偵探：保險箱的深灰金屬（細條紋表現拉絲質感）與黃銅細邊。 */
@@ -633,6 +661,238 @@ summary:focus-visible {
 .stat-label {
   font-size: 12px;
   color: var(--text-muted);
+}
+
+/* ---------- 遊戲歷程 ---------- */
+
+.history {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.history-summary {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-top: 1px solid var(--surface-2);
+}
+
+.history-item img {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: 10px;
+}
+
+.history-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.history-title {
+  font-weight: 700;
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-when {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.history-ms {
+  flex: none;
+  font-weight: 800;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.history-more {
+  min-height: 44px;
+  border: none;
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ---------- 凍結帳號 ---------- */
+
+.freeze-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.freeze-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  flex: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #6c7b95, #36415a);
+  color: #fff;
+  font-size: 22px;
+}
+
+.freeze-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.freeze-text h2 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.freeze-text p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.freeze-btn,
+.freeze-cancel,
+.freeze-submit {
+  min-width: 72px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.freeze-btn {
+  flex: none;
+}
+
+.freeze-submit {
+  background: linear-gradient(135deg, #6c7b95, #36415a);
+  color: #fff;
+}
+
+.freeze-submit:disabled {
+  opacity: 0.6;
+}
+
+.freeze-dialog {
+  width: min(400px, calc(100% - 32px));
+  max-height: calc(100% - 32px);
+  padding: 20px;
+  border: none;
+  border-radius: 20px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-lg);
+}
+
+.freeze-dialog::backdrop {
+  background: rgba(10, 12, 20, 0.55);
+}
+
+.freeze-dialog form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.freeze-dialog h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 19px;
+}
+
+.freeze-dialog label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.freeze-dialog input {
+  min-height: 46px;
+  padding: 0 12px;
+  border: 2px solid var(--surface-2);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 17px;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.freeze-dialog input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.freeze-note {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.freeze-note b {
+  color: var(--warn);
+}
+
+.freeze-msg {
+  min-height: 1.5em;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #d33b3b;
+}
+
+.freeze-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
 /* ---------- 準備出發 ---------- */

@@ -6,6 +6,7 @@ import { CHAPTERS, LEVELS } from './levels-data.js';
 import { SPRITES } from './sprites.js';
 import { TIPS, tipsForLevel } from './tips.js';
 import * as store from './storage.js';
+import { trackPlay, guardFreeze } from './playlog.js';
 import { starsFor, chapterUnlocked, levelUnlocked, chapterSummary, chapterLevels } from './progress.js';
 
 /** 每關提示次數。 */
@@ -1483,6 +1484,9 @@ function bindEvents() {
 
 /** 啟動。 */
 function init() {
+  // 遊玩歷程與帳號凍結（與大廳共用，見 playlog.js）。
+  const play = trackPlay('roll');
+  guardFreeze({ onLock: play.flush, onUnlock: play.resume });
   applyTheme();
   document.querySelectorAll('.deco-sprite').forEach((d) => {
     d.innerHTML = SPRITES[d.dataset.sprite];

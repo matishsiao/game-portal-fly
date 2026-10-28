@@ -1,5 +1,5 @@
 // 技能資料與規則（純邏輯）：每個職業 4 個基本技能依角色等級解鎖，每轉職一次再解鎖 2 個轉職技能（共 10 個）；
-// 以技能點升級，技能欄 2 格，每轉職一次多 1 格（最多 4 格）。
+// 以技能點升級，技能欄 2 格，獲得第 3、第 4 個主動技能時開放第 3、第 4 格。
 // 另有被動技能：每個職業 2 個基本被動（Lv.8、Lv.16 解鎖）＋每轉職一次 1 個，花技能點學習，學會後一直生效。
 // 技能點 = 角色等級 − 1 − 已花費點數（不另外存檔，重置技能即把所有技能設回 Lv.1）。
 
@@ -9,7 +9,7 @@ import { STATUS } from './data.js';
 export const SKILL_MAX = 5;
 /** 技能欄的格數上限（存檔中 slots 陣列的長度）。 */
 export const SKILL_SLOTS = 4;
-/** 未轉職時可使用的技能欄格數；每轉職一次 +1。 */
+/** 一開始就能使用的技能欄格數；之後依獲得的主動技能數增加到 SKILL_SLOTS。 */
 export const SKILL_BASE_SLOTS = 2;
 
 /**
@@ -209,12 +209,22 @@ export function newSkills(cls) {
 }
 
 /**
- * 角色可以使用的技能欄格數：2 格，每轉職一次 +1（最多 4 格）。
+ * 角色已獲得（可以使用）的主動技能數：自己職業已解鎖的技能加上學會的技能書技能。
  * @param {object} ch 角色。
- * @returns {number} 格數。
+ * @returns {number} 技能數。
+ */
+export function ownedSkillCount(ch) {
+  return [...classSkills(ch.cls), ...learnedBooks(ch)].filter((id) => skillLevel(ch, id) > 0).length;
+}
+
+/**
+ * 角色可以使用的技能欄格數：2 格；獲得第 3 個主動技能開放第 3 格、第 4 個開放第 4 格（不必轉職）。
+ * 獲得的技能不會減少（等級只升不降、轉職後基本技能維持解鎖、技能書技能重置也保留），所以格數不會變少。
+ * @param {object} ch 角色。
+ * @returns {number} 格數（2～4）。
  */
 export function skillSlotCount(ch) {
-  return Math.min(SKILL_SLOTS, SKILL_BASE_SLOTS + (ch.rebirth || 0));
+  return Math.min(SKILL_SLOTS, Math.max(SKILL_BASE_SLOTS, ownedSkillCount(ch)));
 }
 
 /**
@@ -281,7 +291,7 @@ export function upgradeSkill(ch, id) {
 export function equipSkill(ch, id, slot) {
   const s = SKILLS[id];
   if (!skillLevel(ch, id)) return { ok: false, message: `${s.name}：${unlockText(id)}` };
-  if (!(slot >= 0 && slot < skillSlotCount(ch))) return { ok: false, message: `技能 ${slot + 1} 要轉職 ${slot + 1 - SKILL_BASE_SLOTS} 次才能使用` };
+  if (!(slot >= 0 && slot < skillSlotCount(ch))) return { ok: false, message: `技能 ${slot + 1} 要獲得第 ${slot + 1} 個技能才能使用` };
   const slots = ch.skills.slots;
   const other = slots.indexOf(id);
   if (other >= 0 && other !== slot) slots[other] = slots[slot];

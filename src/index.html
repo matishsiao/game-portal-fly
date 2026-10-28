@@ -70,23 +70,28 @@
       <ul id="featured" class="games featured"></ul>
     </section>
 
-    <!-- 作答獎勵提示：其他遊戲過關可以拿口袋地城的獎勵禮包與入場卷。 -->
-    <a id="reward-tip" class="reward-tip" href="./pocketdungeon/">
-      <span class="reward-tip-ico" aria-hidden="true">🎁</span>
-      <span class="reward-tip-text">
-        <b>作答拿口袋地城獎勵！</b>
-        <small>每個難度<em>第一次過關</em>、<em>第一次全對</em>（沒用提示）送獎勵禮包；<em>每天</em>過關一題再送入場卷。</small>
-        <small id="reward-daily" class="reward-daily"></small>
-      </span>
-    </a>
-
     <section id="continue-section" class="section" hidden>
       <h2 class="section-title"><svg class="i" aria-hidden="true"><use href="#i-play"></use></svg>繼續遊戲</h2>
       <div id="continue-list" class="continue-list"></div>
     </section>
 
+    <!-- 獎勵遊戲：學習遊戲過關可以拿口袋地城的獎勵禮包與入場卷。 -->
+    <section id="reward-section" class="section">
+      <h2 class="section-title"><svg class="i" aria-hidden="true"><use href="#i-book"></use></svg>獎勵遊戲</h2>
+      <a id="reward-tip" class="reward-tip" href="./pocketdungeon/">
+        <span class="reward-tip-ico" aria-hidden="true">🎁</span>
+        <span class="reward-tip-text">
+          <b>學習遊戲作答拿口袋地城獎勵！</b>
+          <small>下面的學習遊戲每個難度<em>第一次過關</em>、<em>第一次全對</em>（沒用提示）送獎勵禮包；<em>每天</em>過關一題再送入場卷。</small>
+          <small id="reward-daily" class="reward-daily"></small>
+        </span>
+      </a>
+      <ul id="reward-games" class="games"></ul>
+    </section>
+
     <section class="section">
-      <h2 class="section-title"><svg class="i" aria-hidden="true"><use href="#i-gamepad"></use></svg>遊戲</h2>
+      <h2 class="section-title"><svg class="i" aria-hidden="true"><use href="#i-gamepad"></use></svg>一般遊戲</h2>
+      <p class="section-note">純粹好玩，過關不送口袋地城的獎勵。</p>
       <ul id="games" class="games"></ul>
     </section>
 
@@ -106,6 +111,24 @@
           <span id="stat-time" class="stat-value">0</span><span class="stat-label">累計遊玩</span>
         </div>
       </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title"><svg class="i" aria-hidden="true"><use href="#i-clock"></use></svg>遊戲歷程</h2>
+      <div class="history">
+        <p id="history-summary" class="history-summary"></p>
+        <ol id="history-list" class="history-list"></ol>
+        <button type="button" id="history-more" class="history-more" hidden></button>
+      </div>
+    </section>
+
+    <section class="freeze-card">
+      <span class="freeze-icon"><svg class="i" aria-hidden="true"><use href="#i-lock"></use></svg></span>
+      <div class="freeze-text">
+        <h2>凍結帳號</h2>
+        <p>暫停使用遊戲大廳與所有遊戲；輸入凍結密碼才能解除。</p>
+      </div>
+      <button type="button" id="freeze-btn" class="freeze-btn">凍結</button>
     </section>
 
     <section id="prepare" class="prepare">
@@ -151,6 +174,28 @@
     </details>
     <p id="version-line" class="version-line"></p>
   </main>
+
+  <!-- 凍結帳號：設定凍結時數與密碼。 -->
+  <dialog id="freeze-dialog" class="freeze-dialog" aria-labelledby="freeze-title">
+    <form id="freeze-form" novalidate>
+      <h2 id="freeze-title"><svg class="i" aria-hidden="true"><use href="#i-lock"></use></svg>凍結帳號</h2>
+      <label>凍結時間（小時）
+        <input id="freeze-hours" type="number" inputmode="numeric" min="1" max="168" step="1" value="1" required>
+      </label>
+      <label>凍結密碼（4～32 個字）
+        <input id="freeze-password" type="password" autocomplete="new-password" minlength="4" maxlength="32" required>
+      </label>
+      <label>再輸入一次密碼
+        <input id="freeze-confirm" type="password" autocomplete="new-password" minlength="4" maxlength="32" required>
+      </label>
+      <p class="freeze-note">凍結後遊戲大廳與所有遊戲都無法使用。時間到之後、或提前解除，都要輸入這組密碼。<b>忘記密碼只能清除網站資料，所有遊戲的進度會一起消失。</b></p>
+      <p id="freeze-msg" class="freeze-msg" role="alert"></p>
+      <div class="freeze-actions">
+        <button type="button" id="freeze-cancel" class="freeze-cancel">取消</button>
+        <button type="submit" id="freeze-submit" class="freeze-submit">凍結</button>
+      </div>
+    </form>
+  </dialog>
 
   <button type="button" id="portal-update" class="portal-update" hidden><svg class="i" aria-hidden="true"><use href="#i-sparkle"></use></svg>大廳有新版本，點此更新</button>
 </body>

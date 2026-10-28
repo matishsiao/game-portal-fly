@@ -360,7 +360,9 @@ export const GIFT = {
   potionChance: [0.5, 0.6, 0.7, 0.8, 0.9], potions: [1, 2, 2, 3, 4],
   cureChance: [0.2, 0.3, 0.4, 0.5, 0.6], cures: [1, 1, 1, 2, 2],
   pouchChance: [0.03, 0.06, 0.1, 0.15, 0.25],
-  games: { sudoku: '數獨', crossmath: '數學填字', numberlink: '數字連線', idiom: '成語填字', roll: '滾滾解謎', words: '英文單字連線', codebreaker: '密碼偵探' },
+  games: { sudoku: '數獨', crossmath: '數學填字', numberlink: '數字連線', idiom: '成語填字', roll: '滾滾解謎', words: '英文單字連線', spelling: '英文單字拼圖', codebreaker: '密碼偵探', olympiad: '奧數挑戰' },
+  /** 學習遊戲：只有這些遊戲過關會寫入新的獲得紀錄，口袋地城也只從它們的 `<目錄>.stats` 回補；其他遊戲之前寫入的紀錄仍可領取。 */
+  learning: ['crossmath', 'idiom', 'words', 'spelling', 'olympiad'],
 };
 
 /** 合成材料（依品質，索引與稀有度相同）：分解裝備取得，用來合成裝備。 */

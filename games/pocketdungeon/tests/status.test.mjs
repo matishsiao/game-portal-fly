@@ -345,21 +345,32 @@ test('吸血：寶石最多 15%，嗜血技能另外疊加；每秒最多回復 
   assert.ok(p.hp - 1 >= Math.floor(p.maxHp * 0.02 * 3) - 2);
 });
 
-test('技能欄：未轉職 2 格，每轉職一次 +1，最多 4 格；轉職技能依轉職次數解鎖', () => {
-  assert.equal(sk.skillSlotCount({ rebirth: 0 }), 2);
-  assert.equal(sk.skillSlotCount({ rebirth: 1 }), 3);
-  assert.equal(sk.skillSlotCount({ rebirth: 3 }), 4);
+test('技能欄：2 格，獲得第 3、第 4 個技能時開放（不必轉職）；轉職技能依轉職次數解鎖', () => {
+  assert.equal(sk.skillSlotCount(hero('archer', 1, 0)), 2);
+  assert.equal(sk.skillSlotCount(hero('archer', 5, 0)), 2);
+  assert.equal(sk.skillSlotCount(hero('archer', 12, 0)), 3);
+  assert.equal(sk.skillSlotCount(hero('archer', 20, 0)), 4);
+  assert.equal(sk.skillSlotCount(hero('archer', 1, 1)), 4);
+  // 技能書技能也算獲得的技能：Lv.5（2 個基本技能）學會 1 本即開放第 3 格。
+  const reader = hero('archer', 5, 0);
+  sk.learnBook(reader, sk.bookSkillIds()[0]);
+  assert.equal(sk.skillSlotCount(reader), 3);
   const ch = hero('archer', 1, 0);
   assert.equal(sk.equipSkill(ch, 'spread', 2).ok, false);
   assert.equal(sk.skillLevel(ch, 'venom'), 0);
+  ch.level = 12;
+  assert.ok(sk.equipSkill(ch, 'leap', 2).ok);
+  assert.equal(sk.equipSkill(ch, 'spread', 3).ok, false);
+  assert.equal(sk.equippedSkills(ch).length, 3);
+  ch.level = 1;
   ch.rebirth = 1;
   assert.equal(sk.skillLevel(ch, 'venom'), 1);
   assert.equal(sk.skillLevel(ch, 'volley'), 0);
   assert.ok(sk.equipSkill(ch, 'venom', 2).ok);
-  assert.equal(sk.equipSkill(ch, 'leap', 3).ok, false);
-  assert.equal(sk.equippedSkills(ch).length, 3);
+  assert.ok(sk.equipSkill(ch, 'leap', 3).ok);
+  assert.equal(sk.equippedSkills(ch).length, 4);
   const w = arena(ch);
-  assert.equal(w.skills.length, 3);
+  assert.equal(w.skills.length, 4);
   assert.equal(w.skills[2].id, 'venom');
   w.update(DT, { ...IDLE, skill3: true });
   assert.ok(w.player.skillCd[2] > 0);
@@ -898,17 +909,21 @@ test('地城會掉淨化藥水：身上帶滿 5 瓶時放進村莊庫存', () =>
   assert.ok(LIMITS.cureDrop > 0 && LIMITS.cureChestDrop > 0);
 });
 
-test('獲得紀錄：讀取其他遊戲寫入的紀錄，並從過關統計與 roll 進度回補（同一個 id 只算一次）', () => {
+test('獲得紀錄：讀取其他遊戲寫入的紀錄（一般遊戲之前的紀錄仍保留），只從學習遊戲的過關統計回補（同一個 id 只算一次）', () => {
   const store = new Map();
   globalThis.localStorage = { getItem: (k) => (store.has(k) ? store.get(k) : null), setItem: (k, val) => store.set(k, String(val)), removeItem: (k) => store.delete(k) };
   store.set('games.rewards', JSON.stringify([{ id: 'sudoku:hard:clear', game: 'sudoku', type: 'clear', tier: 3, label: '困難 第一次過關', at: 5 }, { id: 'bad', game: 'nope', tier: 1, label: 'x' }]));
+  // 一般遊戲（數獨、滾滾解謎）的統計與進度不再回補；學習遊戲（成語填字）會回補。
   store.set('sudoku.stats', JSON.stringify({ hard: { started: 3, completed: 2, noHint: 1 }, easy: { started: 1, completed: 0, noHint: 0 } }));
   store.set('roll.progress', JSON.stringify({ '3-2': { stars: 3, bestSteps: 9 }, '1-1': { stars: 1, bestSteps: 4 } }));
+  store.set('idiom.stats', JSON.stringify({ hard: { started: 3, completed: 2, noHint: 1 }, easy: { started: 1, completed: 0, noHint: 0 } }));
   const list = loadRewards();
   const ids = list.map((r) => r.id).sort();
-  assert.deepEqual(ids, ['roll:1-1:clear', 'roll:3-2:clear', 'roll:3-2:star3', 'sudoku:hard:clear', 'sudoku:hard:perfect']);
-  assert.equal(list.find((r) => r.id === 'sudoku:hard:perfect').tier, 4);
-  assert.equal(list.find((r) => r.id === 'roll:3-2:star3').tier, 4);
+  assert.deepEqual(ids, ['idiom:hard:clear', 'idiom:hard:perfect', 'sudoku:hard:clear']);
+  assert.equal(list.find((r) => r.id === 'idiom:hard:perfect').tier, 4);
+  for (const g of ['crossmath', 'idiom', 'words', 'spelling', 'olympiad']) assert.ok(GIFT.learning.includes(g), `${g} 是學習遊戲`);
+  for (const g of ['sudoku', 'numberlink', 'roll', 'codebreaker']) assert.ok(!GIFT.learning.includes(g), `${g} 是一般遊戲`);
+  assert.ok(GIFT.learning.every((g) => GIFT.games[g]), '學習遊戲都必須在 GIFT.games 註冊');
   // 每日練習：一天一筆（daily:日期），格式不對的忽略。
   store.set('games.rewards', JSON.stringify([
     { id: 'daily:2026-10-27', game: 'idiom', type: 'daily', tier: 1, label: '今天第一次過關（簡單）', at: 9 },

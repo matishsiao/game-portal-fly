@@ -20,7 +20,9 @@ const GAMES = {
   idiom: 'games/idiom',
   roll: 'games/roll',
   words: 'games/words',
+  spelling: 'games/spelling',
   codebreaker: 'games/codebreaker',
+  olympiad: 'games/olympiad',
   pocketdungeon: 'games/pocketdungeon',
 };
 

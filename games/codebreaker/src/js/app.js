@@ -5,6 +5,7 @@ import {
   createGame, restartGame, configOf, hintsLeft, isOver, selectSlot, placeColor, clearSlot, copyLast, toggleExclude, applyUndo, submit, useHint,
 } from './game.js';
 import * as store from './storage.js';
+import { trackPlay, guardFreeze } from './playlog.js';
 
 /** 暫時訊息顯示時間（毫秒）。 */
 const MESSAGE_MS = 2500;
@@ -1120,6 +1121,9 @@ function setupPortalLink() {
 
 /** 啟動程式。 */
 function init() {
+  // 遊玩歷程與帳號凍結（與大廳共用，見 playlog.js）。
+  const play = trackPlay('codebreaker');
+  guardFreeze({ onLock: play.flush, onUnlock: play.resume });
   applyTheme();
   buildDifficultyButtons();
   bindEvents();

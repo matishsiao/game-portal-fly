@@ -1,24 +1,33 @@
 // 遊戲大廳：列出各遊戲目錄、顯示進度與戰績、離線狀態，並可一次下載所有遊戲的離線資源。
 // 每個遊戲部署在與本頁同層的獨立目錄（例如 ./sudoku/），各自擁有 Service Worker 與快取。
 // 遊戲與大廳同網域，大廳以唯讀方式讀取各遊戲的 `<遊戲>.save`、`<遊戲>.stats` 顯示進度。
+// 遊玩歷程（`games.history`）與帳號凍結（`games.freeze`）由共用模組 playlog.js 處理。
+
+import { loadHistory, guardFreeze, validateFreeze, freezeAccount, formatClock, HISTORY_LIMIT } from './playlog.js';
 
 /**
  * 遊戲清單：新增遊戲時加一筆，並把建置結果放到同名目錄。
  * `featured` 的遊戲顯示在最上方「主打遊戲」，不列在下方遊戲列表；`record: 'rpg'` 的卡片改顯示角色與冒險紀錄（見 rpgRecordLines）。
+ * `reward: true` 為學習遊戲，列在「獎勵遊戲」（過關可拿口袋地城的獎勵禮包與入場卷），其餘列在「一般遊戲」。
  */
 const GAMES = [
   { dir: 'pocketdungeon', title: '口袋地城', desc: '像素動作 RPG，闖地城打倒 Boss', tags: [['layers', '多個地城'], ['sword', '多種職業']], featured: true, record: 'rpg' },
   { dir: 'sudoku', title: '數獨', desc: '9 × 9 經典數獨，邏輯推理', tags: [['layers', '4 種難度'], ['bulb', '提示・筆記']] },
-  { dir: 'crossmath', title: '數學填字', desc: '交叉算式，用數字庫填滿空格', tags: [['layers', '4 種難度'], ['plus', '加減乘除']] },
+  { dir: 'crossmath', title: '數學填字', desc: '交叉算式，用數字庫填滿空格', tags: [['layers', '4 種難度'], ['plus', '加減乘除']], reward: true },
   { dir: 'numberlink', title: '數字連線', desc: '連起相同數字，線不交叉並填滿棋盤', tags: [['layers', '4 種難度'], ['link', '4×4～10×10']] },
-  { dir: 'idiom', title: '成語填字', desc: '選字完成成語，學會意思與用法', tags: [['layers', '4 種難度'], ['book', '成語卡・成語本']] },
+  { dir: 'idiom', title: '成語填字', desc: '選字完成成語，學會意思與用法', tags: [['layers', '4 種難度'], ['book', '成語卡・成語本']], reward: true },
   { dir: 'roll', title: '滾滾解謎', desc: '推箱子、浮起來、滑過去、彈上去', tags: [['layers', '4 章 80 關'], ['sparkle', '物理小知識']] },
-  { dir: 'words', title: '英文單字連線', desc: '旅行與生活單字，配對學英文', tags: [['layers', '34 個分類'], ['book', '單字卡・單字本']] },
+  { dir: 'words', title: '英文單字連線', desc: '旅行與生活單字，配對學英文', tags: [['layers', '34 個分類'], ['book', '單字卡・單字本']], reward: true },
+  { dir: 'spelling', title: '英文單字拼圖', desc: '看中文拼英文，高中 6,000 字分 6 級', tags: [['layers', '6 個 Level'], ['book', '發音・單字本']], reward: true },
+  { dir: 'olympiad', title: '奧數挑戰', desc: '奧數選擇題，答錯有解題重點引導', tags: [['layers', '4 種難度'], ['bulb', '解題重點・錯題本']], reward: true },
   { dir: 'codebreaker', title: '密碼偵探', desc: '看回饋推理，破解保險箱的顏色密碼', tags: [['layers', '4 種難度'], ['lock', '推理回顧']] },
 ];
 
 /** 難度代碼與名稱，依由易到難排列。 */
 const DIFFICULTY_LABEL = { easy: '簡單', medium: '中等', hard: '困難', expert: '專家' };
+
+/** 遊戲歷程一開始顯示的筆數；其餘按「顯示全部」展開。 */
+const HISTORY_PREVIEW = 10;
 
 /** 讓遊戲頁顯示「所有遊戲」連結的 localStorage 鍵（同網域共用）。 */
 const PORTAL_KEY = 'games.portal';
@@ -68,6 +77,20 @@ function formatDuration(ms) {
   if (minutes < 60) return `${minutes} 分`;
   const hours = ms / 3600000;
   return `${hours < 10 ? hours.toFixed(1) : Math.round(hours)} 小時`;
+}
+
+/**
+ * 將一段遊玩時間格式化為「x 分 y 秒」，超過 1 小時為「x 小時 y 分」。
+ * @param {number} ms 毫秒。
+ * @returns {string} 時間字串。
+ */
+function formatPlay(ms) {
+  const total = Math.round(ms / 1000);
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  if (h) return `${h} 小時 ${m} 分`;
+  return m ? `${m} 分 ${s} 秒` : `${s} 秒`;
 }
 
 /**
@@ -180,9 +203,10 @@ function renderGreeting() {
   document.getElementById('greeting-icon').setAttribute('href', `#i-${name}`);
 }
 
-/** 建立遊戲卡片與「即將推出」卡片。 */
+/** 建立遊戲卡片（主打遊戲、獎勵遊戲、一般遊戲）與「即將推出」卡片。 */
 function renderGames() {
   const list = document.getElementById('games');
+  const rewardList = document.getElementById('reward-games');
   const featured = document.getElementById('featured');
   for (const game of GAMES) {
     const li = document.createElement('li');
@@ -201,6 +225,7 @@ function renderGames() {
         </span>
       </span>
       <span class="card-meta">
+        ${game.reward ? '<span class="meta-chip reward-chip">🎁 獎勵</span>' : ''}
         <span class="meta-chip update-chip" hidden>${icon('sparkle')}有新版本</span>
         <span class="meta-chip game-status">${icon('check')}<span class="status-text">檢查中…</span></span>
         ${game.tags.map(([name, label]) => `<span class="meta-chip">${icon(name)}${label}</span>`).join('')}
@@ -213,9 +238,10 @@ function renderGames() {
     a.querySelector('.game-desc').textContent = game.desc;
     statusEls.set(game.dir, a.querySelector('.game-status'));
     li.appendChild(a);
-    (game.featured ? featured : list).appendChild(li);
+    (game.featured ? featured : game.reward ? rewardList : list).appendChild(li);
   }
   document.getElementById('featured-section').hidden = featured.children.length === 0;
+  document.getElementById('reward-section').hidden = rewardList.children.length === 0;
   const soon = document.createElement('li');
   soon.className = 'coming-soon';
   soon.innerHTML = `${icon('plus')}<span>更多遊戲即將推出</span>`;
@@ -268,6 +294,83 @@ function renderProgress() {
   document.getElementById('stat-completed').textContent = String(completed);
   document.getElementById('stat-nohint').textContent = String(noHint);
   document.getElementById('stat-time').textContent = formatDuration(totalMs);
+}
+
+/** 遊戲歷程是否展開全部紀錄。 */
+let historyExpanded = false;
+
+/**
+ * 遊戲歷程：最近 100 筆遊玩紀錄（開始時間、遊玩多久、玩哪個遊戲），由新到舊。
+ */
+function renderHistory() {
+  const titles = new Map(GAMES.map((game) => [game.dir, game.title]));
+  const entries = loadHistory().filter((r) => titles.has(r.game));
+  const totalMs = entries.reduce((sum, r) => sum + r.ms, 0);
+  document.getElementById('history-summary').textContent = entries.length
+    ? `最近 ${entries.length} 筆（最多保留 ${HISTORY_LIMIT} 筆），合計 ${formatPlay(totalMs)}`
+    : '還沒有紀錄。進入任何遊戲玩超過 10 秒，就會記下開始時間與玩了多久。';
+  const list = document.getElementById('history-list');
+  list.innerHTML = '';
+  for (const r of historyExpanded ? entries : entries.slice(0, HISTORY_PREVIEW)) {
+    const li = document.createElement('li');
+    li.className = 'history-item';
+    li.innerHTML = `
+      <img src="icons/${r.game}.svg" alt="" width="36" height="36">
+      <span class="history-text">
+        <span class="history-title"></span>
+        <span class="history-when">${icon('clock')} ${formatClock(r.start)} 開始</span>
+      </span>
+      <span class="history-ms">${formatPlay(r.ms)}</span>`;
+    li.querySelector('.history-title').textContent = titles.get(r.game);
+    list.appendChild(li);
+  }
+  const more = document.getElementById('history-more');
+  more.hidden = entries.length <= HISTORY_PREVIEW;
+  more.textContent = historyExpanded ? '收合' : `顯示全部 ${entries.length} 筆`;
+}
+
+/**
+ * 設定「凍結帳號」：輸入凍結時數與密碼（輸入兩次），凍結後整個大廳與所有遊戲都被凍結畫面蓋住。
+ */
+function setupFreeze() {
+  const dialog = document.getElementById('freeze-dialog');
+  const form = document.getElementById('freeze-form');
+  const msg = document.getElementById('freeze-msg');
+  const guard = guardFreeze({ onUnlock: refreshView });
+  document.getElementById('freeze-btn').addEventListener('click', () => {
+    form.reset();
+    msg.textContent = '';
+    if (typeof dialog.showModal === 'function') dialog.showModal();
+    else dialog.setAttribute('open', '');
+    document.getElementById('freeze-hours').focus();
+  });
+  /** 關閉設定視窗。 */
+  const close = () => {
+    if (typeof dialog.close === 'function') dialog.close();
+    else dialog.removeAttribute('open');
+  };
+  document.getElementById('freeze-cancel').addEventListener('click', close);
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const hoursText = document.getElementById('freeze-hours').value.trim();
+    const hours = /^\d+$/.test(hoursText) ? Number(hoursText) : NaN;
+    const password = document.getElementById('freeze-password').value;
+    const error = validateFreeze(hours, password, document.getElementById('freeze-confirm').value);
+    if (error) {
+      msg.textContent = `✕ ${error}`;
+      return;
+    }
+    const submit = document.getElementById('freeze-submit');
+    submit.disabled = true;
+    const ok = await freezeAccount(password, hours);
+    submit.disabled = false;
+    if (!ok) {
+      msg.textContent = '✕ 無法儲存凍結設定（瀏覽器可能禁止儲存資料）';
+      return;
+    }
+    close();
+    guard.check();
+  });
 }
 
 /**
@@ -674,7 +777,7 @@ function renderRewardTip() {
   const id = `daily:${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   const list = readJson('games.rewards');
   const done = Array.isArray(list) && list.some((r) => r && r.id === id);
-  el.textContent = done ? '✓ 今天的每日練習完成了，到口袋地城點 🎁 領入場卷' : '今天還沒過關，玩一題就能拿到今天的入場卷';
+  el.textContent = done ? '✓ 今天的每日練習完成了，到口袋地城點 🎁 領入場卷' : '今天還沒過關，玩一題學習遊戲就能拿到今天的入場卷';
   el.classList.toggle('done', done);
 }
 
@@ -683,6 +786,7 @@ function refreshView() {
   renderGreeting();
   renderRewardTip();
   renderProgress();
+  renderHistory();
   refreshAll();
   checkPortalUpdate();
   checkGameUpdates();
@@ -692,6 +796,11 @@ function refreshView() {
 function init() {
   renderGames();
   renderRewardTip();
+  setupFreeze();
+  document.getElementById('history-more').addEventListener('click', () => {
+    historyExpanded = !historyExpanded;
+    renderHistory();
+  });
   rememberPortal();
   setupInstall();
   const platform = mobilePlatform();

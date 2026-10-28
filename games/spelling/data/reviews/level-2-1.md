@@ -1,0 +1,68 @@
+# level-2-1 審閱紀錄
+
+- 檢查數：259
+- 通過數：236
+- 修正數：23
+
+## 修正項目
+
+- **addition**（n.）：例句用的是「加法」，調整 zh 順序使第一個意思與例句一致。
+  - `zh`：原「增加、加法」→ 改「加法、增加」
+- **against**（prep.）：原例句用「靠著」，與 zh 第一個意思「反對」不一致；改用最常用的「反對」。
+  - `example`：原「I leaned the ladder against the wall.」→ 改「Most students are against the new school rule.」
+  - `exampleZh`：原「我把梯子靠在牆上。」→ 改「大部分學生反對新的校規。」
+- **arrangement**（n.）：原例句 flower arrangement 是「插花」，與 zh「安排」不一致。
+  - `example`：原「The flower arrangement on the table looks lovely.」→ 改「The teacher made all the arrangements for our class trip.」
+  - `form`：原「」→ 改「arrangements」
+  - `exampleZh`：原「桌上的插花看起來很漂亮。」→ 改「老師為我們的校外教學做好了所有安排。」
+- **character**（n.）：zh 只取 1～2 個意思，刪去「字元」。
+  - `zh`：原「角色、個性、字元」→ 改「角色、個性」
+- **chopstick**（n.）：「use a chopstick」不自然，筷子應用複數。
+  - `example`：原「He is learning to use a chopstick.」→ 改「He is learning to use chopsticks.」
+  - `form`：原「」→ 改「chopsticks」
+  - `exampleZh`：原「他正在學習使用筷子。」→ 改「他正在學用筷子。」
+- **contract**（n./v.）：「合同」為中國大陸用語，改為台灣用語「契約」。
+  - `zh`：原「合約、合同」→ 改「合約、契約」
+- **court**（n.）：例句用的是「球場」，調整 zh 順序使第一個意思與例句一致。
+  - `zh`：原「法庭、球場」→ 改「球場、法庭」
+- **dancer**（n.）：gracefully 超出 Level 2 難度，改用較簡單的字。
+  - `example`：原「The dancer moved gracefully across the stage.」→ 改「The dancer moved across the stage to the music.」
+  - `exampleZh`：原「那位舞者優雅地在舞台上移動。」→ 改「那位舞者隨著音樂在舞台上移動。」
+- **eve**（n.）：New Year's Eve 指 12 月 31 日，台灣稱「跨年夜」；「除夕夜」指農曆除夕。
+  - `exampleZh`：原「我們在除夕夜辦了派對。」→ 改「我們在跨年夜辦了派對。」
+- **furniture**（n.）：改用教育部標準用字「家具」。
+  - `zh`：原「傢俱」→ 改「家具」
+- **image**（n.）：zh 只取 1～2 個意思，且第一個意思須與例句「影像」一致。
+  - `zh`：原「形象、影像、圖像」→ 改「影像、形象」
+- **lantern**（n.）：「Children carried a lantern」主詞複數配單數燈籠不自然。
+  - `example`：原「Children carried a lantern at the festival.」→ 改「The kids carried paper lanterns at the festival.」
+  - `form`：原「」→ 改「lanterns」
+  - `exampleZh`：原「孩子們在節慶中提著燈籠。」→ 改「孩子們在節慶時提著紙燈籠。」
+- **master**（n./v.）：例句用的是「大師（老師傅）」，調整 zh 順序使第一個意思與例句一致。
+  - `zh`：原「主人、大師」→ 改「大師、主人」
+- **motorcycle**（n.）：台灣常用「機車」。
+  - `zh`：原「摩托車」→ 改「機車、摩托車」
+  - `exampleZh`：原「台灣有很多人騎摩托車上班。」→ 改「台灣有很多人騎機車上班。」
+- **nail**（n.）：「put in a nail」不自然。
+  - `example`：原「He used a hammer to put in a nail.」→ 改「Dad hit the nail into the wall with a hammer.」
+  - `exampleZh`：原「他用鐵鎚釘入一根釘子。」→ 改「爸爸用鐵鎚把釘子釘進牆裡。」
+- **network**（n./v.）：「網絡」偏中國大陸用語，台灣用「網路」。
+  - `zh`：原「網路、網絡」→ 改「網路」
+- **phrase**（n./v.）：原例句「Learn this ___ before the test.」挖空後太空泛，難以猜出。
+  - `example`：原「Learn this phrase before the test.」→ 改「"Look after" is a phrase that means "take care of."」
+  - `exampleZh`：原「考試前先學會這個片語。」→ 改「「look after」是一個意思為「take care of」的片語。」
+- **punishment**（n.）：原句「遲到不是很重的處罰」語意不通（遲到本身不是處罰）。
+  - `example`：原「Being late for class was not a big punishment.」→ 改「His punishment for being late was cleaning the classroom.」
+  - `exampleZh`：原「上課遲到並不是很重的處罰。」→ 改「他遲到的處罰是打掃教室。」
+- **salesman**（n.）：「男業務員」不自然，改為常用說法。
+  - `zh`：原「男業務員、推銷員」→ 改「推銷員、業務員」
+- **simply**（adv.）：例句用的是「只是」，調整 zh 順序使第一個意思與例句一致。
+  - `zh`：原「簡單地、僅僅」→ 改「只是、簡單地」
+- **switch**（n./v.）：原句 turn 重複出現（Turn the switch to turn on），不自然。
+  - `example`：原「Turn the switch to turn on the light.」→ 改「Press the switch to turn on the light.」
+- **thought**（n.）：原例句「That is a good ___.」挖空後太空泛。
+  - `example`：原「That is a good thought.」→ 改「She shared her thoughts about the book with the class.」
+  - `form`：原「」→ 改「thoughts」
+  - `exampleZh`：原「那是個好想法。」→ 改「她和全班分享她對這本書的想法。」
+- **weekday**（n.）：「on every weekday」文法不自然，every 前不加 on。
+  - `example`：原「I get up at six on every weekday.」→ 改「I get up at six every weekday.」
