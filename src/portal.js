@@ -20,6 +20,7 @@ const GAMES = [
   { dir: 'words', title: '英文單字連線', desc: '旅行與生活單字，配對學英文', tags: [['layers', '34 個分類'], ['book', '單字卡・單字本']], reward: true },
   { dir: 'spelling', title: '英文單字拼圖', desc: '看中文拼英文，高中 6,000 字分 6 級', tags: [['layers', '6 個 Level'], ['book', '發音・單字本']], reward: true },
   { dir: 'olympiad', title: '奧數挑戰', desc: '奧數選擇題，答錯有解題重點引導', tags: [['layers', '4 種難度'], ['bulb', '解題重點・錯題本']], reward: true },
+  { dir: 'science', title: '自然探險', desc: '國小到國中自然科學，預習與複習', tags: [['layers', '低年級到國中'], ['book', '科學卡・複習本']], reward: true },
   { dir: 'codebreaker', title: '密碼偵探', desc: '看回饋推理，破解保險箱的顏色密碼', tags: [['layers', '4 種難度'], ['lock', '推理回顧']] },
 ];
 

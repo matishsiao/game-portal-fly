@@ -23,6 +23,7 @@ const GAMES = {
   spelling: 'games/spelling',
   codebreaker: 'games/codebreaker',
   olympiad: 'games/olympiad',
+  science: 'games/science',
   pocketdungeon: 'games/pocketdungeon',
 };
 

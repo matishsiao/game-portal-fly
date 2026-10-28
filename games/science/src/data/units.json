@@ -1,0 +1,551 @@
+{
+  "v": 1,
+  "units": [
+    {
+      "id": "e-body",
+      "stage": "easy",
+      "topic": "life",
+      "title": "我的身體與感官",
+      "icon": "👀"
+    },
+    {
+      "id": "e-plants",
+      "stage": "easy",
+      "topic": "life",
+      "title": "植物朋友",
+      "icon": "🌱"
+    },
+    {
+      "id": "e-animals",
+      "stage": "easy",
+      "topic": "life",
+      "title": "動物朋友",
+      "icon": "🐛"
+    },
+    {
+      "id": "e-weather",
+      "stage": "easy",
+      "topic": "earth",
+      "title": "天氣與四季",
+      "icon": "🌦️"
+    },
+    {
+      "id": "e-sun-shadow",
+      "stage": "easy",
+      "topic": "earth",
+      "title": "太陽、影子與白天晚上",
+      "icon": "☀️"
+    },
+    {
+      "id": "e-environment",
+      "stage": "easy",
+      "topic": "earth",
+      "title": "愛護環境與生活安全",
+      "icon": "♻️"
+    },
+    {
+      "id": "e-changes",
+      "stage": "easy",
+      "topic": "matter",
+      "title": "好玩的水：冰、水與浮沉",
+      "icon": "🧊"
+    },
+    {
+      "id": "e-air-wind",
+      "stage": "easy",
+      "topic": "matter",
+      "title": "風和空氣",
+      "icon": "🎈"
+    },
+    {
+      "id": "e-magnet",
+      "stage": "easy",
+      "topic": "force",
+      "title": "好玩的磁鐵",
+      "icon": "🧲"
+    },
+    {
+      "id": "e-sound",
+      "stage": "easy",
+      "topic": "force",
+      "title": "好聽的聲音",
+      "icon": "🔔"
+    },
+    {
+      "id": "e-light",
+      "stage": "easy",
+      "topic": "force",
+      "title": "光和顏色",
+      "icon": "🌈"
+    },
+    {
+      "id": "m-plants",
+      "stage": "medium",
+      "topic": "life",
+      "title": "植物的構造、繁殖與養分",
+      "icon": "🌿"
+    },
+    {
+      "id": "m-animals",
+      "stage": "medium",
+      "topic": "life",
+      "title": "動物的身體、生活與繁殖",
+      "icon": "🐟"
+    },
+    {
+      "id": "m-water-life",
+      "stage": "medium",
+      "topic": "life",
+      "title": "水中生物",
+      "icon": "🐠"
+    },
+    {
+      "id": "m-insects",
+      "stage": "medium",
+      "topic": "life",
+      "title": "昆蟲世界",
+      "icon": "🦋"
+    },
+    {
+      "id": "m-water-states",
+      "stage": "medium",
+      "topic": "matter",
+      "title": "水的三態與水循環",
+      "icon": "💧"
+    },
+    {
+      "id": "m-water-move",
+      "stage": "medium",
+      "topic": "matter",
+      "title": "水的移動",
+      "icon": "🚰"
+    },
+    {
+      "id": "m-dissolve",
+      "stage": "medium",
+      "topic": "matter",
+      "title": "溶解",
+      "icon": "🥄"
+    },
+    {
+      "id": "m-air",
+      "stage": "medium",
+      "topic": "matter",
+      "title": "空氣與風",
+      "icon": "🌬️"
+    },
+    {
+      "id": "m-magnet",
+      "stage": "medium",
+      "topic": "force",
+      "title": "磁鐵與電磁鐵",
+      "icon": "🧲"
+    },
+    {
+      "id": "m-circuit",
+      "stage": "medium",
+      "topic": "force",
+      "title": "簡單電路",
+      "icon": "🔋"
+    },
+    {
+      "id": "m-float",
+      "stage": "medium",
+      "topic": "force",
+      "title": "浮沉與力",
+      "icon": "🛶"
+    },
+    {
+      "id": "m-time",
+      "stage": "medium",
+      "topic": "force",
+      "title": "時間的測量",
+      "icon": "⏳"
+    },
+    {
+      "id": "m-weather",
+      "stage": "medium",
+      "topic": "earth",
+      "title": "天氣與颱風",
+      "icon": "🌡️"
+    },
+    {
+      "id": "m-sun",
+      "stage": "medium",
+      "topic": "earth",
+      "title": "太陽、影子、方位與四季",
+      "icon": "🧭"
+    },
+    {
+      "id": "m-moon",
+      "stage": "medium",
+      "topic": "earth",
+      "title": "月亮",
+      "icon": "🌙"
+    },
+    {
+      "id": "m-rocks",
+      "stage": "medium",
+      "topic": "earth",
+      "title": "岩石、土壤與地表變化",
+      "icon": "🪨"
+    },
+    {
+      "id": "h-human-body",
+      "stage": "medium",
+      "topic": "life",
+      "title": "人體的構造與功能",
+      "icon": "🫀"
+    },
+    {
+      "id": "h-microbes",
+      "stage": "medium",
+      "topic": "life",
+      "title": "微生物與食物保存",
+      "icon": "🦠"
+    },
+    {
+      "id": "h-ecology",
+      "stage": "medium",
+      "topic": "life",
+      "title": "生物與環境",
+      "icon": "🦅"
+    },
+    {
+      "id": "h-acid-base",
+      "stage": "medium",
+      "topic": "matter",
+      "title": "水溶液與酸鹼",
+      "icon": "🍋"
+    },
+    {
+      "id": "h-combustion",
+      "stage": "medium",
+      "topic": "matter",
+      "title": "燃燒、生鏽與滅火",
+      "icon": "🧯"
+    },
+    {
+      "id": "h-heat",
+      "stage": "medium",
+      "topic": "matter",
+      "title": "熱的傳播與熱脹冷縮",
+      "icon": "♨️"
+    },
+    {
+      "id": "h-light",
+      "stage": "medium",
+      "topic": "force",
+      "title": "光的世界：反射、折射與色光",
+      "icon": "🔦"
+    },
+    {
+      "id": "h-sound",
+      "stage": "medium",
+      "topic": "force",
+      "title": "聲音與樂器",
+      "icon": "🎵"
+    },
+    {
+      "id": "h-motion",
+      "stage": "medium",
+      "topic": "force",
+      "title": "力與運動",
+      "icon": "🏃"
+    },
+    {
+      "id": "h-machines",
+      "stage": "medium",
+      "topic": "force",
+      "title": "簡單機械",
+      "icon": "⚙️"
+    },
+    {
+      "id": "h-stars",
+      "stage": "medium",
+      "topic": "earth",
+      "title": "星星與星座",
+      "icon": "✨"
+    },
+    {
+      "id": "h-resources",
+      "stage": "medium",
+      "topic": "earth",
+      "title": "能源與環境保護",
+      "icon": "🌳"
+    },
+    {
+      "id": "h-inquiry",
+      "stage": "medium",
+      "topic": "inquiry",
+      "title": "科學探究：公平的實驗與推論",
+      "icon": "🔬"
+    },
+    {
+      "id": "x-inquiry",
+      "stage": "expert",
+      "topic": "inquiry",
+      "title": "探究方法與實驗室安全",
+      "icon": "🥽"
+    },
+    {
+      "id": "x-cells",
+      "stage": "expert",
+      "topic": "life",
+      "title": "生命的特性與細胞",
+      "icon": "🔬"
+    },
+    {
+      "id": "x-nutrition",
+      "stage": "expert",
+      "topic": "life",
+      "title": "生物體的營養",
+      "icon": "🍎"
+    },
+    {
+      "id": "x-transport",
+      "stage": "expert",
+      "topic": "life",
+      "title": "生物體的運輸作用",
+      "icon": "🫀"
+    },
+    {
+      "id": "x-coordination",
+      "stage": "expert",
+      "topic": "life",
+      "title": "生物體的協調作用",
+      "icon": "🧠"
+    },
+    {
+      "id": "x-homeostasis",
+      "stage": "expert",
+      "topic": "life",
+      "title": "生物體的恆定性",
+      "icon": "🌡️"
+    },
+    {
+      "id": "x-reproduction",
+      "stage": "expert",
+      "topic": "life",
+      "title": "生殖",
+      "icon": "🌸"
+    },
+    {
+      "id": "x-genetics",
+      "stage": "expert",
+      "topic": "life",
+      "title": "遺傳",
+      "icon": "🧬"
+    },
+    {
+      "id": "x-evolution",
+      "stage": "expert",
+      "topic": "life",
+      "title": "演化與化石",
+      "icon": "🦕"
+    },
+    {
+      "id": "x-classification",
+      "stage": "expert",
+      "topic": "life",
+      "title": "生物的分類",
+      "icon": "🗂️"
+    },
+    {
+      "id": "x-ecosystem",
+      "stage": "expert",
+      "topic": "life",
+      "title": "生態系",
+      "icon": "🌍"
+    },
+    {
+      "id": "x-human-env",
+      "stage": "expert",
+      "topic": "life",
+      "title": "人類與環境",
+      "icon": "🏭"
+    },
+    {
+      "id": "x-measurement",
+      "stage": "expert",
+      "topic": "matter",
+      "title": "基本測量與密度",
+      "icon": "📏"
+    },
+    {
+      "id": "x-matter",
+      "stage": "expert",
+      "topic": "matter",
+      "title": "物質的世界：純物質、混合物與溶液",
+      "icon": "⚗️"
+    },
+    {
+      "id": "x-atoms",
+      "stage": "expert",
+      "topic": "matter",
+      "title": "原子、分子與週期表",
+      "icon": "⚛️"
+    },
+    {
+      "id": "x-waves-sound",
+      "stage": "expert",
+      "topic": "force",
+      "title": "波動與聲音",
+      "icon": "🔊"
+    },
+    {
+      "id": "x-light",
+      "stage": "expert",
+      "topic": "force",
+      "title": "光的直進、反射與面鏡",
+      "icon": "🪞"
+    },
+    {
+      "id": "x-light-refract",
+      "stage": "expert",
+      "topic": "force",
+      "title": "光的折射、透鏡與色光",
+      "icon": "🔍"
+    },
+    {
+      "id": "x-heat",
+      "stage": "expert",
+      "topic": "matter",
+      "title": "溫度與熱",
+      "icon": "🌡️"
+    },
+    {
+      "id": "x-reactions",
+      "stage": "expert",
+      "topic": "matter",
+      "title": "化學反應與質量守恆",
+      "icon": "🧪"
+    },
+    {
+      "id": "x-oxidation",
+      "stage": "expert",
+      "topic": "matter",
+      "title": "氧化與還原",
+      "icon": "🔥"
+    },
+    {
+      "id": "x-acid-base",
+      "stage": "expert",
+      "topic": "matter",
+      "title": "電解質與酸鹼鹽",
+      "icon": "🍋"
+    },
+    {
+      "id": "x-rate",
+      "stage": "expert",
+      "topic": "matter",
+      "title": "反應速率與平衡",
+      "icon": "⏱️"
+    },
+    {
+      "id": "x-organic",
+      "stage": "expert",
+      "topic": "matter",
+      "title": "有機化合物",
+      "icon": "🧴"
+    },
+    {
+      "id": "x-pressure",
+      "stage": "expert",
+      "topic": "force",
+      "title": "力與壓力",
+      "icon": "⚓"
+    },
+    {
+      "id": "x-motion",
+      "stage": "expert",
+      "topic": "force",
+      "title": "直線運動",
+      "icon": "🚗"
+    },
+    {
+      "id": "x-newton",
+      "stage": "expert",
+      "topic": "force",
+      "title": "力與運動",
+      "icon": "🍎"
+    },
+    {
+      "id": "x-energy",
+      "stage": "expert",
+      "topic": "force",
+      "title": "功與能",
+      "icon": "⚡"
+    },
+    {
+      "id": "x-machines",
+      "stage": "expert",
+      "topic": "force",
+      "title": "簡單機械：槓桿、滑輪與輪軸",
+      "icon": "⚙️"
+    },
+    {
+      "id": "x-electricity",
+      "stage": "expert",
+      "topic": "force",
+      "title": "靜電與電路",
+      "icon": "🔋"
+    },
+    {
+      "id": "x-current-effects",
+      "stage": "expert",
+      "topic": "force",
+      "title": "電流的熱效應與化學效應",
+      "icon": "🔥"
+    },
+    {
+      "id": "x-electromagnetism",
+      "stage": "expert",
+      "topic": "force",
+      "title": "電與磁：電流磁效應與電磁感應",
+      "icon": "🧲"
+    },
+    {
+      "id": "x-earth-structure",
+      "stage": "expert",
+      "topic": "earth",
+      "title": "地球的構造與板塊運動",
+      "icon": "🌋"
+    },
+    {
+      "id": "x-geology",
+      "stage": "expert",
+      "topic": "earth",
+      "title": "岩石、礦物與地層化石",
+      "icon": "🪨"
+    },
+    {
+      "id": "x-weather",
+      "stage": "expert",
+      "topic": "earth",
+      "title": "天氣與氣候",
+      "icon": "⛈️"
+    },
+    {
+      "id": "x-earth-moon",
+      "stage": "expert",
+      "topic": "earth",
+      "title": "晝夜、四季、月相與潮汐",
+      "icon": "🌗"
+    },
+    {
+      "id": "x-astronomy",
+      "stage": "expert",
+      "topic": "earth",
+      "title": "宇宙與太陽系",
+      "icon": "🪐"
+    },
+    {
+      "id": "x-sustainability",
+      "stage": "expert",
+      "topic": "earth",
+      "title": "能源與永續發展",
+      "icon": "♻️"
+    }
+  ]
+}
