@@ -1,0 +1,26 @@
+{
+  "name": "offline-social",
+  "version": "1.0.0",
+  "private": true,
+  "description": "可離線遊玩的單機社會探索（Social Studies Quest）PWA",
+  "type": "module",
+  "engines": {
+    "node": ">=16.17"
+  },
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "dev:https": "node scripts/serve.mjs --https",
+    "build": "node scripts/build.mjs",
+    "preview": "node scripts/build.mjs && node scripts/serve.mjs --dist",
+    "preview:https": "node scripts/build.mjs && node scripts/serve.mjs --dist --https",
+    "test": "node --test tests/",
+    "check:puzzles": "node scripts/check-bank.mjs",
+    "check:release": "node scripts/check-bank.mjs --release",
+    "icons": "node scripts/make-icons.mjs",
+    "bank": "node scripts/build-bank.mjs",
+    "bank:draft": "node scripts/build-bank.mjs --draft",
+    "validate": "node scripts/validate-bank.mjs",
+    "check:full": "node scripts/check-bank.mjs --full",
+    "check:dates": "node scripts/check-bank.mjs --dates"
+  }
+}
