@@ -17,6 +17,8 @@ const STEP = 1 / 60;
 const AUTOSAVE = 10;
 /** 短訊息顯示時間（毫秒）。 */
 const TOAST_MS = 2200;
+/** 獲得紀錄的「已領取」只顯示最近這幾天領取的（毫秒）；已領取的代碼仍永久保留，不會重複領。 */
+const CLAIM_LOG_MS = 3 * 24 * 3600 * 1000;
 
 /**
  * 依 id 取得元素。
@@ -63,6 +65,10 @@ const app = {
   chars: new Map(),
   /** 已領取的獲得紀錄（其他遊戲的第一次過關與第一次全對，整個帳號共用）。 */
   claimed: [],
+  /** 各獲得紀錄的領取時間（只保留最近 3 天，供「已領取」顯示）。 */
+  claimedAt: {},
+  /** 清除「已領取」顯示的時間；在這之前領取的不再列出。 */
+  claimCleared: 0,
   /** 共用倉庫（所有角色共用的 20 格裝備與金幣）。 */
   shared: { items: [], gold: 0 },
   /** 進行中的探險 {charId, snap}。 */
@@ -1606,6 +1612,16 @@ async function bulkDialog(ch) {
 }
 
 /**
+ * 整理要儲存的已領取紀錄：領取時間只留最近 3 天，已領取的代碼全部保留（避免重複領取）。
+ * @returns {{claimed: string[], claimedAt: Object<string, number>, cleared: number}} 已領取的紀錄。
+ */
+function giftState() {
+  const after = Date.now() - CLAIM_LOG_MS;
+  app.claimedAt = Object.fromEntries(Object.entries(app.claimedAt).filter(([, at]) => at > after));
+  return { claimed: app.claimed, claimedAt: app.claimedAt, cleared: app.claimCleared };
+}
+
+/**
  * 獲得紀錄：列出其他遊戲的第一次過關與第一次全對；還沒領取的可以「全部領取」，禮包放進目前角色的背包（每個紀錄只能領一次）。
  * @param {object} ch 角色。
  * @returns {Promise<void>}
@@ -1618,12 +1634,30 @@ async function openRewards(ch) {
   const row = (r, done) => (r.type === 'daily'
     ? `<div class="reward-row${done ? ' done' : ''}"><span class="inv-cell stack static ticket-cell"><img src="${itemDataUrl(`ticket${tier}`)}" alt=""></span><div><b>每日練習 ${r.id.slice(6)}</b><small>${esc(GIFT.games[r.game])}・${esc(r.label)}</small></div><em>${done ? '已領取' : `${TICKET.short[tier - 1]} ×${TICKET.daily}`}</em></div>`
     : `<div class="reward-row${done ? ' done' : ''}"><span class="inv-cell stack static gift-cell tier${r.tier}"><img src="${itemDataUrl('gift')}" alt=""></span><div><b>${GIFT.games[r.game]}</b><small>${esc(r.label)}</small></div><em>${done ? '已領取' : GIFT.names[r.tier - 1]}</em></div>`);
-  const done = list.filter((r) => app.claimed.includes(r.id)).slice(0, 30);
+  const shownAfter = Math.max(Date.now() - CLAIM_LOG_MS, app.claimCleared);
+  const done = list.filter((r) => app.claimed.includes(r.id) && app.claimedAt[r.id] > shownAfter)
+    .sort((a, b) => app.claimedAt[b.id] - app.claimedAt[a.id]);
   const html = `<p class="muted small">在學習遊戲（${GIFT.learning.map((g) => GIFT.games[g]).join('、')}）<b>第一次過關</b>或<b>第一次全對</b>（沒用提示）時取得獎勵禮包，難度愈高，禮包等級愈高；重複過關不會再給。<b>每天</b>在學習遊戲過關一題，還可以領 ${TICKET.daily} 張入場卷（目前進度的等級）。每個紀錄只能領一次，領取後放進目前角色。</p>
     ${pending.length ? pending.map((r) => row(r, false)).join('') : '<p class="muted">目前沒有可以領取的禮包。到大廳玩學習遊戲吧！</p>'}
-    ${done.length ? `<h3>已領取</h3>${done.map((r) => row(r, true)).join('')}` : ''}`;
-  const act = await openModal({ title: '獲得紀錄', html, actions: [{ label: '關閉', value: null }, ...(pending.length ? [{ label: `全部領取（${pending.length}）`, value: 'claim', className: 'primary' }] : [])] });
+    ${done.length ? `<h3>已領取</h3><p class="muted small">只保留最近 3 天的領取紀錄。</p>${done.map((r) => row(r, true)).join('')}` : ''}`;
+  const act = await openModal({
+    title: '獲得紀錄',
+    html,
+    actions: [
+      { label: '關閉', value: null },
+      ...(done.length ? [{ label: '清除紀錄', value: 'clear' }] : []),
+      ...(pending.length ? [{ label: `全部領取（${pending.length}）`, value: 'claim', className: 'primary' }] : []),
+    ],
+  });
+  if (act === 'clear') {
+    app.claimCleared = Date.now();
+    await store.saveGifts(giftState());
+    villageMessage('已清除領取紀錄');
+    openRewards(ch);
+    return;
+  }
   if (act !== 'claim') return;
+  const now = Date.now();
   let got = 0;
   let gifts = 0;
   let tickets = 0;
@@ -1632,9 +1666,10 @@ async function openRewards(ch) {
     else if (village.addGift(ch, r.tier)) gifts++;
     else break;
     app.claimed.push(r.id);
+    app.claimedAt[r.id] = now;
     got++;
   }
-  await store.saveClaimed(ch, app.claimed);
+  await store.saveClaimed(ch, giftState());
   const parts = [gifts ? `${gifts} 個獎勵禮包（到倉庫開啟）` : '', tickets ? `${tickets} 張${TICKET.names[tier - 1]}` : ''].filter(Boolean).join('、');
   villageMessage(got === pending.length ? `領取了 ${parts}` : `背包已滿，領取了 ${got}／${pending.length} 筆：${parts}`, got < pending.length);
   renderVillage();
@@ -2868,6 +2903,8 @@ async function init() {
   app.run = data.run;
   app.shared = data.shared;
   app.claimed = data.claimed;
+  app.claimedAt = data.claimedAt;
+  app.claimCleared = data.claimCleared;
   app.current = data.meta.current && app.chars.has(data.meta.current) ? data.meta.current : null;
   const notices = [];
   if (!ok) notices.push('此瀏覽器無法儲存資料（可能是私密瀏覽模式），關閉後進度會遺失。');

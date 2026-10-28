@@ -8,7 +8,7 @@ import { loadHistory, guardFreeze, validateFreeze, freezeAccount, formatClock, H
 /**
  * 遊戲清單：新增遊戲時加一筆，並把建置結果放到同名目錄。
  * `featured` 的遊戲顯示在最上方「主打遊戲」，不列在下方遊戲列表；`record: 'rpg'` 的卡片改顯示角色與冒險紀錄（見 rpgRecordLines）。
- * `reward: true` 為學習遊戲，列在「獎勵遊戲」（過關可拿口袋地城的獎勵禮包與入場卷），其餘列在「益智遊戲」。
+ * `reward: true` 為學習遊戲，列在「獎勵遊戲」分頁（過關可拿口袋地城的獎勵禮包與入場卷），其餘列在「益智遊戲」分頁。
  */
 const GAMES = [
   { dir: 'pocketdungeon', title: '口袋地城', desc: '像素動作 RPG，闖地城打倒 Boss', tags: [['layers', '多個地城'], ['sword', '多種職業']], featured: true, record: 'rpg' },
@@ -29,7 +29,7 @@ const GAMES = [
 /** 難度代碼與名稱，依由易到難排列。 */
 const DIFFICULTY_LABEL = { easy: '簡單', medium: '中等', hard: '困難', expert: '專家' };
 
-/** 遊戲歷程一開始顯示的筆數；其餘按「顯示全部」展開。 */
+/** 遊戲歷程在大廳顯示的筆數；其餘按「顯示更多」開啟列表。 */
 const HISTORY_PREVIEW = 10;
 
 /** 讓遊戲頁顯示「所有遊戲」連結的 localStorage 鍵（同網域共用）。 */
@@ -244,7 +244,6 @@ function renderGames() {
     (game.featured ? featured : game.reward ? rewardList : list).appendChild(li);
   }
   document.getElementById('featured-section').hidden = featured.children.length === 0;
-  document.getElementById('reward-section').hidden = rewardList.children.length === 0;
   const soon = document.createElement('li');
   soon.className = 'coming-soon';
   soon.innerHTML = `${icon('plus')}<span>更多遊戲即將推出</span>`;
@@ -293,43 +292,144 @@ function renderProgress() {
       continueList.appendChild(a);
     }
   }
-  document.getElementById('continue-section').hidden = continueList.children.length === 0;
+  const unfinished = continueList.children.length;
+  const count = document.getElementById('continue-count');
+  count.hidden = unfinished === 0;
+  count.textContent = String(unfinished);
+  document.getElementById('continue-empty').hidden = unfinished > 0;
   document.getElementById('stat-completed').textContent = String(completed);
   document.getElementById('stat-nohint').textContent = String(noHint);
   document.getElementById('stat-time').textContent = formatDuration(totalMs);
 }
 
-/** 遊戲歷程是否展開全部紀錄。 */
-let historyExpanded = false;
+/** 大廳記住所選分頁的 localStorage 鍵。 */
+const TAB_KEY = 'portal.tab';
+/** 遊戲分頁（依畫面順序）。 */
+const TABS = ['continue', 'reward', 'puzzle'];
 
 /**
- * 遊戲歷程：最近 100 筆遊玩紀錄（開始時間、遊玩多久、玩哪個遊戲），由新到舊。
+ * 切換遊戲分頁（繼續遊戲、獎勵遊戲、益智遊戲）。
+ * @param {string} name 分頁名稱。
+ * @param {boolean} [remember=false] 是否記住這次的選擇（玩家點選時）。
  */
-function renderHistory() {
+function selectTab(name, remember = false) {
+  for (const tab of TABS) {
+    const on = tab === name;
+    const btn = document.getElementById(`tab-${tab}`);
+    btn.setAttribute('aria-selected', String(on));
+    btn.tabIndex = on ? 0 : -1;
+    document.getElementById(`panel-${tab}`).hidden = !on;
+  }
+  if (!remember) return;
+  try {
+    localStorage.setItem(TAB_KEY, name);
+  } catch {
+    // 忽略：無法儲存時下次改用預設分頁。
+  }
+}
+
+/**
+ * 設定遊戲分頁：點選或用左右鍵切換；一開始顯示上次選的分頁，
+ * 沒選過（或上次是繼續遊戲但已沒有玩到一半的遊戲）時，有玩到一半的遊戲就顯示繼續遊戲，否則顯示獎勵遊戲。
+ */
+function setupTabs() {
+  for (const tab of TABS) {
+    const btn = document.getElementById(`tab-${tab}`);
+    btn.addEventListener('click', () => selectTab(tab, true));
+    /**
+     * 左右鍵移到相鄰的分頁。
+     * @param {KeyboardEvent} e 鍵盤事件。
+     */
+    btn.addEventListener('keydown', (e) => {
+      const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (!step) return;
+      e.preventDefault();
+      const next = TABS[(TABS.indexOf(tab) + step + TABS.length) % TABS.length];
+      selectTab(next, true);
+      document.getElementById(`tab-${next}`).focus();
+    });
+  }
+  let saved = null;
+  try {
+    saved = localStorage.getItem(TAB_KEY);
+  } catch {
+    saved = null;
+  }
+  const hasUnfinished = document.getElementById('continue-list').children.length > 0;
+  if (!TABS.includes(saved) || (saved === 'continue' && !hasUnfinished)) saved = hasUnfinished ? 'continue' : 'reward';
+  selectTab(saved);
+}
+
+/**
+ * 建立一筆遊戲歷程的列表項目。
+ * @param {{game: string, start: number, ms: number}} r 遊玩紀錄。
+ * @param {Map<string, string>} titles 遊戲目錄對應的名稱。
+ * @returns {HTMLLIElement} 列表項目。
+ */
+function historyItem(r, titles) {
+  const li = document.createElement('li');
+  li.className = 'history-item';
+  li.innerHTML = `
+    <img src="icons/${r.game}.svg" alt="" width="36" height="36">
+    <span class="history-text">
+      <span class="history-title"></span>
+      <span class="history-when">${icon('clock')} ${formatClock(r.start)} 開始</span>
+    </span>
+    <span class="history-ms">${formatPlay(r.ms)}</span>`;
+  li.querySelector('.history-title').textContent = titles.get(r.game);
+  return li;
+}
+
+/**
+ * 讀取要顯示的遊戲歷程（只留大廳有的遊戲），由新到舊。
+ * @returns {{entries: object[], titles: Map<string, string>, totalMs: number}} 紀錄、遊戲名稱與合計時間。
+ */
+function historyEntries() {
   const titles = new Map(GAMES.map((game) => [game.dir, game.title]));
   const entries = loadHistory().filter((r) => titles.has(r.game));
-  const totalMs = entries.reduce((sum, r) => sum + r.ms, 0);
+  return { entries, titles, totalMs: entries.reduce((sum, r) => sum + r.ms, 0) };
+}
+
+/**
+ * 遊戲歷程：大廳只列最新的 10 筆；超過時顯示「顯示更多」，點了開啟最近 100 筆的列表。
+ */
+function renderHistory() {
+  const { entries, titles, totalMs } = historyEntries();
   document.getElementById('history-summary').textContent = entries.length
     ? `最近 ${entries.length} 筆（最多保留 ${HISTORY_LIMIT} 筆），合計 ${formatPlay(totalMs)}`
     : '還沒有紀錄。進入任何遊戲玩超過 10 秒，就會記下開始時間與玩了多久。';
   const list = document.getElementById('history-list');
   list.innerHTML = '';
-  for (const r of historyExpanded ? entries : entries.slice(0, HISTORY_PREVIEW)) {
-    const li = document.createElement('li');
-    li.className = 'history-item';
-    li.innerHTML = `
-      <img src="icons/${r.game}.svg" alt="" width="36" height="36">
-      <span class="history-text">
-        <span class="history-title"></span>
-        <span class="history-when">${icon('clock')} ${formatClock(r.start)} 開始</span>
-      </span>
-      <span class="history-ms">${formatPlay(r.ms)}</span>`;
-    li.querySelector('.history-title').textContent = titles.get(r.game);
-    list.appendChild(li);
-  }
+  for (const r of entries.slice(0, HISTORY_PREVIEW)) list.appendChild(historyItem(r, titles));
   const more = document.getElementById('history-more');
   more.hidden = entries.length <= HISTORY_PREVIEW;
-  more.textContent = historyExpanded ? '收合' : `顯示全部 ${entries.length} 筆`;
+  more.textContent = `顯示更多（最近 ${entries.length} 筆）`;
+}
+
+/** 開啟「最近的遊戲歷程」列表（最多 100 筆）。 */
+function openHistoryDialog() {
+  const { entries, titles, totalMs } = historyEntries();
+  document.getElementById('history-dialog-summary').textContent = `共 ${entries.length} 筆，合計 ${formatPlay(totalMs)}`;
+  const list = document.getElementById('history-all');
+  list.innerHTML = '';
+  for (const r of entries) list.appendChild(historyItem(r, titles));
+  const dialog = document.getElementById('history-dialog');
+  dialog.showModal();
+  list.scrollTop = 0;
+}
+
+/** 設定遊戲歷程的「顯示更多」與列表的關閉（按鈕、點背景、Esc）。 */
+function setupHistory() {
+  const dialog = document.getElementById('history-dialog');
+  document.getElementById('history-more').addEventListener('click', openHistoryDialog);
+  document.getElementById('history-close').addEventListener('click', () => dialog.close());
+  /**
+   * 點對話框外的背景時關閉。
+   * @param {MouseEvent} e 點擊事件。
+   */
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog) dialog.close();
+  });
 }
 
 /**
@@ -800,10 +900,7 @@ function init() {
   renderGames();
   renderRewardTip();
   setupFreeze();
-  document.getElementById('history-more').addEventListener('click', () => {
-    historyExpanded = !historyExpanded;
-    renderHistory();
-  });
+  setupHistory();
   rememberPortal();
   setupInstall();
   const platform = mobilePlatform();
@@ -840,6 +937,7 @@ function init() {
   document.addEventListener('gesturestart', (e) => e.preventDefault());
   setupPortalWorker();
   refreshView();
+  setupTabs();
   autoDownload();
 }
 
