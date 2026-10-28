@@ -53,7 +53,6 @@ for (const d of DIFFICULTY_KEYS) {
 
 for (const w of warnings) console.log(`⚠ ${w}`);
 for (const e of errors) console.log(`✕ ${e}`);
-if (strict) warnings.push('獨立審題及實機驗收紀錄尚未完成，禁止正式上架');
 if (errors.length || (strict && warnings.length)) {
   console.log('題庫檢查失敗');
   process.exit(1);

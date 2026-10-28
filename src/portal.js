@@ -21,7 +21,7 @@ const GAMES = [
   { dir: 'spelling', title: '英文單字拼圖', desc: '看中文拼英文，高中 6,000 字分 6 級', tags: [['layers', '6 個 Level'], ['book', '發音・單字本']], reward: true },
   { dir: 'olympiad', title: '奧數挑戰', desc: '奧數選擇題，答錯有解題重點引導', tags: [['layers', '4 種難度'], ['bulb', '解題重點・錯題本']], reward: true },
   { dir: 'science', title: '自然探險', desc: '國小到國中自然科學，預習與複習', tags: [['layers', '低年級到國中'], ['book', '科學卡・複習本']], reward: true },
-  { dir: 'writing', title: '作文工坊', desc: '試玩版：從句子到文章，練習寫作', tags: [['layers', '國小到國中'], ['book', '寫作小卡・選寫']], reward: true },
+  { dir: 'writing', title: '作文工坊', desc: '從句子到文章，練習寫作', tags: [['layers', '國小到國中'], ['book', '寫作小卡・選寫']], reward: true },
   { dir: 'social', title: '社會科學', desc: '國小到國中歷史、地理與公民，預習與複習', tags: [['layers', '小三到國中'], ['book', '知識卡・今日複習']], reward: true },
   { dir: 'codebreaker', title: '密碼偵探', desc: '看回饋推理，破解保險箱的顏色密碼', tags: [['layers', '4 種難度'], ['lock', '推理回顧']] },
 ];
