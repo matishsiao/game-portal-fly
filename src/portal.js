@@ -8,7 +8,7 @@ import { loadHistory, guardFreeze, validateFreeze, freezeAccount, formatClock, H
 /**
  * 遊戲清單：新增遊戲時加一筆，並把建置結果放到同名目錄。
  * `featured` 的遊戲顯示在最上方「主打遊戲」，不列在下方遊戲列表；`record: 'rpg'` 的卡片改顯示角色與冒險紀錄（見 rpgRecordLines）。
- * `reward: true` 為學習遊戲，列在「獎勵遊戲」（過關可拿口袋地城的獎勵禮包與入場卷），其餘列在「一般遊戲」。
+ * `reward: true` 為學習遊戲，列在「獎勵遊戲」（過關可拿口袋地城的獎勵禮包與入場卷），其餘列在「益智遊戲」。
  */
 const GAMES = [
   { dir: 'pocketdungeon', title: '口袋地城', desc: '像素動作 RPG，闖地城打倒 Boss', tags: [['layers', '多個地城'], ['sword', '多種職業']], featured: true, record: 'rpg' },
@@ -203,7 +203,7 @@ function renderGreeting() {
   document.getElementById('greeting-icon').setAttribute('href', `#i-${name}`);
 }
 
-/** 建立遊戲卡片（主打遊戲、獎勵遊戲、一般遊戲）與「即將推出」卡片。 */
+/** 建立遊戲卡片（主打遊戲、獎勵遊戲、益智遊戲）與「即將推出」卡片。 */
 function renderGames() {
   const list = document.getElementById('games');
   const rewardList = document.getElementById('reward-games');
