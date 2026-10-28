@@ -194,7 +194,7 @@ export function newCharacter(cls, name) {
 
 /**
  * 讀取全部資料並驗證。
- * @returns {Promise<{characters: Map<string, object>, run: object | null, meta: object, shared: {items: object[], gold: number}, claimed: string[], problems: string[]}>} 角色、進行中的探險、設定、共用倉庫、已領取的獲得紀錄與資料損毀說明。
+ * @returns {Promise<{characters: Map<string, object>, run: object | null, meta: object, shared: {items: object[], gold: number}, claimed: string[], claimedAt: Object<string, number>, claimCleared: number, problems: string[]}>} 角色、進行中的探險、設定、共用倉庫、已領取的獲得紀錄（含領取時間與清除顯示的時間）與資料損毀說明。
  */
 export async function loadAll() {
   const problems = [];
@@ -265,7 +265,12 @@ export async function loadAll() {
   if (!run) removeKey(KEYS.save);
   const giftMeta = metaMap.get('gifts');
   const claimed = giftMeta && Array.isArray(giftMeta.claimed) ? giftMeta.claimed.filter((id) => typeof id === 'string') : [];
-  return { characters, run, meta, shared, claimed, problems };
+  const claimedAt = {};
+  if (giftMeta && giftMeta.claimedAt && typeof giftMeta.claimedAt === 'object') {
+    for (const id of claimed) if (Number.isFinite(giftMeta.claimedAt[id])) claimedAt[id] = giftMeta.claimedAt[id];
+  }
+  const claimCleared = giftMeta && Number.isFinite(giftMeta.cleared) ? giftMeta.cleared : 0;
+  return { characters, run, meta, shared, claimed, claimedAt, claimCleared, problems };
 }
 
 /**
@@ -314,14 +319,23 @@ export function saveShared(ch, shared) {
 /**
  * 領取獲得紀錄：在同一個交易中儲存角色（放進背包的禮包）與已領取的紀錄（整個帳號共用，不會重複領）。
  * @param {object} ch 角色。
- * @param {string[]} claimed 已領取的紀錄代碼。
+ * @param {{claimed: string[], claimedAt: Object<string, number>, cleared: number}} gifts 已領取的紀錄代碼、各紀錄的領取時間、清除顯示的時間。
  * @returns {Promise<boolean>} 是否成功。
  */
-export function saveClaimed(ch, claimed) {
+export function saveClaimed(ch, gifts) {
   return writeMany([
     { store: 'characters', key: ch.id, value: ch },
-    { store: 'meta', key: 'gifts', value: { claimed } },
+    { store: 'meta', key: 'gifts', value: gifts },
   ]);
+}
+
+/**
+ * 只儲存已領取的紀錄（清除「已領取」顯示時使用；已領取的代碼仍保留，不會重複領）。
+ * @param {{claimed: string[], claimedAt: Object<string, number>, cleared: number}} gifts 已領取的紀錄。
+ * @returns {Promise<boolean>} 是否成功。
+ */
+export function saveGifts(gifts) {
+  return writeMany([{ store: 'meta', key: 'gifts', value: gifts }]);
 }
 
 /** 難度代碼的名稱（獲得紀錄回補用）。 */

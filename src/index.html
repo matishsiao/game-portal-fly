@@ -70,29 +70,35 @@
       <ul id="featured" class="games featured"></ul>
     </section>
 
-    <section id="continue-section" class="section" hidden>
-      <h2 class="section-title"><svg class="i" aria-hidden="true"><use href="#i-play"></use></svg>繼續遊戲</h2>
-      <div id="continue-list" class="continue-list"></div>
-    </section>
-
-    <!-- 獎勵遊戲：學習遊戲過關可以拿口袋地城的獎勵禮包與入場卷。 -->
-    <section id="reward-section" class="section">
-      <h2 class="section-title"><svg class="i" aria-hidden="true"><use href="#i-book"></use></svg>獎勵遊戲</h2>
-      <a id="reward-tip" class="reward-tip" href="./pocketdungeon/">
-        <span class="reward-tip-ico" aria-hidden="true">🎁</span>
-        <span class="reward-tip-text">
-          <b>學習遊戲作答拿口袋地城獎勵！</b>
-          <small>下面的學習遊戲每個難度<em>第一次過關</em>、<em>第一次全對</em>（沒用提示）送獎勵禮包；<em>每天</em>過關一題再送入場卷。</small>
-          <small id="reward-daily" class="reward-daily"></small>
-        </span>
-      </a>
-      <ul id="reward-games" class="games"></ul>
-    </section>
-
+    <!-- 遊戲分頁：繼續遊戲、獎勵遊戲（學習遊戲過關可以拿口袋地城的獎勵禮包與入場卷）、益智遊戲。 -->
     <section class="section">
-      <h2 class="section-title"><svg class="i" aria-hidden="true"><use href="#i-gamepad"></use></svg>益智遊戲</h2>
-      <p class="section-note">純粹好玩，過關不送口袋地城的獎勵。</p>
-      <ul id="games" class="games"></ul>
+      <div class="tabs" role="tablist" aria-label="遊戲分類">
+        <button type="button" id="tab-continue" class="tab" role="tab" data-tab="continue" aria-controls="panel-continue" aria-selected="false"><svg class="i" aria-hidden="true"><use href="#i-play"></use></svg>繼續遊戲<span id="continue-count" class="tab-count" hidden></span></button>
+        <button type="button" id="tab-reward" class="tab" role="tab" data-tab="reward" aria-controls="panel-reward" aria-selected="false"><svg class="i" aria-hidden="true"><use href="#i-book"></use></svg>獎勵遊戲</button>
+        <button type="button" id="tab-puzzle" class="tab" role="tab" data-tab="puzzle" aria-controls="panel-puzzle" aria-selected="false"><svg class="i" aria-hidden="true"><use href="#i-gamepad"></use></svg>益智遊戲</button>
+      </div>
+
+      <div id="panel-continue" class="tab-panel" role="tabpanel" aria-labelledby="tab-continue" hidden>
+        <div id="continue-list" class="continue-list"></div>
+        <p id="continue-empty" class="section-note tab-empty" hidden>目前沒有玩到一半的遊戲，到「獎勵遊戲」或「益智遊戲」開一局吧。</p>
+      </div>
+
+      <div id="panel-reward" class="tab-panel" role="tabpanel" aria-labelledby="tab-reward" hidden>
+        <a id="reward-tip" class="reward-tip" href="./pocketdungeon/">
+          <span class="reward-tip-ico" aria-hidden="true">🎁</span>
+          <span class="reward-tip-text">
+            <b>學習遊戲作答拿口袋地城獎勵！</b>
+            <small>下面的學習遊戲每個難度<em>第一次過關</em>、<em>第一次全對</em>（沒用提示）送獎勵禮包；<em>每天</em>過關一題再送入場卷。</small>
+            <small id="reward-daily" class="reward-daily"></small>
+          </span>
+        </a>
+        <ul id="reward-games" class="games"></ul>
+      </div>
+
+      <div id="panel-puzzle" class="tab-panel" role="tabpanel" aria-labelledby="tab-puzzle" hidden>
+        <p class="section-note">純粹好玩，過關不送口袋地城的獎勵。</p>
+        <ul id="games" class="games"></ul>
+      </div>
     </section>
 
     <section class="section">
@@ -195,6 +201,16 @@
         <button type="submit" id="freeze-submit" class="freeze-submit">凍結</button>
       </div>
     </form>
+  </dialog>
+
+  <!-- 遊戲歷程：最近 100 筆。 -->
+  <dialog id="history-dialog" class="history-dialog" aria-labelledby="history-dialog-title">
+    <div class="history-dialog-head">
+      <h2 id="history-dialog-title"><svg class="i" aria-hidden="true"><use href="#i-clock"></use></svg>最近的遊戲歷程</h2>
+      <button type="button" id="history-close" class="history-close">關閉</button>
+    </div>
+    <p id="history-dialog-summary" class="history-summary"></p>
+    <ol id="history-all" class="history-list history-all"></ol>
   </dialog>
 
   <button type="button" id="portal-update" class="portal-update" hidden><svg class="i" aria-hidden="true"><use href="#i-sparkle"></use></svg>大廳有新版本，點此更新</button>
