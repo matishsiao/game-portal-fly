@@ -158,4 +158,7 @@ writeFileSync(join(OUT, 'pocketdungeon.svg'), POCKETDUNGEON_SVG);
 writeFileSync(join(OUT, 'olympiad.svg'), OLYMPIAD_SVG);
 writeFileSync(join(OUT, 'science.svg'), SCIENCE_SVG);
 writeFileSync(join(OUT, 'social.svg'), SOCIAL_SVG);
+/** 作文工坊卡片圖示：墨綠漸層上的筆記本與書寫橫線。 */
+const WRITING_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56"><defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="#527b70"/><stop offset="1" stop-color="#365d55"/></linearGradient></defs><rect width="56" height="56" rx="12" fill="url(#g)"/><path d="M12 13h32v29H12zM28 13v29M16 22h8m8 0h8M16 30h8m8 0h8" fill="none" stroke="#fffdf8" stroke-width="2"/></svg>\n`;
+writeFileSync(join(OUT, 'writing.svg'), WRITING_SVG);
 console.log(`圖示已輸出到 ${OUT}`);

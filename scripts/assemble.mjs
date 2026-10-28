@@ -25,6 +25,7 @@ const GAMES = {
   olympiad: 'games/olympiad',
   science: 'games/science',
   social: 'games/social',
+  writing: 'games/writing',
   pocketdungeon: 'games/pocketdungeon',
 };
 
