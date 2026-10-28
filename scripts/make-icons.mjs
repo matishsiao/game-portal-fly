@@ -134,6 +134,9 @@ const POCKETDUNGEON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 
 /** 奧數挑戰卡片圖示：霧藍紫漸層底上的白色「＋」「×」與米白圓點，與 games/olympiad 的 icon.svg 相同。 */
 const OLYMPIAD_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5f6aa0"/><stop offset="1" stop-color="#4a527f"/></linearGradient></defs><rect width="56" height="56" rx="12" fill="url(#g)"/><path d="M19 10v18M10 19h18" stroke="#fffdf8" stroke-width="5" stroke-linecap="round"/><path d="M31.7 31.7l10.6 10.6M42.3 31.7L31.7 42.3" stroke="#fffdf8" stroke-width="5" stroke-linecap="round"/><circle cx="39" cy="17" r="4" fill="#f3ead2"/><circle cx="17" cy="39" r="4" fill="#f3ead2"/></svg>\n`;
 
+/** 自然探險卡片圖示：苔綠漸層底上的白色雙葉幼苗與米白太陽，與 games/science 的 icon.svg 相同。 */
+const SCIENCE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5f7a52"/><stop offset="1" stop-color="#4b6440"/></linearGradient></defs><rect width="56" height="56" rx="12" fill="url(#g)"/><path d="M28 24v22M14 46h28" stroke="#fffdf8" stroke-width="3.6" stroke-linecap="round"/><ellipse cx="20" cy="24" rx="9" ry="4.6" transform="rotate(30 20 24)" fill="#fffdf8"/><ellipse cx="36" cy="20" rx="9" ry="4.6" transform="rotate(-36 36 20)" fill="#fffdf8"/><circle cx="11" cy="10" r="4.5" fill="#f3ead2"/></svg>\n`;
+
 mkdirSync(OUT, { recursive: true });
 writeFileSync(join(OUT, 'icon-192.png'), drawIcon(192, 0.1));
 writeFileSync(join(OUT, 'icon-512.png'), drawIcon(512, 0.1));
@@ -150,4 +153,5 @@ writeFileSync(join(OUT, 'words.svg'), WORDS_SVG);
 writeFileSync(join(OUT, 'spelling.svg'), SPELLING_SVG);
 writeFileSync(join(OUT, 'pocketdungeon.svg'), POCKETDUNGEON_SVG);
 writeFileSync(join(OUT, 'olympiad.svg'), OLYMPIAD_SVG);
+writeFileSync(join(OUT, 'science.svg'), SCIENCE_SVG);
 console.log(`圖示已輸出到 ${OUT}`);

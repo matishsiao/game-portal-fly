@@ -1,6 +1,6 @@
 # 遊戲飛行（PlayFlight）共用規格
 
-本文件是 `games/` 下所有遊戲的共用規格，涵蓋產品原則、與遊戲大廳的整合介面、操作體驗、儲存、離線、部署與驗收。各遊戲目錄另有自己的規格（例如 `games/sudoku/spec.md`、`games/crossmath/cm_spec.md`、`games/numberlink/spec.md`、`games/idiom/spec.md`、`games/roll/spec.md`、`games/codebreaker/spec.md`、`games/spelling/spec.md`、`games/olympiad/spec.md`、`games/pocketdungeon/spec.md`），描述遊戲規則、盤面、難度、出題與該遊戲特有的操作。
+本文件是 `games/` 下所有遊戲的共用規格，涵蓋產品原則、與遊戲大廳的整合介面、操作體驗、儲存、離線、部署與驗收。各遊戲目錄另有自己的規格（例如 `games/sudoku/spec.md`、`games/crossmath/cm_spec.md`、`games/numberlink/spec.md`、`games/idiom/spec.md`、`games/roll/spec.md`、`games/codebreaker/spec.md`、`games/spelling/spec.md`、`games/olympiad/spec.md`、`games/science/spec.md`、`games/pocketdungeon/spec.md`），描述遊戲規則、盤面、難度、出題與該遊戲特有的操作。
 
 ## 文件關係
 
@@ -73,7 +73,7 @@
 ### 跨遊戲獎勵紀錄
 
 - **只有學習遊戲寫入獎勵紀錄**：玩家第一次過關、第一次全對時給口袋地城的「獎勵禮包」，每天過關一題給入場卷（每日練習）。
-  - 學習遊戲：數學填字（`crossmath`）、成語填字（`idiom`）、英文單字連線（`words`）、英文單字拼圖（`spelling`）、奧數挑戰（`olympiad`）。新遊戲是否為學習遊戲在遊戲規格的「產品範圍」寫明；學習遊戲必須寫入獎勵紀錄（上架條件之一）。
+  - 學習遊戲：數學填字（`crossmath`）、成語填字（`idiom`）、英文單字連線（`words`）、英文單字拼圖（`spelling`）、奧數挑戰（`olympiad`）、自然探險（`science`）。新遊戲是否為學習遊戲在遊戲規格的「產品範圍」寫明；學習遊戲必須寫入獎勵紀錄（上架條件之一）。
   - 益智遊戲（數獨、數字連線、滾滾解謎、密碼偵探，以及口袋地城本身）不寫入 `games.rewards`。改為益智遊戲之前已寫入的紀錄保留，口袋地城仍可領取。
   - 學習遊戲清單有兩處，須保持一致：大廳 `src/portal.js` 的 `GAMES`（`reward: true`）與口袋地城 `games/pocketdungeon/src/js/pd/data.js` 的 `GIFT.learning`。
 - `games.rewards` 是所有遊戲共用的**附加式**紀錄（JSON 陣列），口袋地城讀取後換成「獎勵禮包」。每筆為 `{ id, game, type, tier, label, at }`：
@@ -293,5 +293,5 @@
 ## 參考資料
 
 - 大廳說明：`README.md`（專案根目錄），含遊玩網址與部署方式；上架流程以本文件「上架到大廳」為準。
-- 現有遊戲規格：`games/sudoku/spec.md`、`games/crossmath/cm_spec.md`、`games/numberlink/spec.md`、`games/idiom/spec.md`、`games/roll/spec.md`、`games/codebreaker/spec.md`、`games/spelling/spec.md`、`games/olympiad/spec.md`、`games/pocketdungeon/spec.md`。
+- 現有遊戲規格：`games/sudoku/spec.md`、`games/crossmath/cm_spec.md`、`games/numberlink/spec.md`、`games/idiom/spec.md`、`games/roll/spec.md`、`games/codebreaker/spec.md`、`games/spelling/spec.md`、`games/olympiad/spec.md`、`games/science/spec.md`、`games/pocketdungeon/spec.md`。
 - [mkcert 開發憑證說明](https://github.com/FiloSottile/mkcert)：選用的區網 HTTPS 開發模式參考。
