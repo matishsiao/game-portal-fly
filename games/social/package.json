@@ -2,7 +2,7 @@
   "name": "offline-social",
   "version": "1.0.0",
   "private": true,
-  "description": "可離線遊玩的單機社會探索（Social Studies Quest）PWA",
+  "description": "可離線遊玩的單機社會科學（Social Studies）PWA",
   "type": "module",
   "engines": {
     "node": ">=16.17"

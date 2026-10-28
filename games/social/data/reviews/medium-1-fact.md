@@ -249,3 +249,39 @@
 2. `medium-003`：`years` 採 1661（鄭成功來臺）與 1684（納入版圖）；若希望與教材常見的分期起算年 1662／1683 一致，可改 `years`，排序結果不變。
 3. `medium-009`：十大建設 `years` 採 1974（1973 年 11 月提出、1974 年起推動），排序結果不受影響。
 4. 部分事實（澎湖菜宅、蘭嶼地下屋、劉銘傳鐵路通到新竹的年份）在政府機關網站上找不到專頁，查證來源以學術論文、地方政府文史資料與主要媒體為主，內容彼此一致。
+
+## 原始來源核對（2026-10-28）
+
+- 範圍：原紀錄的來源未註明是否實際開啟，且多為 PDF、媒體或考題資料，本次以原始頁面重新核對具體事實（年份、法條、地名、制度內容）。觀念題（`medium-014`、`medium-016`、`medium-019`、`medium-021`、`medium-023`、`medium-030`）略過。
+- 「已開啟」：以網頁擷取工具或 `curl` 實際讀取頁面全文（全國法規資料庫以 `curl` 下載條文；教育百科讀取條目內容）。「仍只有摘錄」：原始頁面無法讀取（403、500、PDF 文字無法解析、動態載入），或開啟的頁面沒有寫到該事實。
+- 本批核對 24 題，不一致 0 題，沒有修改題目與知識卡。
+
+| 題目 | 網址 | 狀態 | 核對結果 |
+| --- | --- | --- | --- |
+| `medium-001` | 中研院「臺灣史前文化」舊石器 https://twstudy.iis.sinica.edu.tw/preHistory/old_times.html 、新石器 https://twstudy.iis.sinica.edu.tw/preHistory/new_times.html ；史前館友善導覽 https://m.nmp.gov.tw/accessibility/TPH_02.html | 已開啟 | 一致：舊石器時代採集、狩獵、漁撈，新石器時代農耕、定居、製陶；八仙洞有「生火的火塘」，舊石器時代已會用火 |
+| `medium-002` | 同上，另記憶庫「長濱文化」 https://tcmb.culture.tw/zh-tw/detail?indexCode=Culture_Object&id=263288 、史前館 https://m.nmp.gov.tw/accessibility/TPH_07.html | 已開啟 | 一致：舊石器「敲打」、新石器「磨製」；長濱文化屬舊石器時代晚期；大坌坑人最早帶著陶器製作技術來到臺灣 |
+| `medium-003` | 臺南市政府「歷史沿革」 https://www.tainan.gov.tw/cp.aspx?n=13291 ；記憶庫「熱蘭遮博物館」 https://tcmb.culture.tw/zh-tw/detail?indexCode=Culture_Place&id=291471 | 已開啟 | 一致：1624 荷蘭人進入臺南並建堡壘；1661 年 4 月鄭成功率軍來臺；清帝國設臺灣府隸屬福建省；1895 割讓。文化資產網「熱蘭遮堡遺構」頁面為動態載入，無法讀取 |
+| `medium-004` | 中研院研之有物 https://newsletter.sinica.edu.tw/16885/ ；教育百科「安平古堡」 https://pedia.cloud.edu.tw/Entry/Detail/?title=安平古堡 | 已開啟 | 一致：1624 年在大員築城，大員為中轉貿易據點，鹿皮大量出口；安平古堡原稱熱蘭遮城。生絲、瓷器轉運到日本與歐洲的細節仍只有摘錄（國史館館刊 PDF 文字無法解析） |
+| `medium-005` | 教育百科「唐山過臺灣」 https://pedia.cloud.edu.tw/Entry/Detail/?title=唐山過臺灣 | 已開啟 | 一致：1684 年納入版圖後禁止內地居民移民臺灣，偷渡處罰嚴厲，與提示「限制人民渡海來臺」相符。「閩粵沿海人多地少」仍只有摘錄 |
+| `medium-006` | 記憶庫「臺灣縱貫鐵路興築歷程」 https://tcmb.culture.tw/zh-tw/detail?id=236232&indexCode=Culture_Event | 已開啟 | 一致：1908 年全線通車，路線測量自基隆至打狗（高雄），日本接收劉銘傳時期的既有鐵路。劉銘傳鐵路通到新竹的年份仍只有摘錄 |
+| `medium-007` | 中研院數位典藏「臺灣現代教育的發展」 https://digiarch.sinica.edu.tw/content/subject/resource_content.jsp?oid=16797295&queryType=qc ；臺史所檔案館 https://archives.ith.sinica.edu.tw/collections_con.php?no=34 ；記憶庫 https://tcmb.culture.tw/zh-tw/detail?indexCode=Culture_Object&id=473141 ；教育百科「科舉」 | 已開啟 | 一致：1898 年國語傳習所改為公學校，以日語為重心，另有實學、體育、音樂等；書房加設日語、算術、修身；科舉為清代選官制度 |
+| `medium-008` | 文化資產局世界遺產潛力點「烏山頭水庫及嘉南大圳」 https://twh.boch.gov.tw/taiwan/intro.aspx?id=17&lang=zh_tw ；教育百科「嘉南大圳」 | 已開啟 | 一致：1930 年完工，含濁水溪系統，灌溉 15 萬 2,000 公頃；建設前枯水期常數月無雨，稱「看天田」 |
+| `medium-009` | 行政院史料 https://history.ey.gov.tw/story/ ；國家人權記憶庫年表 https://memory.nhrm.gov.tw/NormalNode/Detail/167?MenuNode=11 ；記憶庫「高速之旅」 https://tcmb.culture.tw/zh-tw/detail?indexCode=Culture_Media&id=753979 ；總統府 https://www.president.gov.tw/Page/86 | 已開啟 | 一致：1949 年 5 月 20 日起戒嚴、12 月 9 日行政院在臺北辦公；十大建設 1973 年 12 月 16 日提出（`years` 1974 為推動年，不影響排序）；1987 年 7 月 15 日解嚴；1996 年 3 月首次總統直接選舉 |
+| `medium-010` | 經濟部產業園區管理局「創設沿革」 https://www.bip.gov.tw/page.aspx?pageid=45da8e73a81d495d ；教育百科「加工出口區」 | 已開啟 | 一致：1966 年高雄前鎮成立全球第一個加工出口區，目標之一為增加就業機會 |
+| `medium-011` | 行政院國情簡介「土地」 https://www.ey.gov.tw/state/4447F4A951A1EC45/094b1d53-de8d-4393-bde6-ab092969cce4 ；教育百科「臺灣海峽」 | 已開啟 | 一致：東臨太平洋、西隔臺灣海峽、南界巴士海峽、北瀕東海 |
+| `medium-012` | 澎湖縣政府文化局玄武岩教材 https://basalt.phhcc.gov.tw/c/c01_01.asp ；澎湖國家風景區「小門菜宅」 https://www.penghu-nsa.gov.tw/TravelInformationFoodDetailC001200.aspx?Cond=20c32b2c-aa25-4892-b6d7-807a66ee6f9e&SearchAdvanced=False&Language=1028 | 已開啟 | 一致：以硓𥑮石或玄武岩砌牆抵擋東北季風、保護作物。詳解「風中帶著海水的鹽分」在兩頁都沒有寫到，仍只有摘錄 |
+| `medium-013` | 花東縱谷國家風景區管理處 https://admin.taiwan.net.tw/erv-nsa/introductionErv/Articles?a=970 ；行政院國情簡介「地理」 https://www.ey.gov.tw/state/4447F4A951A1EC45/52515c49-bcc0-45f5-bd5f-78c22c9d3f45 | 已開啟 | 一致：花東縱谷是中央山脈與海岸山脈之間的狹長谷地；五大山脈自東向西為海岸、中央、雪山、玉山、阿里山 |
+| `medium-015` | 行政院國情簡介「地理」（同上） | 已開啟 | 一致：中央山脈為東、西部河川分水嶺；河川長度多不及 100 公里 |
+| `medium-017` | 中央氣象署科普「季風」 https://pweb.cwa.gov.tw/PopularScience/wt/wt_3.html ；氣象署數位導覽基隆站 https://etour.cwa.gov.tw/station.php?stn_id=15 | 已開啟 | 一致：秋冬東北季風時基隆「時常陰雨不斷，故素有雨港之稱」；中、南部吹東北季風時進入乾季 |
+| `medium-018` | 中央氣象署科普「梅子成熟傾盆雨」 https://edu.cwa.gov.tw/PopularScience/wt/wt_9.html | 已開啟 | 一致：氣象署定義 5、6 月為梅雨季，冷暖氣團交會形成近似滯留的鋒面；名稱源於中國江南一帶梅子成熟季節 |
+| `medium-020` | 竹科管理局兒童版 https://web.sipa.gov.tw/SPACHWeb/viewContent.do?pno=20220511131106 ；臺北市教學資源中心「臺灣五大地形」 https://tmrc.tiec.tp.edu.tw/HTML/RSR200811191906220FM/topographytaiwan/tai01.htm | 已開啟 | 一致：民國 69 年（1980）12 月成立，周邊有工研院、清大、陽明交大；面積最大的平原為嘉南平原 |
+| `medium-022` | 全國法規資料庫《中華民國憲法》 https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0000001 | 已開啟 | 一致：第 129 條普通、平等、直接及無記名投票 |
+| `medium-024` | 憲法第 107 條；《地方制度法》 https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0040003 第 18～20 條 | 已開啟 | 一致：外交、國防、幣制由中央立法並執行；道路、公園綠地、廢棄物清除屬地方自治事項 |
+| `medium-025` | 憲法第 63 條 | 已開啟 | 一致：立法院議決法律案、預算案 |
+| `medium-026` | 地方制度法第 36、37 條 | 已開啟 | 一致：縣（市）議會議決規章、預算；鄉（鎮、市）民代表會議決預算 |
+| `medium-027` | 憲法第 10、11、13、17、19、20、21 條 | 已開啟 | 一致：納稅、服兵役為義務；受國民教育為權利與義務 |
+| `medium-028` | 憲法第 170～172 條 | 已開啟 | 一致：法律與憲法牴觸者無效、命令與憲法或法律牴觸者無效；憲法原文寫「由司法院解釋之」，憲法訴訟法施行後由憲法法庭審理，詳解寫法正確 |
+| `medium-029` | 《消費者保護法》 https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=J0170001 第 19 條 | 已開啟 | 一致：通訊交易收受商品後 7 日內可解除契約，無須說明理由；合理例外由行政院定之 |
+
+- 知識卡：`medium-voc-trade`（安平古堡原址為熱蘭遮城，記憶庫、教育百科已開啟，一致）、`medium-democratization`（同 `medium-009`，一致）、`medium-tw-location`（同 `medium-011`，一致）。`medium-tw-mountains` 的「池上、玉里以出產稻米聞名」仍只有摘錄。
+- 仍只有摘錄的細節共 5 項（`medium-004` 生絲瓷器、`medium-005` 人多地少、`medium-006` 鐵路通到新竹年份、`medium-012` 鹽分、知識卡池上玉里），都不影響答案。

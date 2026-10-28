@@ -81,3 +81,35 @@
 
 1. 知識卡 `expert-world-religions` 寫「伊斯蘭教由穆罕默德創立」：這是 Britannica 與國中教科書的通用寫法，事實上沒有錯；但伊斯蘭教信徒視穆罕默德為「最後的先知」而非創立者，是否改成「由穆罕默德在阿拉伯半島傳布」，請中立審閱判斷。expert-010 的提示中使用「先知穆罕默德」，同樣請中立審閱確認用語。
 2. expert-009 的「古印度文明」類別同時涵蓋印度河流域文明與雅利安人時期，與國中教科書的單元劃分一致；已在提示與詳解寫明時間先後。若希望分類題只考單一時期，可改為「印度河流域文明」並換掉「形成種姓制度」這張卡片。
+
+## 原始來源核對（2026-10-28）
+
+- 範圍：本批原紀錄沒有標示來源是否實際開啟，且多數以 Britannica 為主要來源；這次以 WebFetch 重新開啟原始頁面，逐題核對有具體事實（年份、地名、法條、氣候分類、制度內容）的題目。觀念題（expert-001、012、016、017、021～025、028：機會成本、均衡價格、公共財、工業區位等，沒有需要查證的具體事實）略過。
+- 開啟情況：Britannica 全站回應 403；CIA World Factbook 已停刊（國家頁面只剩停刊公告），原紀錄 expert-011、expert-014 引用的 Factbook 頁面已失效，改用下列來源。本輪後段 WebSearch 額度用盡，無法再搜尋新網址。
+- 結果：核對 19 題，全部一致；沒有修改題目、答案或知識卡。
+
+- **expert-002** 已開啟 World History Encyclopedia「Johannes Gutenberg」https://www.worldhistory.org/Johannes_Gutenberg/ ：印刷機約 1450 年在美因茲運作、推動以本地語言印行、促進宗教改革。一致。
+- **expert-003** 已開啟 World History Encyclopedia「Ottoman Empire」https://www.worldhistory.org/Ottoman_Empire/ ：鄂圖曼控制商路，迫使歐洲國家另尋新航路、葡萄牙繞過非洲。一致。
+- **expert-004** 已開啟 美國國家檔案館「Social Security Act (1935)」https://www.archives.gov/milestone-documents/social-security-act （1935 年 8 月簽署）；美國國家檔案館「Tennessee Valley Authority Act (1933)」https://www.archives.gov/milestone-documents/tennessee-valley-authority-act （1933 年 5 月 18 日簽署，興建水壩、創造就業）。「1933 年起」「興建水壩等公共工程」「建立社會保險」一致。
+- **expert-005** 已開啟 德國政府入口網站 deutschland.de「Day of German Unity」https://www.deutschland.de/en/topic/politics/day-of-german-unity （1989 年 11 月 9 日圍牆開放、1990 年 10 月 3 日統一）；柏林圍牆基金會「1961 | 1989. The Berlin Wall」https://www.stiftung-berliner-mauer.de/en/node/247 （1961～1989）。一致。
+- **expert-006** 已開啟 羅浮宮館藏「漢摩拉比法典」https://collections.louvre.fr/en/ark:/53355/cl010174436 （漢摩拉比在位 -1792～-1750，與「約西元前 18 世紀」、`years` -1754 一致）；World History Encyclopedia「Cleisthenes」https://www.worldhistory.org/Cleisthenes/ （約 -508）、「Alexander the Great」https://www.worldhistory.org/Alexander_the_Great/ （-334 渡海進入小亞細亞）、「Augustus」https://www.worldhistory.org/augustus/ （-27 獲「奧古斯都」稱號）。一致。
+- **expert-007** 已開啟 World History Encyclopedia「Christopher Columbus」https://www.worldhistory.org/Christopher_Columbus/ （1492 年 10 月 12 日）、「Martin Luther's 95 Theses」https://worldhistory.org/article/1891 （1517 年 10 月 31 日）、「French Revolution」https://www.worldhistory.org/French_Revolution/ （1789 年，受美國革命與啟蒙思想影響）；英國王室官網「William III and Mary II」https://www.royal.uk/william-and-mary （光榮革命後《權利法案》限制王權，議會成為政治的常設部分）；美國國家檔案館「Declaration of Independence」https://www.archives.gov/founding-docs/declaration （1776 年 7 月 4 日）。一致。
+- **expert-008** 已開啟 凡爾賽宮官網「1919: the Treaty of Versailles」https://en.chateauversailles.fr/history/the-significant-dates/most-important-dates/1919-the-treaty-of-versailles （1919 年 6 月 28 日）；美國聯邦準備體系 Federal Reserve History「Stock Market Crash of 1929」https://www.federalreservehistory.org/essays/stock-market-crash-of-1929 （1929 年 10 月）；聯合國「History of the UN」https://www.un.org/en/about-us/history-of-the-un （1945 年 10 月 24 日）；deutschland.de（同 expert-005，1989）；美國國務院史料室「The Collapse of the Soviet Union」https://history.state.gov/milestones/1989-1992/collapse-soviet-union （1991 年 12 月）。一致。
+- **expert-009** 已開啟 World History Encyclopedia「Caste System in Ancient India」https://www.worldhistory.org/article/1152/ （瓦爾納首見於《梨俱吠陀》，吠陀時期約 -1500～-1000，後來逐漸世襲化）；羅浮宮館藏（同 expert-006，楔形文字、巴比倫）。種姓制度形成於印度河流域城市文明之後的吠陀時期，與現行卡片提示、詳解一致。摩亨卓達羅：UNESCO 世界遺產頁面 https://whc.unesco.org/en/list/138/ 回應 403，**仍只有摘錄**。
+- **expert-010** 習俗題（浴佛節、聖誕節、齋戒月、麥加朝聖），本輪未另開啟頁面，**仍只有原紀錄的 Britannica 來源（本輪 403）**。
+- **expert-011** 已開啟 聯合國糧農組織 FAO「Egypt: Geography and population」https://www.fao.org/4/W4356E/w4356e0c.HTM （尼羅河谷與三角洲只占全國面積約 4%，人口密度極高；年雨量約 18 毫米，農業幾乎全靠灌溉）。一致。
+- **expert-013** 已開啟 NASA Science「Tundra」https://science.nasa.gov/kids/earth/mission-biomes/biotundra （苔原橫跨北美、歐洲、西伯利亞，有永凍土、生長季短）。「冬季漫長嚴寒、永凍土、生長季短」一致。
+- **expert-014** 已開啟 Saudipedia（沙烏地官方百科）「Geography of the Kingdom」https://saudipedia.com/en/article/191/geography/saudi-geography/geography-of-the-kingdom （西臨紅海、東臨阿拉伯灣〔波斯灣〕）。一致。
+- **expert-015** 已開啟 美國國家地理教育「Plate Tectonics and the Ring of Fire」https://education.nationalgeographic.org/resource/plate-tectonics-ring-fire/ （日本、紐西蘭、印尼、智利都在環太平洋火山帶上）；USGS「What is the Ring of Fire?」https://www.usgs.gov/faqs/what-ring-fire?page=1 （太平洋板塊與周圍板塊交界，未列國名）。一致。知識卡「臺灣也是」：中央氣象署地震測報中心頁面沒有相關內容，**仍只有摘錄**（國家發展委員會公務出國報告 https://report.nat.gov.tw/ReportFront/PageSystem/reportFileDownload/C10700955/001 的搜尋摘要：臺灣位於環太平洋地震帶、菲律賓海板塊與歐亞板塊交界）。
+- **expert-018** 已開啟 俄亥俄大學地理系「Mediterranean Climate」https://people.ohio.edu/dyer/TPE/tpe_3e/climate_systems/mediterranean.html （南北緯約 30～40 度的大陸西岸與地中海盆地；夏季副熱帶高壓、冬季西風帶來雨）；LibreTexts（Ritter《The Physical Environment》）9.5.01 https://geo.libretexts.org/Bookshelves/Geography_(Physical)/The_Physical_Environment_(Ritter)/09%3A_Climate_Systems/9.05%3A_Midlatitude_and_Subtropical_Climates/9.5.01%3A_Mediterranean_or_Dry_Summer_Subtropical_Climate 。與題目及知識卡 `expert-mediterranean` 一致。
+- **expert-019** 已開啟 俄亥俄大學、LibreTexts（同 expert-018）：開普敦一帶、澳洲西南部屬地中海型氣候，與詳解「開普敦、伯斯附近」一致。柯本分類 Cs（最乾夏月少於 30 毫米且不到最濕冬月三分之一）、Cfb（最熱月低於 22 °C）的門檻：維也納獸醫大學 Köppen-Geiger 頁面沒有列定義、Springer 表格需登入、澳洲氣象局伯斯統計回應 403，**仍只有摘錄**。答案判斷（夏乾冬雨、南半球）不依賴這兩個門檻，維持原結論。
+- **expert-020** 已開啟 NASA Science「Tundra」（同 expert-013）、「Rainforest」https://science.nasa.gov/kids/earth/mission-biomes/biorainforest （位於南北回歸線之間、近赤道）、「Desert」https://science.nasa.gov/kids/earth/mission-biomes/biodesert 。一致；頁面未逐一點名亞馬孫、剛果盆地、撒哈拉，屬通用地理知識。
+- **expert-026** 已開啟 WTO「What is the WTO?」https://www.wto.org/english/thewto_e/whatis_e/whatis_e.htm （1995 年 1 月 1 日成立，處理貿易爭端、作為貿易談判場所）。一致。
+- **expert-027** 已開啟 Fairtrade International「FAQ」https://www.fairtrade.net/about/faq （最低價格是價格下跌時的安全網、另付溢價金用於社區）；Fairtrade International 新聞稿 https://www.fairtrade.net/en/get-involved/Press-centre/fairtrade-international-secures-a-stronger-safety-net-for-coffee.html （最低價格「based on the sustainable cost of production」）。與短文「不低於生產成本的收購價格」、詳解「保障價格」一致。
+- **expert-029** 已開啟 全國法規資料庫《中華民國刑法》第 1 條 https://law.moj.gov.tw/LawClass/LawSingle.aspx?pcode=C0000001&flno=1 （「行為之處罰，以行為時之法律有明文規定者為限。」）。一致。
+- **expert-030** 已開啟 立法院「立法院議案審議的讀會程序為何？」https://www.ly.gov.tw/Pages/Detail.aspx?nodeid=217&pid=37534 （法律案一讀後交付委員會審查，亦可逕付二讀；二讀、三讀）；全國法規資料庫《中華民國憲法》第 72 條 https://law.moj.gov.tw/LawClass/LawSingle.aspx?pcode=A0000001&flno=72 （總統公布）、第 87 條 https://law.moj.gov.tw/LawClass/LawSingle.aspx?pcode=A0000001&flno=87 （考試院得提出法律案）。一致。司法院、監察院的提案權（釋字第 175 號、第 3 號）：司法院英文解釋網頁出現資料庫連線錯誤、大法官解釋 PDF 無文字內容，**仍只有摘錄**（司法院 cons.judicial.gov.tw 解釋文的搜尋摘要）。
+
+### 統計
+
+- 核對 19 題（全部至少開啟 1 個原始頁面）；其中仍有部分細節只有摘錄的 4 題：expert-009（摩亨卓達羅）、expert-015（臺灣）、expert-019（柯本門檻）、expert-030（釋字第 175、3 號）；另 expert-010 本輪未開啟新頁面。
+- 不一致：0 題；`data/bank/expert-1.json` 未修改。

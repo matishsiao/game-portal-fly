@@ -299,3 +299,29 @@
   - easy-012 依「沒有指北針時上北下南」的慣例作答，這是國小教材的通用說法，但地圖學上屬慣例而非規定；如希望更嚴謹，可改成「地圖右上角的指北針指向上方」。
   - easy-017 上游「流得很急」保留國小教材常見的描述（湍急），已刪除「下游水流慢」；若中立審閱者認為上游描述也需更保守，可改為「坡度很陡的河段」。
   - easy-027 已由計算題改寫為儲蓄觀念題，請確認符合題目配額（`economy` 主題仍為 2 題）。
+
+## 原始來源核對（2026-10-28）
+
+- 原紀錄沒有區分哪些來源實際開啟、哪些只看搜尋摘錄，本輪對有具體事實（日期、年份、法條、詞義、統計、制度）的題目逐題重新開啟原始頁面；觀念題（easy-004、008、011、012、014、016、017、021、022、025、027、028、030）略過。
+- PDF 一律下載後以本機 PDFKit 擷取文字核對；網頁以 WebFetch 開啟。
+- 結果：核對 17 題，全部一致，未修改題目與知識卡。
+
+| 題目 | 來源（網址） | 狀態 | 核對結果 |
+| --- | --- | --- | --- |
+| easy-001 | 全國法規資料庫《紀念日及節日實施條例》第 5 條：https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=D0020095 ；總統府公報第 7790 號（PDF）：https://www.ttsh.tp.edu.tw/wp-content/uploads/doc/g171/1140528%20制定紀念日及節日實施條例(總統府公報).pdf | 已開啟 | 一致：春節農曆一月一日、元宵節一月十五日、端午節五月五日、中秋節八月十五日。原紀錄引用的臺中市 PDF 改以法規資料庫為準。 |
+| easy-002 | 教育部《臺灣台語常用詞辭典》「坑」：https://sutian.moe.edu.tw/zh-hant/tshiau/?lui=tai_su&tsha=坑 | 已開啟 | 一致：「坑」為「山谷、溪谷」，「坑溝」為山間水溝；誘答「埔」「崙」見下列辭典。 |
+| easy-003 | 同辭典「厝」：https://sutian.moe.edu.tw/zh-hant/tshiau/?lui=tai_su&tsha=厝 ；臺南市政府〈劉厝里沿革〉（PDF）：https://w3fs.tainan.gov.tw/001/Upload/205/attachment/22143/7773676/09.pdf | 已開啟 | 一致：「厝」為「房屋」；劉厝「由先民劉登魁來此開基建厝，因而稱為劉厝」，與「姓氏＋厝」來自家族居住相符。 |
+| easy-005 | 中央研究院臺灣史研究所檔案館〈「二鹿」：在鹿港深耕的郊商〉：https://archives.ith.sinica.edu.tw/collections_con.php?no=151 ；國家文化記憶庫〈褪色的淡水港〉：https://tcmb.culture.tw/zh-tw/detail?id=597056&indexCode=Culture_Object ；交通部觀光署〈淡水〉：https://www.taiwan.net.tw/m1.aspx?id=19&sNo=0001016 | 已開啟 | 一致：鹿港 1784 年開放與泉州通商，後因「港口泥沙淤積」與縱貫鐵路未經過而沒落；淡水「隨著港口泥沙淤積，加上 1899 年基隆港築港工程等原因」逐漸沒落；淡水 1858 年開港通商。詳解「後來港口淤積、交通方式改變」正確。 |
+| easy-006 | 教育百科「端午節」（教育部辭典）：https://pedia.cloud.edu.tw/Entry/Detail/?title=%E7%AB%AF%E5%8D%88%E7%AF%80 ；交通部觀光署兒童網〈端午節〉：https://child.taiwan.net.tw/0000000050.htm ；農業部農業知識入口網〈防五毒天然艾草香〉：https://kmweb.moa.gov.tw/theme_data.php?theme=news&sub_theme=variety&id=54767 | 已開啟 | 一致：粽子、龍舟競渡相傳紀念屈原；門上插艾草、菖蒲「有避邪的效果」，農業部文章說明插菖蒲、艾草因應氣候、驅五毒。 |
+| easy-007 | 交通部高速公路局〈從第一代國道到第三代國道〉：https://www.freeway.gov.tw/Publish.aspx?cnid=3005 ；臺北大眾捷運公司〈大事紀〉：https://www.metro.taipei/cp.aspx?n=B27E7BC8CBBCDA61 ；台灣高鐵公司簡介：https://www.thsrc.com.tw/corp/2ddb06c3-c9d5-4b6f-a580-40f887b1a01f ；國家文化記憶庫〈劉銘傳〉：https://tcmb.culture.tw/zh-tw/detail?indexCode=Culture_People&id=259191 | 已開啟 | 一致：中山高民國 67 年（1978）通車；木柵線 85.03.28（1996）通車；高鐵 2007 年開始營運；劉銘傳任巡撫期間（至 1891 年去職）開通臺北到基隆的鐵路。備註：國家鐵道博物館、國立臺灣博物館頁面沒有寫基隆－臺北段的完工年份，部分外文資料記為 1893 年全段完工；1891 年與 1893 年都遠早於 1978 年，排序不受影響，`years` 維持 1891（與原紀錄引用的東海大學館刊論文一致）。 |
+| easy-009 | 文化部文化資產主題資料〈臺北水道水源地〉（PDF）：https://themefile.culture.tw/file/2019-03-06/8323b600-4923-4f21-9410-98c0b40e7c40/2.%E5%8F%B0%E5%8C%97%E6%B0%B4%E9%81%93%E6%B0%B4%E6%BA%90%E5%9C%B0.pdf | 已開啟 | 一致：清末以前多以淡水河河水為生活飲用水，並有鑿井汲取地下水；1909 年水道開工。 |
+| easy-010 | 台灣電力公司電業文物典藏〈追尋大台北的水電足跡〉：https://service.taipower.com.tw/Collection/2009/2025/8330/ | 已開啟 | 一致：「1905（明治 38）年興建臺北第一發電所（今新店區龜山發電廠）」，一百多年前電力剛開始供應都市。 |
+| easy-013 | 教育部《重編國語辭典修訂本》「圖例」：https://dict.revised.moe.edu.tw/search.jsp?md=1&word=圖例 | 已開啟 | 一致：「地理或統計等圖上所附有各種符號、標記的說明。一般位於圖的角落。」 |
+| easy-015 | 同辭典「盆地」：https://dict.revised.moe.edu.tw/dictView.jsp?ID=23961 | 已開啟 | 一致：「四周被高山或高地圍繞，中間相對低緩的地形。」 |
+| easy-018 | 中央氣象署氣候百問 22：https://www.cwa.gov.tw/V8/C/K/Encyclopedia/climate/climate3-04.txt | 已開啟 | 一致：梅雨約 5 月中到 6 月中影響臺灣，為東北季風與西南季風的轉換期、常有滯留鋒面；名稱來自「長江中下游一帶梅子成熟時期連綿降雨」。 |
+| easy-019 | 中央氣象署氣候百問 38：https://www.cwa.gov.tw/V8/C/K/Encyclopedia/climate/climate5-01.txt ；中央氣象署《颱風百問》（PDF）第 38 問：https://www.cwa.gov.tw/V8/C/K/Encyclopedia/typhoon/typhoon.pdf | 已開啟 | 一致：1991～2020 年平均每年侵臺 3.2 個，7～10 月約占 91%；1911～2025 年「以 8 月最多，次為 7 月和 9 月，因此每年之 7 至 9 月可說是臺灣的颱風季」。詳解「以七到九月最多」正確。 |
+| easy-020 | 中央氣象署氣候百問 10：https://www.cwa.gov.tw/V8/C/K/Encyclopedia/climate/climate2-03.txt ；氣候百問 15：https://www.cwa.gov.tw/V8/C/K/Encyclopedia/climate/climate2-08.txt | 已開啟 | 一致：夏秋颱風、冬季寒流、午後雷陣雨；東北季風迎風面的北、東部冬季平均日雨量約 3 毫米，背風面中南部不足 1 毫米。 |
+| easy-023 | 全國法規資料庫《志願服務法》第 3 條：https://law.moj.gov.tw/LawClass/LawSingle.aspx?pcode=D0050131&flno=3 | 已開啟 | 一致：出於自由意志、非基於義務或法律責任、不以獲取報酬為目的。 |
+| easy-024 | 內政部《會議規範》（PDF）：https://ws.moi.gov.tw/001/Upload/OldFile/civil_law_file/%E6%9C%83%E8%AD%B0%E8%A6%8F%E7%AF%84.pdf | 已開啟 | 一致：主席報告議程後進行討論事項，提付討論及表決，紀錄載明討論事項、表決方法及結果。 |
+| easy-026 | 全國法規資料庫《兒童權利公約》：https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=Y0000062 | 已開啟 | 一致：第 12 條表意、第 19 條免受傷害、第 24 條健康與醫療、第 31 條休息與遊戲。 |
+| easy-029 | 新北市政府警察局〈新北市里守望相助隊管理實施計畫〉（ODT 文件）：https://www.police.ntpc.gov.tw/dl-30415-00bf95c5-8d3e-49cd-816a-252df9a2730c.html | 已開啟（下載後解壓縮讀取） | 一致：依內政部 87 年（1998）「守望相助再出發推行方案」；由里長結合鄰長及熱心人士組成，任務為里、社區巡守與協助維護社區安全。 |
