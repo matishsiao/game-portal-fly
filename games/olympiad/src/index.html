@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>離線奧數挑戰</title>
+  <meta name="description" content="可離線遊玩的奧林匹克數學選擇題：答錯時給解題重點，引導小朋友自己想出答案">
+  <meta name="theme-color" content="#4a527f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="奧數挑戰">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <div id="update-banner" class="banner" hidden>
+    <span>有新版本可以使用</span>
+    <button type="button" id="update-btn" class="banner-btn">重新整理以更新</button>
+  </div>
+
+  <main id="home" class="screen home">
+    <header class="home-header">
+      <div class="hero-deco" aria-hidden="true"><span style="left:56%;top:10%;font-size:30px">＋</span><span style="left:74%;top:4%;font-size:24px">×</span><span style="left:88%;top:38%;font-size:30px">π</span><span style="left:64%;top:58%;font-size:22px">÷</span><span style="left:80%;top:72%;font-size:26px">△</span></div>
+      <div class="hero-title">
+        <h1>奧數挑戰</h1>
+        <p class="hero-sub">選擇題・答錯有解題重點，自己想出答案</p>
+      </div>
+      <button type="button" id="theme-btn" class="icon-btn" aria-label="切換主題"></button>
+    </header>
+
+    <p id="offline-status" class="offline-status" role="status"></p>
+    <div id="home-notice" class="notice" role="alert" hidden></div>
+
+    <button type="button" id="continue-btn" class="continue-btn" hidden>
+      <span class="continue-title">繼續遊戲</span>
+      <span id="continue-detail" class="continue-detail"></span>
+    </button>
+
+    <h2 class="section-title">開始新局（每局 10 題）</h2>
+    <div id="difficulty-list" class="difficulty-list"></div>
+    <p class="reward-note">🎁 每個難度第一次過關、第一次全對，可以在口袋地城領獎勵禮包</p>
+
+    <nav class="home-links">
+      <a id="portal-link" class="link-btn" href="../" hidden>‹ 所有遊戲</a>
+      <button type="button" id="review-btn" class="link-btn">錯題本</button>
+      <button type="button" id="rules-btn" class="link-btn">玩法</button>
+      <button type="button" id="stats-btn" class="link-btn">統計</button>
+      <button type="button" id="rest-btn" class="link-btn"></button>
+    </nav>
+  </main>
+
+  <main id="game" class="screen game" hidden>
+    <header class="game-bar">
+      <button type="button" id="home-btn" class="bar-btn" aria-label="回首頁">‹ 首頁</button>
+      <div class="game-info">
+        <span id="game-difficulty"></span>
+        <span class="dot">·</span>
+        <span id="progress"></span>
+        <span class="dot">·</span>
+        <span id="timer" aria-label="耗時">00:00</span>
+        <span class="dot">·</span>
+        <span id="mistakes">答錯 0</span>
+      </div>
+      <button type="button" id="menu-btn" class="bar-btn" aria-label="選單">選單</button>
+    </header>
+
+    <div id="play-area" class="play-area">
+      <div id="sheet" class="sheet">
+        <p id="topic" class="topic"></p>
+        <div id="question" class="question"></div>
+        <section id="keys" class="keys" aria-live="polite" hidden>
+          <h3>💡 解題重點</h3>
+          <ol id="keys-list"></ol>
+          <p id="keys-extra" class="keys-extra" hidden></p>
+        </section>
+        <section id="explain" class="explain" aria-live="polite" hidden>
+          <h3>✓ 答對了！</h3>
+          <p id="explain-text"></p>
+        </section>
+        <p id="game-message" class="game-message" aria-live="polite"></p>
+      </div>
+      <div id="choices" class="choices" role="group" aria-label="選項"></div>
+      <div id="pause-cover" class="pause-cover" hidden>
+        <p id="pause-title">已暫停</p>
+        <p id="pause-sub" class="pause-sub" hidden>看看遠方 20 秒，讓眼睛放鬆一下</p>
+        <button type="button" id="resume-btn" class="primary-btn">繼續</button>
+      </div>
+    </div>
+
+    <div class="tools">
+      <button type="button" id="hint-btn" class="tool-btn"><span class="tool-icon" aria-hidden="true">💡</span>解題重點<span id="hint-count" class="tool-badge">0</span></button>
+      <button type="button" id="pause-btn" class="tool-btn"><span class="tool-icon" aria-hidden="true">⏸</span>暫停</button>
+      <button type="button" id="next-btn" class="next-btn" hidden>下一題 ›</button>
+    </div>
+  </main>
+
+  <div id="modal" class="overlay" hidden>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <h2 id="modal-title"></h2>
+      <div id="modal-body" class="modal-body"></div>
+      <div id="modal-actions" class="modal-actions"></div>
+    </div>
+  </div>
+</body>
+</html>

@@ -8,6 +8,7 @@ import {
   bankValues, equationsOf, completedEquations,
 } from './game.js';
 import * as store from './storage.js';
+import { trackPlay, guardFreeze } from './playlog.js';
 
 /** 前景出題逾時（毫秒）。 */
 const GENERATE_TIMEOUT = { easy: 15000, medium: 15000, hard: 15000, expert: 30000 };
@@ -1343,6 +1344,9 @@ function setupPortalLink() {
 
 /** 啟動程式。 */
 function init() {
+  // 遊玩歷程與帳號凍結（與大廳共用，見 playlog.js）。
+  const play = trackPlay('crossmath');
+  guardFreeze({ onLock: play.flush, onUnlock: play.resume });
   applyTheme();
   buildDifficultyButtons();
   bindEvents();

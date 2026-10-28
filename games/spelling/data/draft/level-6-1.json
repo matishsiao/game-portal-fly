@@ -1,0 +1,1502 @@
+[
+ {
+  "id": "abbreviate",
+  "en": "abbreviate",
+  "pos": "v.",
+  "level": 6,
+  "zh": "縮寫、縮短",
+  "example": "We often abbreviate Monday to Mon on the calendar.",
+  "form": "",
+  "exampleZh": "我們常在日曆上把 Monday 縮寫成 Mon。"
+ },
+ {
+  "id": "academy",
+  "en": "academy",
+  "pos": "n.",
+  "level": 6,
+  "zh": "學院、學會",
+  "example": "My sister studies music at a famous academy in the city.",
+  "form": "",
+  "exampleZh": "我姊姊在城裡一所有名的學院學音樂。"
+ },
+ {
+  "id": "accumulation",
+  "en": "accumulation",
+  "pos": "n.",
+  "level": 6,
+  "zh": "累積、堆積",
+  "example": "The accumulation of snow on the roof worried my father.",
+  "form": "",
+  "exampleZh": "屋頂上積雪的堆積讓我爸爸很擔心。"
+ },
+ {
+  "id": "administer",
+  "en": "administer",
+  "pos": "v.",
+  "level": 6,
+  "zh": "管理、給予",
+  "example": "The nurse will administer the medicine to the sick boy.",
+  "form": "",
+  "exampleZh": "護理師會給那個生病的男孩服藥。"
+ },
+ {
+  "id": "affiliate",
+  "en": "affiliate",
+  "pos": "n.",
+  "level": 6,
+  "zh": "分會、附屬機構",
+  "example": "Our school club is an affiliate of a national group.",
+  "form": "",
+  "exampleZh": "我們學校的社團是一個全國性團體的分會。"
+ },
+ {
+  "id": "allege",
+  "en": "allege",
+  "pos": "v.",
+  "level": 6,
+  "zh": "聲稱、指稱",
+  "example": "The man alleged that someone had stolen his bike.",
+  "form": "alleged",
+  "exampleZh": "那個男人聲稱有人偷了他的腳踏車。"
+ },
+ {
+  "id": "amplify",
+  "en": "amplify",
+  "pos": "v.",
+  "level": 6,
+  "zh": "放大、增強",
+  "example": "This small machine can amplify the sound of your voice.",
+  "form": "",
+  "exampleZh": "這台小機器可以放大你的聲音。"
+ },
+ {
+  "id": "anthem",
+  "en": "anthem",
+  "pos": "n.",
+  "level": 6,
+  "zh": "國歌、頌歌",
+  "example": "Everyone stood up when the national anthem began.",
+  "form": "",
+  "exampleZh": "國歌開始時，大家都站了起來。"
+ },
+ {
+  "id": "approximate",
+  "en": "approximate",
+  "pos": "adj./v.",
+  "level": 6,
+  "zh": "大約的、近似",
+  "example": "The approximate cost of the trip is five hundred dollars.",
+  "form": "",
+  "exampleZh": "這趟旅行的大約費用是五百美元。"
+ },
+ {
+  "id": "asthma",
+  "en": "asthma",
+  "pos": "n.",
+  "level": 6,
+  "zh": "氣喘",
+  "example": "My little brother has asthma, so he cannot run too fast.",
+  "form": "",
+  "exampleZh": "我弟弟有氣喘，所以不能跑太快。"
+ },
+ {
+  "id": "attendant",
+  "en": "attendant",
+  "pos": "n.",
+  "level": 6,
+  "zh": "服務員、隨從",
+  "example": "The flight attendant gave us water and some snacks.",
+  "form": "",
+  "exampleZh": "空服員給了我們水和一些點心。"
+ },
+ {
+  "id": "bachelor",
+  "en": "bachelor",
+  "pos": "n.",
+  "level": 6,
+  "zh": "單身漢、學士",
+  "example": "My uncle is a bachelor and lives alone in a small house.",
+  "form": "",
+  "exampleZh": "我叔叔是單身漢，一個人住在小房子裡。"
+ },
+ {
+  "id": "beautify",
+  "en": "beautify",
+  "pos": "v.",
+  "level": 6,
+  "zh": "美化",
+  "example": "We planted flowers to beautify our school yard.",
+  "form": "",
+  "exampleZh": "我們種花來美化學校的院子。"
+ },
+ {
+  "id": "bleach",
+  "en": "bleach",
+  "pos": "n./v.",
+  "level": 6,
+  "zh": "漂白劑、漂白",
+  "example": "Mom used bleach to make the white shirts clean again.",
+  "form": "",
+  "exampleZh": "媽媽用漂白劑讓白襯衫再次變乾淨。"
+ },
+ {
+  "id": "boulevard",
+  "en": "boulevard",
+  "pos": "n.",
+  "level": 6,
+  "zh": "林蔭大道",
+  "example": "We walked along a wide boulevard with tall trees on both sides.",
+  "form": "",
+  "exampleZh": "我們沿著兩旁有高大樹木的寬闊大道散步。"
+ },
+ {
+  "id": "breakdown",
+  "en": "breakdown",
+  "pos": "n.",
+  "level": 6,
+  "zh": "故障、崩潰",
+  "example": "A breakdown of the bus made us late for school.",
+  "form": "",
+  "exampleZh": "公車故障害我們上學遲到了。"
+ },
+ {
+  "id": "brook",
+  "en": "brook",
+  "pos": "n.",
+  "level": 6,
+  "zh": "小溪",
+  "example": "The children played by the brook near their grandmother's house.",
+  "form": "",
+  "exampleZh": "孩子們在奶奶家附近的小溪邊玩耍。"
+ },
+ {
+  "id": "calculator",
+  "en": "calculator",
+  "pos": "n.",
+  "level": 6,
+  "zh": "計算機",
+  "example": "You may use a calculator during the math test.",
+  "form": "",
+  "exampleZh": "數學考試時你可以使用計算機。"
+ },
+ {
+  "id": "cardboard",
+  "en": "cardboard",
+  "pos": "n.",
+  "level": 6,
+  "zh": "硬紙板",
+  "example": "I made a small house out of cardboard for my project.",
+  "form": "",
+  "exampleZh": "我用硬紙板做了一個小房子當作業。"
+ },
+ {
+  "id": "casualty",
+  "en": "casualty",
+  "pos": "n.",
+  "level": 6,
+  "zh": "傷亡者、受害者",
+  "example": "There were no casualties in the small fire last night.",
+  "form": "casualties",
+  "exampleZh": "昨晚的小火災沒有任何傷亡者。"
+ },
+ {
+  "id": "cement",
+  "en": "cement",
+  "pos": "n./v.",
+  "level": 6,
+  "zh": "水泥、鋪水泥",
+  "example": "The workers mixed cement with water to build the wall.",
+  "form": "",
+  "exampleZh": "工人把水泥和水混合來蓋牆。"
+ },
+ {
+  "id": "chairwoman",
+  "en": "chairwoman",
+  "pos": "n.",
+  "level": 6,
+  "zh": "女主席",
+  "example": "The chairwoman asked everyone to be quiet and listen.",
+  "form": "",
+  "exampleZh": "女主席請大家安靜聆聽。"
+ },
+ {
+  "id": "chili",
+  "en": "chili",
+  "pos": "n.",
+  "level": 6,
+  "zh": "辣椒",
+  "example": "This soup is too hot because it has a lot of chili.",
+  "form": "",
+  "exampleZh": "這碗湯加了很多辣椒，所以太辣了。"
+ },
+ {
+  "id": "clasp",
+  "en": "clasp",
+  "pos": "v./n.",
+  "level": 6,
+  "zh": "緊握、扣住",
+  "example": "She clasped her mother's hand tightly in the crowd.",
+  "form": "clasped",
+  "exampleZh": "在人群中，她緊緊握住媽媽的手。"
+ },
+ {
+  "id": "coastline",
+  "en": "coastline",
+  "pos": "n.",
+  "level": 6,
+  "zh": "海岸線",
+  "example": "The coastline of this island is long and very beautiful.",
+  "form": "",
+  "exampleZh": "這座島的海岸線又長又美麗。"
+ },
+ {
+  "id": "comparative",
+  "en": "comparative",
+  "pos": "adj.",
+  "level": 6,
+  "zh": "比較的、相對的",
+  "example": "The teacher taught us the comparative form of long adjectives.",
+  "form": "",
+  "exampleZh": "老師教我們長形容詞的比較級。"
+ },
+ {
+  "id": "compute",
+  "en": "compute",
+  "pos": "v.",
+  "level": 6,
+  "zh": "計算、運算",
+  "example": "Can you compute the total price of these three books?",
+  "form": "",
+  "exampleZh": "你能算出這三本書的總價嗎？"
+ },
+ {
+  "id": "congressman",
+  "en": "congressman",
+  "pos": "n.",
+  "level": 6,
+  "zh": "國會議員",
+  "example": "The congressman visited our school to talk with students.",
+  "form": "",
+  "exampleZh": "那位國會議員來我們學校和學生交談。"
+ },
+ {
+  "id": "consonant",
+  "en": "consonant",
+  "pos": "n.",
+  "level": 6,
+  "zh": "子音",
+  "example": "The letter B is a consonant, but the letter A is not.",
+  "form": "",
+  "exampleZh": "字母 B 是子音，但字母 A 不是。"
+ },
+ {
+  "id": "coral",
+  "en": "coral",
+  "pos": "n./adj.",
+  "level": 6,
+  "zh": "珊瑚",
+  "example": "We saw colorful fish swimming around the coral.",
+  "form": "",
+  "exampleZh": "我們看見彩色的魚在珊瑚周圍游動。"
+ },
+ {
+  "id": "courtyard",
+  "en": "courtyard",
+  "pos": "n.",
+  "level": 6,
+  "zh": "庭院、中庭",
+  "example": "Students ate lunch in the courtyard on sunny days.",
+  "form": "",
+  "exampleZh": "晴天時學生們在中庭吃午餐。"
+ },
+ {
+  "id": "crater",
+  "en": "crater",
+  "pos": "n./v.",
+  "level": 6,
+  "zh": "火山口、坑洞",
+  "example": "We looked down into the crater of the old volcano.",
+  "form": "",
+  "exampleZh": "我們往下看那座古老火山的火山口。"
+ },
+ {
+  "id": "cucumber",
+  "en": "cucumber",
+  "pos": "n.",
+  "level": 6,
+  "zh": "小黃瓜",
+  "example": "Dad cut a cucumber and put it in the salad.",
+  "form": "",
+  "exampleZh": "爸爸切了一條小黃瓜放進沙拉裡。"
+ },
+ {
+  "id": "cynical",
+  "en": "cynical",
+  "pos": "adj.",
+  "level": 6,
+  "zh": "憤世嫉俗的",
+  "example": "He became cynical after many people had lied to him.",
+  "form": "",
+  "exampleZh": "許多人對他說謊之後，他變得憤世嫉俗。"
+ },
+ {
+  "id": "default",
+  "en": "default",
+  "pos": "n./v.",
+  "level": 6,
+  "zh": "預設值、違約",
+  "example": "The default language of this phone is English.",
+  "form": "",
+  "exampleZh": "這支手機的預設語言是英文。"
+ },
+ {
+  "id": "descent",
+  "en": "descent",
+  "pos": "n.",
+  "level": 6,
+  "zh": "下降、血統",
+  "example": "The plane began its descent as we came near the city.",
+  "form": "",
+  "exampleZh": "我們接近城市時，飛機開始下降。"
+ },
+ {
+  "id": "detergent",
+  "en": "detergent",
+  "pos": "n.",
+  "level": 6,
+  "zh": "洗衣粉、清潔劑",
+  "example": "Please buy some detergent when you go to the store.",
+  "form": "",
+  "exampleZh": "你去商店時請買些洗衣粉。"
+ },
+ {
+  "id": "diesel",
+  "en": "diesel",
+  "pos": "n.",
+  "level": 6,
+  "zh": "柴油",
+  "example": "The big truck uses diesel instead of gas.",
+  "form": "",
+  "exampleZh": "這輛大卡車用柴油而不是汽油。"
+ },
+ {
+  "id": "disbelief",
+  "en": "disbelief",
+  "pos": "n.",
+  "level": 6,
+  "zh": "不相信、驚訝",
+  "example": "She looked at the test score in disbelief.",
+  "form": "",
+  "exampleZh": "她難以置信地看著考試成績。"
+ },
+ {
+  "id": "discreet",
+  "en": "discreet",
+  "pos": "adj.",
+  "level": 6,
+  "zh": "謹慎的、慎重的",
+  "example": "Please be discreet and do not tell anyone our secret.",
+  "form": "",
+  "exampleZh": "請謹慎一點，不要把我們的祕密告訴任何人。"
+ },
+ {
+  "id": "dispose",
+  "en": "dispose",
+  "pos": "v.",
+  "level": 6,
+  "zh": "處置、丟棄",
+  "example": "Please dispose of your trash in the right bin.",
+  "form": "",
+  "exampleZh": "請把你的垃圾丟進正確的垃圾桶。"
+ },
+ {
+  "id": "divert",
+  "en": "divert",
+  "pos": "v.",
+  "level": 6,
+  "zh": "轉移、使改道",
+  "example": "The police diverted traffic because the road was closed.",
+  "form": "diverted",
+  "exampleZh": "因為道路封閉，警察將車輛改道。"
+ },
+ {
+  "id": "doze",
+  "en": "doze",
+  "pos": "v./n.",
+  "level": 6,
+  "zh": "打盹",
+  "example": "Grandpa likes to doze in his chair after lunch.",
+  "form": "",
+  "exampleZh": "爺爺午餐後喜歡在椅子上打盹。"
+ },
+ {
+  "id": "duration",
+  "en": "duration",
+  "pos": "n.",
+  "level": 6,
+  "zh": "持續期間",
+  "example": "The duration of the movie is about two hours.",
+  "form": "",
+  "exampleZh": "這部電影的長度大約兩小時。"
+ },
+ {
+  "id": "eclipse",
+  "en": "eclipse",
+  "pos": "n./v.",
+  "level": 6,
+  "zh": "日蝕、月蝕",
+  "example": "We watched the eclipse of the moon in the backyard.",
+  "form": "",
+  "exampleZh": "我們在後院觀看月蝕。"
+ },
+ {
+  "id": "emigration",
+  "en": "emigration",
+  "pos": "n.",
+  "level": 6,
+  "zh": "移民出國",
+  "example": "Many families chose emigration to find a better life.",
+  "form": "",
+  "exampleZh": "許多家庭選擇移居國外來尋找更好的生活。"
+ },
+ {
+  "id": "enlighten",
+  "en": "enlighten",
+  "pos": "v.",
+  "level": 6,
+  "zh": "啟發、教導",
+  "example": "The teacher's story enlightened us about the history of our town.",
+  "form": "enlightened",
+  "exampleZh": "老師的故事讓我們對家鄉的歷史有所了解。"
+ },
+ {
+  "id": "equate",
+  "en": "equate",
+  "pos": "v.",
+  "level": 6,
+  "zh": "等同、視為相同",
+  "example": "Do not equate being rich with being happy.",
+  "form": "",
+  "exampleZh": "不要把有錢等同於快樂。"
+ },
+ {
+  "id": "examinee",
+  "en": "examinee",
+  "pos": "n.",
+  "level": 6,
+  "zh": "考生",
+  "example": "Every examinee must show an ID card at the door.",
+  "form": "",
+  "exampleZh": "每位考生都必須在門口出示身分證。"
+ },
+ {
+  "id": "exert",
+  "en": "exert",
+  "pos": "v.",
+  "level": 6,
+  "zh": "運用、施加",
+  "example": "You must exert more effort if you want to win.",
+  "form": "",
+  "exampleZh": "如果你想贏，就必須付出更多努力。"
+ },
+ {
+  "id": "eyelid",
+  "en": "eyelid",
+  "pos": "n.",
+  "level": 6,
+  "zh": "眼皮",
+  "example": "The baby closed her eyelids and fell asleep quickly.",
+  "form": "eyelids",
+  "exampleZh": "寶寶閉上眼皮，很快就睡著了。"
+ },
+ {
+  "id": "fascination",
+  "en": "fascination",
+  "pos": "n.",
+  "level": 6,
+  "zh": "著迷、魅力",
+  "example": "The boy has a deep fascination with space and stars.",
+  "form": "",
+  "exampleZh": "這個男孩對太空和星星深深著迷。"
+ },
+ {
+  "id": "fin",
+  "en": "fin",
+  "pos": "n.",
+  "level": 6,
+  "zh": "魚鰭",
+  "example": "The shark's fin moved above the water near our boat.",
+  "form": "",
+  "exampleZh": "鯊魚的魚鰭在我們的船附近露出水面。"
+ },
+ {
+  "id": "flourish",
+  "en": "flourish",
+  "pos": "v./n.",
+  "level": 6,
+  "zh": "繁盛、茁壯",
+  "example": "These flowers flourish when they get enough sun and water.",
+  "form": "",
+  "exampleZh": "這些花得到足夠的陽光和水就會長得茂盛。"
+ },
+ {
+  "id": "forthcoming",
+  "en": "forthcoming",
+  "pos": "adj.",
+  "level": 6,
+  "zh": "即將來臨的",
+  "example": "Tickets for the forthcoming concert will be sold next week.",
+  "form": "",
+  "exampleZh": "即將舉行的音樂會門票下週開賣。"
+ },
+ {
+  "id": "freak",
+  "en": "freak",
+  "pos": "n./v.",
+  "level": 6,
+  "zh": "怪人、狂熱者",
+  "example": "My friend is a movie freak and sees one every weekend.",
+  "form": "",
+  "exampleZh": "我朋友是電影狂，每個週末都看一部。"
+ },
+ {
+  "id": "gallop",
+  "en": "gallop",
+  "pos": "n./v.",
+  "level": 6,
+  "zh": "疾馳、奔馳",
+  "example": "The horse began to gallop across the wide field.",
+  "form": "",
+  "exampleZh": "那匹馬開始在寬廣的田野上奔馳。"
+ },
+ {
+  "id": "geometry",
+  "en": "geometry",
+  "pos": "n.",
+  "level": 6,
+  "zh": "幾何學",
+  "example": "We learned how to draw circles in geometry class.",
+  "form": "",
+  "exampleZh": "我們在幾何課學了怎麼畫圓。"
+ },
+ {
+  "id": "gloom",
+  "en": "gloom",
+  "pos": "n./v.",
+  "level": 6,
+  "zh": "陰暗、憂鬱",
+  "example": "A feeling of gloom filled the room after the bad news.",
+  "form": "",
+  "exampleZh": "聽到壞消息後，房間裡瀰漫著憂鬱的氣氛。"
+ },
+ {
+  "id": "grease",
+  "en": "grease",
+  "pos": "n./v.",
+  "level": 6,
+  "zh": "油脂、潤滑油",
+  "example": "Dad put some grease on the bike chain.",
+  "form": "",
+  "exampleZh": "爸爸在腳踏車的鏈條上抹了一點潤滑油。"
+ },
+ {
+  "id": "hamper",
+  "en": "hamper",
+  "pos": "v.",
+  "level": 6,
+  "zh": "妨礙、阻礙",
+  "example": "Heavy rain may hamper our plan to visit the zoo.",
+  "form": "",
+  "exampleZh": "大雨可能會妨礙我們去動物園的計畫。"
+ },
+ {
+  "id": "harness",
+  "en": "harness",
+  "pos": "n./v.",
+  "level": 6,
+  "zh": "馬具、利用",
+  "example": "The farmer put a harness on the horse before work.",
+  "form": "",
+  "exampleZh": "農夫在工作前替馬套上馬具。"
+ },
+ {
+  "id": "hemisphere",
+  "en": "hemisphere",
+  "pos": "n.",
+  "level": 6,
+  "zh": "半球",
+  "example": "Taiwan is in the northern hemisphere of the Earth.",
+  "form": "",
+  "exampleZh": "台灣位於地球的北半球。"
+ },
+ {
+  "id": "hoarse",
+  "en": "hoarse",
+  "pos": "adj.",
+  "level": 6,
+  "zh": "沙啞的",
+  "example": "My voice was hoarse after I shouted at the game.",
+  "form": "",
+  "exampleZh": "我在比賽中大聲喊叫後，聲音變得沙啞。"
+ },
+ {
+  "id": "hover",
+  "en": "hover",
+  "pos": "v./n.",
+  "level": 6,
+  "zh": "盤旋、徘徊",
+  "example": "A small bird began to hover over the flower.",
+  "form": "",
+  "exampleZh": "一隻小鳥開始在花的上方盤旋。"
+ },
+ {
+  "id": "iceberg",
+  "en": "iceberg",
+  "pos": "n.",
+  "level": 6,
+  "zh": "冰山",
+  "example": "The ship stayed far away from the huge iceberg.",
+  "form": "",
+  "exampleZh": "那艘船遠離那座巨大的冰山。"
+ },
+ {
+  "id": "imprison",
+  "en": "imprison",
+  "pos": "v.",
+  "level": 6,
+  "zh": "監禁、關押",
+  "example": "The king imprisoned the thief in a dark room.",
+  "form": "imprisoned",
+  "exampleZh": "國王把小偷關在一間黑暗的房間裡。"
+ },
+ {
+  "id": "induce",
+  "en": "induce",
+  "pos": "v.",
+  "level": 6,
+  "zh": "誘使、引起",
+  "example": "Some medicine can induce sleep within an hour.",
+  "form": "",
+  "exampleZh": "有些藥物能在一小時內使人入睡。"
+ },
+ {
+  "id": "injustice",
+  "en": "injustice",
+  "pos": "n.",
+  "level": 6,
+  "zh": "不公平、不公正",
+  "example": "The students felt a great injustice when the rule changed.",
+  "form": "",
+  "exampleZh": "規則改變時，學生們覺得非常不公平。"
+ },
+ {
+  "id": "intake",
+  "en": "intake",
+  "pos": "n.",
+  "level": 6,
+  "zh": "攝取量",
+  "example": "Doctors say you should reduce your sugar intake.",
+  "form": "",
+  "exampleZh": "醫生說你應該減少糖的攝取量。"
+ },
+ {
+  "id": "intonation",
+  "en": "intonation",
+  "pos": "n.",
+  "level": 6,
+  "zh": "語調",
+  "example": "Good English intonation makes your speech sound natural.",
+  "form": "",
+  "exampleZh": "良好的英語語調能讓你的說話聽起來自然。"
+ },
+ {
+  "id": "ironic",
+  "en": "ironic",
+  "pos": "adj.",
+  "level": 6,
+  "zh": "諷刺的、反諷的",
+  "example": "It is ironic that the fire station caught fire.",
+  "form": "",
+  "exampleZh": "消防局竟然失火，真是諷刺。"
+ },
+ {
+  "id": "janitor",
+  "en": "janitor",
+  "pos": "n.",
+  "level": 6,
+  "zh": "管理員、清潔工",
+  "example": "The janitor cleans the school halls every morning.",
+  "form": "",
+  "exampleZh": "校工每天早上打掃學校的走廊。"
+ },
+ {
+  "id": "kin",
+  "en": "kin",
+  "pos": "n./adj.",
+  "level": 6,
+  "zh": "親屬",
+  "example": "Most of my kin live in the same town.",
+  "form": "",
+  "exampleZh": "我的大部分親戚都住在同一個鎮上。"
+ },
+ {
+  "id": "latitude",
+  "en": "latitude",
+  "pos": "n.",
+  "level": 6,
+  "zh": "緯度",
+  "example": "The two cities are at almost the same latitude.",
+  "form": "",
+  "exampleZh": "這兩座城市的緯度幾乎相同。"
+ },
+ {
+  "id": "lesbian",
+  "en": "lesbian",
+  "pos": "adj.",
+  "level": 6,
+  "zh": "女同性戀的",
+  "example": "The writer is a lesbian and she has a happy family.",
+  "form": "",
+  "exampleZh": "那位作家是女同性戀者，她有個幸福的家庭。"
+ },
+ {
+  "id": "lieutenant",
+  "en": "lieutenant",
+  "pos": "n.",
+  "level": 6,
+  "zh": "中尉、副官",
+  "example": "The lieutenant led his team across the river.",
+  "form": "",
+  "exampleZh": "那位中尉帶領他的隊伍過了河。"
+ },
+ {
+  "id": "liter",
+  "en": "liter",
+  "pos": "n.",
+  "level": 6,
+  "zh": "公升",
+  "example": "I drink about two liters of water every day.",
+  "form": "liters",
+  "exampleZh": "我每天喝大約兩公升的水。"
+ },
+ {
+  "id": "lodge",
+  "en": "lodge",
+  "pos": "n./v.",
+  "level": 6,
+  "zh": "小屋、投宿",
+  "example": "We stayed in a small lodge near the mountain.",
+  "form": "",
+  "exampleZh": "我們住在山附近的一間小屋。"
+ },
+ {
+  "id": "lottery",
+  "en": "lottery",
+  "pos": "n.",
+  "level": 6,
+  "zh": "彩券、抽籤",
+  "example": "He won a prize in the school lottery last week.",
+  "form": "",
+  "exampleZh": "他上週在學校的抽獎中得了獎。"
+ },
+ {
+  "id": "lush",
+  "en": "lush",
+  "pos": "adj.",
+  "level": 6,
+  "zh": "蔥鬱的、茂盛的",
+  "example": "The hills are lush and green after the spring rain.",
+  "form": "",
+  "exampleZh": "春雨過後，山丘一片蔥綠。"
+ },
+ {
+  "id": "manuscript",
+  "en": "manuscript",
+  "pos": "n.",
+  "level": 6,
+  "zh": "手稿、原稿",
+  "example": "The writer sent his manuscript to a big book company.",
+  "form": "",
+  "exampleZh": "那位作家把他的手稿寄給一家大出版社。"
+ },
+ {
+  "id": "mastery",
+  "en": "mastery",
+  "pos": "n.",
+  "level": 6,
+  "zh": "精通、掌握",
+  "example": "Her mastery of English helped her get a good job.",
+  "form": "",
+  "exampleZh": "她精通英文，幫助她找到好工作。"
+ },
+ {
+  "id": "merchandise",
+  "en": "merchandise",
+  "pos": "n./v.",
+  "level": 6,
+  "zh": "商品、貨物",
+  "example": "The shop sells school merchandise like bags and caps.",
+  "form": "",
+  "exampleZh": "這家店販售書包和帽子之類的學校商品。"
+ },
+ {
+  "id": "mischievous",
+  "en": "mischievous",
+  "pos": "adj.",
+  "level": 6,
+  "zh": "頑皮的、淘氣的",
+  "example": "The mischievous boy hid his sister's shoes again.",
+  "form": "",
+  "exampleZh": "那個頑皮的男孩又把妹妹的鞋子藏起來了。"
+ },
+ {
+  "id": "monetary",
+  "en": "monetary",
+  "pos": "adj.",
+  "level": 6,
+  "zh": "貨幣的、金錢的",
+  "example": "The company gave him a monetary gift for his hard work.",
+  "form": "",
+  "exampleZh": "公司因為他的努力而給了他一筆獎金。"
+ },
+ {
+  "id": "motto",
+  "en": "motto",
+  "pos": "n.",
+  "level": 6,
+  "zh": "座右銘、格言",
+  "example": "Our school motto is to learn and to help others.",
+  "form": "",
+  "exampleZh": "我們的校訓是學習並幫助別人。"
+ },
+ {
+  "id": "mute",
+  "en": "mute",
+  "pos": "adj./v./n.",
+  "level": 6,
+  "zh": "沉默的、啞的",
+  "example": "The boy stayed mute when the teacher asked him a question.",
+  "form": "",
+  "exampleZh": "老師問他問題時，那個男孩保持沉默。"
+ },
+ {
+  "id": "navigation",
+  "en": "navigation",
+  "pos": "n.",
+  "level": 6,
+  "zh": "導航、航行",
+  "example": "The phone has a navigation app to help us find the road.",
+  "form": "",
+  "exampleZh": "這支手機有導航應用程式，幫助我們找路。"
+ },
+ {
+  "id": "nourishment",
+  "en": "nourishment",
+  "pos": "n.",
+  "level": 6,
+  "zh": "營養、養分",
+  "example": "Plants get nourishment from the soil and the water.",
+  "form": "",
+  "exampleZh": "植物從土壤和水中獲得養分。"
+ },
+ {
+  "id": "oatmeal",
+  "en": "oatmeal",
+  "pos": "n.",
+  "level": 6,
+  "zh": "燕麥片",
+  "example": "I eat oatmeal with milk for breakfast every day.",
+  "form": "",
+  "exampleZh": "我每天早餐吃加牛奶的燕麥片。"
+ },
+ {
+  "id": "offshore",
+  "en": "offshore",
+  "pos": "adj.",
+  "level": 6,
+  "zh": "近海的、離岸的",
+  "example": "There is a small offshore island near our village.",
+  "form": "",
+  "exampleZh": "我們村子附近有一座小離島。"
+ },
+ {
+  "id": "organizer",
+  "en": "organizer",
+  "pos": "n.",
+  "level": 6,
+  "zh": "組織者、籌辦人",
+  "example": "The organizer of the party asked us to bring some food.",
+  "form": "",
+  "exampleZh": "派對的籌辦人請我們帶些食物。"
+ },
+ {
+  "id": "ounce",
+  "en": "ounce",
+  "pos": "n.",
+  "level": 6,
+  "zh": "盎司",
+  "example": "This small bag of tea weighs only one ounce.",
+  "form": "",
+  "exampleZh": "這小包茶葉只有一盎司重。"
+ },
+ {
+  "id": "outnumber",
+  "en": "outnumber",
+  "pos": "v.",
+  "level": 6,
+  "zh": "數量超過",
+  "example": "Girls outnumber boys in our class this year.",
+  "form": "",
+  "exampleZh": "今年我們班女生的人數比男生多。"
+ },
+ {
+  "id": "outward-2",
+  "en": "outward",
+  "pos": "adv.",
+  "level": 6,
+  "zh": "向外的、外表上",
+  "example": "The ship sailed outward from the quiet harbor.",
+  "form": "",
+  "exampleZh": "那艘船從寧靜的港口向外航行。"
+ },
+ {
+  "id": "ozone",
+  "en": "ozone",
+  "pos": "n.",
+  "level": 6,
+  "zh": "臭氧",
+  "example": "The ozone layer protects us from too much sunlight.",
+  "form": "",
+  "exampleZh": "臭氧層保護我們不受過多陽光傷害。"
+ },
+ {
+  "id": "pastime",
+  "en": "pastime",
+  "pos": "n.",
+  "level": 6,
+  "zh": "消遣、娛樂",
+  "example": "Reading comic books is my favorite pastime on weekends.",
+  "form": "",
+  "exampleZh": "週末看漫畫是我最喜歡的消遣。"
+ },
+ {
+  "id": "peninsula",
+  "en": "peninsula",
+  "pos": "n.",
+  "level": 6,
+  "zh": "半島",
+  "example": "Italy is a long peninsula in the middle of the sea.",
+  "form": "",
+  "exampleZh": "義大利是海中央一座狹長的半島。"
+ },
+ {
+  "id": "persistent",
+  "en": "persistent",
+  "pos": "adj.",
+  "level": 6,
+  "zh": "堅持不懈的、持續的",
+  "example": "She is a persistent girl who never gives up easily.",
+  "form": "",
+  "exampleZh": "她是個堅持不懈的女孩，不會輕易放棄。"
+ },
+ {
+  "id": "pilgrim",
+  "en": "pilgrim",
+  "pos": "n.",
+  "level": 6,
+  "zh": "朝聖者",
+  "example": "Many pilgrims walk a long way to reach the holy place.",
+  "form": "pilgrims",
+  "exampleZh": "許多朝聖者走很遠的路才到達聖地。"
+ },
+ {
+  "id": "plow",
+  "en": "plow",
+  "pos": "n./v.",
+  "level": 6,
+  "zh": "犁、耕地",
+  "example": "The farmer used a plow to turn over the soil.",
+  "form": "",
+  "exampleZh": "農夫用犁把土翻過來。"
+ },
+ {
+  "id": "posture",
+  "en": "posture",
+  "pos": "n./v.",
+  "level": 6,
+  "zh": "姿勢、姿態",
+  "example": "Sit up straight and keep a good posture when you study.",
+  "form": "",
+  "exampleZh": "念書時要坐直，保持良好的姿勢。"
+ },
+ {
+  "id": "predecessor",
+  "en": "predecessor",
+  "pos": "n.",
+  "level": 6,
+  "zh": "前任、前輩",
+  "example": "The new teacher is kinder than her predecessor.",
+  "form": "",
+  "exampleZh": "新老師比她的前任更和善。"
+ },
+ {
+  "id": "priceless",
+  "en": "priceless",
+  "pos": "adj.",
+  "level": 6,
+  "zh": "無價的、極珍貴的",
+  "example": "The old photo of my grandma is priceless to me.",
+  "form": "",
+  "exampleZh": "奶奶的那張老照片對我來說是無價之寶。"
+ },
+ {
+  "id": "prose",
+  "en": "prose",
+  "pos": "n.",
+  "level": 6,
+  "zh": "散文",
+  "example": "He writes both poems and prose for the school paper.",
+  "form": "",
+  "exampleZh": "他為校刊寫詩，也寫散文。"
+ },
+ {
+  "id": "psychiatry",
+  "en": "psychiatry",
+  "pos": "n.",
+  "level": 6,
+  "zh": "精神醫學",
+  "example": "My aunt works in a hospital and studies psychiatry.",
+  "form": "",
+  "exampleZh": "我阿姨在醫院工作，研究精神醫學。"
+ },
+ {
+  "id": "purify",
+  "en": "purify",
+  "pos": "v.",
+  "level": 6,
+  "zh": "淨化、過濾",
+  "example": "This machine can purify the water from the river.",
+  "form": "",
+  "exampleZh": "這台機器可以淨化河裡的水。"
+ },
+ {
+  "id": "radish",
+  "en": "radish",
+  "pos": "n.",
+  "level": 6,
+  "zh": "蘿蔔",
+  "example": "Grandma planted some radishes in the garden.",
+  "form": "radishes",
+  "exampleZh": "奶奶在花園裡種了一些蘿蔔。"
+ },
+ {
+  "id": "reckless",
+  "en": "reckless",
+  "pos": "adj.",
+  "level": 6,
+  "zh": "魯莽的、不顧後果的",
+  "example": "Reckless driving can hurt many people on the road.",
+  "form": "",
+  "exampleZh": "魯莽的駕駛可能傷害路上的許多人。"
+ },
+ {
+  "id": "referendum",
+  "en": "referendum",
+  "pos": "n.",
+  "level": 6,
+  "zh": "公民投票",
+  "example": "The town held a referendum on building a new park.",
+  "form": "",
+  "exampleZh": "鎮上舉行公民投票，決定是否蓋新公園。"
+ },
+ {
+  "id": "rehabilitate",
+  "en": "rehabilitate",
+  "pos": "v.",
+  "level": 6,
+  "zh": "使復健、使恢復",
+  "example": "The hospital helps injured people rehabilitate after an accident.",
+  "form": "",
+  "exampleZh": "醫院協助受傷的人在意外後復健。"
+ },
+ {
+  "id": "reliant",
+  "en": "reliant",
+  "pos": "adj.",
+  "level": 6,
+  "zh": "依賴的",
+  "example": "The little girl is still reliant on her mother.",
+  "form": "",
+  "exampleZh": "那個小女孩仍然依賴她的媽媽。"
+ },
+ {
+  "id": "reptile",
+  "en": "reptile",
+  "pos": "n./adj.",
+  "level": 6,
+  "zh": "爬蟲類動物",
+  "example": "A snake is a reptile that does not have legs.",
+  "form": "",
+  "exampleZh": "蛇是沒有腳的爬蟲類動物。"
+ },
+ {
+  "id": "restrain",
+  "en": "restrain",
+  "pos": "v.",
+  "level": 6,
+  "zh": "抑制、控制",
+  "example": "He tried to restrain his anger and stay calm.",
+  "form": "",
+  "exampleZh": "他努力克制怒氣，保持冷靜。"
+ },
+ {
+  "id": "revolt",
+  "en": "revolt",
+  "pos": "n./v.",
+  "level": 6,
+  "zh": "反抗、叛亂",
+  "example": "The people started a revolt against the unfair king.",
+  "form": "",
+  "exampleZh": "人民起來反抗那個不公平的國王。"
+ },
+ {
+  "id": "rotate",
+  "en": "rotate",
+  "pos": "v.",
+  "level": 6,
+  "zh": "旋轉、輪流",
+  "example": "The Earth rotates once around its axis every day.",
+  "form": "rotates",
+  "exampleZh": "地球每天繞著地軸自轉一圈。"
+ },
+ {
+  "id": "salvage",
+  "en": "salvage",
+  "pos": "v.",
+  "level": 6,
+  "zh": "搶救、打撈",
+  "example": "The workers tried to salvage the sunken boat.",
+  "form": "",
+  "exampleZh": "工人們試著打撈那艘沉沒的船。"
+ },
+ {
+  "id": "scroll",
+  "en": "scroll",
+  "pos": "n./v.",
+  "level": 6,
+  "zh": "捲軸、捲動",
+  "example": "I used my finger to scroll down the web page.",
+  "form": "",
+  "exampleZh": "我用手指把網頁往下捲動。"
+ },
+ {
+  "id": "serene",
+  "en": "serene",
+  "pos": "adj.",
+  "level": 6,
+  "zh": "寧靜的、安詳的",
+  "example": "The lake looked serene in the early morning.",
+  "form": "",
+  "exampleZh": "清晨的湖面看起來十分寧靜。"
+ },
+ {
+  "id": "sharpen",
+  "en": "sharpen",
+  "pos": "v.",
+  "level": 6,
+  "zh": "削尖、磨利",
+  "example": "Please sharpen your pencil before the test starts.",
+  "form": "",
+  "exampleZh": "考試開始前請把鉛筆削尖。"
+ },
+ {
+  "id": "shuffle",
+  "en": "shuffle",
+  "pos": "v.",
+  "level": 6,
+  "zh": "洗牌、拖著腳走",
+  "example": "Let me shuffle the cards before we start the game.",
+  "form": "",
+  "exampleZh": "開始遊戲前讓我先洗牌。"
+ },
+ {
+  "id": "slang",
+  "en": "slang",
+  "pos": "n./v.",
+  "level": 6,
+  "zh": "俚語",
+  "example": "My teacher does not like us to use slang in essays.",
+  "form": "",
+  "exampleZh": "老師不喜歡我們在作文裡使用俚語。"
+ },
+ {
+  "id": "sly",
+  "en": "sly",
+  "pos": "adj.",
+  "level": 6,
+  "zh": "狡猾的",
+  "example": "The sly fox found a way into the farm.",
+  "form": "",
+  "exampleZh": "那隻狡猾的狐狸找到了進入農場的方法。"
+ },
+ {
+  "id": "socialism",
+  "en": "socialism",
+  "pos": "n.",
+  "level": 6,
+  "zh": "社會主義",
+  "example": "We learned about socialism in our history class today.",
+  "form": "",
+  "exampleZh": "我們今天在歷史課學到了社會主義。"
+ },
+ {
+  "id": "solitude",
+  "en": "solitude",
+  "pos": "n.",
+  "level": 6,
+  "zh": "孤獨、獨處",
+  "example": "He enjoys the solitude of walking alone in the forest.",
+  "form": "",
+  "exampleZh": "他喜歡獨自在森林裡散步的寧靜。"
+ },
+ {
+  "id": "span",
+  "en": "span",
+  "pos": "n./v.",
+  "level": 6,
+  "zh": "跨度、一段時間",
+  "example": "The bridge has a span of about two hundred meters.",
+  "form": "",
+  "exampleZh": "這座橋的跨度約兩百公尺。"
+ },
+ {
+  "id": "spokeswoman",
+  "en": "spokeswoman",
+  "pos": "n.",
+  "level": 6,
+  "zh": "女發言人",
+  "example": "The spokeswoman told reporters that the school would stay open.",
+  "form": "",
+  "exampleZh": "女發言人告訴記者學校會繼續開放。"
+ },
+ {
+  "id": "stabilize",
+  "en": "stabilize",
+  "pos": "v.",
+  "level": 6,
+  "zh": "穩定、使穩固",
+  "example": "The doctor gave him medicine to stabilize his heartbeat.",
+  "form": "",
+  "exampleZh": "醫生給他藥來穩定心跳。"
+ },
+ {
+  "id": "stature",
+  "en": "stature",
+  "pos": "n.",
+  "level": 6,
+  "zh": "身高、聲望",
+  "example": "The boy is small in stature but very strong.",
+  "form": "",
+  "exampleZh": "那個男孩身材矮小，但非常強壯。"
+ },
+ {
+  "id": "strangle",
+  "en": "strangle",
+  "pos": "v.",
+  "level": 6,
+  "zh": "掐死、勒住",
+  "example": "The tight scarf almost strangled the little puppy.",
+  "form": "strangled",
+  "exampleZh": "那條太緊的圍巾差點勒住小狗。"
+ },
+ {
+  "id": "subjective",
+  "en": "subjective",
+  "pos": "adj./n.",
+  "level": 6,
+  "zh": "主觀的",
+  "example": "Which food tastes best is a subjective choice.",
+  "form": "",
+  "exampleZh": "哪種食物最好吃是一種主觀的選擇。"
+ },
+ {
+  "id": "successive",
+  "en": "successive",
+  "pos": "adj.",
+  "level": 6,
+  "zh": "連續的",
+  "example": "Our team won three successive games this month.",
+  "form": "",
+  "exampleZh": "我們隊這個月連續贏了三場比賽。"
+ },
+ {
+  "id": "superstitious",
+  "en": "superstitious",
+  "pos": "adj.",
+  "level": 6,
+  "zh": "迷信的",
+  "example": "My grandmother is superstitious about the number four.",
+  "form": "",
+  "exampleZh": "我奶奶對數字四很迷信。"
+ },
+ {
+  "id": "suspense",
+  "en": "suspense",
+  "pos": "n.",
+  "level": 6,
+  "zh": "懸疑、緊張感",
+  "example": "The movie was full of suspense until the very end.",
+  "form": "",
+  "exampleZh": "這部電影到最後都充滿懸疑。"
+ },
+ {
+  "id": "symphony",
+  "en": "symphony",
+  "pos": "n.",
+  "level": 6,
+  "zh": "交響樂",
+  "example": "We listened to a beautiful symphony at the concert hall.",
+  "form": "",
+  "exampleZh": "我們在音樂廳聽了一首優美的交響樂。"
+ },
+ {
+  "id": "teller",
+  "en": "teller",
+  "pos": "n.",
+  "level": 6,
+  "zh": "銀行行員",
+  "example": "The bank teller counted the money for my mother.",
+  "form": "",
+  "exampleZh": "銀行行員替我媽媽數了錢。"
+ },
+ {
+  "id": "thermometer",
+  "en": "thermometer",
+  "pos": "n.",
+  "level": 6,
+  "zh": "溫度計",
+  "example": "The nurse put a thermometer under my arm.",
+  "form": "",
+  "exampleZh": "護理師把溫度計放在我腋下。"
+ },
+ {
+  "id": "torrent",
+  "en": "torrent",
+  "pos": "n.",
+  "level": 6,
+  "zh": "急流、洪流",
+  "example": "A torrent of rain fell on the town last night.",
+  "form": "",
+  "exampleZh": "昨晚一場傾盆大雨落在鎮上。"
+ },
+ {
+  "id": "trifle",
+  "en": "trifle",
+  "pos": "n./v.",
+  "level": 6,
+  "zh": "瑣事、小事",
+  "example": "Do not get angry over such a trifle.",
+  "form": "",
+  "exampleZh": "不要為了這種小事生氣。"
+ },
+ {
+  "id": "twilight",
+  "en": "twilight",
+  "pos": "n.",
+  "level": 6,
+  "zh": "黃昏、暮光",
+  "example": "We walked home together in the soft twilight.",
+  "form": "",
+  "exampleZh": "我們在柔和的暮光中一起走路回家。"
+ },
+ {
+  "id": "underway",
+  "en": "underway",
+  "pos": "adv.",
+  "level": 6,
+  "zh": "進行中、航行中",
+  "example": "The school festival is already underway in the gym.",
+  "form": "",
+  "exampleZh": "校慶活動已經在體育館裡開始進行了。"
+ },
+ {
+  "id": "upward-2",
+  "en": "upward",
+  "pos": "adv.",
+  "level": 6,
+  "zh": "向上地",
+  "example": "The balloon floated slowly upward into the sky.",
+  "form": "",
+  "exampleZh": "氣球慢慢地向天空飄升。"
+ },
+ {
+  "id": "vanity",
+  "en": "vanity",
+  "pos": "n.",
+  "level": 6,
+  "zh": "虛榮心",
+  "example": "Her vanity made her spend hours in front of the mirror.",
+  "form": "",
+  "exampleZh": "她的虛榮心讓她在鏡子前花好幾個小時。"
+ },
+ {
+  "id": "veterinarian",
+  "en": "veterinarian",
+  "pos": "n.",
+  "level": 6,
+  "zh": "獸醫",
+  "example": "The veterinarian checked our dog and gave it a shot.",
+  "form": "",
+  "exampleZh": "獸醫檢查了我們的狗，並替牠打了一針。"
+ },
+ {
+  "id": "vigorous",
+  "en": "vigorous",
+  "pos": "adj.",
+  "level": 6,
+  "zh": "精力充沛的、激烈的",
+  "example": "Vigorous exercise is good for your heart.",
+  "form": "",
+  "exampleZh": "劇烈的運動對你的心臟有益。"
+ },
+ {
+  "id": "vitality",
+  "en": "vitality",
+  "pos": "n.",
+  "level": 6,
+  "zh": "活力",
+  "example": "The old man still has a lot of vitality.",
+  "form": "",
+  "exampleZh": "那位老先生依然充滿活力。"
+ },
+ {
+  "id": "wardrobe",
+  "en": "wardrobe",
+  "pos": "n.",
+  "level": 6,
+  "zh": "衣櫃",
+  "example": "I hung my coat in the wardrobe in my room.",
+  "form": "",
+  "exampleZh": "我把外套掛在房間的衣櫃裡。"
+ },
+ {
+  "id": "wholesale",
+  "en": "wholesale",
+  "pos": "adj./adv./n./v.",
+  "level": 6,
+  "zh": "批發",
+  "example": "This shop sells fruit at wholesale prices to restaurants.",
+  "form": "",
+  "exampleZh": "這家店以批發價把水果賣給餐廳。"
+ },
+ {
+  "id": "workforce",
+  "en": "workforce",
+  "pos": "n.",
+  "level": 6,
+  "zh": "勞動力、員工",
+  "example": "The company has a workforce of about two hundred people.",
+  "form": "",
+  "exampleZh": "這家公司大約有兩百名員工。"
+ }
+]

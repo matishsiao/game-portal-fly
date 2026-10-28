@@ -17,6 +17,7 @@ game-portal/
 ├── README.md            專案說明、遊玩網址、指令、部署
 ├── src/                 大廳原始碼（portal.js 的 GAMES 為大廳遊戲清單）
 ├── scripts/             大廳建置、組合（assemble.mjs 的 GAMES 為組合清單）、預覽、圖示
+├── tests/               共用模組 src/playlog.js 的測試（含各遊戲複本一致性）
 ├── games/
 │   ├── spec.md          共用規格
 │   └── <目錄>/          每個遊戲是獨立專案：src/、scripts/、tests/、package.json、README.md、規格
@@ -56,7 +57,8 @@ game-portal/
 - 遊戲規則、出題、解題等純邏輯放在獨立模組（例如 `src/js/<目錄>/`、`src/js/game.js`），與畫面（`src/js/app.js`）分離，並撰寫單元測試。
 - 出題在 Web Worker（`src/js/worker.js`）執行，並有主程式退路。
 - 本機儲存集中在 `src/js/storage.js`，所有鍵以 `<目錄>.` 開頭，`.save`／`.stats` 格式須符合「大廳整合介面」。
-- 第一次過關與第一次全對時寫入共用的 `games.rewards`（口袋地城的獎勵禮包），照抄現有遊戲 `storage.js` 的 `addReward()` 並加上測試，詳見 `games/spec.md`「跨遊戲獎勵紀錄」。
+- 從大廳複製共用模組 `src/playlog.js` 到 `src/js/playlog.js`（不得修改複本），並在 `app.js` 的 `init()` 開頭啟用遊玩歷程與帳號凍結，詳見 `games/spec.md`「遊玩歷程與帳號凍結」。
+- **學習遊戲**才寫入共用的 `games.rewards`（第一次過關、第一次全對與每日練習，換成口袋地城的獎勵禮包與入場卷），照抄現有學習遊戲（例如 `games/idiom/`）`storage.js` 的 `addReward()` 並加上測試；一般遊戲不寫入。詳見 `games/spec.md`「跨遊戲獎勵紀錄」。
 - `sw.js` 須支援 `CHECK_CACHE`（回覆 `{ ok, missing, version, label }`）與 `SKIP_WAITING`；`build.mjs` 負責填入版本號、版本標籤與預先快取清單。
 - 外觀採用「豐富色調」：選定兩色漸層的遊戲主色，做法參考現有遊戲 `src/css/style.css` 末尾的段落。
 
@@ -74,14 +76,14 @@ game-portal/
 3. `scripts/make-icons.mjs`：加入 56 × 56 的 `<目錄>.svg`，執行 `npm run icons` 產生 `src/icons/<目錄>.svg`。
 4. `src/portal.css`：在淺色與深色 `:root` 加入 `--<目錄>-1`、`--<目錄>-2`，並加入 `.game-card[data-theme="<目錄>"]` 漸層。
 5. 根目錄 `package.json`：`test`、`check:puzzles` 串上 `npm --prefix games/<目錄> …`，並新增 `dev:<目錄>`。
-6. 口袋地城 `games/pocketdungeon/src/js/pd/data.js` 的 `GIFT.games`：加入 `<目錄>: '<遊戲名稱>'`；沒有四級難度的遊戲另在口袋地城 `storage.js` 的 `loadRewards()` 補上補發規則。
+6. 學習遊戲：`src/portal.js` 的 `GAMES` 加上 `reward: true`（列在「獎勵遊戲」），口袋地城 `games/pocketdungeon/src/js/pd/data.js` 的 `GIFT.games` 加入 `<目錄>: '<遊戲名稱>'` 並加入 `GIFT.learning`；沒有四級難度的遊戲另在口袋地城 `storage.js` 的 `loadRewards()` 補上補發規則。一般遊戲略過此步。
 7. 使用共用難度代碼（`easy`、`medium`、`hard`、`expert`）以外的代碼時，先更新 `src/portal.js` 的 `DIFFICULTY_LABEL`。
 8. 文件：`README.md` 的遊玩網址表、專案結構與網站結構；`games/spec.md` 開頭的遊戲規格舉例與「參考資料」。
 
 ### 6. 驗證
 
 - 根目錄執行 `npm test` 與 `npm run check:puzzles`，全部通過。
-- 執行 `npm run preview`，在 `http://localhost:5180/` 依 `games/spec.md`「上架驗證與發布」逐項確認（卡片、離線可玩、繼續遊戲、戰績、「‹ 所有遊戲」、口袋地城獎勵禮包、離線開新局）。
+- 執行 `npm run preview`，在 `http://localhost:5180/` 依 `games/spec.md`「上架驗證與發布」逐項確認（卡片、離線可玩、繼續遊戲、戰績、「‹ 所有遊戲」、口袋地城獎勵禮包（學習遊戲）、離線開新局）。
 - 預覽結束後停止本機伺服器。
 - 回報時清楚區分「本機自動化測試已通過」與「需要實機（手機、飛航模式）確認」的項目，不得把未實測的項目寫成已驗證。
 

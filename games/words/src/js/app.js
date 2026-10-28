@@ -7,6 +7,7 @@ import {
 } from './game.js';
 import { initSpeech, speechAvailable, speak, voiceOptions, currentVoiceName, configureSpeech } from './speech.js';
 import * as store from './storage.js';
+import { trackPlay, guardFreeze } from './playlog.js';
 
 /** 暫時訊息顯示時間（毫秒）。 */
 const MESSAGE_MS = 2200;
@@ -1106,6 +1107,9 @@ function bindEvents() {
 
 /** 啟動。 */
 function init() {
+  // 遊玩歷程與帳號凍結（與大廳共用，見 playlog.js）。
+  const play = trackPlay('words');
+  guardFreeze({ onLock: play.flush, onUnlock: play.resume });
   applyTheme();
   bindEvents();
   if (history.state && history.state.screen) history.replaceState(null, '');

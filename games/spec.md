@@ -1,6 +1,6 @@
 # 遊戲飛行（PlayFlight）共用規格
 
-本文件是 `games/` 下所有遊戲的共用規格，涵蓋產品原則、與遊戲大廳的整合介面、操作體驗、儲存、離線、部署與驗收。各遊戲目錄另有自己的規格（例如 `games/sudoku/spec.md`、`games/crossmath/cm_spec.md`、`games/numberlink/spec.md`、`games/idiom/spec.md`、`games/roll/spec.md`、`games/codebreaker/spec.md`、`games/pocketdungeon/spec.md`），描述遊戲規則、盤面、難度、出題與該遊戲特有的操作。
+本文件是 `games/` 下所有遊戲的共用規格，涵蓋產品原則、與遊戲大廳的整合介面、操作體驗、儲存、離線、部署與驗收。各遊戲目錄另有自己的規格（例如 `games/sudoku/spec.md`、`games/crossmath/cm_spec.md`、`games/numberlink/spec.md`、`games/idiom/spec.md`、`games/roll/spec.md`、`games/codebreaker/spec.md`、`games/spelling/spec.md`、`games/olympiad/spec.md`、`games/pocketdungeon/spec.md`），描述遊戲規則、盤面、難度、出題與該遊戲特有的操作。
 
 ## 文件關係
 
@@ -60,7 +60,7 @@
 
 ### 本機儲存鍵
 
-- 遊戲寫入的所有 localStorage 鍵都以 `<目錄>.` 開頭（例如 `sudoku.save`）；不得寫入其他前綴的鍵，例外只有讀取 `games.portal`（見下方）與附加寫入共用的 `games.rewards`（見「跨遊戲獎勵紀錄」）。
+- 遊戲寫入的所有 localStorage 鍵都以 `<目錄>.` 開頭（例如 `sudoku.save`）；不得寫入其他前綴的鍵，例外只有讀取 `games.portal`（見下方）、學習遊戲附加寫入共用的 `games.rewards`（見「跨遊戲獎勵紀錄」），以及由共用模組 `playlog.js` 寫入的 `games.history`、讀取的 `games.freeze`（見「遊玩歷程與帳號凍結」）。
 - 大廳以**唯讀**方式讀取下列兩個鍵，格式須維持相容；欄位可以增加，但不得刪除或改變意義：
 
   | 鍵 | 大廳使用的欄位 |
@@ -72,19 +72,46 @@
 
 ### 跨遊戲獎勵紀錄
 
-- **每個遊戲都必須寫入獎勵紀錄**（口袋地城本身除外；新遊戲也一樣，是上架條件之一）：玩家第一次過關、第一次全對時給口袋地城的「獎勵禮包」。
+- **只有學習遊戲寫入獎勵紀錄**：玩家第一次過關、第一次全對時給口袋地城的「獎勵禮包」，每天過關一題給入場卷（每日練習）。
+  - 學習遊戲：數學填字（`crossmath`）、成語填字（`idiom`）、英文單字連線（`words`）、英文單字拼圖（`spelling`）、奧數挑戰（`olympiad`）。新遊戲是否為學習遊戲在遊戲規格的「產品範圍」寫明；學習遊戲必須寫入獎勵紀錄（上架條件之一）。
+  - 一般遊戲（數獨、數字連線、滾滾解謎、密碼偵探，以及口袋地城本身）不寫入 `games.rewards`。改為一般遊戲之前已寫入的紀錄保留，口袋地城仍可領取。
+  - 學習遊戲清單有兩處，須保持一致：大廳 `src/portal.js` 的 `GAMES`（`reward: true`）與口袋地城 `games/pocketdungeon/src/js/pd/data.js` 的 `GIFT.learning`。
 - `games.rewards` 是所有遊戲共用的**附加式**紀錄（JSON 陣列），口袋地城讀取後換成「獎勵禮包」。每筆為 `{ id, game, type, tier, label, at }`：
-  - `id`：唯一代碼，同一個 `id` 只寫入一次（重複過關不再寫入）。有難度的遊戲用 `<目錄>:<難度代碼>:clear`、`<目錄>:<難度代碼>:perfect`；滾滾解謎用 `roll:<章>-<關>:clear`、`roll:<章>-<關>:star3`。
+  - `id`：唯一代碼，同一個 `id` 只寫入一次（重複過關不再寫入）。有難度的遊戲用 `<目錄>:<難度代碼>:clear`、`<目錄>:<難度代碼>:perfect`；滾滾解謎（改為一般遊戲前寫入的紀錄）為 `roll:<章>-<關>:clear`、`roll:<章>-<關>:star3`。
   - `game`：遊戲目錄名稱；`type`：`clear`（第一次過關）、`perfect`（第一次全對：沒用提示，或三顆星）或 `daily`（每日練習，見下）。
-  - `tier`：禮包等級 1～5。難度 `easy`／`medium`／`hard`／`expert` 的第一次過關為 1／2／3／4，第一次全對再 +1；滾滾解謎第一次過關為章節（最多 4），三顆星再 +1。
+  - `tier`：禮包等級 1～5。難度 `easy`／`medium`／`hard`／`expert` 的第一次過關為 1／2／3／4，第一次全對再 +1；滾滾解謎（改為一般遊戲前）第一次過關為章節（最多 4），三顆星再 +1。
   - `label`：顯示用說明（例如「困難 第一次過關」）；`at`：寫入時間（毫秒）。
-- **每日練習**：每完成一題（不論是否第一次），也寫入 `{ id: 'daily:YYYY-MM-DD', type: 'daily', tier: 1, label: '今天第一次過關（…）' }`（本機日期）。所有遊戲共用同一個 `id`，所以一天只有一筆（由當天第一個過關的遊戲寫入）；口袋地城每天可以用它領一次入場卷，避免第一次過關的禮包都拿完後就沒有入場卷。
+- **每日練習**：每完成一題（不論是否第一次），也寫入 `{ id: 'daily:YYYY-MM-DD', type: 'daily', tier: 1, label: '今天第一次過關（…）' }`（本機日期）。所有學習遊戲共用同一個 `id`，所以一天只有一筆（由當天第一個過關的學習遊戲寫入）；口袋地城每天可以用它領一次入場卷，避免第一次過關的禮包都拿完後就沒有入場卷。
 - 寫入時機：完成一題並更新 `<目錄>.stats` 之後；判斷「第一次」使用更新前的統計（`completed` 為 0、`noHint` 為 0 且這題沒用提示）。只保留最新 1,000 筆；不得刪除或修改既有紀錄。
-- **大廳提示**：大廳在「主打遊戲」與「遊戲」之間顯示作答獎勵提示（每個難度第一次過關、第一次全對送口袋地城的獎勵禮包；每天過關一題再送入場卷），並依 `games.rewards` 中今天的 `daily:日期` 顯示「今天的每日練習完成了」或「今天還沒過關」；點提示開啟口袋地城。
+- **大廳分區**：大廳的遊戲列表分成「獎勵遊戲」（學習遊戲，卡片標示「🎁 獎勵」）與「一般遊戲」（說明過關不送獎勵）。「獎勵遊戲」開頭顯示作答獎勵提示（學習遊戲每個難度第一次過關、第一次全對送口袋地城的獎勵禮包；每天過關一題再送入場卷），並依 `games.rewards` 中今天的 `daily:日期` 顯示「今天的每日練習完成了」或「今天還沒過關」；點提示開啟口袋地城。
 - 寫入失敗（例如 localStorage 無法使用）不影響遊戲本身。「重設統計」後再次過關不會重複給禮包（同一個 `id` 已存在）。
-- **實作方式**：照抄現有遊戲 `src/js/storage.js` 的 `GAME_DIR`、`REWARD_KEY`、`REWARD_TIER`、`addReward()` 與 `dailyId()`（例如 `games/sudoku/src/js/storage.js`），並在記錄完成的函式中：更新統計前算出 `firstClear`、`firstPerfect`，寫入統計後呼叫 `addReward()`（第一次過關、第一次全對，以及每題都呼叫的每日練習）。加上測試：第一次過關寫入 `clear`、沒用提示再寫入 `perfect`（等級 +1）、重複過關不再寫入。
-- **沒有四級難度的遊戲**（例如以關卡或章節為單位）：在遊戲規格中定義 `id`（每個可「第一次過關」的單位一個）、「全對」的條件與 `tier` 的對應（1～4，全對再 +1，最多 5），並在口袋地城 `loadRewards()` 補上從該遊戲進度補發的規則（參考滾滾解謎 `roll.progress`）。
-- **口袋地城端的註冊**：口袋地城只接受已註冊的遊戲。上架新遊戲時在 `games/pocketdungeon/src/js/pd/data.js` 的 `GIFT.games` 加上 `<目錄>: '<遊戲名稱>'`（獲得紀錄中顯示的名稱）；使用共用 `.stats` 格式的遊戲，口袋地城會自動從 `<目錄>.stats` 補發上架前已完成的紀錄。
+- **實作方式**：照抄現有學習遊戲 `src/js/storage.js` 的 `GAME_DIR`、`REWARD_KEY`、`REWARD_TIER`、`addReward()` 與 `dailyId()`（例如 `games/idiom/src/js/storage.js`），並在記錄完成的函式中：更新統計前算出 `firstClear`、`firstPerfect`，寫入統計後呼叫 `addReward()`（第一次過關、第一次全對，以及每題都呼叫的每日練習）。加上測試：第一次過關寫入 `clear`、沒用提示再寫入 `perfect`（等級 +1）、重複過關不再寫入。
+- **沒有四級難度的學習遊戲**（例如以關卡或章節為單位）：在遊戲規格中定義 `id`（每個可「第一次過關」的單位一個）、「全對」的條件與 `tier` 的對應（1～4，全對再 +1，最多 5），並在口袋地城 `loadRewards()` 補上從該遊戲進度補發的規則。
+- **口袋地城端的註冊**：口袋地城只接受已註冊的遊戲。上架學習遊戲時在 `games/pocketdungeon/src/js/pd/data.js` 的 `GIFT.games` 加上 `<目錄>: '<遊戲名稱>'`（獲得紀錄中顯示的名稱），並加入 `GIFT.learning`；使用共用 `.stats` 格式的學習遊戲，口袋地城會自動從 `<目錄>.stats` 補發上架前已完成的紀錄。一般遊戲不需要註冊（已註冊的保留，讓之前的紀錄能顯示名稱）。
+
+### 遊玩歷程與帳號凍結
+
+- 共用模組：大廳的 `src/playlog.js` 是正本，每個遊戲放一份**逐字相同**的複本 `src/js/playlog.js`；修改時先改正本，再複製到所有遊戲。根目錄 `npm test`（`tests/playlog.test.mjs`）會檢查已上架遊戲（`scripts/assemble.mjs` 的 `GAMES`）的複本與正本一致，且都已啟用。
+- 遊戲在 `src/js/app.js` 的 `init()` 開頭呼叫：
+
+  ```js
+  const play = trackPlay('<目錄>');
+  guardFreeze({ onLock: play.flush, onUnlock: play.resume });
+  ```
+
+- **遊玩歷程**（`games.history`）：JSON 陣列，每筆為 `{ id, game, start, end, ms }`：
+  - 一段遊玩 = 遊戲頁面在前景的時間。`ms` 以 `performance.now()` 累計（不受改時間影響）；`start`、`end` 為開始與最後結算的時間（毫秒）；`id` 為 `<目錄>:<start>`。
+  - 切到背景或離開頁面（`visibilitychange`、`pagehide`）時結算並寫入；5 分鐘內回到前景接續同一段（同一個 `id` 更新），超過 5 分鐘算新的一段。
+  - 前景時間未滿 10 秒的一段不記錄；凍結中不計時。
+  - 只保留開始時間最新的 100 筆；寫入失敗不影響遊戲。
+  - 大廳在「遊戲歷程」顯示最近 100 筆（由新到舊；開始時間、玩多久、玩哪個遊戲），先顯示 10 筆，可「顯示全部」。
+- **帳號凍結**（`games.freeze`）：由大廳的「凍結帳號」寫入 `{ v: 1, at, until, salt, alg, hash }`：
+  - 設定凍結時間（1～168 的整數小時）與凍結密碼（4～32 字，輸入兩次）。只存加鹽雜湊（`alg` 為 `sha256`；瀏覽器不提供 `crypto.subtle` 時為 `fnv`），不存明碼。
+  - 凍結中大廳與所有遊戲都以全螢幕凍結畫面蓋住，頁面其他內容不能點按或聚焦；凍結畫面顯示凍結到的時間與剩餘時間（時間到後顯示「凍結時間已到」）。
+  - **不論時間是否已到，都要輸入正確的密碼才能解除**；解除後刪除 `games.freeze`。
+  - 開啟頁面、回到前景、從返回快取還原（`pageshow`）、其他分頁變更凍結狀態（`storage` 事件）時重新檢查。
+  - `games.freeze` 損毀或格式不完整時視為沒有凍結（無法驗證密碼，避免永久鎖住）。
+  - 凍結只是本機的自我管理，不是安全機制：清除網站資料即可解除，但所有遊戲的進度會一起消失，設定時須提示。
 
 ### 返回大廳
 
@@ -226,7 +253,7 @@
 
 - 遊戲規格的驗收條件與本文件的「共用驗收條件」全部通過。
 - 在遊戲目錄執行 `npm test` 全部通過；有出題器的遊戲 `npm run check:puzzles` 各難度 100 題全部合格且符合效能目標。
-- 符合「大廳整合介面」：localStorage 鍵前綴、`.save`／`.stats` 格式與難度代碼、`games.rewards` 獎勵紀錄（第一次過關與第一次全對）、Service Worker（快取前綴、`CHECK_CACHE` 含 `label`、`SKIP_WAITING`、詢問自己的註冊）、版本標籤、「‹ 所有遊戲」連結。
+- 符合「大廳整合介面」：localStorage 鍵前綴、`.save`／`.stats` 格式與難度代碼、學習遊戲的 `games.rewards` 獎勵紀錄（第一次過關、第一次全對與每日練習）、`playlog.js`（遊玩歷程與帳號凍結）、Service Worker（快取前綴、`CHECK_CACHE` 含 `label`、`SKIP_WAITING`、詢問自己的註冊）、版本標籤、「‹ 所有遊戲」連結。
 - 外觀採用與大廳一致的豐富色調：選定一組遊戲主色（漸層的兩個顏色），首頁漸層橫幅、各難度漸層按鈕、遊戲頂部列、彩色工具列；做法參考現有遊戲 `src/css/style.css` 末尾的「豐富色調」段落。盤面上代表語意的顏色（錯誤、提示、選取）不得被主色取代。
 - 遊戲首頁不提供「出發前檢查」，由大廳統一提供。
 
@@ -241,7 +268,7 @@
 3. **卡片圖示**：在 `scripts/make-icons.mjs` 加入 56 × 56 的 `<目錄>.svg`（圓角、以遊戲主色為底），執行 `npm run icons` 產生 `src/icons/<目錄>.svg`；遊戲自己的 `src/icons/icon.svg` 建議使用同一圖案。
 4. **卡片主色**：在 `src/portal.css` 的淺色與深色 `:root` 各加入 `--<目錄>-1`、`--<目錄>-2`（與遊戲主色相同），並加入 `.game-card[data-theme="<目錄>"] { background: linear-gradient(135deg, var(--<目錄>-1), var(--<目錄>-2)); }`。
 5. **根目錄指令**：在根目錄 `package.json` 的 `test`、`check:puzzles`（有出題器時）串上 `npm --prefix games/<目錄> …`，並加上 `dev:<目錄>`。
-6. **獎勵禮包**：在口袋地城 `games/pocketdungeon/src/js/pd/data.js` 的 `GIFT.games` 註冊 `<目錄>: '<遊戲名稱>'`（見「跨遊戲獎勵紀錄」）；沒有四級難度的遊戲另在 `games/pocketdungeon/src/js/storage.js` 的 `loadRewards()` 補上補發規則，並更新口袋地城規格「獎勵禮包」中的取得來源。
+6. **獎勵禮包**（只有學習遊戲）：在 `src/portal.js` 的 `GAMES` 加上 `reward: true`，在口袋地城 `games/pocketdungeon/src/js/pd/data.js` 的 `GIFT.games` 註冊 `<目錄>: '<遊戲名稱>'` 並加入 `GIFT.learning`（見「跨遊戲獎勵紀錄」）；沒有四級難度的遊戲另在 `games/pocketdungeon/src/js/storage.js` 的 `loadRewards()` 補上補發規則，並更新口袋地城規格「獎勵禮包」中的取得來源。
 7. **難度代碼**：遊戲使用共用難度代碼以外的代碼時，先更新大廳 `src/portal.js` 的 `DIFFICULTY_LABEL`。
 8. **文件**：根目錄 `README.md` 的遊玩網址表加上 `https://matishsiao.github.io/game-portal-fly/<目錄>/`，並更新專案結構與網站結構；本文件「參考資料」加上該遊戲規格。
 
@@ -253,7 +280,7 @@
    - 自動下載後顯示「離線可玩」，「離線就緒」計數包含新遊戲。
    - 玩一局後回大廳，「繼續遊戲」卡片與戰績正確；完成一局後完成局數與最佳紀錄正確。
    - 遊戲首頁顯示「‹ 所有遊戲」且能返回大廳。
-   - 第一次過關（以及第一次沒用提示過關）後開啟口袋地城：首頁或村莊的 🎁 數量增加，獲得紀錄顯示新遊戲名稱、說明與正確的禮包等級；同一難度再過關一次，數量不再增加。
+   - 學習遊戲：大廳卡片列在「獎勵遊戲」；第一次過關（以及第一次沒用提示過關）後開啟口袋地城：首頁或村莊的 🎁 數量增加，獲得紀錄顯示新遊戲名稱、說明與正確的禮包等級；同一難度再過關一次，數量不再增加。
    - 離線後大廳與新遊戲都能開啟並開始新局；各遊戲與大廳的快取各自獨立（共用驗收條件 4、6、7、11）。
 3. commit 並推送到 `main`，GitHub Actions 部署完成後，以正式網址再確認一次大廳與新遊戲。
 4. 已安裝大廳的玩家下次連網開啟大廳時會自動看到新遊戲並下載其離線資源，不需要重新安裝。
@@ -266,5 +293,5 @@
 ## 參考資料
 
 - 大廳說明：`README.md`（專案根目錄），含遊玩網址與部署方式；上架流程以本文件「上架到大廳」為準。
-- 現有遊戲規格：`games/sudoku/spec.md`、`games/crossmath/cm_spec.md`、`games/numberlink/spec.md`、`games/idiom/spec.md`、`games/roll/spec.md`、`games/codebreaker/spec.md`、`games/pocketdungeon/spec.md`。
+- 現有遊戲規格：`games/sudoku/spec.md`、`games/crossmath/cm_spec.md`、`games/numberlink/spec.md`、`games/idiom/spec.md`、`games/roll/spec.md`、`games/codebreaker/spec.md`、`games/spelling/spec.md`、`games/olympiad/spec.md`、`games/pocketdungeon/spec.md`。
 - [mkcert 開發憑證說明](https://github.com/FiloSottile/mkcert)：選用的區網 HTTPS 開發模式參考。

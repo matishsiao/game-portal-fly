@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>英文單字拼圖</title>
+  <meta name="description" content="可離線遊玩的英文單字拼字遊戲：看中文意思，用字母方塊拼出英文單字">
+  <meta name="theme-color" content="#7c5cf0" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1b1430" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="單字拼圖">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <div id="update-banner" class="banner" hidden>
+    <span>有新版本可以使用</span>
+    <button type="button" id="update-btn" class="banner-btn">重新整理以更新</button>
+  </div>
+
+  <main id="home" class="screen home">
+    <header class="hero">
+      <div class="hero-deco" aria-hidden="true">
+        <span style="left:56%;top:14%;font-size:30px">S</span>
+        <span style="left:74%;top:6%;font-size:22px">p</span>
+        <span style="left:88%;top:38%;font-size:26px">E</span>
+        <span style="left:68%;top:56%;font-size:20px">L</span>
+        <span style="left:84%;top:72%;font-size:18px">l</span>
+      </div>
+      <div class="hero-title">
+        <h1>英文單字拼圖</h1>
+        <p class="hero-sub">看中文拼英文・6,000 字</p>
+      </div>
+      <button type="button" id="theme-btn" class="icon-btn" aria-label="切換主題"></button>
+    </header>
+
+    <p id="offline-status" class="offline-status" role="status"></p>
+    <div id="home-notice" class="notice" role="alert" hidden></div>
+
+    <button type="button" id="continue-btn" class="continue-btn" hidden>
+      <span class="continue-title">繼續遊戲</span>
+      <span id="continue-detail" class="continue-detail"></span>
+    </button>
+
+    <section class="progress-card">
+      <div>
+        <p class="progress-label">已學會</p>
+        <p class="progress-value"><span id="learned-count">0</span><small> / <span id="total-count">0</span></small></p>
+      </div>
+      <div class="quick">
+        <button type="button" id="review-btn" class="quick-btn"><span aria-hidden="true">🔁</span>待複習<span id="review-count" class="quick-badge">0</span></button>
+      </div>
+    </section>
+
+    <h2 class="group-title">選擇 Level</h2>
+    <div id="level-grid" class="level-grid"></div>
+    <p class="source-note">單字清單取自大考中心「高中英文參考詞彙表」（111 學年度起適用），依該表的 Level 分級。</p>
+
+    <nav class="home-links">
+      <a id="portal-link" class="link-btn" href="../" hidden>‹ 所有遊戲</a>
+      <button type="button" id="book-btn" class="link-btn">單字本</button>
+      <button type="button" id="stats-btn" class="link-btn">統計</button>
+      <button type="button" id="rules-btn" class="link-btn">玩法</button>
+      <button type="button" id="settings-btn" class="link-btn">設定</button>
+    </nav>
+  </main>
+
+  <main id="game" class="screen game" hidden>
+    <header class="game-bar">
+      <button type="button" id="home-btn" class="bar-btn" aria-label="回首頁">‹ 首頁</button>
+      <div class="game-info">
+        <span id="game-title" class="game-title"></span>
+        <span class="info-line"><span id="word-progress"></span><span class="dot">·</span><span id="timer">00:00</span><span class="dot">·</span><span id="mistakes">錯誤 0</span></span>
+      </div>
+      <button type="button" id="menu-btn" class="bar-btn">選單</button>
+    </header>
+
+    <div class="board-wrap">
+      <section class="clue">
+        <div class="clue-head">
+          <span id="clue-zh" class="clue-zh"></span>
+          <span id="clue-pos" class="clue-pos"></span>
+          <button type="button" id="clue-speak" class="speak-btn clue-speak" aria-label="唸出這個單字" hidden>🔊</button>
+        </div>
+        <p id="clue-example" class="clue-example"></p>
+      </section>
+      <div id="slots" class="slots" aria-label="答案"></div>
+      <div id="tiles" class="tiles" aria-label="字母方塊"></div>
+      <div id="solved-card" class="solved-card" hidden></div>
+      <div id="pause-cover" class="pause-cover" hidden>
+        <p>已暫停</p>
+        <button type="button" id="resume-btn" class="primary-btn">繼續</button>
+      </div>
+    </div>
+
+    <div class="controls">
+      <p id="game-message" class="game-message" aria-live="polite"></p>
+      <div id="tools" class="tools">
+        <button type="button" id="back-btn" class="tool-btn"><span class="tool-icon" aria-hidden="true">⌫</span>退格</button>
+        <button type="button" id="clear-btn" class="tool-btn"><span class="tool-icon" aria-hidden="true">↺</span>清除</button>
+        <button type="button" id="hint-btn" class="tool-btn"><span class="tool-icon" aria-hidden="true">💡</span>提示<span id="hint-count" class="tool-badge">0</span></button>
+        <button type="button" id="pause-btn" class="tool-btn"><span class="tool-icon" aria-hidden="true">⏸</span>暫停</button>
+      </div>
+      <button type="button" id="next-btn" class="primary-btn next-btn" hidden>下一個</button>
+    </div>
+  </main>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+  <div id="modal" class="overlay" hidden>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <h2 id="modal-title"></h2>
+      <div id="modal-body" class="modal-body"></div>
+      <div id="modal-actions" class="modal-actions"></div>
+    </div>
+  </div>
+</body>
+</html>

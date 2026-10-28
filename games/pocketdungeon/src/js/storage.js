@@ -330,7 +330,8 @@ const DIFF_NAME = { easy: '簡單', medium: '中等', hard: '困難', expert: '�
 /**
  * 讀取其他遊戲的獲得紀錄（第一次過關、第一次全對）：
  * 1. 其他遊戲過關時寫入共用鍵 `games.rewards` 的紀錄；
- * 2. 回補：從各遊戲的 `<目錄>.stats`（每個難度 completed／noHint）與 `roll.progress`（每關星數）補上更新前就達成的紀錄。
+ * 2. 回補：從學習遊戲（GIFT.learning）的 `<目錄>.stats`（每個難度 completed／noHint）補上更新前就達成的紀錄。
+ * 一般遊戲（數獨等）不再寫入新紀錄，也不回補；之前已寫入 `games.rewards` 的紀錄仍可領取。
  * 兩者以相同的 id 合併，同一個 id 只算一次。只讀取，不寫入其他遊戲的鍵。
  * @returns {{id: string, game: string, type: 'clear' | 'perfect', tier: number, label: string, at: number}[]} 紀錄（新的在前）。
  */
@@ -347,8 +348,7 @@ export function loadRewards() {
     out.set(r.id, { id: r.id, game: r.game, type: r.type === 'perfect' ? 'perfect' : 'clear', tier: r.tier, label: r.label, at: Number(r.at) || 0 });
   }
   const tiers = { easy: 1, medium: 2, hard: 3, expert: 4 };
-  for (const game of Object.keys(GIFT.games)) {
-    if (game === 'roll') continue;
+  for (const game of GIFT.learning) {
     const stats = readJson(`${game}.stats`);
     if (!stats || typeof stats !== 'object') continue;
     for (const diff of Object.keys(tiers)) {
@@ -358,17 +358,6 @@ export function loadRewards() {
       const perfect = `${game}:${diff}:perfect`;
       if (s.completed > 0 && !out.has(clear)) out.set(clear, { id: clear, game, type: 'clear', tier: tiers[diff], label: `${DIFF_NAME[diff]} 第一次過關`, at: 0 });
       if (s.noHint > 0 && !out.has(perfect)) out.set(perfect, { id: perfect, game, type: 'perfect', tier: tiers[diff] + 1, label: `${DIFF_NAME[diff]} 第一次全對（沒用提示）`, at: 0 });
-    }
-  }
-  const roll = readJson('roll.progress');
-  if (roll && typeof roll === 'object') {
-    for (const [lv, p] of Object.entries(roll)) {
-      if (!p || !/^\d+-\d+$/.test(lv)) continue;
-      const tier = Math.min(4, Number(lv.split('-')[0]) || 1);
-      const clear = `roll:${lv}:clear`;
-      const star = `roll:${lv}:star3`;
-      if (!out.has(clear)) out.set(clear, { id: clear, game: 'roll', type: 'clear', tier, label: `第 ${lv} 關 第一次過關`, at: 0 });
-      if (p.stars === 3 && !out.has(star)) out.set(star, { id: star, game: 'roll', type: 'perfect', tier: tier + 1, label: `第 ${lv} 關 第一次三顆星`, at: 0 });
     }
   }
   return [...out.values()].sort((a, b) => b.at - a.at || a.id.localeCompare(b.id));

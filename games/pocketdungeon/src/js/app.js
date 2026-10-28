@@ -1,6 +1,7 @@
 // 主程式：首頁、村莊、地城畫面、遊戲迴圈、輸入、存檔與 Service Worker。
 
 import * as store from './storage.js';
+import { trackPlay, guardFreeze } from './playlog.js';
 import { CLASSES, CLASS_KEYS, AREAS, AREA_KEYS, RARITIES, LIMITS, EQUIP_SLOTS, ITEM_SLOTS, BAG_EXPAND, EVOLVE, SHARED_SLOTS, REBIRTH, STATUS, GEMS, GEM_RULES, MATERIALS, CRAFT, WEAPON_HANDS, BOSSES, GIFT, TICKET } from './pd/data.js';
 import { xpToNext, characterStats, speedProfile, describeStats, sellPrice, enhanceCost, levelCap, gemName, gemEffect, parseGem, socketCount, statusText, gemBonus, itemStats, weaponHands, dungeonLevel, powerScore } from './pd/rules.js';
 import { World } from './pd/world.js';
@@ -631,7 +632,7 @@ async function openMapNode(ch, key) {
     : ch.gold >= price
       ? `<p class="ticket-line lack"><img src="${itemDataUrl(`ticket${tier}`)}" alt="">需要 1 張${TICKET.names[tier - 1]}（持有 0 張），可以花 ${price}G 購買並出發</p>`
       : `<p class="ticket-line lack"><img src="${itemDataUrl(`ticket${tier}`)}" alt="">需要 1 張${TICKET.names[tier - 1]}（持有 0 張），金幣也不足 ${price}G</p>
-        <p class="ticket-hint">🎁 ${pending ? `你有 ${pending} 筆獲得紀錄還沒領取，裡面有入場卷！` : `到其他遊戲（數獨、數學填字、成語填字……）過關一題，<b>每天</b>可以領 ${TICKET.daily} 張入場卷；<b>第一次過關</b>或<b>第一次全對</b>還能拿到獎勵禮包，禮包裡一定有入場卷！`}</p>`;
+        <p class="ticket-hint">🎁 ${pending ? `你有 ${pending} 筆獲得紀錄還沒領取，裡面有入場卷！` : `到學習遊戲（${GIFT.learning.map((g) => GIFT.games[g]).join('、')}）過關一題，<b>每天</b>可以領 ${TICKET.daily} 張入場卷；<b>第一次過關</b>或<b>第一次全對</b>還能拿到獎勵禮包，禮包裡一定有入場卷！`}</p>`;
   const goLabel = have ? '出發' : `購買並出發（${price}G）`;
   const canGo = have || ch.gold >= price;
   const stuck = pending ? { label: `領取禮包（${pending}）`, value: 'gift', className: 'primary' } : { label: '前往商店', value: 'shop', className: 'primary' };
@@ -898,7 +899,7 @@ async function openBagCell(ch, key) {
     const n = ch.gifts[id];
     const act = await openModal({
       title: `${GIFT.names[k]} ×${n}`,
-      html: `<div class="gift-head"><span class="inv-cell stack static gift-cell tier${tier}"><img src="${itemDataUrl('gift')}" alt=""></span><p>來自其他遊戲的第一次過關或第一次全對。開啟可以得到：</p></div>
+      html: `<div class="gift-head"><span class="inv-cell stack static gift-cell tier${tier}"><img src="${itemDataUrl('gift')}" alt=""></span><p>來自學習遊戲的第一次過關或第一次全對。開啟可以得到：</p></div>
         <ul><li>金幣 ${GIFT.gold[k]}G</li><li>入場卷 ${TICKET.gift[k]} 張（${TICKET.names[village.progressTicketTier(ch) - 1]}，依目前進度）</li><li>裝備材料 ${GIFT.mats[k]} 個（等級愈高，高品質材料愈多）</li><li>技能書碎片 ${GIFT.shards[k]} 片（同一本的碎片 ${GIFT.shardNeed} 片合成 1 本技能書）</li>
         <li>機率：回復藥水 ${GIFT.potions[k]} 瓶（${Math.round(GIFT.potionChance[k] * 100)}%）、淨化藥水 ${GIFT.cures[k]} 瓶（${Math.round(GIFT.cureChance[k] * 100)}%）、背包擴充袋（${Math.round(GIFT.pouchChance[k] * 100)}%）</li></ul>
         <p class="muted">藥水超過持有上限（各 ${LIMITS.potionHold} 瓶）或背包已擴充到 ${BAG_EXPAND.max} 格時，改為金幣。</p>`,
@@ -1072,7 +1073,7 @@ function skillPanel(ch) {
   const count = skills.skillSlotCount(ch);
   // 技能欄：已裝備技能的圖示；尚未開放的格子上鎖。
   const slots = ch.skills.slots.map((id, n) => {
-    if (n >= count) return `<span class="skill-slot locked"><span class="skill-ico">🔒</span><small>技能 ${n + 1}</small><small class="muted">轉職 ${n + 1 - skills.SKILL_BASE_SLOTS} 次</small></span>`;
+    if (n >= count) return `<span class="skill-slot locked"><span class="skill-ico">🔒</span><small>技能 ${n + 1}</small><small class="muted">第 ${n + 1} 個技能</small></span>`;
     const sk = id && skills.SKILLS[id];
     return `<span class="skill-slot${sk ? '' : ' empty'}"><span class="skill-ico">${sk ? skillIcon(id, sk.kind) : ''}</span><small>技能 ${n + 1}</small><small class="muted">${sk ? sk.short : '未裝備'}</small></span>`;
   }).join('');
@@ -1208,7 +1209,7 @@ function rebirthHtml(ch) {
   const rows = [['HP', 'hp'], ['攻擊', 'atk'], ['防禦', 'def']].map(([name, k]) => `<dt>${name}</dt><dd>${now1[k]} → <b class="up">${next1[k]}</b></dd>`).join('');
   return `<p><b>${village.classTitle(ch)} → ${nextTitle}</b>（第 ${n + 1}／${REBIRTH.max} 次）</p>
     <p>條件：達到 <b>Lv.${levelCap(n)}</b>（目前 Lv.${ch.level}）。</p>
-    <ul><li>回到 Lv.1，等級上限提高為 Lv.${levelCap(n + 1)}</li><li>解鎖 2 個轉職技能、1 個轉職被動，技能欄 +1 格（最多 4 格）</li><li>裝備、金幣、技能與地城進度全部保留</li><li>怪物變強，掉落與獎勵也變好</li></ul>
+    <ul><li>回到 Lv.1，等級上限提高為 Lv.${levelCap(n + 1)}</li><li>解鎖 2 個轉職技能、1 個轉職被動</li><li>裝備、金幣、技能與地城進度全部保留</li><li>怪物變強，掉落與獎勵也變好</li></ul>
     <p class="muted small">Lv.1 起始能力（不含裝備）：</p><dl class="result-list">${rows}</dl>`;
 }
 
@@ -1255,8 +1256,8 @@ const INFO = {
   ...Object.fromEntries(TICKET.names.map((name, k) => [`ticket${k + 1}`, {
     title: name,
     html: `<p>每趟探險出發時用掉 1 張。用在：${Object.keys(TICKET.area).filter((a) => TICKET.area[a] === k + 1).map((a) => AREAS[a].name).join('、')}。</p>
-      <ul><li>商店售價 ${TICKET.price[k]}G（解鎖用得到的區域後才會販售）</li><li>每個獎勵禮包都會開出入場卷（依目前進度的等級）</li><li>每天在其他遊戲過關一題，可以領 ${TICKET.daily} 張（依目前進度的等級）</li><li>新角色送 ${TICKET.start} 張銅入場卷</li></ul>
-      <p class="muted small">入場卷用完又沒有金幣時，到其他遊戲過關：每天可以領入場卷，第一次過關或第一次全對還有獎勵禮包。</p>`,
+      <ul><li>商店售價 ${TICKET.price[k]}G（解鎖用得到的區域後才會販售）</li><li>每個獎勵禮包都會開出入場卷（依目前進度的等級）</li><li>每天在學習遊戲（${GIFT.learning.map((g) => GIFT.games[g]).join('、')}）過關一題，可以領 ${TICKET.daily} 張（依目前進度的等級）</li><li>新角色送 ${TICKET.start} 張銅入場卷</li></ul>
+      <p class="muted small">入場卷用完又沒有金幣時，到學習遊戲（${GIFT.learning.map((g) => GIFT.games[g]).join('、')}）過關：每天可以領入場卷，第一次過關或第一次全對還有獎勵禮包。</p>`,
   }])),
   leech: {
     title: '吸血',
@@ -1618,8 +1619,8 @@ async function openRewards(ch) {
     ? `<div class="reward-row${done ? ' done' : ''}"><span class="inv-cell stack static ticket-cell"><img src="${itemDataUrl(`ticket${tier}`)}" alt=""></span><div><b>每日練習 ${r.id.slice(6)}</b><small>${esc(GIFT.games[r.game])}・${esc(r.label)}</small></div><em>${done ? '已領取' : `${TICKET.short[tier - 1]} ×${TICKET.daily}`}</em></div>`
     : `<div class="reward-row${done ? ' done' : ''}"><span class="inv-cell stack static gift-cell tier${r.tier}"><img src="${itemDataUrl('gift')}" alt=""></span><div><b>${GIFT.games[r.game]}</b><small>${esc(r.label)}</small></div><em>${done ? '已領取' : GIFT.names[r.tier - 1]}</em></div>`);
   const done = list.filter((r) => app.claimed.includes(r.id)).slice(0, 30);
-  const html = `<p class="muted small">在其他遊戲<b>第一次過關</b>或<b>第一次全對</b>（沒用提示／三顆星）時取得獎勵禮包，難度或章節愈高，禮包等級愈高；重複過關不會再給。<b>每天</b>在其他遊戲過關一題，還可以領 ${TICKET.daily} 張入場卷（目前進度的等級）。每個紀錄只能領一次，領取後放進目前角色。</p>
-    ${pending.length ? pending.map((r) => row(r, false)).join('') : '<p class="muted">目前沒有可以領取的禮包。到大廳玩其他遊戲吧！</p>'}
+  const html = `<p class="muted small">在學習遊戲（${GIFT.learning.map((g) => GIFT.games[g]).join('、')}）<b>第一次過關</b>或<b>第一次全對</b>（沒用提示）時取得獎勵禮包，難度愈高，禮包等級愈高；重複過關不會再給。<b>每天</b>在學習遊戲過關一題，還可以領 ${TICKET.daily} 張入場卷（目前進度的等級）。每個紀錄只能領一次，領取後放進目前角色。</p>
+    ${pending.length ? pending.map((r) => row(r, false)).join('') : '<p class="muted">目前沒有可以領取的禮包。到大廳玩學習遊戲吧！</p>'}
     ${done.length ? `<h3>已領取</h3>${done.map((r) => row(r, true)).join('')}` : ''}`;
   const act = await openModal({ title: '獲得紀錄', html, actions: [{ label: '關閉', value: null }, ...(pending.length ? [{ label: `全部領取（${pending.length}）`, value: 'claim', className: 'primary' }] : [])] });
   if (act !== 'claim') return;
@@ -2140,7 +2141,7 @@ function updateHud(force) {
     const cd = sk ? Math.max(0, p.skillCd[n]) : 0;
     set(`skillId${n}`, sk ? sk.id : n < w.skills.length ? 'none' : 'locked', () => {
       const btn = $(`skill${n + 1}-btn`);
-      // 第 3、4 格在轉職後才出現。
+      // 第 3、4 格在獲得第 3、4 個技能後才出現。
       btn.hidden = n >= w.skills.length;
       // 有第 3、4 格技能時，藥水往上移一排。
       if (n === 2) btn.parentElement.classList.toggle('four-skills', w.skills.length > 2);
@@ -2566,7 +2567,7 @@ function openRules() {
       <li>地上出現<b>紅色範圍</b>或<b>虛線</b>時，代表怪物即將攻擊那裡，趕快閃避！</li>
       <li>倒下時保留經驗值與裝備，但會失去一半本趟撿到的金幣。回城卷軸可以帶著全部所得回村。</li>
       <li>擊敗 Boss 後解鎖更深的深度與下一個地城。</li>
-      <li>每個職業有 4 個基本技能，在 Lv.1、5、12、20 解鎖；每轉職一次再解鎖 2 個轉職技能。每升 1 級得到 1 技能點。技能欄 2 格，每轉職一次多 1 格（最多 4 格）。另有<b>被動技能</b>（Lv.8、Lv.16 各 1 個，每轉職一次再 1 個），花技能點學習，學會後一直生效。</li>
+      <li>每個職業有 4 個基本技能，在 Lv.1、5、12、20 解鎖；每轉職一次再解鎖 2 個轉職技能。每升 1 級得到 1 技能點。技能欄 2 格，獲得第 3、第 4 個技能（升級或學會技能書）時開放第 3、第 4 格。另有<b>被動技能</b>（Lv.8、Lv.16 各 1 個，每轉職一次再 1 個），花技能點學習，學會後一直生效。</li>
       <li><b>單手與雙手武器</b>：單手武器（劍、弩、魔杖）可以搭配副手的盾牌；雙手武器（斧、弓、法杖）攻擊較高，但佔用兩隻手、不能拿盾牌。</li>
       <li><b>異常狀態</b>：中毒（5 秒內每秒失去 2% HP，會被毒死）、睡眠（10 秒不能行動，被攻擊 3 次醒來）、暈眩（10 秒不能行動，被攻擊也不會醒）。喝<b>淨化藥水</b>可以解除。你的武器和部分技能也能讓敵人陷入這些狀態（Boss 只受 30% 的時間）。</li>
       <li><b>分解與合成</b>：在倉庫點裝備可以「分解」成材料（有機會多得高品質材料）；用製作書加 12 個同品質材料，在鐵匠合成保證品質的裝備。製作書從打怪、寶箱或商店取得。</li>
@@ -2853,6 +2854,9 @@ function setupPortalLink() {
 
 /** 啟動程式：讀取存檔後顯示首頁。 */
 async function init() {
+  // 遊玩歷程與帳號凍結（與大廳共用，見 playlog.js）。
+  const play = trackPlay('pocketdungeon');
+  guardFreeze({ onLock: play.flush, onUnlock: play.resume });
   applyTheme();
   buildHeroDeco();
   fillIcons(document);

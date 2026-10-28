@@ -9,3 +9,10 @@ https://github.com/matishsiao/game-portal-fly
 
 Fork、修改或散布本專案（含衍生作品）時，請保留本 NOTICE 檔案，
 並在 README 或關於頁面中註明源自上述專案。
+
+第三方資料：
+games/spelling/data/ceec/ 以及由它整理出的英文單字清單、詞性與 Level，
+取自財團法人大學入學考試中心基金會《高中英文參考詞彙表》（111 學年度起適用），
+著作權屬該基金會所有，僅供非營利目的使用，轉載請註明出處；
+營利使用須事前取得該基金會書面同意授權。這部分資料不適用 Apache License 2.0。
+來源與詳細說明見 games/spelling/data/README.md。
