@@ -331,7 +331,7 @@ const DIFF_NAME = { easy: '簡單', medium: '中等', hard: '困難', expert: '�
  * 讀取其他遊戲的獲得紀錄（第一次過關、第一次全對）：
  * 1. 其他遊戲過關時寫入共用鍵 `games.rewards` 的紀錄；
  * 2. 回補：從學習遊戲（GIFT.learning）的 `<目錄>.stats`（每個難度 completed／noHint）補上更新前就達成的紀錄。
- * 一般遊戲（數獨等）不再寫入新紀錄，也不回補；之前已寫入 `games.rewards` 的紀錄仍可領取。
+ * 益智遊戲（數獨等）不再寫入新紀錄，也不回補；之前已寫入 `games.rewards` 的紀錄仍可領取。
  * 兩者以相同的 id 合併，同一個 id 只算一次。只讀取，不寫入其他遊戲的鍵。
  * @returns {{id: string, game: string, type: 'clear' | 'perfect', tier: number, label: string, at: number}[]} 紀錄（新的在前）。
  */
