@@ -17,6 +17,7 @@
 | 密碼偵探 | <https://matishsiao.github.io/game-portal-fly/codebreaker/> |
 | 奧數挑戰 | <https://matishsiao.github.io/game-portal-fly/olympiad/> |
 | 自然探險 | <https://matishsiao.github.io/game-portal-fly/science/> |
+| 社會科學 | <https://matishsiao.github.io/game-portal-fly/social/> |
 | 口袋地城 | <https://matishsiao.github.io/game-portal-fly/pocketdungeon/> |
 
 用手機開啟大廳並加入主畫面，連網時會自動下載所有遊戲，之後沒有網路也能玩。
@@ -38,6 +39,7 @@ game-portal/
 │   ├── spelling/        英文單字拼圖（自成一個專案：src/、scripts/、tests/、data/、spec.md；單字清單取自大考中心詞彙表，僅供非營利使用）
 │   ├── olympiad/        奧數挑戰（自成一個專案：src/、scripts/、tests/、spec.md；題庫在 src/data/questions.json）
 │   ├── science/         自然探險（自成一個專案：src/、scripts/、tests/、spec.md；題庫與科學卡在 src/data/）
+│   ├── social/          社會科學（自成一個專案：src/、scripts/、tests/、data/、spec.md；審閱定稿在 data/bank/，合併後的題庫與知識卡在 src/data/）
 │   └── pocketdungeon/   口袋地城（自成一個專案：src/、scripts/、tests/、spec.md）
 └── site/                組合結果（不進版本控制），內容即網站根目錄
 ```
@@ -56,6 +58,7 @@ game-portal/
 ├── spelling/     ← games/spelling 的 dist/
 ├── olympiad/     ← games/olympiad 的 dist/
 ├── science/      ← games/science 的 dist/
+├── social/       ← games/social 的 dist/
 └── pocketdungeon/ ← games/pocketdungeon 的 dist/
 ```
 
@@ -85,7 +88,7 @@ game-portal/
 | --- | --- |
 | `npm test` | 執行共用模組與所有遊戲的單元測試 |
 | `npm run check:puzzles` | 所有遊戲各難度批次出題驗收（口袋地城為地城生成與數值平衡檢查） |
-| `npm run dev:sudoku`／`npm run dev:crossmath`／`npm run dev:numberlink`／`npm run dev:idiom`／`npm run dev:roll`／`npm run dev:codebreaker`／`npm run dev:spelling`／`npm run dev:olympiad`／`npm run dev:science`／`npm run dev:pocketdungeon` | 單獨開發某個遊戲（不啟用離線快取） |
+| `npm run dev:sudoku`／`npm run dev:crossmath`／`npm run dev:numberlink`／`npm run dev:idiom`／`npm run dev:roll`／`npm run dev:codebreaker`／`npm run dev:spelling`／`npm run dev:olympiad`／`npm run dev:science`／`npm run dev:social`／`npm run dev:pocketdungeon` | 單獨開發某個遊戲（不啟用離線快取） |
 | `npm run preview` | 建置大廳與所有遊戲、組合成 `site/`，以 `http://localhost:5180/` 預覽 |
 | `npm run assemble` | 只建置並組合成 `site/`（加 `-- --no-build` 則不重新建置遊戲） |
 | `npm run build` | 只建置大廳到 `dist/` |
@@ -101,7 +104,7 @@ game-portal/
 
 推送到 `main` 後，`.github/workflows/pages.yml` 會自動執行所有遊戲的單元測試、組合 `site/`，並部署到 GitHub Pages：
 
-- 網址：`https://matishsiao.github.io/game-portal-fly/`（大廳），遊戲在 `/sudoku/`、`/crossmath/`、`/numberlink/`、`/idiom/`、`/roll/`、`/codebreaker/`、`/spelling/`、`/olympiad/`、`/science/`、`/pocketdungeon/`。
+- 網址：`https://matishsiao.github.io/game-portal-fly/`（大廳），遊戲在 `/sudoku/`、`/crossmath/`、`/numberlink/`、`/idiom/`、`/roll/`、`/codebreaker/`、`/spelling/`、`/olympiad/`、`/science/`、`/social/`、`/pocketdungeon/`。
 - HTTPS 憑證由 GitHub 自動提供與續期。
 - 首次使用需在 repo 的 **Settings → Pages** 把 Source 設為 **GitHub Actions**。公開 repo 使用 GitHub Actions 與 Pages 不需付費。
 - 也可在 Actions 分頁對「Deploy to GitHub Pages」按 **Run workflow** 手動重新部署。

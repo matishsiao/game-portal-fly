@@ -32,6 +32,8 @@
   --olympiad-2: #4a527f;
   --science-1: #5f7a52;
   --science-2: #4b6440;
+  --social-1: #8f6a50;
+  --social-2: #6f5240;
   --codebreaker-1: #4b5058;
   --codebreaker-2: #1f2226;
   --pocketdungeon-1: #9e2a3a;
@@ -74,6 +76,8 @@
     --olympiad-2: #3d4466;
     --science-1: #55704a;
     --science-2: #3e5035;
+    --social-1: #7f5f48;
+    --social-2: #5a4334;
     --codebreaker-1: #454a52;
     --codebreaker-2: #17191c;
     --pocketdungeon-1: #8a2433;
@@ -448,6 +452,11 @@ summary:focus-visible {
 /* 自然探險：低彩度的苔綠（護眼配色）。 */
 .game-card[data-theme="science"] {
   background: linear-gradient(135deg, var(--science-1), var(--science-2));
+}
+
+/* 社會科學：低彩度的陶土棕（護眼配色）。 */
+.game-card[data-theme="social"] {
+  background: linear-gradient(135deg, var(--social-1), var(--social-2));
 }
 
 /* 密碼偵探：保險箱的深灰金屬（細條紋表現拉絲質感）與黃銅細邊。 */

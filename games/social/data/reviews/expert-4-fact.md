@@ -136,3 +136,4 @@
 
 - 本次補核對 21 題（其中 16 題新開啟了原始頁面），不一致 0 題，修改 0 題。
 - 仍只有摘錄或只有一個來源的部分：expert-124（只有百科類來源）、expert-134 面積比例、expert-137 基爾運河、expert-141 歐洲市場、expert-144、expert-152。
+- 驗證：`node scripts/validate-bank.mjs data/bank/expert-4.json data/bank/expert-5.json` 通過（各 42 題；知識卡 34、35 張）。

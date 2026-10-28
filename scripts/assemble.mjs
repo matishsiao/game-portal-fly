@@ -24,6 +24,7 @@ const GAMES = {
   codebreaker: 'games/codebreaker',
   olympiad: 'games/olympiad',
   science: 'games/science',
+  social: 'games/social',
   pocketdungeon: 'games/pocketdungeon',
 };
 

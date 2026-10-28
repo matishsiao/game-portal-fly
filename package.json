@@ -9,8 +9,8 @@
     "node": ">=16.17"
   },
   "scripts": {
-    "test": "node --test tests/ && npm --prefix games/sudoku test && npm --prefix games/crossmath test && npm --prefix games/numberlink test && npm --prefix games/idiom test && npm --prefix games/roll test && npm --prefix games/codebreaker test && npm --prefix games/words test && npm --prefix games/spelling test && npm --prefix games/olympiad test && npm --prefix games/science test && npm --prefix games/pocketdungeon test",
-    "check:puzzles": "npm --prefix games/sudoku run check:puzzles && npm --prefix games/crossmath run check:puzzles && npm --prefix games/numberlink run check:puzzles && npm --prefix games/idiom run check:puzzles && npm --prefix games/roll run check:levels && npm --prefix games/codebreaker run check:puzzles && npm --prefix games/words run check:puzzles && npm --prefix games/spelling run check:puzzles && npm --prefix games/olympiad run check:release && npm --prefix games/science run check:release && npm --prefix games/pocketdungeon run check:dungeons && npm --prefix games/pocketdungeon run check:balance",
+    "test": "node --test tests/ && npm --prefix games/sudoku test && npm --prefix games/crossmath test && npm --prefix games/numberlink test && npm --prefix games/idiom test && npm --prefix games/roll test && npm --prefix games/codebreaker test && npm --prefix games/words test && npm --prefix games/spelling test && npm --prefix games/olympiad test && npm --prefix games/science test && npm --prefix games/social test && npm --prefix games/pocketdungeon test",
+    "check:puzzles": "npm --prefix games/sudoku run check:puzzles && npm --prefix games/crossmath run check:puzzles && npm --prefix games/numberlink run check:puzzles && npm --prefix games/idiom run check:puzzles && npm --prefix games/roll run check:levels && npm --prefix games/codebreaker run check:puzzles && npm --prefix games/words run check:puzzles && npm --prefix games/spelling run check:puzzles && npm --prefix games/olympiad run check:release && npm --prefix games/science run check:release && npm --prefix games/social run check:release && npm --prefix games/pocketdungeon run check:dungeons && npm --prefix games/pocketdungeon run check:balance",
     "build": "node scripts/build.mjs",
     "assemble": "node scripts/assemble.mjs",
     "preview": "node scripts/assemble.mjs && node scripts/serve.mjs",
@@ -25,6 +25,7 @@
     "dev:spelling": "npm --prefix games/spelling run dev",
     "dev:olympiad": "npm --prefix games/olympiad run dev",
     "dev:science": "npm --prefix games/science run dev",
+    "dev:social": "npm --prefix games/social run dev",
     "dev:pocketdungeon": "npm --prefix games/pocketdungeon run dev"
   }
 }

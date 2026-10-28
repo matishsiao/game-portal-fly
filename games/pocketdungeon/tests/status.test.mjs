@@ -921,7 +921,7 @@ test('獲得紀錄：讀取其他遊戲寫入的紀錄（一般遊戲之前的�
   const ids = list.map((r) => r.id).sort();
   assert.deepEqual(ids, ['idiom:hard:clear', 'idiom:hard:perfect', 'sudoku:hard:clear']);
   assert.equal(list.find((r) => r.id === 'idiom:hard:perfect').tier, 4);
-  for (const g of ['crossmath', 'idiom', 'words', 'spelling', 'olympiad', 'science']) assert.ok(GIFT.learning.includes(g), `${g} 是學習遊戲`);
+  for (const g of ['crossmath', 'idiom', 'words', 'spelling', 'olympiad', 'science', 'social']) assert.ok(GIFT.learning.includes(g), `${g} 是學習遊戲`);
   for (const g of ['sudoku', 'numberlink', 'roll', 'codebreaker']) assert.ok(!GIFT.learning.includes(g), `${g} 是一般遊戲`);
   assert.ok(GIFT.learning.every((g) => GIFT.games[g]), '學習遊戲都必須在 GIFT.games 註冊');
   // 每日練習：一天一筆（daily:日期），格式不對的忽略。
