@@ -17,7 +17,7 @@ export const TABLE_CELL_MAX = 12;
  * 不使用的用語（與 data/terms.md 一致）。只列不會誤傷正常詞彙的寫法。
  * 例如「大陸」用於「歐亞大陸」「大陸型氣候」是正常地理名詞，所以只禁用「大陸地區」。
  */
-export const BANNED = ['台灣', '台北', '台中', '台南', '台東', '大陸地區', '內地', '祖國', '荷蘭政府', '滿清', '日據', '播遷', '山胞', '蕃人', '生番', '熟番', '外籍新娘', '殘障'];
+export const BANNED = ['台灣', '台北', '台中', '台南', '台東', '大陸地區', '內地', '祖國', '荷蘭政府', '滿清', '日據', '播遷', '山胞', '蕃人', '生番', '熟番', '外籍新娘', '殘障', '最早開發', '鼓勵改日本姓名', '鼓勵改用日本姓名'];
 
 /** 會過期的說法（題目不得使用；需要時改寫為有年份的說法並標 asOf）。 */
 export const VOLATILE = ['目前', '最新', '現任', '現在的總統', '今年'];
@@ -178,12 +178,14 @@ export function cardErrors(c) {
  * 檢查整個題庫（題目與知識卡），回傳錯誤訊息。
  * @param {object[]} questions 題目。
  * @param {object[]} cards 知識卡。
- * @param {{requireLinked?: boolean}} [opt] requireLinked：每張知識卡都必須被題目連到。
+ * @param {{requireLinked?: boolean, knownCards?: string[]}} [opt] requireLinked：每張知識卡都必須被題目連到；knownCards：其他檔案已有的知識卡 id（題目可以連到，但不可重複定義）。
  * @returns {string[]} 錯誤訊息。
  */
 export function bankErrors(questions, cards, opt = {}) {
   const e = [];
-  const cardIds = new Set(cards.map((c) => c.id));
+  const known = new Set(opt.knownCards || []);
+  for (const c of cards) if (known.has(c.id)) e.push(`知識卡 id 與其他檔案重複：${c.id}`);
+  const cardIds = new Set([...cards.map((c) => c.id), ...known]);
   const ids = questions.map((q) => q && q.id);
   for (const id of new Set(ids.filter((id, i) => ids.indexOf(id) !== i))) e.push(`題目 id 重複：${id}`);
   const cids = cards.map((c) => c && c.id);
