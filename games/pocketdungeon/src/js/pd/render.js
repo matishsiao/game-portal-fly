@@ -36,6 +36,653 @@ function hash(i, j) {
   return (h & 0xffff) / 0x10000;
 }
 
+/**
+ * 把色碼調亮或調暗。
+ * @param {string} hex `#rrggbb` 色碼。
+ * @param {number} amt -1～1；正值往白色、負值往黑色。
+ * @returns {string} 調整後的色碼。
+ */
+function shade(hex, amt) {
+  const n = parseInt(hex.slice(1), 16);
+  const ch = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((c) => Math.round(amt >= 0 ? c + (255 - c) * amt : c * (1 + amt)));
+  return `#${ch.map((c) => c.toString(16).padStart(2, '0')).join('')}`;
+}
+
+/**
+ * 混合兩個色碼。
+ * @param {string} a `#rrggbb` 色碼。
+ * @param {string} b `#rrggbb` 色碼。
+ * @param {number} t 0～1；0 為 a、1 為 b。
+ * @returns {string} 混合後的色碼。
+ */
+function mix(a, b, t) {
+  const na = parseInt(a.slice(1), 16);
+  const nb = parseInt(b.slice(1), 16);
+  const ch = [16, 8, 0].map((sh) => Math.round(((na >> sh) & 255) * (1 - t) + ((nb >> sh) & 255) * t));
+  return `#${ch.map((c) => c.toString(16).padStart(2, '0')).join('')}`;
+}
+
+/**
+ * 由區域色調推出牆壁用的色盤（磚面三種深淺、高光、陰影、灰縫、牆頂石板、外框）。
+ * @param {object} th 區域色調。
+ * @returns {object} 牆壁色盤。
+ */
+function wallPalette(th) {
+  return {
+    // 磚面往牆頂色混合（不往白色），保留區域的色相。
+    brick: [mix(th.face, th.top, 0.42), mix(th.face, th.top, 0.52), mix(th.face, th.top, 0.34)],
+    brickHi: mix(th.face, th.top, 0.85),
+    brickLo: mix(th.face, th.top, 0.16),
+    mortar: shade(th.line, -0.2),
+    top: [shade(th.top, -0.12), shade(th.top, -0.18), shade(th.top, -0.06)],
+    topHi: shade(th.top, 0.08),
+    topLo: shade(th.top, -0.38),
+    seam: shade(th.top, -0.26),
+    // 圓柱由亮到暗五階（取牆頂色，柱子比牆面亮，像參考的石柱）。
+    pillar: [shade(th.top, 0.32), shade(th.top, 0.14), th.top, shade(th.top, -0.22), shade(th.top, -0.4)],
+    outline: shade(th.line, -0.55),
+  };
+}
+
+/**
+ * 畫牆面（下方是地板的牆）：上緣是牆頂的石唇，下面是交錯的磚塊，每塊磚有高光、陰影與少量裂痕。
+ * 上方也是牆時，牆面往上加高半格（蓋住上方牆頂的下半部），牆看起來更高。草原區域的牆是樹籬，改畫葉叢。
+ * @param {CanvasRenderingContext2D} g 畫布。
+ * @param {number} i 格子 x。
+ * @param {number} j 格子 y。
+ * @param {object} pal 牆壁色盤。
+ * @param {boolean} hedge 是否為樹籬。
+ * @param {{left: string, right: string, mid: boolean, rise: number}} opt 左右鄰格（'face' 牆面相連、'top' 接到牆頂、'void' 地圖外）、是否在中間立圓柱、往上加高的像素。
+ */
+function drawWallFace(g, i, j, pal, hedge, opt) {
+  const x = i * T;
+  const top = j * T - opt.rise;
+  const bottom = (j + 1) * T;
+  // 牆頂石唇：亮邊、石面、下方的深色陰影。
+  g.fillStyle = pal.topHi;
+  g.fillRect(x, top, T, 1);
+  g.fillStyle = pal.top[0];
+  g.fillRect(x, top + 1, T, 2);
+  g.fillStyle = pal.outline;
+  g.fillRect(x, top + 3, T, 1);
+  if (hedge) {
+    g.fillStyle = pal.brick[0];
+    g.fillRect(x, top + 4, T, bottom - top - 4);
+    for (let k = 0; k < 18; k++) {
+      const r = hash(i * 31 + k, j * 17 - k);
+      g.fillStyle = k % 3 ? pal.brickHi : pal.brickLo;
+      g.fillRect(x + Math.floor(r * 15), top + 4 + Math.floor(hash(k, i + j) * (bottom - top - 5)), 2, 1);
+    }
+    g.fillStyle = pal.mortar;
+    g.fillRect(x, bottom - 1, T, 1);
+    return;
+  }
+  for (let row = 0, by = top + 4; by < bottom - 1; row++, by += 6) {
+    const gr = j * 4 + row;
+    const off = gr % 2 ? 5 : 0;
+    g.fillStyle = pal.mortar;
+    g.fillRect(x, by + 5, T, 1);
+    // 磚塊寬 10 像素，以整張地圖的像素座標計算接縫，相鄰格子的磚塊才會連續。
+    for (let gx = x; gx < x + T;) {
+      const start = gx - ((gx + off) % 10);
+      const end = start + 10;
+      const x0 = Math.max(gx, start);
+      const x1 = Math.min(x + T, end);
+      const r = hash(Math.floor((gx + off) / 10), gr);
+      g.fillStyle = pal.brick[Math.floor(r * 3)];
+      g.fillRect(x0, by, x1 - x0, 5);
+      // 上緣與左緣高光、下緣陰影，讓每塊磚有凸起感。
+      g.fillStyle = pal.brickHi;
+      const h0 = Math.max(x0, start + 1);
+      const h1 = Math.min(x1, end - 1);
+      if (h1 > h0) g.fillRect(h0, by, h1 - h0, 1);
+      if (start + 1 >= x0 && start + 1 < x1) g.fillRect(start + 1, by, 1, 4);
+      g.fillStyle = pal.brickLo;
+      if (h1 > h0) g.fillRect(h0, by + 4, h1 - h0, 1);
+      if (end - 2 >= x0 && end - 2 < x1) g.fillRect(end - 2, by + 1, 1, 4);
+      g.fillStyle = pal.mortar;
+      if (end - 1 < x1) g.fillRect(end - 1, by, 1, 5);
+      if (start >= x0) g.fillRect(start, by, 1, 5);
+      // 少數磚塊有裂痕或缺角。
+      if (r > 0.8 && start + 6 >= x0 && start + 7 < x1) {
+        g.fillStyle = pal.brickLo;
+        g.fillRect(start + 4, by + 2, 2, 1);
+        g.fillRect(start + 6, by + 1, 1, 1);
+      }
+      gx = x1;
+    }
+  }
+  // 牆腳陰影。
+  g.fillStyle = pal.outline;
+  g.fillRect(x, bottom - 1, T, 1);
+  // 圓柱：牆面接到牆頂（轉角）或地圖外的端點各立一根，長牆中間每隔幾格也立一根。
+  // 圓柱比牆頂高出 4 像素，像參考圖的石柱一樣凸出牆面。
+  if (opt.left !== 'face') drawPillar(g, x - 1, top - 4, bottom, pal);
+  if (opt.right !== 'face') drawPillar(g, x + T - 11, top - 4, bottom, pal);
+  if (opt.mid) drawPillar(g, x + 2, top - 4, bottom, pal);
+}
+
+/**
+ * 畫一根石造圓柱（寬 12 像素，從牆頂畫到牆腳）：方形柱頭、左亮右暗的圓柱身（分成數段石塊）、圓環與方形柱座，
+ * 兩側在牆面投下陰影。
+ * @param {CanvasRenderingContext2D} g 畫布。
+ * @param {number} x 圓柱左緣 x（像素）。
+ * @param {number} top 圓柱上緣 y（像素）。
+ * @param {number} bottom 圓柱下緣 y（像素）。
+ * @param {object} pal 牆壁色盤。
+ */
+function drawPillar(g, x, top, bottom, pal) {
+  const p = pal.pillar;
+  const O = pal.outline;
+  // 投在牆面上的陰影（右側較深）。
+  g.fillStyle = 'rgba(0,0,0,0.3)';
+  g.fillRect(x - 1, top + 5, 1, bottom - top - 6);
+  g.fillStyle = 'rgba(0,0,0,0.45)';
+  g.fillRect(x + 12, top + 5, 2, bottom - top - 6);
+  // 柱身（x+1～x+10）：由左到右的明暗，做出圓柱的立體感。
+  const shaft = [O, p[1], p[0], p[0], p[1], p[2], p[2], p[3], p[4], O];
+  const s0 = top + 5;
+  const s1 = bottom - 5;
+  shaft.forEach((c, k) => {
+    g.fillStyle = c;
+    g.fillRect(x + 1 + k, s0, 1, s1 - s0);
+  });
+  // 柱身分段：每 7 像素一道接縫（暗線）與下方的亮線。
+  for (let sy = s0 + 6; sy < s1 - 2; sy += 7) {
+    g.fillStyle = p[4];
+    g.fillRect(x + 2, sy, 8, 1);
+    g.fillStyle = p[1];
+    g.fillRect(x + 2, sy + 1, 3, 1);
+  }
+  // 柱頭：上方寬板（12 寬）與下方圓盤（10 寬）。
+  g.fillStyle = O;
+  g.fillRect(x, top, 12, 4);
+  g.fillStyle = p[1];
+  g.fillRect(x + 1, top, 10, 2);
+  g.fillStyle = p[0];
+  g.fillRect(x + 1, top, 10, 1);
+  g.fillStyle = p[3];
+  g.fillRect(x + 1, top + 2, 10, 1);
+  g.fillStyle = p[2];
+  g.fillRect(x + 1, top + 4, 10, 1);
+  g.fillStyle = p[4];
+  g.fillRect(x + 1, top + 4, 1, 1);
+  g.fillRect(x + 10, top + 4, 1, 1);
+  // 柱座：圓環（10 寬）與方座（12 寬）。
+  g.fillStyle = p[2];
+  g.fillRect(x + 1, bottom - 5, 10, 1);
+  g.fillStyle = p[0];
+  g.fillRect(x + 2, bottom - 5, 3, 1);
+  g.fillStyle = O;
+  g.fillRect(x, bottom - 4, 12, 4);
+  g.fillStyle = p[2];
+  g.fillRect(x + 1, bottom - 4, 10, 2);
+  g.fillStyle = p[1];
+  g.fillRect(x + 1, bottom - 4, 10, 1);
+  g.fillStyle = p[4];
+  g.fillRect(x + 1, bottom - 2, 10, 1);
+}
+
+/**
+ * 畫石板地板：每格分成 8 × 8 的石塊（部分左右相連成長條），石塊顏色略有深淺，接縫為深色灰縫，
+ * 左上有一點高光；少數石塊有裂痕。
+ * @param {CanvasRenderingContext2D} g 畫布。
+ * @param {number} i 格子 x。
+ * @param {number} j 格子 y。
+ * @param {object} th 區域色調。
+ * @param {object} fp 地板色盤。
+ */
+function drawFloorStones(g, i, j, th, fp) {
+  const x = i * T;
+  const y = j * T;
+  g.fillStyle = fp.mortar;
+  g.fillRect(x, y, T, T);
+  for (let cy = 0; cy < 2; cy++) {
+    for (let cx = 0; cx < 2; cx++) {
+      const gi = i * 2 + cx;
+      const gj = j * 2 + cy;
+      const r = hash(gi + 211, gj + 97);
+      // 與左邊的石塊相連（不畫左側灰縫），形成長條石板。
+      const joinLeft = hash(gi + 13, gj + 5) < 0.35;
+      const sx = x + cx * 8 + (joinLeft ? 0 : 1);
+      const sy = y + cy * 8 + 1;
+      const w = 7 + (joinLeft ? 1 : 0);
+      g.fillStyle = fp.stone[Math.floor(r * fp.stone.length)];
+      g.fillRect(sx, sy, w, 7);
+      g.fillStyle = fp.hi;
+      g.fillRect(sx, sy, Math.min(w, 4), 1);
+      if (!joinLeft) g.fillRect(sx, sy, 1, 3);
+      g.fillStyle = fp.lo;
+      g.fillRect(sx, sy + 6, w, 1);
+      if (r > 0.86) {
+        g.fillStyle = fp.mortar;
+        g.fillRect(sx + 2, sy + 3, 2, 1);
+        g.fillRect(sx + 4, sy + 2, 1, 1);
+      }
+    }
+  }
+}
+
+/**
+ * 畫牆頂（從上方看到的牆）：交錯的石板，接到地板或地圖外的邊加深色外框。
+ * @param {CanvasRenderingContext2D} g 畫布。
+ * @param {number} i 格子 x。
+ * @param {number} j 格子 y。
+ * @param {object} pal 牆壁色盤。
+ * @param {{up: boolean, down: boolean, left: boolean, right: boolean}} edge 各方向是否要畫外框。
+ */
+function drawWallTop(g, i, j, pal, edge) {
+  const x = i * T;
+  const y = j * T;
+  // 平整的石板：每片 16×8，隔排錯開半片；接縫只比石面稍暗，看起來是平面而不是磚牆。
+  for (let row = 0; row < 2; row++) {
+    const by = y + row * 8;
+    const gr = j * 2 + row;
+    const off = gr % 2 ? 8 : 0;
+    for (let gx = x; gx < x + T;) {
+      const start = gx - ((gx + off) % 16);
+      const end = start + 16;
+      const x0 = Math.max(gx, start);
+      const x1 = Math.min(x + T, end);
+      g.fillStyle = pal.top[Math.floor(hash(Math.floor((gx + off) / 16) + 7, gr) * 3)];
+      g.fillRect(x0, by, x1 - x0, 8);
+      g.fillStyle = pal.seam;
+      g.fillRect(x0, by + 7, x1 - x0, 1);
+      if (end - 1 < x1) g.fillRect(end - 1, by, 1, 8);
+      gx = x1;
+    }
+  }
+  // 外框內側加一道亮邊，牆頂的邊緣看起來有厚度。
+  g.fillStyle = pal.topHi;
+  if (edge.up) g.fillRect(x, y + 2, T, 1);
+  if (edge.left) g.fillRect(x + 2, y, 1, T);
+  g.fillStyle = pal.topLo;
+  if (edge.down) g.fillRect(x, y + T - 3, T, 1);
+  if (edge.right) g.fillRect(x + T - 3, y, 1, T);
+  g.fillStyle = pal.outline;
+  if (edge.up) g.fillRect(x, y, T, 2);
+  if (edge.down) g.fillRect(x, y + T - 2, T, 2);
+  if (edge.left) g.fillRect(x, y, 2, T);
+  if (edge.right) g.fillRect(x + T - 2, y, 2, T);
+}
+
+/**
+ * 在牆面畫一面掛旗（顏色取區域的點綴色）。
+ * @param {CanvasRenderingContext2D} g 畫布。
+ * @param {number} x 格子左上角 x（像素）。
+ * @param {number} y 格子左上角 y（像素）。
+ * @param {object} th 區域色調。
+ * @param {object} pal 牆壁色盤。
+ */
+function drawBanner(g, x, y, th, pal) {
+  g.fillStyle = '#c8a050';
+  g.fillRect(x + 4, y + 4, 8, 1);
+  g.fillStyle = pal.outline;
+  g.fillRect(x + 5, y + 5, 6, 9);
+  g.fillStyle = th.speck;
+  g.fillRect(x + 5, y + 5, 6, 8);
+  g.fillRect(x + 6, y + 13, 4, 1);
+  g.fillStyle = shade(th.speck, -0.35);
+  g.fillRect(x + 10, y + 5, 1, 8);
+  g.fillStyle = '#e8c870';
+  g.fillRect(x + 7, y + 7, 2, 1);
+  g.fillRect(x + 7, y + 9, 2, 2);
+}
+
+/**
+ * 畫地刺陷阱：鉚釘鐵板，升起時是交錯兩排（3＋2 根）有明暗的金屬尖刺與陰影，降下時是同位置的小孔。
+ * @param {CanvasRenderingContext2D} g 畫布。
+ * @param {number} x 格子左上角 x（像素）。
+ * @param {number} y 格子左上角 y（像素）。
+ * @param {boolean} up 尖刺是否升起。
+ */
+function drawSpikeTrap(g, x, y, up) {
+  g.fillStyle = '#120e10';
+  g.fillRect(x + 1, y + 1, T - 2, T - 2);
+  g.fillStyle = '#4a4448';
+  g.fillRect(x + 2, y + 2, T - 4, T - 4);
+  g.fillStyle = '#6e676c';
+  g.fillRect(x + 2, y + 2, T - 4, 1);
+  g.fillRect(x + 2, y + 2, 1, T - 4);
+  g.fillStyle = '#2a2528';
+  g.fillRect(x + 2, y + T - 3, T - 4, 1);
+  g.fillRect(x + T - 3, y + 2, 1, T - 4);
+  g.fillStyle = '#9a9298';
+  for (const [rx, ry] of [[3, 3], [12, 3], [3, 12], [12, 12]]) g.fillRect(x + rx, y + ry, 1, 1);
+  for (const [dx, dy] of [[3, 8], [7, 8], [11, 8], [5, 13], [9, 13]]) {
+    const bx = x + dx;
+    const by = y + dy;
+    if (!up) {
+      g.fillStyle = '#0e0a0a';
+      g.fillRect(bx + 1, by - 1, 1, 1);
+      g.fillStyle = '#2a2528';
+      g.fillRect(bx, by - 1, 1, 1);
+      g.fillRect(bx + 2, by - 1, 1, 1);
+      continue;
+    }
+    g.fillStyle = 'rgba(0,0,0,0.45)';
+    g.fillRect(bx + 2, by - 1, 2, 2);
+    g.fillStyle = '#c8ccd6';
+    g.fillRect(bx, by - 2, 1, 3);
+    g.fillStyle = '#7a7e8a';
+    g.fillRect(bx + 2, by - 2, 1, 3);
+    g.fillStyle = '#e8ecf2';
+    g.fillRect(bx + 1, by - 4, 1, 5);
+    g.fillStyle = '#ffffff';
+    g.fillRect(bx + 1, by - 5, 1, 1);
+    g.fillStyle = '#3a3a42';
+    g.fillRect(bx, by + 1, 3, 1);
+  }
+}
+
+/** 各區域牆邊大型擺設的種類（依序挑選，沒有列出的區域用 default）。 */
+const PROPS = {
+  default: ['barrel', 'crates', 'boulder', 'statue', 'trophy', 'skulls'],
+  grass: ['barrel', 'crates', 'boulder'],
+  sky: ['statue', 'crates', 'boulder', 'trophy'],
+  necro: ['skulls', 'statue', 'boulder', 'skulls', 'crates'],
+  clock: ['crates', 'barrel', 'trophy', 'boulder'],
+};
+
+/**
+ * 以字元陣列畫小型像素圖（'.' 為透明）。
+ * @param {CanvasRenderingContext2D} g 畫布。
+ * @param {number} x 左上角 x（像素）。
+ * @param {number} y 左上角 y（像素）。
+ * @param {string[]} rows 像素列。
+ * @param {Record<string, string>} colors 字元對應的顏色。
+ */
+function drawRows(g, x, y, rows, colors) {
+  rows.forEach((row, k) => {
+    for (let m = 0; m < row.length; m++) {
+      const c = colors[row[m]];
+      if (!c) continue;
+      g.fillStyle = c;
+      g.fillRect(x + m, y + k, 1, 1);
+    }
+  });
+}
+
+/**
+ * 在物件腳下畫橢圓形的地面影子。
+ * @param {CanvasRenderingContext2D} g 畫布。
+ * @param {number} cx 中心 x（像素）。
+ * @param {number} by 底部 y（像素）。
+ * @param {number} w 寬度（像素）。
+ */
+function groundShadow(g, cx, by, w) {
+  g.fillStyle = 'rgba(0,0,0,0.35)';
+  g.beginPath();
+  g.ellipse(cx, by, w / 2, 2, 0, 0, Math.PI * 2);
+  g.fill();
+}
+
+/**
+ * 畫木桶（12 × 14）：左亮右暗的桶身、三道鐵箍、橢圓桶蓋。
+ * @param {CanvasRenderingContext2D} g 畫布。
+ * @param {number} x 左上角 x（像素）。
+ * @param {number} y 左上角 y（像素）。
+ */
+function drawBarrel(g, x, y) {
+  drawRows(g, x, y, [
+    '...oooooo...',
+    '.oohhhhhhoo.',
+    'odhwwwwwwhdo',
+    'oMmmmmmmmmMo',
+    'odWhwwwWWDdo',
+    'odWhwwwWWDdo',
+    'odWhwwwWWDdo',
+    'oMmmmmmmmmMo',
+    'odWhwwwWWDdo',
+    'odWhwwwWWDdo',
+    'odWhwwwWWDdo',
+    'oMmmmmmmmmMo',
+    '.odWWWWWWdo.',
+    '..oooooooo..',
+  ], { o: '#1a1020', W: '#8a5a2a', w: '#b07a3e', h: '#d09a5a', d: '#5a3a1a', D: '#6a4422', M: '#4a4a52', m: '#8a8a94' });
+}
+
+/**
+ * 畫一個木箱（寬 w、高 h）：木板框、橫向木板接縫、四角鐵釘與左上高光。
+ * @param {CanvasRenderingContext2D} g 畫布。
+ * @param {number} x 左上角 x（像素）。
+ * @param {number} y 左上角 y（像素）。
+ * @param {number} w 寬度（像素）。
+ * @param {number} h 高度（像素）。
+ */
+function drawCrate(g, x, y, w, h) {
+  g.fillStyle = '#1a1020';
+  g.fillRect(x, y, w, h);
+  g.fillStyle = '#a8783e';
+  g.fillRect(x + 1, y + 1, w - 2, h - 2);
+  g.fillStyle = '#6a4520';
+  g.fillRect(x + 1, y + h - 2, w - 2, 1);
+  g.fillRect(x + w - 2, y + 1, 1, h - 2);
+  g.fillStyle = '#e0b870';
+  g.fillRect(x + 1, y + 1, w - 2, 1);
+  g.fillRect(x + 1, y + 1, 1, h - 2);
+  // 內框。
+  g.fillStyle = '#7a5226';
+  g.fillRect(x + 2, y + 2, w - 4, 1);
+  g.fillRect(x + 2, y + h - 3, w - 4, 1);
+  // 橫向木板接縫與四角的鐵釘。
+  g.fillStyle = '#7a5226';
+  for (let py = y + 4; py < y + h - 3; py += 3) g.fillRect(x + 2, py, w - 4, 1);
+  g.fillStyle = '#4a4a52';
+  for (const [px, py] of [[2, 2], [w - 3, 2], [2, h - 3], [w - 3, h - 3]]) g.fillRect(x + px, y + py, 1, 1);
+}
+
+/**
+ * 畫大石球（直徑 14）：左上受光的球體、外框與幾道裂痕。
+ * @param {CanvasRenderingContext2D} g 畫布。
+ * @param {number} x 左上角 x（像素）。
+ * @param {number} y 左上角 y（像素）。
+ * @param {object} pal 牆壁色盤（取圓柱的石色）。
+ */
+function drawBoulder(g, x, y, pal) {
+  const r = 7;
+  const tones = [pal.pillar[0], pal.pillar[1], pal.pillar[2], pal.pillar[3], pal.pillar[4]];
+  for (let py = 0; py < 14; py++) {
+    for (let px = 0; px < 14; px++) {
+      const dx = px - 6.5;
+      const dy = py - 6.5;
+      const d = Math.hypot(dx, dy);
+      if (d > r) continue;
+      if (d > r - 1) {
+        g.fillStyle = pal.outline;
+      } else {
+        // 光從左上照來：越靠左上越亮。
+        const light = (-dx * 0.6 - dy * 0.8) / r;
+        g.fillStyle = tones[Math.max(0, Math.min(4, Math.round(2 - light * 2.4)))];
+      }
+      g.fillRect(x + px, y + py, 1, 1);
+    }
+  }
+  g.fillStyle = pal.pillar[4];
+  g.fillRect(x + 8, y + 4, 1, 2);
+  g.fillRect(x + 9, y + 6, 2, 1);
+  g.fillRect(x + 4, y + 9, 2, 1);
+  g.fillStyle = '#ffffff';
+  g.globalAlpha = 0.35;
+  g.fillRect(x + 4, y + 3, 2, 1);
+  g.globalAlpha = 1;
+}
+
+/**
+ * 畫壁龕（牆面上的深色拱形凹槽，石像放在裡面）。
+ * @param {CanvasRenderingContext2D} g 畫布。
+ * @param {number} x 格子左上角 x（像素）。
+ * @param {number} top 牆面上緣 y（像素）。
+ * @param {number} bottom 牆面下緣 y（像素）。
+ * @param {object} pal 牆壁色盤。
+ */
+function drawNiche(g, x, top, bottom, pal) {
+  const y0 = top + 5;
+  g.fillStyle = pal.outline;
+  g.fillRect(x + 2, y0 + 2, 12, bottom - y0 - 2);
+  g.fillRect(x + 4, y0, 8, 2);
+  g.fillStyle = shade(pal.outline, 0.08);
+  g.fillRect(x + 3, y0 + 2, 10, bottom - y0 - 3);
+  g.fillRect(x + 5, y0 + 1, 6, 1);
+  g.fillStyle = pal.brickHi;
+  g.fillRect(x + 4, y0 - 1, 8, 1);
+  g.fillRect(x + 2, y0 + 1, 2, 1);
+  g.fillRect(x + 12, y0 + 1, 2, 1);
+}
+
+/**
+ * 畫石像（12 × 22）：戴頭盔的騎士雙手握著立在身前的劍，站在台座上。
+ * @param {CanvasRenderingContext2D} g 畫布。
+ * @param {number} x 左上角 x（像素）。
+ * @param {number} y 左上角 y（像素）。
+ * @param {object} pal 牆壁色盤（取圓柱的石色）。
+ */
+function drawStatue(g, x, y, pal) {
+  drawRows(g, x, y, [
+    '....oooo....',
+    '...osssSo...',
+    '...osSSdo...',
+    '...oSDDdo...',
+    '....oSdo....',
+    '.ooossSSdoo.',
+    'osssSSSSSSdo',
+    'osSoSlSSoSdo',
+    'osSoSlSSoSdo',
+    'osdolllloddo',
+    '..osSSlSSdo.',
+    '..osSSlSSdo.',
+    '..osSSlSSdo.',
+    '..osSSlSSdo.',
+    '..osSSlSdDo.',
+    '..osSSSSdDo.',
+    '..osSddSdDo.',
+    '..oooooooo..',
+    'osssssssssso',
+    'oSSSSSSSSSdo',
+    'odddddddddDo',
+    'oooooooooooo',
+  ], { o: pal.outline, s: shade(pal.pillar[0], 0.25), S: pal.pillar[0], l: '#f4f2ea', d: pal.pillar[2], D: pal.pillar[3] });
+}
+
+/**
+ * 畫牆上的戰利品：交叉的兩把斧頭與圓盾。
+ * @param {CanvasRenderingContext2D} g 畫布。
+ * @param {number} x 格子左上角 x（像素）。
+ * @param {number} y 盾牌上緣 y（像素）。
+ */
+function drawTrophy(g, x, y) {
+  // 斧柄：兩條交叉的斜線。
+  for (let k = 0; k < 13; k++) {
+    g.fillStyle = '#5a3a1a';
+    g.fillRect(x + 2 + k, y + k, 1, 1);
+    g.fillRect(x + 14 - k, y + k, 1, 1);
+    g.fillStyle = '#8a5a2a';
+    g.fillRect(x + 3 + k, y + k, 1, 1);
+    g.fillRect(x + 13 - k, y + k, 1, 1);
+  }
+  // 斧頭：左上與右上的半月刃。
+  drawRows(g, x, y - 3, [
+    '.ooo.........ooo.',
+    'ohhmo.......omhho',
+    'ohmmo.......ommho',
+    '.oddo.......oddo.',
+    '..oo.........oo..',
+  ], { o: '#1a1020', h: '#e8ecf2', m: '#a0a4ae', d: '#6a6e78' });
+  // 圓盾。
+  drawRows(g, x + 3, y + 3, [
+    '..ooooooo..',
+    '.oGGGGGGGo.',
+    'oGRRRRRRrGo',
+    'oGRRRYRRrGo',
+    'oGRRYYYRrGo',
+    'oGRRRYRRrGo',
+    'oGrRRRRrrGo',
+    '.oGrrrrrGo.',
+    '..oGGGGGo..',
+    '...ooooo...',
+  ], { o: '#1a1020', G: '#c89a3a', R: '#a83a28', r: '#7a2418', Y: '#f0d070' });
+}
+
+/**
+ * 畫頭骨堆（16 × 10）：三顆頭骨與幾根散落的骨頭。
+ * @param {CanvasRenderingContext2D} g 畫布。
+ * @param {number} x 左上角 x（像素）。
+ * @param {number} y 左上角 y（像素）。
+ */
+function drawSkulls(g, x, y) {
+  const skull = ['.ooooo.', 'oBBBBBo', 'oBBBBbo', 'oeBbebo', 'oBBeBbo', '.obbbo.', '.obob..'];
+  const colors = { o: '#1a1020', B: '#e8e0c8', b: '#b0a68c', e: '#2a1e1e' };
+  // 骨頭。
+  g.fillStyle = '#1a1020';
+  g.fillRect(x, y + 8, 16, 2);
+  g.fillStyle = '#d8d0b8';
+  g.fillRect(x + 1, y + 8, 14, 1);
+  drawRows(g, x, y + 3, skull, colors);
+  drawRows(g, x + 9, y + 3, skull, colors);
+  drawRows(g, x + 4, y - 1, skull, colors);
+}
+
+/**
+ * 畫牆邊的大型擺設（在整層地圖畫完後畫，才能稍微壓到下方的地板）。
+ * @param {CanvasRenderingContext2D} g 畫布。
+ * @param {{kind: string, i: number, j: number}} prop 擺設。
+ * @param {object} pal 牆壁色盤。
+ */
+function drawProp(g, prop, pal) {
+  const x = prop.i * T;
+  const base = (prop.j + 1) * T + 2;
+  if (prop.kind === 'barrel') {
+    groundShadow(g, x + 8, base, 13);
+    drawBarrel(g, x + 2, base - 14);
+  } else if (prop.kind === 'crates') {
+    groundShadow(g, x + 8, base, 16);
+    drawCrate(g, x, base - 10, 12, 10);
+    drawCrate(g, x + 5, base - 18, 9, 8);
+  } else if (prop.kind === 'boulder') {
+    groundShadow(g, x + 8, base, 14);
+    drawBoulder(g, x + 1, base - 14, pal);
+  } else if (prop.kind === 'statue') {
+    drawStatue(g, x + 2, base - 23, pal);
+  } else if (prop.kind === 'trophy') {
+    drawTrophy(g, x - 1, prop.j * T - 4);
+  } else if (prop.kind === 'skulls') {
+    groundShadow(g, x + 8, base, 16);
+    drawSkulls(g, x, base - 10);
+  }
+}
+
+/**
+ * 地板上的小點綴（不影響行走）：骨頭或碎石。
+ * @param {CanvasRenderingContext2D} g 畫布。
+ * @param {number} x 格子左上角 x（像素）。
+ * @param {number} y 格子左上角 y（像素）。
+ * @param {number} r 0～1 的雜湊值（決定種類與位置）。
+ * @param {object} fp 地板色盤。
+ */
+function drawFloorLitter(g, x, y, r, fp) {
+  const ox = x + 3 + Math.floor(r * 70) % 7;
+  const oy = y + 4 + Math.floor(r * 130) % 6;
+  if (r < 0.5) {
+    // 骨頭：中間細、兩端圓的白骨。
+    g.fillStyle = '#1a1020';
+    g.fillRect(ox - 1, oy - 1, 8, 4);
+    g.fillStyle = '#d8d0b8';
+    g.fillRect(ox, oy, 6, 2);
+    g.fillRect(ox - 1, oy - 1, 2, 2);
+    g.fillRect(ox + 5, oy + 1, 2, 2);
+    g.fillStyle = '#a8a08a';
+    g.fillRect(ox + 1, oy + 1, 4, 1);
+  } else {
+    // 碎石：幾顆深淺不同的小石頭。
+    for (const [dx, dy, w] of [[0, 2, 3], [4, 0, 2], [5, 3, 2], [2, 5, 2]]) {
+      g.fillStyle = fp.mortar;
+      g.fillRect(ox + dx, oy + dy + 1, w, 1);
+      g.fillStyle = fp.hi;
+      g.fillRect(ox + dx, oy + dy, w, 1);
+    }
+  }
+}
+
 /** 地城畫面的繪製器。 */
 export class Renderer {
   /**
@@ -92,7 +739,49 @@ export class Renderer {
    */
   buildFloor(world) {
     const f = world.floor;
-    const th = THEMES[AREAS[world.area].theme];
+    const themeName = AREAS[world.area].theme;
+    const th = THEMES[themeName];
+    const pal = wallPalette(th);
+    const fpal = {
+      stone: [th.floor[0], th.floor[1], shade(th.floor[0], 0.06), shade(th.floor[1], -0.05)],
+      hi: shade(th.floor[1], 0.12),
+      lo: shade(th.floor[0], -0.12),
+      mortar: shade(th.floor[0], -0.38),
+    };
+    const hedge = themeName === 'grass';
+    const torches = [];
+    /** 已放置火把、掛旗或大型擺設的牆面格子。 */
+    const decor = [];
+    /** 牆邊的大型擺設（整層畫完後再畫）。 */
+    const props = [];
+    /**
+     * 是否為牆。
+     * @param {number} i 格子 x。
+     * @param {number} j 格子 y。
+     * @returns {boolean} 牆（含地圖外）時為 true。
+     */
+    const solid = (i, j) => !walkable(world.tileAt(i, j));
+    /**
+     * 是否為牆面（下方是地板的牆）。
+     * @param {number} i 格子 x。
+     * @param {number} j 格子 y。
+     * @returns {boolean} 牆面時為 true。
+     */
+    const isFace = (i, j) => solid(i, j) && j + 1 < f.h && !solid(i, j + 1);
+    /**
+     * 是否靠近地板（周圍 8 格有地板），這樣的牆才畫牆頂。
+     * @param {number} i 格子 x。
+     * @param {number} j 格子 y。
+     * @returns {boolean} 靠近地板時為 true。
+     */
+    const near = (i, j) => [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]].some(([dx, dy]) => !solid(i + dx, j + dy));
+    /**
+     * 是否為畫出牆頂的牆（相鄰的牆頂之間不畫外框）。
+     * @param {number} i 格子 x。
+     * @param {number} j 格子 y。
+     * @returns {boolean} 畫出牆頂時為 true。
+     */
+    const isSolidTop = (i, j) => solid(i, j) && !isFace(i, j) && near(i, j);
     const c = document.createElement('canvas');
     c.width = f.w * T;
     c.height = f.h * T;
@@ -106,30 +795,66 @@ export class Renderer {
         const y = j * T;
         if (t === WALL) {
           const below = j + 1 < f.h && walkable(f.tiles[(j + 1) * f.w + i]);
-          const near = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]].some(([dx, dy]) => walkable(world.tileAt(i + dx, j + dy)));
           if (below) {
-            g.fillStyle = th.top;
-            g.fillRect(x, y, T, 5);
-            g.fillStyle = th.face;
-            g.fillRect(x, y + 5, T, T - 5);
-            g.fillStyle = th.line;
-            g.fillRect(x, y + 10, T, 1);
-            g.fillRect(x + (j % 2 ? 4 : 11), y + 5, 1, 5);
-            g.fillRect(x + (j % 2 ? 11 : 4), y + 11, 1, 5);
-          } else if (near) {
-            g.fillStyle = th.top;
-            g.fillRect(x, y, T, T);
-            g.fillStyle = th.line;
-            g.fillRect(x, y + T - 1, T, 1);
+            /**
+             * 牆面左右鄰格的種類（決定兩端怎麼收邊）。
+             * @param {number} di -1 左、1 右。
+             * @returns {string} 'face'、'top' 或 'void'。
+             */
+            const endKind = (di) => (isFace(i + di, j) ? 'face' : isSolidTop(i + di, j) ? 'top' : 'void');
+            const wideFace = isFace(i - 1, j) && isFace(i + 1, j);
+            // 長牆中間每隔 5 格立一根圓柱（兩側都要是牆面，不和兩端的圓柱擠在一起）。
+            const mid = !hedge && wideFace && isFace(i - 2, j) && isFace(i + 2, j) && i % 5 === 0;
+            drawWallFace(g, i, j, pal, hedge, { left: endKind(-1), right: endKind(1), mid, rise: j > 0 && solid(i, j - 1) ? 8 : 0 });
+            // 牆面點綴：間隔放置火把（另外每幀畫火焰與光暈）或掛旗；兩側都要是牆面、且不是圓柱的位置才放。
+            const r = hash(i + 101, j + 57);
+            // 火把、掛旗與擺設彼此至少間隔 2 格。
+            const spaced = !decor.some((d) => d.j === j && Math.abs(d.i - i) < 2);
+            if (!hedge && wideFace && !mid && spaced && r < 0.16) {
+              torches.push({ i, j });
+              decor.push({ i, j });
+            } else if (wideFace && !mid && spaced && r >= 0.16 && r < 0.55) {
+              // 大型擺設：依區域挑種類；石像先在牆面挖出壁龕。
+              const list = PROPS[themeName] || PROPS.default;
+              const kind = list[Math.floor(hash(i + 7, j + 311) * list.length)];
+              if (kind === 'statue') drawNiche(g, x, j * T - (j > 0 && solid(i, j - 1) ? 8 : 0), (j + 1) * T, pal);
+              props.push({ kind, i, j });
+              decor.push({ i, j });
+            } else if (!hedge && wideFace && !mid && spaced && r > 0.9) {
+              drawBanner(g, x, y, th, pal);
+              decor.push({ i, j });
+            }
+            if (torches.length && torches[torches.length - 1].i === i && torches[torches.length - 1].j === j) {
+              g.fillStyle = '#3a2a1a';
+              g.fillRect(x + 7, y + 8, 2, 5);
+              g.fillStyle = '#8a8a92';
+              g.fillRect(x + 6, y + 7, 4, 2);
+              g.fillStyle = '#5a5a62';
+              g.fillRect(x + 6, y + 12, 4, 1);
+            }
+          } else if (near(i, j)) {
+            drawWallTop(g, i, j, pal, {
+              up: !isSolidTop(i, j - 1),
+              down: !isSolidTop(i, j + 1) && !isFace(i, j + 1),
+              left: !isSolidTop(i - 1, j) && !isFace(i - 1, j),
+              right: !isSolidTop(i + 1, j) && !isFace(i + 1, j),
+            });
           }
           continue;
         }
-        g.fillStyle = th.floor[(i + j) % 2];
-        g.fillRect(x, y, T, T);
+        if (hedge) {
+          g.fillStyle = th.floor[(i + j) % 2];
+          g.fillRect(x, y, T, T);
+        } else {
+          drawFloorStones(g, i, j, th, fpal);
+        }
         const r = hash(i, j);
         g.fillStyle = th.speck;
         if (r < 0.35) g.fillRect(x + Math.floor(r * 40) % 13 + 1, y + Math.floor(r * 97) % 13 + 1, 2, 1);
         if (r > 0.8) g.fillRect(x + Math.floor(r * 53) % 12 + 2, y + Math.floor(r * 71) % 12 + 2, 1, 2);
+        // 少數地板有骨頭或碎石（樓梯與陷阱除外，只是裝飾，不影響行走）。
+        const lr = hash(i + 503, j + 71);
+        if (!hedge && t !== STAIRS && t !== SPIKES && lr < 0.035) drawFloorLitter(g, x, y, lr / 0.035, fpal);
         if (t === STAIRS) {
           g.fillStyle = '#0b0710';
           g.fillRect(x + 1, y + 1, T - 2, T - 2);
@@ -138,14 +863,18 @@ export class Renderer {
           g.fillStyle = '#e8b84a';
           g.fillRect(x + 1, y + 1, T - 2, 1);
         }
-        // 樓梯與地刺以外的格子，若上方是牆，畫一條陰影增加立體感。
+        // 樓梯與地刺以外的格子，若上方或左右是牆，畫一條陰影增加立體感（左右較淡，轉角才不會突兀）。
         if (j > 0 && f.tiles[(j - 1) * f.w + i] === WALL) {
           g.fillStyle = 'rgba(0,0,0,0.25)';
           g.fillRect(x, y, T, 3);
         }
+        g.fillStyle = 'rgba(0,0,0,0.18)';
+        if (solid(i - 1, j)) g.fillRect(x, y, 2, T);
+        if (solid(i + 1, j)) g.fillRect(x + T - 1, y, 1, T);
       }
     }
-    this.floorCache = { canvas: c, floor: f };
+    for (const prop of props) drawProp(g, prop, pal);
+    this.floorCache = { canvas: c, floor: f, torches: themeName === 'sky' ? [] : torches, props };
   }
 
   /**
@@ -208,33 +937,40 @@ export class Renderer {
   }
 
   /**
-   * 畫會變化的格子：地刺（升起時為尖刺，降下時為小孔）。
+   * 畫會變化的格子：地刺（升起時為尖刺，降下時為小孔）與牆上火把（閃爍的火焰與光暈）。
    * @param {object} world 探險。
    */
   drawDynamicTiles(world) {
     const g = this.ctx;
     const f = world.floor;
     const v = this.visible();
+    for (const tc of this.floorCache.torches) {
+      if (tc.i < v.i0 || tc.i > v.i1 || tc.j < v.j0 || tc.j > v.j1) continue;
+      const x = tc.i * T;
+      const y = tc.j * T;
+      const flick = Math.floor(world.time * 8 + tc.i * 3) % 3;
+      g.fillStyle = `rgba(255,170,70,${0.1 + flick * 0.025})`;
+      g.beginPath();
+      g.arc(x + 8, y + 6, 13 + flick, 0, Math.PI * 2);
+      g.fill();
+      g.fillStyle = 'rgba(255,200,110,0.16)';
+      g.beginPath();
+      g.arc(x + 8, y + 6, 6, 0, Math.PI * 2);
+      g.fill();
+      g.fillStyle = '#e8541c';
+      g.fillRect(x + 6, y + 4 - (flick === 1 ? 1 : 0), 4, 3 + (flick === 1 ? 1 : 0));
+      g.fillStyle = '#ffb030';
+      g.fillRect(x + 7 - (flick === 2 ? 1 : 0), y + 3, 2, 3);
+      g.fillStyle = '#fff2b0';
+      g.fillRect(x + 7, y + 5, 1 + (flick === 0 ? 1 : 0), 1);
+    }
     const up = world.spikesUp();
     for (let j = Math.max(0, v.j0); j < Math.min(f.h, v.j1); j++) {
       for (let i = Math.max(0, v.i0); i < Math.min(f.w, v.i1); i++) {
         if (f.tiles[j * f.w + i] !== SPIKES) continue;
         const x = i * T;
         const y = j * T;
-        g.fillStyle = '#1a1414';
-        g.fillRect(x + 1, y + 1, T - 2, T - 2);
-        g.fillStyle = '#5a4a4a';
-        g.fillRect(x + 1, y + 1, T - 2, 1);
-        for (const [dx, dy] of [[3, 4], [10, 4], [3, 11], [10, 11], [6.5, 7.5]]) {
-          if (up) {
-            g.fillStyle = '#d8dce4';
-            g.fillRect(x + dx + 1, y + dy - 3, 1, 4);
-            g.fillRect(x + dx, y + dy, 3, 1);
-          } else {
-            g.fillStyle = '#6a6a72';
-            g.fillRect(x + dx + 0.5, y + dy, 2, 1);
-          }
-        }
+        drawSpikeTrap(g, x, y, up);
       }
     }
   }
@@ -442,7 +1178,17 @@ export class Renderer {
     const g = this.ctx;
     for (const c of world.chests) {
       const img = itemArt(c.opened ? 'chestOpen' : 'chest');
-      g.drawImage(img, Math.round(c.x * T - img.width / 2), Math.round(c.y * T - img.height / 2));
+      const x = Math.round(c.x * T - img.width / 2);
+      const y = Math.round(c.y * T - img.height / 2);
+      // 地上的影子；還沒開的寶箱偶爾閃一下金光。
+      g.fillStyle = 'rgba(0,0,0,0.35)';
+      g.fillRect(x + 1, y + img.height - 1, img.width, 2);
+      g.drawImage(img, x, y);
+      if (!c.opened && Math.floor(world.time * 3 + c.x * 7) % 6 === 0) {
+        g.fillStyle = '#fff6c8';
+        g.fillRect(x + img.width - 3, y - 2, 1, 5);
+        g.fillRect(x + img.width - 5, y, 5, 1);
+      }
     }
     for (const it of world.pickups) {
       const bob = Math.round(Math.sin(world.time * 5 + it.x) * 1);
