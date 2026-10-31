@@ -18,6 +18,7 @@ const KEYS = {
   stats: 'pocketdungeon.stats',
   areaStats: 'pocketdungeon.areaStats',
   settings: 'pocketdungeon.settings',
+  tips: 'pocketdungeon.tips',
 };
 
 /** IndexedDB 無法使用時的記憶體備援：{characters: Map, run: Map, meta: Map}。 */
@@ -576,6 +577,23 @@ export function loadSettings() {
   if (['system', 'light', 'dark'].includes(data.theme)) out.theme = data.theme;
   for (const k of ['tapMove', 'aimAssist', 'saver', 'shake', 'minimap', 'refillPrompt']) if (typeof data[k] === 'boolean') out[k] = data[k];
   return out;
+}
+
+/**
+ * 讀取已看過的新手提示（所有角色共用）。
+ * @returns {string[]} 提示代碼。
+ */
+export function loadTips() {
+  const data = readJson(KEYS.tips);
+  return Array.isArray(data) ? data.filter((k) => typeof k === 'string') : [];
+}
+
+/**
+ * 寫入已看過的新手提示。
+ * @param {string[]} tips 提示代碼。
+ */
+export function saveTips(tips) {
+  writeJson(KEYS.tips, tips);
 }
 
 /**

@@ -3891,3 +3891,41 @@ button:focus-visible {
 .bulk-grid .inv-cell {
   pointer-events: none;
 }
+
+/* 新手提示與倉庫道具說明：上方的圖示與標題。 */
+.tip-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.tip-head .inv-cell,
+.tip-head .gem-cell {
+  flex: 0 0 auto;
+  width: 48px;
+  pointer-events: none;
+}
+
+/* 新手提示說明中的格子：發光外框提醒玩家點這裡。 */
+.tip-focus {
+  position: relative;
+  z-index: 1;
+  animation: tip-pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes tip-pulse {
+  from {
+    box-shadow: 0 0 0 2px #ffd34d, 0 0 6px 2px rgba(255, 211, 77, 0.5);
+  }
+  to {
+    box-shadow: 0 0 0 3px #ffd34d, 0 0 14px 5px rgba(255, 211, 77, 0.8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tip-focus {
+    animation: none;
+    box-shadow: 0 0 0 3px #ffd34d;
+  }
+}
