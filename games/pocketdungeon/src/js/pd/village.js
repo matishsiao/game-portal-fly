@@ -410,19 +410,46 @@ export function progressTicketTier(ch) {
 }
 
 /**
- * 購買 1 張入場卷（只賣已解鎖區域用得到的等級）。
- * @param {object} ch 角色（會被修改）。
- * @param {number} tier 等級（1～5）。
- * @returns {{ok: boolean, message: string}} 結果。
+ * 本地時間的日期代碼（入場卷每日限購用）。
+ * @param {Date} [now=new Date()] 時間。
+ * @returns {string} 例如「2026-10-31」。
  */
-export function buyTicket(ch, tier) {
+export function localDay(now = new Date()) {
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+}
+
+/**
+ * 今天商店還能買幾張這個等級的入場卷（每個角色每種等級每天限購 TICKET.shopDaily 張，隔天重置）。
+ * @param {object} ch 角色。
+ * @param {number} tier 等級（1～5）。
+ * @param {string} [day=localDay()] 日期代碼。
+ * @returns {number} 剩餘張數。
+ */
+export function ticketShopLeft(ch, tier, day = localDay()) {
+  const rec = ch.ticketBuy;
+  const bought = rec && rec.day === day && rec.tiers ? Number(rec.tiers[String(tier)]) || 0 : 0;
+  return Math.max(0, TICKET.shopDaily - bought);
+}
+
+/**
+ * 購買 1 張入場卷（只賣已解鎖區域用得到的等級；每種等級每天限購，賣完時 soldOut 為 true）。
+ * @param {object} ch 角色（會被修改：金幣、入場卷與今天的購買紀錄 ticketBuy）。
+ * @param {number} tier 等級（1～5）。
+ * @param {string} [day=localDay()] 日期代碼。
+ * @returns {{ok: boolean, message: string, soldOut?: boolean}} 結果。
+ */
+export function buyTicket(ch, tier, day = localDay()) {
   const price = TICKET.price[tier - 1];
   if (!price || tier > progressTicketTier(ch)) return { ok: false, message: '還沒有用得到這種入場卷的區域' };
+  if (ticketShopLeft(ch, tier, day) <= 0) return { ok: false, soldOut: true, message: `今天的${TICKET.names[tier - 1]}已經賣完，到學習遊戲過關拿獎勵禮包，禮包裡有入場卷` };
   if (ticketCount(ch, tier) >= TICKET.max) return { ok: false, message: `${TICKET.names[tier - 1]}最多持有 ${TICKET.max} 張` };
   if (ch.gold < price) return { ok: false, message: `金幣不足（需要 ${price}G）` };
   ch.gold -= price;
   addTickets(ch, tier, 1);
-  return { ok: true, message: `買下${TICKET.names[tier - 1]}（持有 ${ticketCount(ch, tier)} 張）` };
+  if (!ch.ticketBuy || ch.ticketBuy.day !== day || !ch.ticketBuy.tiers) ch.ticketBuy = { day, tiers: {} };
+  ch.ticketBuy.tiers[String(tier)] = (Number(ch.ticketBuy.tiers[String(tier)]) || 0) + 1;
+  const left = ticketShopLeft(ch, tier, day);
+  return { ok: true, message: `買下${TICKET.names[tier - 1]}（持有 ${ticketCount(ch, tier)} 張，${left ? `今天還能買 ${left} 張` : '今天的已賣完'}）` };
 }
 
 /**

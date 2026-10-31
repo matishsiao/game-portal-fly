@@ -3,7 +3,7 @@
 //
 // 座標單位為「格」，(x, y) 為實體中心；地圖格子 (i, j) 的範圍為 [i, i + 1) × [j, j + 1)。
 
-import { CLASSES, MONSTERS, BOSSES, LIMITS, BOSS_HEAL, EVOLVE, REBIRTH, STATUS, STATUS_BOSS, STATUS_REPEAT, GEMS, GEM_RULES, DIFFICULTY, CRAFT, BAG_EXPAND, CRIT_MULT, SKILL_BOOK, MAT_DROP, MATERIALS } from './data.js';
+import { CLASSES, MONSTERS, BOSSES, LIMITS, BOSS_HEAL, EVOLVE, REBIRTH, STATUS, STATUS_BOSS, STATUS_REPEAT, AUTO_SHIELD_HP, GEMS, GEM_RULES, DIFFICULTY, CRAFT, BAG_EXPAND, CRIT_MULT, SKILL_BOOK, MAT_DROP, MATERIALS } from './data.js';
 import { generateFloor, walkable, STAIRS, SPIKES, WALL } from './dungeon.js';
 import {
   characterStats, speedProfile, damage, dungeonLevel, monsterStats, killReward, rollRarity, rarityWeights, makeItem, gainXp, sellPrice, rollGem, gemName, pick,
@@ -593,6 +593,7 @@ export class World {
     if (input.cure) this.useCure();
     if (input.gem1) this.useActive(0);
     if (input.gem2) this.useActive(1);
+    if (this.autoGem) this.autoActives();
     this.updateVolley(dt);
     if (asleep || stunned) return;
     for (let k = 0; k < this.skills.length; k++) if (input[`skill${k + 1}`]) this.useSkill(k);
@@ -757,6 +758,22 @@ export class World {
     this.effect('levelup', p.x, p.y, { text: g.label });
     this.events.push({ type: 'active', kind });
     return true;
+  }
+
+  /**
+   * 自動使用主動寶石（設定「自動使用護盾」開啟時）：HP 低於 50% 且沒有護盾時展開血量護盾；
+   * 身上有異常狀態且不在抗異常護盾中時展開抗異常護盾（會一併解除異常）。冷卻中不使用。
+   */
+  autoActives() {
+    const p = this.player;
+    if (p.hp <= 0) return;
+    const st = p.status;
+    for (let i = 0; i < 2; i++) {
+      const kind = p.actives[i];
+      if (!kind || p.gemCd[i] > 0) continue;
+      if (kind === 'shield' && p.shield <= 0 && p.hp < p.maxHp * AUTO_SHIELD_HP) this.useActive(i);
+      else if (kind === 'ward' && p.wardT <= 0 && (st.poison > 0 || st.sleep > 0 || st.stun > 0)) this.useActive(i);
+    }
   }
 
   /**

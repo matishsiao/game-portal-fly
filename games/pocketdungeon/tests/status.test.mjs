@@ -350,6 +350,30 @@ test('主動寶石：血量護盾吸收傷害（25%、10 秒）、抗異常護�
   assert.equal(w.useActive(0), true, '60 秒後可再使用');
 });
 
+test('自動使用護盾：開啟時 HP 低於 50% 自動開血量護盾、中異常自動開抗異常護盾；關閉時不自動使用', () => {
+  const ch = hero('warrior');
+  ch.equipped.armor = { ...makeItem({ slot: 'armor', level: 5, rarity: 3 }, seededRng(3)), gems: ['shield-1', 'ward-1'] };
+  const off = arena(ch);
+  off.player.hp = Math.floor(off.player.maxHp * 0.4);
+  off.applyStatus(off.player, 'poison');
+  off.update(DT, IDLE);
+  assert.equal(off.player.shield, 0, '關閉時不自動使用');
+  assert.ok(off.player.wardT <= 0);
+  const w = arena(ch);
+  w.autoGem = true;
+  const p = w.player;
+  w.update(DT, IDLE);
+  assert.equal(p.shield, 0, 'HP 充足時不使用');
+  p.hp = Math.floor(p.maxHp * 0.4);
+  w.update(DT, IDLE);
+  assert.equal(p.shield, Math.round(p.maxHp * 0.25), 'HP 低於 50% 自動開血量護盾');
+  assert.ok(p.wardT <= 0, '沒有異常時不開抗異常護盾');
+  w.applyStatus(p, 'stun');
+  w.update(DT, IDLE);
+  assert.ok(p.wardT > 0, '中異常自動開抗異常護盾');
+  assert.equal(w.playerAfflicted(), false, '並解除異常');
+});
+
 test('吸血：寶石最多 15%，嗜血技能另外疊加；每秒最多回復 2%（嗜血中 4%）最大 HP', () => {
   const ch = hero('warrior');
   ch.equipped.armor = { ...makeItem({ slot: 'armor', level: 5, rarity: 3 }, seededRng(3)), gems: ['leech-5'] };
@@ -889,6 +913,26 @@ test('地城撿到回復藥水：身上帶滿 10 瓶時放進村莊庫存，庫�
   drop();
   assert.equal(ch.potions, LIMITS.potionHold);
   assert.equal(ch.gold - gold, LIMITS.potionPrice / 2);
+});
+
+test('入場卷商店每種等級每天限購 1 張：賣完後不能再買，隔天重置；不同等級分開計算', () => {
+  const ch = newCharacter('warrior', '測試');
+  ch.unlocked.medium = 1;
+  ch.gold = 5000;
+  const day = '2026-10-31';
+  assert.equal(v.ticketShopLeft(ch, 1, day), TICKET.shopDaily);
+  assert.ok(v.buyTicket(ch, 1, day).ok);
+  assert.equal(v.ticketShopLeft(ch, 1, day), 0);
+  const r = v.buyTicket(ch, 1, day);
+  assert.equal(r.ok, false);
+  assert.equal(r.soldOut, true);
+  assert.match(r.message, /學習遊戲/);
+  assert.equal(ch.gold, 5000 - TICKET.price[0], '賣完時不扣錢');
+  assert.ok(v.buyTicket(ch, 2, day).ok, '銀卷另外計算');
+  assert.equal(v.ticketShopLeft(ch, 1, '2026-11-01'), TICKET.shopDaily, '隔天重置');
+  assert.ok(v.buyTicket(ch, 1, '2026-11-01').ok);
+  assert.equal(v.ticketShopLeft(ch, 2, '2026-11-01'), TICKET.shopDaily);
+  assert.equal(v.localDay(new Date(2026, 0, 5)), '2026-01-05');
 });
 
 test('入場卷：新角色 5 張銅卷；出發用掉 1 張該區域等級的卷；商店只賣用得到的等級；沒有卷就不能出發（沒有免費入場）', () => {

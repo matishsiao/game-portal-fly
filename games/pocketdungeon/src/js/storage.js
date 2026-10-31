@@ -565,17 +565,17 @@ export function resetStats() {
 }
 
 /** 預設設定。 */
-const DEFAULT_SETTINGS = { theme: 'system', tapMove: false, aimAssist: true, saver: false, shake: true, minimap: true, refillPrompt: true };
+const DEFAULT_SETTINGS = { theme: 'system', tapMove: false, aimAssist: true, saver: false, shake: true, minimap: true, refillPrompt: true, autoGem: true };
 
 /**
  * 讀取設定。
- * @returns {{theme: string, tapMove: boolean, aimAssist: boolean, saver: boolean, shake: boolean, minimap: boolean, refillPrompt: boolean}} 設定。
+ * @returns {{theme: string, tapMove: boolean, aimAssist: boolean, saver: boolean, shake: boolean, minimap: boolean, refillPrompt: boolean, autoGem: boolean}} 設定。
  */
 export function loadSettings() {
   const data = readJson(KEYS.settings) || {};
   const out = { ...DEFAULT_SETTINGS };
   if (['system', 'light', 'dark'].includes(data.theme)) out.theme = data.theme;
-  for (const k of ['tapMove', 'aimAssist', 'saver', 'shake', 'minimap', 'refillPrompt']) if (typeof data[k] === 'boolean') out[k] = data[k];
+  for (const k of ['tapMove', 'aimAssist', 'saver', 'shake', 'minimap', 'refillPrompt', 'autoGem']) if (typeof data[k] === 'boolean') out[k] = data[k];
   return out;
 }
 

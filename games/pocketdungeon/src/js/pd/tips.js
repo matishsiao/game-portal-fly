@@ -1,7 +1,8 @@
 // 新手提示：第一次在倉庫看到某類道具、第一次有技能點或新技能時說明用途，
 // 每種提示只顯示一次（所有角色共用已看過的紀錄）。
 
-import { LIMITS, GIFT, CRAFT, BAG_EXPAND } from './data.js';
+import { LIMITS, GIFT, CRAFT, BAG_EXPAND, GEMS } from './data.js';
+import { parseGem } from './rules.js';
 import { SKILLS, classSkills, learnedBooks, skillLevel, skillPoints } from './skills.js';
 
 /**
@@ -24,6 +25,16 @@ function idleSkills(ch) {
 }
 
 /**
+ * 身上裝備鑲嵌的主動寶石種類（血量護盾、抗異常護盾）。
+ * @param {object} ch 角色。
+ * @returns {string[]} 寶石種類（不重複）。
+ */
+function activeGems(ch) {
+  const kinds = Object.values(ch.equipped || {}).filter(Boolean).flatMap((it) => (it.gems || []).map((k) => parseGem(k)).filter((g) => g && GEMS[g.kind].active).map((g) => g.kind));
+  return [...new Set(kinds)];
+}
+
+/**
  * 提示清單（依顯示順序）：
  * id 為已看過紀錄的鍵；has 判斷角色目前是否符合；cell 為倉庫中對應格子代碼的開頭（用來標示格子）；
  * any 為 true 時在村莊任何分頁都會顯示（其他只在倉庫的「個人」頁顯示）；go 為前往其他分頁的按鈕；
@@ -42,6 +53,13 @@ export const TIPS = [
     text: (ch) => `已經可以使用「${idleSkills(ch).map((id) => SKILLS[id].name).join('」「')}」。到「技能」分頁點技能，選「裝到技能 n」裝進技能欄，才能在地城使用。`,
     has: (ch) => idleSkills(ch).length > 0,
     go: { label: '去技能', tab: 'skill' },
+  },
+  {
+    id: 'activegem', icon: 'gem-shield', title: '主動寶石（護盾）', any: true,
+    text: (ch) => `身上的裝備鑲了「${activeGems(ch).map((k) => GEMS[k].label).join('」「')}」。在地城中，護盾按鈕在<b>藥水按鈕的上方</b>（橫向畫面在藥水左邊），按一下展開，冷卻 ${GEMS.shield.cd} 秒。`
+      + `<br>血量護盾：擋下最大 HP ${Math.round(GEMS.shield.pct * 100)}% 的傷害，持續 ${GEMS.shield.dur} 秒；抗異常護盾：解除異常並 ${GEMS.ward.dur} 秒內免疫。`
+      + '<br>設定中的「<b>自動使用護盾</b>」（預設開啟）會在 HP 低於 50% 或中了異常狀態時自動展開，按鈕上顯示「AUTO」；點一下護盾按鈕就改為手動。',
+    has: (ch) => activeGems(ch).length > 0,
   },
   {
     id: 'equip', icon: 'sword', title: '獲得裝備', cell: 'item:',
@@ -74,7 +92,7 @@ export const TIPS = [
   },
   {
     id: 'ticket', icon: 'ticket1', title: '入場卷', cell: 'ticket:',
-    text: '進入地城的每一關要用掉 1 張入場卷，愈難的區域要用愈高級的卷。玩學習遊戲每天可以領，也可以在商店購買。',
+    text: '進入地城的每一關要用掉 1 張入場卷，愈難的區域要用愈高級的卷。玩學習遊戲每天可以領，也可以在商店購買（每種每天限購 1 張）。',
     has: (ch) => any(ch.tickets),
   },
   {

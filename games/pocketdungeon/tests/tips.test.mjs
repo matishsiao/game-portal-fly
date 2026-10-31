@@ -43,3 +43,14 @@ test('升級得到技能點與解鎖新技能時顯示技能提示', () => {
   ch.skills.slots[1] = 'charge';
   assert.ok(!pendingTips(ch, [], false).some((t) => t.id === 'newskill'));
 });
+
+test('身上裝備鑲了主動寶石時顯示護盾使用提示（任何分頁）', () => {
+  const ch = hero();
+  ch.equipped = { armor: { id: 'a', slot: 'armor', gems: ['shield-1'] } };
+  const tip = pendingTips(ch, [], false).find((t) => t.id === 'activegem');
+  assert.ok(tip);
+  assert.match(tipText(tip, ch), /血量護盾/);
+  assert.match(tipText(tip, ch), /自動使用護盾/);
+  ch.equipped.armor.gems = ['atk-1'];
+  assert.ok(!pendingTips(ch, [], false).some((t) => t.id === 'activegem'));
+});

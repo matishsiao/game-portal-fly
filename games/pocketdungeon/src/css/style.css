@@ -1175,14 +1175,8 @@ button:focus-visible {
   transform: scale(0.94);
 }
 
-/* 道具按鈕：右上為主動寶石（血量護盾、抗異常護盾），回復藥水與淨化藥水在技能鍵上方。圓形圖示，冷卻以放射狀遮罩加秒數表示；
+/* 道具按鈕：回復藥水與淨化藥水在技能環上方，主動寶石（血量護盾、抗異常護盾）再往上。圓形圖示，冷卻以放射狀遮罩加秒數表示；
    藥水顯示剩餘數量，護盾生效中右上角倒數剩餘秒數。 */
-.item-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 46px);
-  gap: 8px;
-}
-
 .item-btn {
   --rim: #c8a8ff;
   position: relative;
@@ -1250,6 +1244,24 @@ button:focus-visible {
   font-size: 15px;
 }
 
+/* 地城的藥水與護盾按鈕：圖示往上移，名稱（回復、淨化、護盾、抗異常）放在按鈕內的下緣，和技能鈕相同。 */
+.buttons .item-btn .ico {
+  width: 48%;
+  height: 48%;
+  transform: translateY(-4px);
+}
+
+.buttons .item-btn .btn-label {
+  bottom: 3px;
+  max-width: 38px;
+  padding: 0 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: rgba(10, 4, 16, 0.55);
+  font-size: 8px;
+  line-height: 10px;
+}
+
 .item-btn:active {
   transform: scale(0.92);
 }
@@ -1272,6 +1284,28 @@ button:focus-visible {
   line-height: 20px;
   text-align: center;
   font-variant-numeric: tabular-nums;
+}
+
+/* 自動使用護盾開啟時，護盾按鈕左上角的「AUTO」標籤（右上角留給剩餘秒數）。 */
+.gem-auto {
+  display: none;
+  position: absolute;
+  top: -7px;
+  left: -8px;
+  padding: 0 4px;
+  border-radius: 6px;
+  background: #ffd34d;
+  color: #2a1a04;
+  box-shadow: 0 0 0 1.5px rgba(20, 10, 24, 0.85);
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 12px;
+  letter-spacing: 0.3px;
+}
+
+.gem-btn.auto .gem-auto {
+  display: block;
 }
 
 .gem-dur:empty {
@@ -1554,7 +1588,8 @@ button:focus-visible {
   pointer-events: auto;
 }
 
-/* 藥水在技能環上方、貼著右邊緣直排（回復藥水在下、淨化藥水在上），不論有幾格技能都固定在同一個位置。 */
+/* 藥水在技能 3、4 上方排成一排（右邊回復藥水、左邊淨化藥水），主動寶石（護盾）再往上一排（右邊護盾 1、左邊護盾 2）；
+   不論有幾格技能都固定在同一個位置。橫向高度不足時，護盾改接在藥水左邊同一排（見下方橫向設定）。 */
 .buttons .item-btn {
   position: absolute;
   width: 42px;
@@ -1567,7 +1602,17 @@ button:focus-visible {
 }
 
 #cure-btn {
+  right: 54px;
+  bottom: 176px;
+}
+
+#gem1-btn {
   right: 4px;
+  bottom: 226px;
+}
+
+#gem2-btn {
+  right: 54px;
   bottom: 226px;
 }
 
@@ -1885,18 +1930,23 @@ button:focus-visible {
     grid-row: 2 / span 3;
   }
 
-  #recall-btn,
-  #item-grid {
+  #recall-btn {
     grid-column: 1;
   }
 
-  /* 橫向與直向使用同一個技能環（見上方 .buttons）；高度不足，藥水改為在技能 3、4 上方橫排。 */
+  /* 橫向與直向使用同一個技能環與藥水排（見上方 .buttons）；高度不足，按鈕區縮矮，
+     護盾往上會壓到小地圖，改接在藥水左邊同一排。 */
   .buttons {
     height: 220px;
   }
 
-  #cure-btn {
-    right: 54px;
+  #gem1-btn {
+    right: 104px;
+    bottom: 176px;
+  }
+
+  #gem2-btn {
+    right: 154px;
     bottom: 176px;
   }
 
