@@ -693,9 +693,28 @@ function makeCanvas(w, h) {
 const cache = new Map();
 
 /**
- * 取得角色圖（含受傷閃白的版本）：frames 依序為站立、抬左腳、抬右腳、側面出手、朝下出手、朝上出手。
+ * 拿掉上半身右側（第 12～13 欄）的手臂，身體邊緣補上輪廓線；普攻時由繪製端另外畫出可旋轉的手臂。
+ * @param {string[]} top 上半身各列。
+ * @returns {string[]} 去掉右手臂後的各列。
+ */
+function withoutArm(top) {
+  return top.map((row, i) => {
+    const c = row.split('');
+    if (i >= 10 && i <= 12) {
+      c[12] = c[11] === 'o' ? '.' : 'o';
+      c[13] = '.';
+    } else if (i === 13 && c[11] === 'o' && c[12] === 'o') {
+      c[12] = '.';
+    }
+    return c.join('');
+  });
+}
+
+/**
+ * 取得角色圖（含受傷閃白的版本）：frames 依序為站立、抬左腳、抬右腳、側面出手、朝下出手、朝上出手（技能用），
+ * 以及普攻用的無右手臂正面／背影；palette 供繪製手臂時取色。
  * @param {string} cls 職業。
- * @returns {{frames: HTMLCanvasElement[], flash: HTMLCanvasElement[], scale: number, alpha: number}} 圖。
+ * @returns {{palette: Record<string, string>, frames: HTMLCanvasElement[], flash: HTMLCanvasElement[], scale: number, alpha: number}} 圖。
  */
 export function heroArt(cls) {
   const key = `hero-${cls}`;
@@ -704,7 +723,11 @@ export function heroArt(cls) {
     const legs = cls === 'mage' ? ROBE : LEGS;
     const frames = ['stand', 'left', 'right'].map((k) => b.top.concat(legs[k]));
     for (const pose of [ATTACK_ROWS, ATTACK_DOWN, ATTACK_UP]) frames.push(b.top.map((row, i) => pose[cls][i] || row).concat(legs.stand));
+    // 普攻用的兩幀（6：側面／正面，7：背影）：拿掉右手臂，改由繪製端從肩膀畫出手臂與武器一起揮動。
+    frames.push(withoutArm(b.top).concat(legs.stand));
+    frames.push(b.top.map((row, i) => (ATTACK_UP[cls][i] || row).replace(/^(.{14})s/, '$1.')).concat(legs.stand));
     cache.set(key, {
+      palette: b.palette,
       frames: frames.map((r) => paint(r, b.palette)),
       flash: frames.map((r) => paint(r, b.palette, '#ffffff')),
       scale: 1,

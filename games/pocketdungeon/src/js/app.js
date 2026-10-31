@@ -2187,16 +2187,7 @@ function updateHud(force) {
     set(`skill${n}`, Math.ceil(cd * 10), () => cooldown(`skill${n + 1}`, cd, sk ? sk.cd : 1, Math.ceil(cd)));
   }
   set('dodgeCd', Math.ceil(Math.max(0, p.dodgeCd) * 10), () => cooldown('dodge', p.dodgeCd, 1.2 * (1 - p.pb.dodgeCd / 100), p.dodgeCd.toFixed(1)));
-  const boss = w.boss();
-  set('boss', boss ? `${boss.hp}/${boss.phase2}/${boss.enraged}/${boss.state === 'healing'}` : 'none', () => {
-    $('boss-bar').hidden = !boss;
-    if (boss) {
-      $('boss-name').textContent = `${boss.abyss ? '強化・' : ''}${boss.name}${boss.state === 'healing' ? '（回復中）' : boss.enraged ? '（狂暴）' : boss.phase2 ? '（第二階段）' : ''}`;
-      $('boss-bar').classList.toggle('healing', boss.state === 'healing');
-      $('boss-fill').style.width = `${(boss.hp / boss.maxHp) * 100}%`;
-      $('boss-trail').style.width = `${(boss.hp / boss.maxHp) * 100}%`;
-    }
-  });
+  // Boss 血條畫在 Boss 頭上（Renderer.bossBar），HUD 不另外顯示。
 }
 
 /**
