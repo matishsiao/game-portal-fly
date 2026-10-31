@@ -9,6 +9,7 @@ import { Renderer } from './pd/render.js';
 import { heroDataUrl, itemDataUrl, monsterDataUrl } from './pd/sprites.js';
 import * as village from './pd/village.js';
 import * as skills from './pd/skills.js';
+import { pendingTips, tipText } from './pd/tips.js';
 import { ICONS, PASSIVE_ICONS, fillIcons, skillIcon } from './icons.js';
 
 /** 固定時間步（秒）。 */
@@ -75,6 +76,10 @@ const app = {
   run: null,
   current: null,
   settings: store.loadSettings(),
+  /** 已看過的新手提示（所有角色共用）。 */
+  tipsSeen: store.loadTips(),
+  /** 新手提示正在顯示中（避免重複開啟）。 */
+  tipBusy: false,
   screen: 'home',
   tab: 'gate',
   /** 鐵匠分頁目前的子頁面（craft 製作、enhance 強化）。 */
@@ -461,6 +466,58 @@ function renderVillage() {
     if (node) requestAnimationFrame(() => node.scrollIntoView({ block: 'center' }));
   }
   app.lastTab = app.tab;
+  // 新手提示：等畫面更新後，若沒有其他對話框才顯示。
+  setTimeout(() => showTips(ch), 0);
+}
+
+/**
+ * 依序顯示角色目前符合、但還沒看過的新手提示；每種只顯示一次。
+ * 道具類提示只在倉庫的「個人」頁顯示，技能點與新技能提示在村莊任何分頁都會顯示。
+ * 顯示時標示倉庫中對應的格子；玩家可以「略過全部提示」，或按前往按鈕切換到相關分頁。
+ * @param {object} ch 角色。
+ * @returns {Promise<void>}
+ */
+async function showTips(ch) {
+  if (app.tipBusy || app.screen !== 'village' || !els.modal.hidden || currentChar() !== ch) return;
+  const list = pendingTips(ch, app.tipsSeen, app.tab === 'bag' && app.bagTab === 'mine');
+  if (!list.length) return;
+  app.tipBusy = true;
+  try {
+    for (const [k, tip] of list.entries()) {
+      app.tipsSeen.push(tip.id);
+      store.saveTips(app.tipsSeen);
+      const cells = tip.cell ? [...els.villagePanel.querySelectorAll(`[data-cell^="${tip.cell}"]`)] : [];
+      cells.forEach((c) => c.classList.add('tip-focus'));
+      if (cells[0]) cells[0].scrollIntoView({ block: 'nearest' });
+      const act = await openModal({
+        title: `新手提示${list.length > 1 ? `（${k + 1}／${list.length}）` : ''}`,
+        html: `<div class="tip-head"><span class="inv-cell stack static"><img src="${itemDataUrl(tip.icon)}" alt=""></span><b>${tip.title}</b></div><p>${tipText(tip, ch)}</p>`,
+        actions: [
+          ...(k < list.length - 1 ? [{ label: '略過全部提示', value: 'skip' }] : []),
+          ...(tip.go && app.tab !== tip.go.tab ? [{ label: tip.go.label, value: 'go' }] : []),
+          { label: k < list.length - 1 ? '下一個' : '知道了', value: 'ok', className: 'primary' },
+        ],
+        dismissValue: 'ok',
+      });
+      cells.forEach((c) => c.classList.remove('tip-focus'));
+      if (act === 'skip') {
+        for (const t of list) if (!app.tipsSeen.includes(t.id)) app.tipsSeen.push(t.id);
+        store.saveTips(app.tipsSeen);
+        return;
+      }
+      if (act === 'go') {
+        app.tab = tip.go.tab;
+        window.scrollTo(0, 0);
+        els.villagePanel.scrollTop = 0;
+        // 先結束這一輪，換分頁後的 renderVillage 會再接著顯示其他提示。
+        app.tipBusy = false;
+        renderVillage();
+        return;
+      }
+    }
+  } finally {
+    app.tipBusy = false;
+  }
 }
 
 /**
@@ -868,7 +925,18 @@ function bagPanel(ch) {
   // 子頁面：個人（裝備欄與背包）、共用（所有角色共用的金幣與倉庫）。
   const tabs = [['mine', '個人'], ['shared', `共用 ${app.shared.items.length}／${SHARED_SLOTS}`]].map(([k, name]) => `<button type="button" role="tab" data-bag-tab="${k}" aria-selected="${app.bagTab === k}">${name}</button>`).join('');
   if (app.bagTab === 'shared') return `<div class="sub-tabs" role="tablist">${tabs}</div>${sharedHtml(ch)}`;
+  // 道具：藥水、卷軸、入場卷、擴充袋與寶石，不佔背包格子；點了顯示用途與前往相關分頁。
+  const goods = [
+    ch.potions > 0 ? stackCell('potion', ch.potions, 'potion:', '', '回復藥水') : '',
+    ch.cures > 0 ? stackCell('cure', ch.cures, 'cure:', '', '淨化藥水') : '',
+    ch.scroll > 0 ? stackCell('key', ch.scroll, 'scroll:', '', '回城卷軸') : '',
+    ...TICKET.names.map((name, k) => (village.ticketCount(ch, k + 1) ? stackCell(`ticket${k + 1}`, village.ticketCount(ch, k + 1), `ticket:${k + 1}`, '', name) : '')),
+    ch.bagExpand > 0 ? stackCell('pouch', ch.bagExpand, 'pouch:', '', '背包擴充袋') : '',
+    ...ownedGems(ch).map(([key, n]) => gemCell(key, n, `data-cell="gem:${key}"`)),
+  ].filter(Boolean);
+  const goodsHtml = goods.length ? `<h3>道具 <small class="muted">（不佔背包格子）</small></h3><div class="inv-grid">${goods.join('')}</div>` : '';
   return `<div class="sub-tabs" role="tablist">${tabs}</div><h3>裝備欄 <small class="muted">（點格子查看與卸下）</small></h3>${paperDoll(ch)}
+    ${goodsHtml}
     <div class="bag-head"><h3>背包 <small class="muted">${used}／${limit} 格${limit < BAG_EXPAND.max && !expand ? `・擴充袋最多到 ${BAG_EXPAND.max} 格` : ''}</small></h3>${expand}</div>
     ${ch.bag.length ? `<div class="bag-tools">${ups ? `<span class="up-note"><b>▲</b> ${ups} 件比目前穿的好</span>` : '<span></span>'}<button type="button" class="link-btn" data-bulk="1">一次賣出／分解</button></div>` : ''}
     <div class="inv-grid">${cells.join('')}</div>
@@ -911,6 +979,61 @@ function itemCell(it, key, attr = 'data-cell', up = false) {
  */
 function stackCell(icon, n, key, cls, name) {
   return `<button type="button" class="inv-cell stack ${cls}" data-cell="${key}" aria-label="${name} ×${n}"><img src="${itemDataUrl(icon)}" alt=""><b class="cell-count">${n}</b></button>`;
+}
+
+/**
+ * 點倉庫「道具」區的格子：說明用途，並提供前往相關分頁（寶石→鑲嵌、藥水與卷軸→商店、入場卷→地城）或使用擴充袋。
+ * @param {object} ch 角色。
+ * @param {string} kind 道具種類（potion、cure、scroll、ticket、pouch、gem）。
+ * @param {string} id 入場卷等級或寶石代碼。
+ * @returns {Promise<{r: {ok: boolean, message: string}} | null>} 使用擴充袋的結果；其他為 null。
+ */
+async function openGoodsCell(ch, kind, id) {
+  const info = {
+    potion: ['回復藥水', 'potion', ch.potions, `在地城按藥水按鈕回復 40% HP。每趟最多帶 ${LIMITS.potions} 瓶，商店每瓶 ${LIMITS.potionPrice}G。`, ['去商店購買', 'shop']],
+    cure: ['淨化藥水', 'cure', ch.cures, `解除中毒、睡眠、暈眩（睡著或暈眩時也能喝）。每趟最多帶 ${LIMITS.cures} 瓶，商店每瓶 ${LIMITS.curePrice}G。`, ['去商店購買', 'shop']],
+    scroll: ['回城卷軸', 'key', ch.scroll, `在地城暫停選單使用，帶著這趟的全部所得回到村莊。每趟帶 1 張，商店 ${LIMITS.scrollPrice}G。`, ['去商店購買', 'shop']],
+    pouch: ['背包擴充袋', 'pouch', ch.bagExpand, `使用後背包上限 +${BAG_EXPAND.step} 格（目前 ${village.bagLimit(ch)}／${BAG_EXPAND.max} 格）。`, null],
+  };
+  let title;
+  let html;
+  let go;
+  if (kind === 'gem') {
+    const g = parseGem(id);
+    if (!g) return null;
+    title = `${gemName(id)} ×${ch.gems[id] || 0}`;
+    html = `<div class="tip-head">${gemCell(id, 0, 'disabled')}<b>${gemEffect(id)}</b></div><p>鑲嵌到裝備的寶石孔上才有效果（普通與精良裝備 1 孔、稀有與傳說 2 孔），取下免費、寶石不會損壞。${GEMS[g.kind].active ? '' : `同級 ${GEM_RULES.fuse} 顆可以合成高一級。`}</p>`;
+    go = ['去鑲嵌', 'gem'];
+  } else if (kind === 'ticket') {
+    const t = Number(id);
+    const areas = Object.keys(TICKET.area).filter((a) => TICKET.area[a] === t && AREAS[a]).map((a) => AREAS[a].name).join('、');
+    title = `${TICKET.names[t - 1]} ×${village.ticketCount(ch, t)}`;
+    html = `<div class="tip-head"><span class="inv-cell stack static"><img src="${itemDataUrl(`ticket${t}`)}" alt=""></span><b>進入地城每一關用掉 1 張</b></div><p>用在：${areas || '—'}。玩學習遊戲每天可以領，也可以在商店購買。</p>`;
+    go = ['去地城', 'gate'];
+  } else {
+    const [name, icon, n, text, link] = info[kind];
+    title = `${name} ×${n || 0}`;
+    html = `<div class="tip-head"><span class="inv-cell stack static"><img src="${itemDataUrl(icon)}" alt=""></span><b>${name}</b></div><p>${text}</p>`;
+    go = link;
+  }
+  const full = kind === 'pouch' && village.bagLimit(ch) >= BAG_EXPAND.max;
+  const act = await openModal({
+    title,
+    html,
+    actions: [
+      { label: '關閉', value: null },
+      ...(go ? [{ label: go[0], value: 'go', className: 'primary' }] : []),
+      ...(kind === 'pouch' ? [{ label: full ? '已達上限' : `擴充 +${BAG_EXPAND.step} 格`, value: 'use', className: 'primary', disabled: full }] : []),
+    ],
+  });
+  if (act === 'use') return { r: village.useBagExpand(ch) };
+  if (act === 'go') {
+    app.tab = go[1];
+    window.scrollTo(0, 0);
+    els.villagePanel.scrollTop = 0;
+    renderVillage();
+  }
+  return null;
 }
 
 /**
@@ -1003,6 +1126,7 @@ async function openBagCell(ch, key) {
     }
     return null;
   }
+  if (['potion', 'cure', 'scroll', 'ticket', 'pouch', 'gem'].includes(kind)) return openGoodsCell(ch, kind, id);
   const it = ch.bag.find((i) => i.id === id);
   if (!it) return null;
   const y = village.salvageYield(it);
@@ -2706,13 +2830,24 @@ async function openSettings() {
     ['shake', '畫面震動', '受傷與 Boss 攻擊時震動畫面'],
     ['refillPrompt', '出發前提醒補藥水', '藥水沒有帶滿時，出發前詢問要不要補齊'],
   ];
+  // 本次開啟設定後是否已重設新手提示（按鈕改為「已重設」）。
+  let tipsReset = false;
   for (;;) {
     const v = await openModal({
       title: '設定',
-      menu: items.map(([k, name, desc]) => ({ label: `<span>${name}<small>${desc}</small></span><b class="toggle ${app.settings[k] ? 'on' : ''}">${app.settings[k] ? '開' : '關'}</b>`, value: k, className: 'setting-row' })),
+      menu: [
+        ...items.map(([k, name, desc]) => ({ label: `<span>${name}<small>${desc}</small></span><b class="toggle ${app.settings[k] ? 'on' : ''}">${app.settings[k] ? '開' : '關'}</b>`, value: k, className: 'setting-row' })),
+        { label: `<span>重新顯示新手提示<small>道具、技能的說明再顯示一次</small></span><b class="toggle${tipsReset ? ' on' : ''}">${tipsReset ? '已重設' : '重設'}</b>`, value: 'resetTips', className: 'setting-row' },
+      ],
       actions: [{ label: '完成', value: null, className: 'primary' }],
     });
     if (!v) return;
+    if (v === 'resetTips') {
+      app.tipsSeen = [];
+      store.saveTips(app.tipsSeen);
+      tipsReset = true;
+      continue;
+    }
     app.settings[v] = !app.settings[v];
     store.saveSettings(app.settings);
   }
