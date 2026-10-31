@@ -15,6 +15,7 @@ export const ICONS = {
   dodge: svg('<path d="M4 15c3 0 4-6 8-6s4 4 8 4"/><path d="M4 19c4 0 5-3 8-3"/><circle cx="17" cy="6" r="2" fill="currentColor"/>'),
   potion: svg('<path d="M10 3h4M10.5 3v5L6 15a4 4 0 0 0 3.4 6h5.2A4 4 0 0 0 18 15l-4.5-7V3"/><path d="M7.5 15h9" /><circle cx="11" cy="17.5" r="1" fill="currentColor"/>'),
   scroll: svg('<path d="M6 4h11a2 2 0 0 1 2 2v1h-3"/><path d="M8 4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V9"/><path d="M10 9h5M10 12.5h5M10 16h3"/>'),
+  lock: svg('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/><circle cx="12" cy="16" r="1.3" fill="currentColor"/>'),
   pause: svg('<path d="M9 5v14M15 5v14" stroke-width="3"/>'),
   whirl: svg('<path d="M12 4a8 8 0 1 1-7.5 5.2"/><path d="M4.5 4.5v4.7h4.7"/><path d="M12 9a3 3 0 1 1-2.6 1.5"/>'),
   charge: svg('<path d="M4 6l6 6-6 6M11 6l6 6-6 6"/><path d="M18 5v14"/>'),

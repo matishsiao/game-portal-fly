@@ -1764,19 +1764,35 @@ button:focus-visible {
   opacity: 0.5;
 }
 
+/* 尚未開放的技能欄：保留位置，灰色並顯示鎖頭，不能按。 */
+.skill-btn.locked {
+  --c1: #8a8a90;
+  --c2: #4a4a52;
+  --rim: #5a5a62;
+  color: #2a2a30;
+  filter: grayscale(1);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.skill-btn.locked kbd {
+  display: none;
+}
+
 /* 技能環（手遊 MMO 式）：以右下角的大攻擊鈕為圓心、半徑 97px，從最下方的閃避開始，
-   依序技能 1～4 每隔 30° 往左上繞到攻擊鈕正上方；全部為圓形，名稱放在按鈕內的下緣。
-   拇指放在攻擊鈕上，往左、左上、上移動就按得到。技能 3、4 獲得第 3、4 個技能後才出現。 */
+   依序技能 1～4 每隔 30° 往左上繞到攻擊鈕正上方；全部為 40px 圓形（含外框 46px），
+   相鄰圓心距離約 50px，外框之間留約 4px 不互相蓋到；名稱放在按鈕內的下緣。
+   拇指放在攻擊鈕上，往左、左上、上移動就按得到。技能 3、4 獲得第 3、4 個技能前顯示灰色鎖頭。 */
 .dodge-btn,
 .skill-btn {
-  width: 46px;
-  height: 46px;
+  width: 40px;
+  height: 40px;
   box-shadow:
     inset 0 2px 0 rgba(255, 255, 255, 0.4),
-    inset 0 -4px 6px rgba(0, 0, 0, 0.3),
-    0 0 0 2px rgba(20, 10, 24, 0.85),
-    0 0 0 3.5px var(--rim),
-    0 5px 10px rgba(0, 0, 0, 0.5);
+    inset 0 -3px 5px rgba(0, 0, 0, 0.3),
+    0 0 0 1.5px rgba(20, 10, 24, 0.85),
+    0 0 0 3px var(--rim),
+    0 3px 5px rgba(0, 0, 0, 0.45);
 }
 
 /* 圖示往上移，名稱放在按鈕內的下緣，不會壓到旁邊的按鈕。 */
@@ -1784,39 +1800,39 @@ button:focus-visible {
 .skill-btn .ico {
   width: 50%;
   height: 50%;
-  transform: translateY(-5px);
+  transform: translateY(-4px);
 }
 
 .dodge-btn .btn-label,
 .skill-btn .btn-label {
-  bottom: 4px;
-  max-width: 38px;
-  padding: 0 3px;
+  bottom: 3px;
+  max-width: 34px;
+  padding: 0 2px;
   overflow: hidden;
   text-overflow: ellipsis;
   background: rgba(10, 4, 16, 0.55);
-  font-size: 8.5px;
-  line-height: 11px;
+  font-size: 8px;
+  line-height: 10px;
 }
 
 #skill1-btn {
-  right: 121px;
-  bottom: 52px;
+  right: 124px;
+  bottom: 55px;
 }
 
 #skill2-btn {
-  right: 96px;
-  bottom: 96px;
+  right: 99px;
+  bottom: 99px;
 }
 
 #skill3-btn {
-  right: 52px;
-  bottom: 121px;
+  right: 55px;
+  bottom: 124px;
 }
 
 #skill4-btn {
-  right: 2px;
-  bottom: 121px;
+  right: 5px;
+  bottom: 124px;
 }
 
 .act-btn[hidden] {
@@ -1826,8 +1842,8 @@ button:focus-visible {
 .dodge-btn {
   --c1: #c7adff;
   --c2: #4f2c94;
-  right: 121px;
-  bottom: 2px;
+  right: 124px;
+  bottom: 5px;
 }
 
 /* 橫向：搖桿在左、按鈕在右，操作區佔畫面下方較高的比例。 */
