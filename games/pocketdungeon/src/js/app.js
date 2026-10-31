@@ -2241,16 +2241,36 @@ function updateHud(force) {
     const cd = sk ? Math.max(0, p.skillCd[n]) : 0;
     set(`skillId${n}`, sk ? sk.id : n < w.skills.length ? 'none' : 'locked', () => {
       const btn = $(`skill${n + 1}-btn`);
-      // 第 3、4 格在獲得第 3、4 個技能後才出現。
-      btn.hidden = n >= w.skills.length;
-      btn.classList.toggle('empty', !sk);
-      $(`skill${n + 1}-icon`).innerHTML = sk ? skillIcon(sk.id, sk.kind) : '';
-      $(`skill${n + 1}-name`).textContent = sk ? sk.short : '未裝備';
+      // 第 3、4 格在獲得第 3、4 個技能前仍保留位置，顯示灰色與鎖頭，下緣標出解鎖條件。
+      const locked = n >= w.skills.length;
+      btn.classList.toggle('locked', locked);
+      btn.classList.toggle('empty', !sk && !locked);
+      btn.disabled = locked;
+      btn.setAttribute('aria-label', locked ? `技能 ${n + 1}（未解鎖）` : `技能 ${n + 1}`);
+      $(`skill${n + 1}-icon`).innerHTML = sk ? skillIcon(sk.id, sk.kind) : locked ? ICONS.lock : '';
+      $(`skill${n + 1}-name`).textContent = sk ? sk.short : locked ? slotUnlockLabel(ch, n) : '未裝備';
     });
     set(`skill${n}`, Math.ceil(cd * 10), () => cooldown(`skill${n + 1}`, cd, sk ? sk.cd : 1, Math.ceil(cd)));
   }
   set('dodgeCd', Math.ceil(Math.max(0, p.dodgeCd) * 10), () => cooldown('dodge', p.dodgeCd, 1.2 * (1 - p.pb.dodgeCd / 100), p.dodgeCd.toFixed(1)));
   // Boss 血條畫在 Boss 頭上（Renderer.bossBar），HUD 不另外顯示。
+}
+
+/**
+ * 未開放技能欄的解鎖提示：第 n 格在獲得第 n+1 個主動技能時開放，
+ * 依職業尚未解鎖的基本技能（依等級排序）推算需要的等級；沒有可推算的就顯示「未解鎖」。
+ * @param {object} ch 角色。
+ * @param {number} n 技能欄索引（0 起算）。
+ * @returns {string} 例如「Lv.12」。
+ */
+function slotUnlockLabel(ch, n) {
+  if (!ch) return '未解鎖';
+  const waiting = skills.classSkills(ch.cls)
+    .filter((id) => !skills.SKILLS[id].rebirth && skills.skillLevel(ch, id) === 0)
+    .map((id) => skills.SKILLS[id].unlock)
+    .sort((a, b) => a - b);
+  const lv = waiting[n - skills.ownedSkillCount(ch)];
+  return lv ? `Lv.${lv}` : '未解鎖';
 }
 
 /**
