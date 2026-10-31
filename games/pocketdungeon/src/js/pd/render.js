@@ -25,6 +25,12 @@ const THEMES = {
 };
 
 /**
+ * 各色調的環境暗度（光照層的黑色不透明度）：戶外的草原、天空、沙漠較亮，地下的遺跡、墓地、深淵較暗。
+ * 火把、角色、寶箱、傳送門與發光的招式會在暗處照出亮區。
+ */
+const AMBIENT = { grass: 0.16, sky: 0.06, desert: 0.22, sea: 0.4, moss: 0.5, lava: 0.42, ice: 0.42, necro: 0.6, clock: 0.5, dragon: 0.5, demon: 0.58, abyss: 0.62 };
+
+/**
  * 以格子座標計算固定的雜湊值（地板花紋用）。
  * @param {number} i 格子 x。
  * @param {number} j 格子 y。
@@ -878,8 +884,12 @@ export class Renderer {
         }
         // 樓梯與地刺以外的格子，若上方或左右是牆，畫一條陰影增加立體感（左右較淡，轉角才不會突兀）。
         if (j > 0 && f.tiles[(j - 1) * f.w + i] === WALL) {
-          g.fillStyle = 'rgba(0,0,0,0.25)';
-          g.fillRect(x, y, T, 3);
+          // 牆腳投下的陰影：靠牆最深，往下 7 像素逐漸變淡。
+          const sh = g.createLinearGradient(0, y, 0, y + 7);
+          sh.addColorStop(0, 'rgba(0,0,0,0.42)');
+          sh.addColorStop(1, 'rgba(0,0,0,0)');
+          g.fillStyle = sh;
+          g.fillRect(x, y, T, 7);
         }
         g.fillStyle = 'rgba(0,0,0,0.18)';
         if (solid(i - 1, j)) g.fillRect(x, y, 2, T);
@@ -932,6 +942,7 @@ export class Renderer {
     this.drawEntities(world);
     this.drawProjectiles(world);
     this.drawEffects(world);
+    this.drawLighting(world);
     this.drawFog(world);
     if (this.frame % 6 === 0) this.drawMinimap(world);
   }
@@ -950,7 +961,7 @@ export class Renderer {
   }
 
   /**
-   * 畫會變化的格子：地刺（升起時為尖刺，降下時為小孔）與牆上火把（閃爍的火焰與光暈）。
+   * 畫會變化的格子：地刺（升起時為尖刺，降下時為小孔）與牆上火把的閃爍火焰。
    * @param {object} world 探險。
    */
   drawDynamicTiles(world) {
@@ -961,15 +972,8 @@ export class Renderer {
       if (tc.i < v.i0 || tc.i > v.i1 || tc.j < v.j0 || tc.j > v.j1) continue;
       const x = tc.i * T;
       const y = tc.j * T;
+      // 光暈由光影（drawLighting）負責，這裡只畫閃爍的火焰。
       const flick = Math.floor(world.time * 8 + tc.i * 3) % 3;
-      g.fillStyle = `rgba(255,170,70,${0.1 + flick * 0.025})`;
-      g.beginPath();
-      g.arc(x + 8, y + 6, 13 + flick, 0, Math.PI * 2);
-      g.fill();
-      g.fillStyle = 'rgba(255,200,110,0.16)';
-      g.beginPath();
-      g.arc(x + 8, y + 6, 6, 0, Math.PI * 2);
-      g.fill();
       g.fillStyle = '#e8541c';
       g.fillRect(x + 6, y + 4 - (flick === 1 ? 1 : 0), 4, 3 + (flick === 1 ? 1 : 0));
       g.fillStyle = '#ffb030';
@@ -1944,27 +1948,108 @@ export class Renderer {
   }
 
   /**
-   * 戰爭迷霧：未探索的格子全黑，已探索但不在視野內的格子變暗。
+   * 光影：先把畫面依區域色調壓暗（AMBIENT），再從光照層挖出光源照亮的範圍，最後在火把與傳送門周圍疊上暖色光暈。
+   * 光源：玩家（約 4 格）、牆上火把（約 3.5 格並閃爍）、還沒開的寶箱、傳送門、樓梯、發光的投射物與爆炸。
+   * 光照層為半解析度的離屏畫布（貼回時放大並平滑，邊緣自然柔和）。
+   * @param {object} world 探險。
+   */
+  drawLighting(world) {
+    const ambient = AMBIENT[AREAS[world.area].theme] ?? 0.5;
+    if (ambient <= 0) return;
+    const g = this.ctx;
+    const k = 2;
+    const w = Math.ceil(this.viewW / k) + 2;
+    const h = Math.ceil(this.viewH / k) + 2;
+    if (!this.light) {
+      this.light = document.createElement('canvas');
+      this.lctx = this.light.getContext('2d');
+    }
+    if (this.light.width !== w || this.light.height !== h) {
+      this.light.width = w;
+      this.light.height = h;
+    }
+    const l = this.lctx;
+    const { x: cx, y: cy } = this.cam;
+    const t = world.time;
+    const lights = [];
+    const glows = [];
+    /**
+     * 加入一個光源（世界座標，像素）。
+     * @param {number} x 中心 x。
+     * @param {number} y 中心 y。
+     * @param {number} r 半徑（像素）。
+     * @param {number} [a=1] 亮度 0～1。
+     */
+    const add = (x, y, r, a = 1) => {
+      if (x + r < cx || y + r < cy || x - r > cx + this.viewW || y - r > cy + this.viewH) return;
+      lights.push({ x, y, r, a });
+    };
+    const p = world.player;
+    add(p.x * T, p.y * T - 4, 4.2 * T);
+    for (const tc of this.floorCache.torches) {
+      const flick = Math.sin(t * 9 + tc.i * 1.7) * 0.06 + Math.sin(t * 23 + tc.j) * 0.03;
+      const x = tc.i * T + 8;
+      const y = tc.j * T + 10;
+      add(x, y + 6, 3.5 * T * (1 + flick), 0.95);
+      // 暖光往下照在地板上（中心在火把下方），避免把牆後的黑色區域染成橘色。
+      glows.push({ x, y: y + 14, r: 2.6 * T * (1 + flick), c: '255,140,50', a: 0.26 });
+    }
+    for (const c of world.chests) if (!c.opened) add(c.x * T, c.y * T, 1.6 * T, 0.7);
+    const st = world.floor.stairs;
+    if (st) add(st.x * T, st.y * T, 1.8 * T, 0.6);
+    const pt = world.floor.portal;
+    if (world.portalOpen && pt) {
+      add(pt.x * T, pt.y * T, 3 * T, 0.9);
+      glows.push({ x: pt.x * T, y: pt.y * T, r: 2.5 * T, c: '170,130,255', a: 0.22 });
+    }
+    for (const pr of world.projectiles) if (pr.kind !== 'arrow') add(pr.x * T, pr.y * T, 1.4 * T, 0.8);
+    for (const e of world.effects) if (e.kind === 'blast') add(e.x * T, e.y * T, ((e.r || 1) + 1) * T, 0.9 * (1 - e.t / e.life));
+    // 光照層：整片暗色，再以 destination-out 挖出光源。
+    l.globalCompositeOperation = 'source-over';
+    l.clearRect(0, 0, w, h);
+    l.fillStyle = `rgba(8,4,18,${ambient})`;
+    l.fillRect(0, 0, w, h);
+    l.globalCompositeOperation = 'destination-out';
+    for (const li of lights) {
+      const x = (li.x - cx) / k;
+      const y = (li.y - cy) / k;
+      const r = li.r / k;
+      const grad = l.createRadialGradient(x, y, 0, x, y, r);
+      grad.addColorStop(0, `rgba(0,0,0,${li.a})`);
+      grad.addColorStop(0.45, `rgba(0,0,0,${li.a * 0.75})`);
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      l.fillStyle = grad;
+      l.fillRect(x - r, y - r, r * 2, r * 2);
+    }
+    g.save();
+    g.imageSmoothingEnabled = true;
+    g.drawImage(this.light, cx, cy, w * k, h * k);
+    // 暖色光暈：以加亮混合疊在火把與傳送門周圍。
+    g.globalCompositeOperation = 'lighter';
+    for (const gl of glows) {
+      if (gl.x + gl.r < cx || gl.y + gl.r < cy || gl.x - gl.r > cx + this.viewW || gl.y - gl.r > cy + this.viewH) continue;
+      const grad = g.createRadialGradient(gl.x, gl.y, 0, gl.x, gl.y, gl.r);
+      grad.addColorStop(0, `rgba(${gl.c},${gl.a})`);
+      grad.addColorStop(1, `rgba(${gl.c},0)`);
+      g.fillStyle = grad;
+      g.fillRect(gl.x - gl.r, gl.y - gl.r, gl.r * 2, gl.r * 2);
+    }
+    g.restore();
+  }
+
+  /**
+   * 戰爭迷霧：未探索的格子全黑；已探索但離玩家較遠的區域，由光影（drawLighting）的光線衰減自然變暗。
    * @param {object} world 探險。
    */
   drawFog(world) {
     const g = this.ctx;
     const f = world.floor;
     const v = this.visible();
-    const p = world.player;
+    g.fillStyle = '#05030a';
     for (let j = v.j0; j < v.j1; j++) {
       for (let i = v.i0; i < v.i1; i++) {
         const inside = i >= 0 && j >= 0 && i < f.w && j < f.h;
-        if (!inside || !world.explored[j * f.w + i]) {
-          g.fillStyle = '#05030a';
-          g.fillRect(i * T, j * T, T, T);
-          continue;
-        }
-        const d = (i + 0.5 - p.x) ** 2 + (j + 0.5 - p.y) ** 2;
-        if (d > 30 && !f.boss) {
-          g.fillStyle = 'rgba(5,3,10,0.5)';
-          g.fillRect(i * T, j * T, T, T);
-        }
+        if (!inside || !world.explored[j * f.w + i]) g.fillRect(i * T, j * T, T, T);
       }
     }
   }

@@ -790,8 +790,10 @@ export const ITEM_ART = {
   ring: { palette: { o: O, Y: '#e8b84a', R: '#e04a5a', r: '#ff9aa8' }, rows: ['..oo..', '.oRro.', 'oYooYo', 'oY..Yo', 'oYooYo', '.oYYo.', '..oo..'] },
   book: { palette: { o: O, B: '#6a3a8a', b: '#9a6ac8', P: '#f0e6c8', Y: '#e8b84a' }, rows: ['oooooooo', 'oBbBBBPo', 'oBYYBBPo', 'oBBBBBPo', 'oBYYYBPo', 'oBBBBBPo', 'oooooooo'] },
   gift: { palette: { o: O, B: '#c0402a', b: '#e86a4a', Y: '#ffe14d' }, rows: ['..o..o..', '.oYooYo.', 'ooooYooo', 'oBBBYBBo', 'oYYYYYYo', 'oBBBYBBo', 'obBBYBBo', 'oooooooo'] },
-  shard: { palette: { o: O, B: '#1e5a9a', b: '#4a8ae8', P: '#f0e6c8', Y: '#ffe14d' }, rows: ['oooo....', 'oBbBo...', 'oBYBPo..', 'oBBBBPo.', 'oBbBBBo.', '.oooooo.'] },
-  skillbook: { palette: { o: O, B: '#1e5a9a', b: '#4a8ae8', P: '#f0e6c8', Y: '#ffe14d' }, rows: ['oooooooo', 'oBbBBBPo', 'oBBYBBPo', 'oBYYYBPo', 'oBBYBBPo', 'oBBBBBPo', 'oooooooo'] },
+  // 技能書碎片：一張撕下的書頁（右上折角、文字行、藍色符文，下緣是撕破的鋸齒）。
+  shard: { palette: { o: O, P: '#f0e6c8', p: '#c8b48a', L: '#8a7a5a', B: '#1e5a9a', b: '#4a8ae8' }, rows: ['ooooo...', 'oPPPopo.', 'oPLLoppo', 'oPPPPooo', 'oPLLLLPo', 'oPPPPPPo', 'oPLLLLPo', 'oPPPPPPo', 'oPLLbBPo', 'oPPPBBPo', 'opPpPPpo', '.o.oo.o.'] },
+  // 技能書：一本完整的書（左側書脊、藍色封面上的金框與寶石、底部的書頁與紅色書籤）。
+  skillbook: { palette: { o: O, S: '#123a6a', B: '#1e5a9a', b: '#4a8ae8', w: '#c0e0ff', Y: '#ffe14d', P: '#f0e6c8', R: '#c0303a' }, rows: ['.oooooooo', 'oSBBBBBBo', 'oSBYYYYBo', 'oSBYbwYBo', 'oSBYbbYBo', 'oSBYYYYBo', 'oSBBBBBBo', 'oSPPPPPPo', '.ooooRooo', '.....R...'] },
   iron: { palette: { o: O, D: '#5a6070', M: '#8a909e', L: '#c0c6d0' }, rows: ['........', '..ooo...', '.oLMMo..', 'oLMMDDo.', 'oMMDDDDo', '.ooooooo'] },
   steel: { palette: { o: O, D: '#2a7a4a', M: '#4fc078', L: '#a8f0c0' }, rows: ['...oo...', '..oLMo..', '.oLMMDo.', 'oLMMMDDo', 'oMMDDDDo', '.oooooo.'] },
   mithril: { palette: { o: O, D: '#1e4a9a', M: '#4a8ae8', L: '#c0e0ff' }, rows: ['...oo...', '..oLLo..', '.oLMMDo.', 'oLMMMMDo', '.oMMMDo.', '..oDDo..', '...oo...'] },

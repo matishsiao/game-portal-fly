@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { World } from '../src/js/pd/world.js';
 import { seededRng, characterStats, gemBonus, parseGem, socketCount, makeItem, rollGem } from '../src/js/pd/rules.js';
-import { STATUS, GEMS, GEM_RULES, LIMITS, GIFT, BAG_EXPAND, TICKET } from '../src/js/pd/data.js';
+import { STATUS, STATUS_REPEAT, GEMS, GEM_RULES, LIMITS, GIFT, BAG_EXPAND, TICKET } from '../src/js/pd/data.js';
 import * as sk from '../src/js/pd/skills.js';
 import * as v from '../src/js/pd/village.js';
 import { isValidCharacter, newCharacter, loadRewards } from '../src/js/storage.js';
@@ -148,6 +148,40 @@ test('暈眩：不能移動、閃避、攻擊或施放技能，被攻擊也不�
   assert.ok(p.status.stun > 0);
   w.update(DT, { ...IDLE, potion: true });
   assert.ok(p.hp > 50);
+});
+
+test('怪物的異常攻擊：同一種異常 30 秒內再次觸發的機率最多 10%，超過 30 秒恢復原本機率', () => {
+  const w = arena(hero('warrior'));
+  const p = w.player;
+  assert.deepEqual(STATUS_REPEAT, { window: 30, chance: 0.1 });
+  // 以固定的亂數值檢查門檻：0.5 低於原本的 100%，但高於冷卻中的 10%。
+  w.rng = () => 0.5;
+  w.rollStatus(p, ['stun', 1]);
+  assert.ok(p.status.stun > 0);
+  assert.equal(p.statusAt.stun, w.time);
+  p.status.stun = 0;
+  w.time += 10;
+  w.rollStatus(p, ['stun', 1]);
+  assert.equal(p.status.stun, 0, '30 秒內 0.5 不會觸發');
+  // 不同種類的異常各自計算。
+  w.rollStatus(p, ['sleep', 1]);
+  assert.ok(p.status.sleep > 0);
+  p.status.sleep = 0;
+  w.rng = () => 0.05;
+  w.rollStatus(p, ['stun', 1]);
+  assert.ok(p.status.stun > 0, '30 秒內仍有 10% 機率');
+  p.status.stun = 0;
+  w.rng = () => 0.5;
+  w.time += 30;
+  w.rollStatus(p, ['stun', 1]);
+  assert.ok(p.status.stun > 0, '超過 30 秒恢復原本機率');
+  // 怪物身上的異常不受影響。
+  const m = w.spawnMonster('slime', p.x + 3, p.y);
+  w.rollStatus(m, ['stun', 1]);
+  m.stun = 0;
+  m.status.stun = 0;
+  w.rollStatus(m, ['stun', 1]);
+  assert.ok(m.status.stun > 0);
 });
 
 test('淨化藥水解除所有異常狀態；沒有異常時不消耗', () => {

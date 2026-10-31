@@ -331,3 +331,33 @@ test('寶石全部合成：由低到高連續往上合成，金幣不足時停�
   assert.equal(s.fused, 2);
   assert.match(s.message, /金幣不足/);
 });
+
+test('出發前補齊藥水：計算缺額與價格；補到每趟上限為止，金幣不足時先買回復藥水', () => {
+  const ch = hero();
+  ch.potions = LIMITS.potions;
+  ch.cures = LIMITS.cures;
+  assert.deepEqual(v.refillNeed(ch), { potions: 0, cures: 0, cost: 0 });
+  ch.potions = 7;
+  ch.cures = 3;
+  const need = v.refillNeed(ch);
+  assert.deepEqual(need, { potions: LIMITS.potions - 7, cures: LIMITS.cures - 3, cost: (LIMITS.potions - 7) * LIMITS.potionPrice + (LIMITS.cures - 3) * LIMITS.curePrice });
+  ch.gold = need.cost + 5;
+  const r = v.refillPotions(ch);
+  assert.ok(r.ok);
+  assert.equal(ch.potions, LIMITS.potions);
+  assert.equal(ch.cures, LIMITS.cures);
+  assert.equal(ch.gold, 5);
+  assert.equal(r.gold, need.cost);
+  // 持有比每趟上限多時不需要補。
+  ch.potions = 50;
+  assert.equal(v.refillNeed(ch).potions, 0);
+  // 金幣只夠買 2 瓶回復藥水：先補回復藥水，淨化藥水沒買到。
+  ch.potions = 0;
+  ch.cures = 0;
+  ch.gold = LIMITS.potionPrice * 2 + 1;
+  const r2 = v.refillPotions(ch);
+  assert.equal(r2.ok, false);
+  assert.equal(ch.potions, 2);
+  assert.equal(ch.cures, 0);
+  assert.match(r2.message, /金幣不足/);
+});
