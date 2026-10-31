@@ -271,6 +271,12 @@ export const STATUS = {
   stun: { name: '暈眩', dur: 10, playerDur: 5, color: '#ffe14d' },
 };
 
+/**
+ * 怪物對玩家的異常狀態冷卻：同一種異常成功附加後 window 秒內，再次觸發的機率最多只有 chance（避免被連續暈眩）。
+ * 距離上一次超過 window 秒才恢復原本的機率。
+ */
+export const STATUS_REPEAT = { window: 30, chance: 0.1 };
+
 /** Boss 承受睡眠與暈眩的持續時間倍率（中毒另見 STATUS.poison.bossDur）。 */
 export const STATUS_BOSS = 0.3;
 

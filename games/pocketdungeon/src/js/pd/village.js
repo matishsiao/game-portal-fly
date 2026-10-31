@@ -113,6 +113,35 @@ export function buyCure(ch) {
 }
 
 /**
+ * 出發前藥水的缺額：持有量低於每趟攜帶上限時，補齊所需的回復藥水、淨化藥水數量與金幣。
+ * @param {object} ch 角色。
+ * @returns {{potions: number, cures: number, cost: number}} 缺少的瓶數與補齊的價格；都為 0 時代表已補齊。
+ */
+export function refillNeed(ch) {
+  const potions = Math.max(0, LIMITS.potions - ch.potions);
+  const cures = Math.max(0, LIMITS.cures - (ch.cures || 0));
+  return { potions, cures, cost: potions * LIMITS.potionPrice + cures * LIMITS.curePrice };
+}
+
+/**
+ * 補齊藥水到每趟攜帶上限（先買回復藥水，再買淨化藥水）；金幣不夠時買到買不起為止。
+ * @param {object} ch 角色（會被修改）。
+ * @returns {{ok: boolean, potions: number, cures: number, gold: number, message: string}} 實際買到的瓶數與花費；全部補齊時 ok 為 true。
+ */
+export function refillPotions(ch) {
+  const need = refillNeed(ch);
+  const gold0 = ch.gold;
+  let potions = 0;
+  let cures = 0;
+  while (potions < need.potions && buyPotion(ch).ok) potions++;
+  while (cures < need.cures && buyCure(ch).ok) cures++;
+  const ok = potions === need.potions && cures === need.cures;
+  const got = [potions && `回復藥水 ${potions} 瓶`, cures && `淨化藥水 ${cures} 瓶`].filter(Boolean).join('、');
+  const message = ok ? `已補齊藥水（${got}，${gold0 - ch.gold}G）` : got ? `金幣不足，只補了${got}（${gold0 - ch.gold}G）` : '金幣不足，沒有補到藥水';
+  return { ok, potions, cures, gold: gold0 - ch.gold, message };
+}
+
+/**
  * 把寶石放進角色的寶石袋（同種同級疊在一起）。
  * @param {object} ch 角色（會被修改）。
  * @param {string} key 寶石代碼。

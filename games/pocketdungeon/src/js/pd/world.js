@@ -3,7 +3,7 @@
 //
 // 座標單位為「格」，(x, y) 為實體中心；地圖格子 (i, j) 的範圍為 [i, i + 1) × [j, j + 1)。
 
-import { CLASSES, MONSTERS, BOSSES, LIMITS, BOSS_HEAL, EVOLVE, REBIRTH, STATUS, STATUS_BOSS, GEMS, GEM_RULES, DIFFICULTY, CRAFT, BAG_EXPAND, CRIT_MULT, SKILL_BOOK, MAT_DROP, MATERIALS } from './data.js';
+import { CLASSES, MONSTERS, BOSSES, LIMITS, BOSS_HEAL, EVOLVE, REBIRTH, STATUS, STATUS_BOSS, STATUS_REPEAT, GEMS, GEM_RULES, DIFFICULTY, CRAFT, BAG_EXPAND, CRIT_MULT, SKILL_BOOK, MAT_DROP, MATERIALS } from './data.js';
 import { generateFloor, walkable, STAIRS, SPIKES, WALL } from './dungeon.js';
 import {
   characterStats, speedProfile, damage, dungeonLevel, monsterStats, killReward, rollRarity, rarityWeights, makeItem, gainXp, sellPrice, rollGem, gemName, pick,
@@ -106,7 +106,7 @@ export class World {
       atkCd: 0, dodgeCd: 0, dodgeT: 0, dodgeDir: { x: 0, y: 1 }, dodgeSpeed: 12, dashHit: null, invuln: 0, potionCd: 0, hurt: 0, attackAnim: 0,
       skillCd: [0, 0, 0, 0], buffT: 0, buffPct: 0, skillAnim: 0,
       // 異常狀態（剩餘秒數）、中毒計時、睡眠中被打的次數。
-      status: { poison: 0, sleep: 0, stun: 0 }, poisonTick: 0, poisonLeft: 0, sleepHits: 0, sleepGuard: 0,
+      status: { poison: 0, sleep: 0, stun: 0 }, statusAt: {}, poisonTick: 0, poisonLeft: 0, sleepHits: 0, sleepGuard: 0,
       // 技能與寶石的效果：護盾量與時間、抗異常護盾、減傷、吸血、加速；主動寶石的冷卻；連射。
       shield: 0, shieldT: 0, wardT: 0, guardT: 0, guardPct: 0, leechT: 0, leechPct: 0, hasteT: 0, hastePct: 0, leechAcc: 0, leechBudget: 0, leechShown: 0, leechShowT: 0,
       gemCd: [0, 0], volley: null, cureCd: 0,
@@ -682,7 +682,8 @@ export class World {
   }
 
   /**
-   * 依機率附加異常狀態。
+   * 依機率附加異常狀態。玩家被同一種異常成功附加後 30 秒內（STATUS_REPEAT），再次觸發的機率最多 10%。
+   * 會在玩家身上記錄每種異常最後一次附加的時間（statusAt）。
    * @param {object} target 玩家或怪物。
    * @param {[string, number] | [string, number][] | undefined} status 狀態與機率（或多組）。
    */
@@ -690,7 +691,14 @@ export class World {
     if (!status) return;
     // 可以是一組 [狀態, 機率]，或多組的陣列（武器加上被動技能）。
     const list = Array.isArray(status[0]) ? status : [status];
-    for (const st of list) if (st && this.rng() < st[1]) this.applyStatus(target, st[0]);
+    const isPlayer = target === this.player;
+    for (const st of list) {
+      if (!st) continue;
+      let chance = st[1];
+      const last = isPlayer ? target.statusAt[st[0]] : undefined;
+      if (last !== undefined && this.time - last < STATUS_REPEAT.window) chance = Math.min(chance, STATUS_REPEAT.chance);
+      if (this.rng() < chance && this.applyStatus(target, st[0]) && isPlayer) target.statusAt[st[0]] = this.time;
+    }
   }
 
 

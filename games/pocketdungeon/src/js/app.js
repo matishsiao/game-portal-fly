@@ -246,7 +246,8 @@ function openModal({ title, html = '', menu = [], actions = [], dismissValue = n
   els.modalActions.hidden = actions.length === 0;
   els.modal.hidden = false;
   els.modal.dataset.dismiss = JSON.stringify(dismissValue);
-  const first = els.modal.querySelector('input') || els.modal.querySelector('button.primary') || els.modal.querySelector('button');
+  // 勾選框不搶焦點，優先聚焦文字輸入框或主要按鈕。
+  const first = els.modal.querySelector('input:not([type="checkbox"])') || els.modal.querySelector('button.primary') || els.modal.querySelector('button');
   if (first) first.focus({ preventScroll: true });
   return new Promise((resolve) => {
     app.modalResolve = resolve;
@@ -697,15 +698,36 @@ function shopPanel(ch) {
 }
 
 /**
- * 與目前穿戴的同部位裝備比較（攻擊、防禦、HP 的差值）。
+ * 與目前穿戴的同部位裝備比較（攻擊、防禦、HP、速度的差值）。
+ * 飾品有兩格，分別列出換掉飾品 1 與飾品 2 的差異，方便決定要替換哪一格。
  * @param {object} ch 角色。
  * @param {object} item 裝備。
  * @returns {string} HTML。
  */
 function compareHtml(ch, item) {
+  if (item.slot === 'accessory') {
+    const rows = ['acc1', 'acc2'].map((k, n) => {
+      const old = ch.equipped[k];
+      const parts = statDiff(ch, item, k);
+      return `<span class="compare-line"><small class="muted">飾品 ${n + 1}${old ? `（換下 ${esc(old.name)}）` : '（空）'}</small> ${parts.length ? parts.join(' ') : '<span class="muted">無變化</span>'}</span>`;
+    });
+    return `<span class="compare compare-acc">${rows.join('')}</span>`;
+  }
+  const parts = statDiff(ch, item, village.slotFor(ch, item));
+  return parts.length ? `<span class="compare">${parts.join(' ')}</span>` : '';
+}
+
+/**
+ * 計算把裝備穿到指定欄位後，攻擊、防禦、HP、速度的變化。
+ * @param {object} ch 角色。
+ * @param {object} item 裝備。
+ * @param {string} slot 裝備欄位（weapon、offhand、acc1、acc2 等）。
+ * @returns {string[]} 每項有變化的屬性一段 HTML（上升為綠色 ▲、下降為紅色 ▼）。
+ */
+function statDiff(ch, item, slot) {
   const pb = skills.passiveBonus(ch);
   const now = characterStats(ch.cls, ch.level, Object.values(ch.equipped), ch.rebirth || 0, pb);
-  const eq = { ...ch.equipped, [village.slotFor(ch, item)]: item };
+  const eq = { ...ch.equipped, [slot]: item };
   // 雙手武器會卸下副手；裝備副手時若拿著雙手武器則無法比較。
   if (weaponHands(item) === 2) eq.offhand = null;
   const next = characterStats(ch.cls, ch.level, Object.values(eq), ch.rebirth || 0, skills.passiveBonus({ ...ch, equipped: eq }));
@@ -714,7 +736,7 @@ function compareHtml(ch, item) {
     const d = next[k] - now[k];
     if (d) parts.push(`<span class="${d > 0 ? 'up' : 'down'}">${name}${d > 0 ? '▲' : '▼'}${Math.abs(d)}</span>`);
   }
-  return parts.length ? `<span class="compare">${parts.join(' ')}</span>` : '';
+  return parts;
 }
 
 /**
@@ -1743,6 +1765,48 @@ async function pickGem(ch, id) {
 // ---------- 探險 ----------
 
 /**
+ * 出發前檢查藥水：回復藥水或淨化藥水沒有帶滿時，詢問要不要補齊（已補齊、或設定中關閉「出發前提醒補藥水」時直接通過）。
+ * 勾選「不再提醒」會關閉這個設定（可在設定中重新開啟）。
+ * @param {object} ch 角色（補齊時會被修改並存檔）。
+ * @returns {Promise<boolean>} 繼續出發為 true；按取消為 false。
+ */
+async function offerRefill(ch) {
+  const need = village.refillNeed(ch);
+  if ((!need.potions && !need.cures) || !app.settings.refillPrompt) return true;
+  const rows = [
+    need.potions ? `<li>回復藥水 ${ch.potions}／${LIMITS.potions}（缺 ${need.potions} 瓶，${need.potions * LIMITS.potionPrice}G）</li>` : '',
+    need.cures ? `<li>淨化藥水 ${ch.cures || 0}／${LIMITS.cures}（缺 ${need.cures} 瓶，${need.cures * LIMITS.curePrice}G）</li>` : '',
+  ].join('');
+  const short = ch.gold < need.cost;
+  // 連一瓶都買不起時不顯示「補齊」。
+  const canBuy = (need.potions && ch.gold >= LIMITS.potionPrice) || (need.cures && ch.gold >= LIMITS.curePrice);
+  const note = !canBuy ? '，金幣不足，無法補充' : short ? '，不夠全部補齊，會先買回復藥水、買到金幣用完為止' : '';
+  const act = await openModal({
+    title: '藥水沒有帶滿',
+    html: `<p>每趟最多攜帶回復藥水 ${LIMITS.potions} 瓶、淨化藥水 ${LIMITS.cures} 瓶，要先補齊嗎？</p><ul>${rows}</ul><p class="muted small">持有金幣 ${ch.gold}G${note}。</p><label class="check-row"><input type="checkbox" id="refill-mute"> 不再提醒（可在「設定」重新開啟）</label>`,
+    actions: [
+      { label: '取消', value: null },
+      { label: '直接出發', value: 'go', className: canBuy ? '' : 'primary' },
+      ...(canBuy ? [{ label: `補齊並出發（${short ? '盡量補' : `${need.cost}G`}）`, value: 'refill', className: 'primary' }] : []),
+    ],
+    dismissValue: null,
+  });
+  // 對話框關閉後內容仍在，直接讀取勾選狀態。
+  if ($('refill-mute') && $('refill-mute').checked) {
+    app.settings.refillPrompt = false;
+    store.saveSettings(app.settings);
+  }
+  if (!act) return false;
+  if (act === 'refill') {
+    const r = village.refillPotions(ch);
+    await store.saveProgress(ch);
+    // 進入地城後在畫面上顯示補了多少（金幣不足時說明只補了部分）。
+    toast(r.message);
+  }
+  return true;
+}
+
+/**
  * 開始新的探險。
  * @param {string} area 區域代碼。
  * @param {number} depth 深度。
@@ -1750,6 +1814,7 @@ async function pickGem(ch, id) {
 async function startRun(area, depth) {
   const ch = currentChar();
   if (!ch || app.run) return;
+  if (!(await offerRefill(ch))) return;
   const ticket = village.useTicket(ch, area);
   if (!ticket.ok) {
     villageMessage(ticket.message, true);
@@ -2178,8 +2243,6 @@ function updateHud(force) {
       const btn = $(`skill${n + 1}-btn`);
       // 第 3、4 格在獲得第 3、4 個技能後才出現。
       btn.hidden = n >= w.skills.length;
-      // 有第 3、4 格技能時，藥水往上移一排。
-      if (n === 2) btn.parentElement.classList.toggle('four-skills', w.skills.length > 2);
       btn.classList.toggle('empty', !sk);
       $(`skill${n + 1}-icon`).innerHTML = sk ? skillIcon(sk.id, sk.kind) : '';
       $(`skill${n + 1}-name`).textContent = sk ? sk.short : '未裝備';
@@ -2614,13 +2677,14 @@ function openRules() {
   });
 }
 
-/** 顯示設定（點地移動、瞄準輔助、省電模式、畫面震動）。 */
+/** 顯示設定（點地移動、瞄準輔助、省電模式、畫面震動、出發前提醒補藥水）。 */
 async function openSettings() {
   const items = [
     ['tapMove', '點地移動', '點地圖位置自動走過去（不需拖曳）'],
     ['aimAssist', '瞄準輔助', '攻擊時自動轉向最近的怪物'],
     ['saver', '省電模式', '畫面改為每秒 30 幀'],
     ['shake', '畫面震動', '受傷與 Boss 攻擊時震動畫面'],
+    ['refillPrompt', '出發前提醒補藥水', '藥水沒有帶滿時，出發前詢問要不要補齊'],
   ];
   for (;;) {
     const v = await openModal({

@@ -669,9 +669,37 @@ button:focus-visible {
 .r2 { --rc: var(--r2); }
 .r3 { --rc: var(--r3); }
 
+/* 對話框中的勾選列（例如出發前補藥水的「不再提醒」）。 */
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.check-row input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
 .compare {
   font-size: 12px;
   font-weight: 700;
+}
+
+/* 飾品：分兩行列出換掉飾品 1、飾品 2 的差異。 */
+.compare-acc {
+  flex-basis: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.compare-line small {
+  font-weight: 600;
 }
 
 /* 角色分頁：屬性的增益數字。 */
@@ -1516,8 +1544,8 @@ button:focus-visible {
 
 .buttons {
   position: relative;
-  width: 150px;
-  height: 225px;
+  width: 170px;
+  height: 270px;
   flex-shrink: 0;
   pointer-events: none;
 }
@@ -1526,26 +1554,21 @@ button:focus-visible {
   pointer-events: auto;
 }
 
-/* 藥水在技能鍵上方：沒有第 3、4 格技能時貼在技能 1、2 上方，有 4 格時再往上一排。 */
+/* 藥水在技能環上方、貼著右邊緣直排（回復藥水在下、淨化藥水在上），不論有幾格技能都固定在同一個位置。 */
 .buttons .item-btn {
   position: absolute;
-  width: 50px;
-  height: 50px;
+  width: 42px;
+  height: 42px;
 }
 
 #potion-btn {
-  right: 11px;
-  bottom: 158px;
+  right: 4px;
+  bottom: 176px;
 }
 
 #cure-btn {
-  right: 85px;
-  bottom: 158px;
-}
-
-.buttons.four-skills #potion-btn,
-.buttons.four-skills #cure-btn {
-  bottom: 228px;
+  right: 4px;
+  bottom: 226px;
 }
 
 /* 提醒使用：回復藥水在 HP 低於 50%、淨化藥水在有異常狀態時閃爍（可以使用時才閃）。 */
@@ -1633,7 +1656,8 @@ button:focus-visible {
   inset: 0;
   display: grid;
   place-items: center;
-  border-radius: 50%;
+  /* 跟著按鈕的形狀（圓形或圓角方形）。 */
+  border-radius: inherit;
   font-style: normal;
   font-size: 20px;
   font-weight: 800;
@@ -1651,7 +1675,7 @@ button:focus-visible {
   content: "";
   position: absolute;
   inset: -6px;
-  border-radius: 50%;
+  border-radius: inherit;
   border: 3px solid rgba(255, 236, 160, 0.95);
   animation: ready 0.45s ease-out forwards;
   pointer-events: none;
@@ -1714,8 +1738,8 @@ button:focus-visible {
 .attack-btn {
   --c1: #ff7b7b;
   --c2: #a8243a;
-  right: 0;
-  bottom: 0;
+  right: 14px;
+  bottom: 14px;
   width: 72px;
   height: 72px;
 }
@@ -1740,33 +1764,59 @@ button:focus-visible {
   opacity: 0.5;
 }
 
-/* 技能 2 × 2：下排技能 1、2（離拇指近），上排技能 3、4（轉職後才出現）。 */
-#skill1-btn,
-#skill2-btn,
-#skill3-btn,
-#skill4-btn {
-  width: 60px;
-  height: 60px;
+/* 技能環（手遊 MMO 式）：以右下角的大攻擊鈕為圓心、半徑 97px，從最下方的閃避開始，
+   依序技能 1～4 每隔 30° 往左上繞到攻擊鈕正上方；全部為圓形，名稱放在按鈕內的下緣。
+   拇指放在攻擊鈕上，往左、左上、上移動就按得到。技能 3、4 獲得第 3、4 個技能後才出現。 */
+.dodge-btn,
+.skill-btn {
+  width: 46px;
+  height: 46px;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -4px 6px rgba(0, 0, 0, 0.3),
+    0 0 0 2px rgba(20, 10, 24, 0.85),
+    0 0 0 3.5px var(--rim),
+    0 5px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* 圖示往上移，名稱放在按鈕內的下緣，不會壓到旁邊的按鈕。 */
+.dodge-btn .ico,
+.skill-btn .ico {
+  width: 50%;
+  height: 50%;
+  transform: translateY(-5px);
+}
+
+.dodge-btn .btn-label,
+.skill-btn .btn-label {
+  bottom: 4px;
+  max-width: 38px;
+  padding: 0 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: rgba(10, 4, 16, 0.55);
+  font-size: 8.5px;
+  line-height: 11px;
 }
 
 #skill1-btn {
-  right: 6px;
-  bottom: 86px;
+  right: 121px;
+  bottom: 52px;
 }
 
 #skill2-btn {
-  right: 80px;
-  bottom: 86px;
+  right: 96px;
+  bottom: 96px;
 }
 
 #skill3-btn {
-  right: 6px;
-  bottom: 158px;
+  right: 52px;
+  bottom: 121px;
 }
 
 #skill4-btn {
-  right: 80px;
-  bottom: 158px;
+  right: 2px;
+  bottom: 121px;
 }
 
 .act-btn[hidden] {
@@ -1776,8 +1826,8 @@ button:focus-visible {
 .dodge-btn {
   --c1: #c7adff;
   --c2: #4f2c94;
-  right: 84px;
-  bottom: 4px;
+  right: 121px;
+  bottom: 2px;
 }
 
 /* 橫向：搖桿在左、按鈕在右，操作區佔畫面下方較高的比例。 */
@@ -1824,51 +1874,14 @@ button:focus-visible {
     grid-column: 1;
   }
 
-  /* 橫向高度不足：技能 2 × 2 移到攻擊鈕左側，閃避移到攻擊鈕上方。 */
+  /* 橫向與直向使用同一個技能環（見上方 .buttons）；高度不足，藥水改為在技能 3、4 上方橫排。 */
   .buttons {
-    width: 226px;
-    height: 214px;
-  }
-
-  /* 橫向：藥水在技能 2 × 2 上方（沒有第 3、4 格技能時貼在技能 1、2 上方）。 */
-  #potion-btn {
-    right: 89px;
-    bottom: 80px;
+    height: 220px;
   }
 
   #cure-btn {
-    right: 163px;
-    bottom: 80px;
-  }
-
-  .buttons.four-skills #potion-btn,
-  .buttons.four-skills #cure-btn {
-    bottom: 152px;
-  }
-
-  .dodge-btn {
-    right: 4px;
-    bottom: 86px;
-  }
-
-  #skill1-btn {
-    right: 84px;
-    bottom: 6px;
-  }
-
-  #skill2-btn {
-    right: 158px;
-    bottom: 6px;
-  }
-
-  #skill3-btn {
-    right: 84px;
-    bottom: 80px;
-  }
-
-  #skill4-btn {
-    right: 158px;
-    bottom: 80px;
+    right: 54px;
+    bottom: 176px;
   }
 
   .toast {
