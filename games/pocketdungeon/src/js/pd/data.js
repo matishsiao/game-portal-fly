@@ -277,6 +277,9 @@ export const STATUS = {
  */
 export const STATUS_REPEAT = { window: 30, chance: 0.1 };
 
+/** 自動使用護盾（設定開啟時）：HP 低於最大 HP 的這個比例且沒有護盾時自動展開血量護盾。 */
+export const AUTO_SHIELD_HP = 0.5;
+
 /** Boss 承受睡眠與暈眩的持續時間倍率（中毒另見 STATUS.poison.bossDur）。 */
 export const STATUS_BOSS = 0.3;
 
@@ -290,8 +293,8 @@ export const GEMS = {
   def: { name: '藍寶石', stat: '防禦', values: [5, 7, 10, 12, 15], color: '#5aa7ff' },
   spd: { name: '黃玉', stat: '速度', values: [5, 7, 10, 12, 15], color: '#f2d04b' },
   leech: { name: '血石', stat: '吸血', values: [5, 7, 10, 12, 15], color: '#a8243a' },
-  shield: { name: '守護鑽石', active: true, label: '血量護盾', pct: 0.25, dur: 10, cd: 60, color: '#e8f4ff' },
-  ward: { name: '月光石', active: true, label: '抗異常護盾', dur: 30, cd: 60, color: '#c8a8ff' },
+  shield: { name: '守護鑽石', active: true, label: '血量護盾', short: '護盾', pct: 0.25, dur: 10, cd: 60, color: '#e8f4ff' },
+  ward: { name: '月光石', active: true, label: '抗異常護盾', short: '抗異常', dur: 30, cd: 60, color: '#c8a8ff' },
 };
 
 /**
@@ -334,7 +337,7 @@ export const MAT_DROP = { monster: 0.08, elite: 0.4, boss: 1, count: { monster: 
 
 /**
  * 入場卷（等級 1～5：銅、銀、金、白金、鑽石）：每趟探險出發時用掉 1 張該區域等級的入場卷，愈難的區域等級愈高、價格愈貴。
- * 新角色送 start 張銅入場卷；商店販售（只賣已解鎖區域用得到的等級）；每個獎勵禮包都會開出入場卷（gift 為各禮包等級的張數）。
+ * 新角色送 start 張銅入場卷；商店販售（只賣已解鎖區域用得到的等級，每個角色每種等級每天限購 shopDaily 張）；每個獎勵禮包都會開出入場卷（gift 為各禮包等級的張數）。
  * 每日練習：當天在其他遊戲完成任何一題，整個帳號可以領一次 daily 張入場卷（等級依領取角色目前的進度），禮包拿完後也有入場卷可用。
  * 沒有免費入場：入場卷用完又沒有金幣時，要到其他遊戲過關取得獎勵禮包或每日練習的入場卷（鼓勵在其他遊戲學習）。
  */
@@ -346,6 +349,7 @@ export const TICKET = {
   start: 5,
   gift: [1, 2, 2, 3, 4],
   daily: 3,
+  shopDaily: 1,
   max: 999,
 };
 

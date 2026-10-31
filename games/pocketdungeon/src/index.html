@@ -97,10 +97,6 @@
           <button type="button" id="pause-btn" class="glass-btn" aria-label="暫停"><span data-icon="pause"></span></button>
           <div id="minimap-frame" class="minimap-frame"><canvas id="minimap" class="minimap" aria-label="小地圖"></canvas></div>
           <button type="button" id="recall-btn" class="glass-pill" aria-label="使用回城卷軸"><span class="pill-ico" data-icon="scroll"></span>回城卷軸<b id="recall-count">0</b></button>
-          <div id="item-grid" class="item-grid">
-            <button type="button" id="gem1-btn" class="item-btn gem-btn" hidden><span id="gem1-icon" class="ico"></span><i id="gem1-cd" class="cd"></i><b id="gem1-dur" class="gem-dur"></b><kbd>1</kbd></button>
-            <button type="button" id="gem2-btn" class="item-btn gem-btn" hidden><span id="gem2-icon" class="ico"></span><i id="gem2-cd" class="cd"></i><b id="gem2-dur" class="gem-dur"></b><kbd>2</kbd></button>
-          </div>
         </div>
       </div>
       <p id="toast" class="toast" aria-live="polite"></p>
@@ -110,9 +106,11 @@
           <div id="stick" class="stick idle"><span class="stick-arrows" aria-hidden="true"></span><span id="stick-knob" class="stick-knob"></span></div>
         </div>
         <div class="buttons">
-          <!-- 攻擊鈕在右下角，閃避與技能 1～4 依序環繞在左方到上方；藥水在技能環右上方。HP 低於 50% 時回復藥水閃爍、身上有異常狀態時淨化藥水閃爍。 -->
-          <button type="button" id="potion-btn" class="item-btn potion-btn" aria-label="回復藥水"><span class="ico" data-icon="potion"></span><b id="potion-count" class="count">0</b><i id="potion-cd" class="cd"></i><kbd>L</kbd></button>
-          <button type="button" id="cure-btn" class="item-btn cure-btn" aria-label="淨化藥水"><span class="ico" data-icon="cure"></span><b id="cure-count" class="count">0</b><i id="cure-cd" class="cd"></i><kbd>H</kbd></button>
+          <!-- 攻擊鈕在右下角，閃避與技能 1～4 依序環繞在左方到上方；藥水在技能環上方排成一排，主動寶石（護盾）在藥水上方一排（橫向時接在藥水左邊）。HP 低於 50% 時回復藥水閃爍、身上有異常狀態時淨化藥水閃爍。 -->
+          <button type="button" id="potion-btn" class="item-btn potion-btn" aria-label="回復藥水"><span class="ico" data-icon="potion"></span><b id="potion-count" class="count">0</b><i id="potion-cd" class="cd"></i><em class="btn-label">回復</em><kbd>L</kbd></button>
+          <button type="button" id="cure-btn" class="item-btn cure-btn" aria-label="淨化藥水"><span class="ico" data-icon="cure"></span><b id="cure-count" class="count">0</b><i id="cure-cd" class="cd"></i><em class="btn-label">淨化</em><kbd>H</kbd></button>
+          <button type="button" id="gem1-btn" class="item-btn gem-btn" hidden><span id="gem1-icon" class="ico"></span><i id="gem1-cd" class="cd"></i><em id="gem1-name" class="btn-label"></em><b id="gem1-dur" class="gem-dur"></b><em class="gem-auto" aria-hidden="true">AUTO</em><kbd>1</kbd></button>
+          <button type="button" id="gem2-btn" class="item-btn gem-btn" hidden><span id="gem2-icon" class="ico"></span><i id="gem2-cd" class="cd"></i><em id="gem2-name" class="btn-label"></em><b id="gem2-dur" class="gem-dur"></b><em class="gem-auto" aria-hidden="true">AUTO</em><kbd>2</kbd></button>
           <button type="button" id="skill1-btn" class="act-btn skill-btn" aria-label="技能 1"><span id="skill1-icon" class="ico"></span><i id="skill1-cd" class="cd"></i><em id="skill1-name" class="btn-label"></em><kbd>U</kbd></button>
           <button type="button" id="skill2-btn" class="act-btn skill-btn" aria-label="技能 2"><span id="skill2-icon" class="ico"></span><i id="skill2-cd" class="cd"></i><em id="skill2-name" class="btn-label"></em><kbd>I</kbd></button>
           <button type="button" id="skill3-btn" class="act-btn skill-btn" aria-label="技能 3"><span id="skill3-icon" class="ico"></span><i id="skill3-cd" class="cd"></i><em id="skill3-name" class="btn-label"></em><kbd>O</kbd></button>

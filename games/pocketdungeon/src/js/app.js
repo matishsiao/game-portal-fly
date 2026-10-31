@@ -691,15 +691,19 @@ async function openMapNode(ch, key) {
   const have = village.ticketCount(ch, tier);
   const price = TICKET.price[tier - 1];
   const pending = store.loadRewards().filter((r) => !app.claimed.includes(r.id)).length;
+  // 商店每種入場卷每天限購，今天賣完時不能「購買並出發」，改提示到學習遊戲拿禮包。
+  const soldOut = village.ticketShopLeft(ch, tier) <= 0;
+  const hint = `<p class="ticket-hint">🎁 ${pending ? `你有 ${pending} 筆獲得紀錄還沒領取，裡面有入場卷！` : learnTicketHint()}</p>`;
   const ticketLine = have
     ? `<p class="ticket-line"><img src="${itemDataUrl(`ticket${tier}`)}" alt="">出發時用掉 1 張${TICKET.names[tier - 1]}（持有 ${have} 張）</p>`
-    : ch.gold >= price
-      ? `<p class="ticket-line lack"><img src="${itemDataUrl(`ticket${tier}`)}" alt="">需要 1 張${TICKET.names[tier - 1]}（持有 0 張），可以花 ${price}G 購買並出發</p>`
-      : `<p class="ticket-line lack"><img src="${itemDataUrl(`ticket${tier}`)}" alt="">需要 1 張${TICKET.names[tier - 1]}（持有 0 張），金幣也不足 ${price}G</p>
-        <p class="ticket-hint">🎁 ${pending ? `你有 ${pending} 筆獲得紀錄還沒領取，裡面有入場卷！` : `到學習遊戲（${GIFT.learning.map((g) => GIFT.games[g]).join('、')}）過關一題，<b>每天</b>可以領 ${TICKET.daily} 張入場卷；<b>第一次過關</b>或<b>第一次全對</b>還能拿到獎勵禮包，禮包裡一定有入場卷！`}</p>`;
+    : soldOut
+      ? `<p class="ticket-line lack"><img src="${itemDataUrl(`ticket${tier}`)}" alt="">需要 1 張${TICKET.names[tier - 1]}（持有 0 張），商店今天的已經賣完</p>${hint}`
+      : ch.gold >= price
+        ? `<p class="ticket-line lack"><img src="${itemDataUrl(`ticket${tier}`)}" alt="">需要 1 張${TICKET.names[tier - 1]}（持有 0 張），可以花 ${price}G 購買並出發（商店每天限購 ${TICKET.shopDaily} 張）</p>`
+        : `<p class="ticket-line lack"><img src="${itemDataUrl(`ticket${tier}`)}" alt="">需要 1 張${TICKET.names[tier - 1]}（持有 0 張），金幣也不足 ${price}G</p>${hint}`;
   const goLabel = have ? '出發' : `購買並出發（${price}G）`;
-  const canGo = have || ch.gold >= price;
-  const stuck = pending ? { label: `領取禮包（${pending}）`, value: 'gift', className: 'primary' } : { label: '前往商店', value: 'shop', className: 'primary' };
+  const canGo = have || (!soldOut && ch.gold >= price);
+  const stuck = pending ? { label: `領取禮包（${pending}）`, value: 'gift', className: 'primary' } : soldOut ? { label: '知道了', value: false, className: 'primary' } : { label: '前往商店', value: 'shop', className: 'primary' };
   const go = await openModal({
     title,
     html: `${boss}<div class="mini-tiles"><span class="mini-tile"><small>樓層</small><b>3＋Boss</b></span><span class="mini-tile"><small>破關</small><b>${clears} 次</b></span><span class="mini-tile"><small>地城等級</small><b>${Math.round(dungeonLevel(area, depth, 0))}</b></span></div>${ticketLine}${evo}${app.run ? '<p class="notice-inline">有探險尚未結束，請先完成或放棄那一趟。</p>' : ''}`,
@@ -727,6 +731,14 @@ async function openMapNode(ch, key) {
 }
 
 /**
+ * 入場卷取得方式的提示：到學習遊戲過關，每天可以領入場卷，第一次過關或全對還能拿到獎勵禮包。
+ * @returns {string} HTML。
+ */
+function learnTicketHint() {
+  return `到學習遊戲（${GIFT.learning.map((g) => GIFT.games[g]).join('、')}）過關一題，<b>每天</b>可以領 ${TICKET.daily} 張入場卷；<b>第一次過關</b>或<b>第一次全對</b>還能拿到獎勵禮包，禮包裡一定有入場卷！`;
+}
+
+/**
  * 商店分頁：藥水、卷軸、裝備與賣出。
  * @param {object} ch 角色。
  * @returns {string} HTML。
@@ -738,7 +750,13 @@ function shopPanel(ch) {
     <div class="shop-row"><img src="${itemDataUrl('key')}" alt="" class="icon"><div class="item-main"><b>回城卷軸</b><span class="item-stats">帶著全部所得返回村莊・持有 ${ch.scroll}／1</span></div><button type="button" class="buy-btn" data-buy="scroll">${LIMITS.scrollPrice}G</button></div>
     <div class="shop-row"><img src="${itemDataUrl('pouch')}" alt="" class="icon"><div class="item-main"><b>背包擴充袋</b><span class="item-stats">背包上限 +${BAG_EXPAND.step} 格・目前 ${village.bagLimit(ch)}／${BAG_EXPAND.max} 格${ch.bagExpand ? `・持有 ${ch.bagExpand} 個` : ''}・商店剩 ${Math.max(0, BAG_EXPAND.shopMax - village.pouchesBought(ch))}／${BAG_EXPAND.shopMax} 個（賣完後打怪取得）</span></div><button type="button" class="buy-btn" data-buy="pouch"${village.bagExpandPrice(ch) === Infinity ? ' disabled' : ''}>${village.bagExpandPrice(ch) !== Infinity ? `${village.bagExpandPrice(ch)}G` : village.pouchesBought(ch) >= BAG_EXPAND.shopMax ? '已賣完' : '已達上限'}</button></div>`;
   // 入場卷：只賣已解鎖區域用得到的等級。
-  const ticketRows = Array.from({ length: village.progressTicketTier(ch) }, (_, k) => `<div class="shop-row"><img src="${itemDataUrl(`ticket${k + 1}`)}" alt="" class="icon"><div class="item-main"><b>${TICKET.names[k]}</b><span class="item-stats">${Object.keys(TICKET.area).filter((a) => TICKET.area[a] === k + 1 && village.areaUnlocked(ch, a)).map((a) => AREAS[a].name).join('、')}・持有 ${village.ticketCount(ch, k + 1)} 張</span></div><button type="button" class="buy-btn" data-buy-ticket="${k + 1}">${TICKET.price[k]}G</button></div>`).join('');
+  // 入場卷每種等級每天限購；賣完時按鈕變成「已賣完」並提示到學習遊戲拿禮包。
+  const ticketRows = Array.from({ length: village.progressTicketTier(ch) }, (_, k) => {
+    const left = village.ticketShopLeft(ch, k + 1);
+    return `<div class="shop-row"><img src="${itemDataUrl(`ticket${k + 1}`)}" alt="" class="icon"><div class="item-main"><b>${TICKET.names[k]}</b><span class="item-stats">${Object.keys(TICKET.area).filter((a) => TICKET.area[a] === k + 1 && village.areaUnlocked(ch, a)).map((a) => AREAS[a].name).join('、')}・持有 ${village.ticketCount(ch, k + 1)} 張・今天剩 ${left}／${TICKET.shopDaily} 張</span></div><button type="button" class="buy-btn" data-buy-ticket="${k + 1}"${left ? '' : ' disabled'}>${left ? `${TICKET.price[k]}G` : '已賣完'}</button></div>`;
+  }).join('');
+  const anySold = Array.from({ length: village.progressTicketTier(ch) }, (_, k) => village.ticketShopLeft(ch, k + 1) <= 0).some(Boolean);
+  const ticketNote = anySold ? `<p class="ticket-hint">🎁 入場卷每天每種限購 ${TICKET.shopDaily} 張，明天再來補貨。${learnTicketHint()}</p>` : '';
   const items = ch.shop.length
     ? ch.shop.map((e, i) => `<div class="shop-row">${itemHtml(e.item)}${compareHtml(ch, e.item)}<button type="button" class="buy-btn" data-buy-item="${i}">${e.price}G</button></div>`).join('')
     : '<p class="muted">今天的裝備都賣完了，下次回村莊時會進新貨。</p>';
@@ -751,7 +769,7 @@ function shopPanel(ch) {
   const books = ch.shopBooks.length
     ? ch.shopBooks.map((slot, i) => `<div class="shop-row"><img src="${itemDataUrl('book')}" alt="" class="icon"><div class="item-main"><b>${village.bookName(slot)}</b><span class="item-stats">在鐵匠用材料合成一件${ITEM_SLOTS[slot]}・持有 ${(ch.books && ch.books[slot]) || 0} 本</span></div><button type="button" class="buy-btn" data-buy-book="${i}">${CRAFT.bookPrice}G</button></div>`).join('')
     : '<p class="muted">今天的製作書都賣完了。</p>';
-  return `<h3>入場卷 <small class="muted">（每趟出發用 1 張）</small></h3>${ticketRows}<h3>道具</h3>${goods}<h3>製作書 <small class="muted">（每次返回村莊時刷新）</small></h3>${books}<h3>今日裝備 <small class="muted">（每次返回村莊時刷新）</small></h3>${items}<h3>賣出 <small class="muted">背包 ${village.bagUsed(ch)}／${village.bagLimit(ch)} 格</small></h3>${sell}`;
+  return `<h3>入場卷 <small class="muted">（每趟出發用 1 張・每種每天限購 ${TICKET.shopDaily} 張）</small></h3>${ticketRows}${ticketNote}<h3>道具</h3>${goods}<h3>製作書 <small class="muted">（每次返回村莊時刷新）</small></h3>${books}<h3>今日裝備 <small class="muted">（每次返回村莊時刷新）</small></h3>${items}<h3>賣出 <small class="muted">背包 ${village.bagUsed(ch)}／${village.bagLimit(ch)} 格</small></h3>${sell}`;
 }
 
 /**
@@ -1008,7 +1026,7 @@ async function openGoodsCell(ch, kind, id) {
     const t = Number(id);
     const areas = Object.keys(TICKET.area).filter((a) => TICKET.area[a] === t && AREAS[a]).map((a) => AREAS[a].name).join('、');
     title = `${TICKET.names[t - 1]} ×${village.ticketCount(ch, t)}`;
-    html = `<div class="tip-head"><span class="inv-cell stack static"><img src="${itemDataUrl(`ticket${t}`)}" alt=""></span><b>進入地城每一關用掉 1 張</b></div><p>用在：${areas || '—'}。玩學習遊戲每天可以領，也可以在商店購買。</p>`;
+    html = `<div class="tip-head"><span class="inv-cell stack static"><img src="${itemDataUrl(`ticket${t}`)}" alt=""></span><b>進入地城每一關用掉 1 張</b></div><p>用在：${areas || '—'}。玩學習遊戲每天可以領，也可以在商店購買（每種每天限購 1 張）。</p>`;
     go = ['去地城', 'gate'];
   } else {
     const [name, icon, n, text, link] = info[kind];
@@ -1408,7 +1426,7 @@ const INFO = {
   ...Object.fromEntries(TICKET.names.map((name, k) => [`ticket${k + 1}`, {
     title: name,
     html: `<p>每趟探險出發時用掉 1 張。用在：${Object.keys(TICKET.area).filter((a) => TICKET.area[a] === k + 1).map((a) => AREAS[a].name).join('、')}。</p>
-      <ul><li>商店售價 ${TICKET.price[k]}G（解鎖用得到的區域後才會販售）</li><li>每個獎勵禮包都會開出入場卷（依目前進度的等級）</li><li>每天在學習遊戲（${GIFT.learning.map((g) => GIFT.games[g]).join('、')}）過關一題，可以領 ${TICKET.daily} 張（依目前進度的等級）</li><li>新角色送 ${TICKET.start} 張銅入場卷</li></ul>
+      <ul><li>商店售價 ${TICKET.price[k]}G（解鎖用得到的區域後才會販售，每天限購 ${TICKET.shopDaily} 張）</li><li>每個獎勵禮包都會開出入場卷（依目前進度的等級）</li><li>每天在學習遊戲（${GIFT.learning.map((g) => GIFT.games[g]).join('、')}）過關一題，可以領 ${TICKET.daily} 張（依目前進度的等級）</li><li>新角色送 ${TICKET.start} 張銅入場卷</li></ul>
       <p class="muted small">入場卷用完又沒有金幣時，到學習遊戲（${GIFT.learning.map((g) => GIFT.games[g]).join('、')}）過關：每天可以領入場卷，第一次過關或第一次全對還有獎勵禮包。</p>`,
   }])),
   leech: {
@@ -1972,6 +1990,7 @@ function continueRun() {
 function enterWorld(world, ch, paused) {
   app.world = world;
   world.aimAssist = app.settings.aimAssist;
+  world.autoGem = app.settings.autoGem;
   app.ending = false;
   app.transition = false;
   app.saveTimer = 0;
@@ -2351,6 +2370,7 @@ function updateHud(force) {
       $(`gem${n + 1}-btn`).hidden = !kind;
       if (!kind) return;
       $(`gem${n + 1}-icon`).innerHTML = ICONS[kind];
+      $(`gem${n + 1}-name`).textContent = GEMS[kind].short;
       $(`gem${n + 1}-btn`).setAttribute('aria-label', GEMS[kind].label);
       $(`gem${n + 1}-btn`).dataset.kind = kind;
     });
@@ -2358,6 +2378,12 @@ function updateHud(force) {
     set(`gemDur${n}`, Math.ceil(left), () => {
       $(`gem${n + 1}-dur`).textContent = left > 0 ? Math.ceil(left) : '';
       $(`gem${n + 1}-btn`).classList.toggle('active', left > 0);
+    });
+    // 自動使用護盾開啟時，按鈕左上角顯示「AUTO」。
+    set(`gemAuto${n}`, !!w.autoGem, () => {
+      const btn = $(`gem${n + 1}-btn`);
+      btn.classList.toggle('auto', !!w.autoGem);
+      btn.setAttribute('aria-label', `${kind ? GEMS[kind].label : ''}${w.autoGem ? '（自動）' : ''}`);
     });
   }
   for (const n of [0, 1, 2, 3]) {
@@ -2676,7 +2702,8 @@ function pressCure() {
 }
 
 /**
- * 按下主動寶石鈕或按鍵：冷卻中時以短訊息說明。
+ * 按下主動寶石鈕或按鍵：自動模式開啟時，這一下只關閉自動模式（改為手動，不展開護盾）；
+ * 手動模式下冷卻中以短訊息說明，否則展開護盾。
  * @param {number} n 按鈕位置（0 或 1）。
  */
 function pressGem(n) {
@@ -2684,6 +2711,13 @@ function pressGem(n) {
   if (!w) return;
   const kind = w.player.actives[n];
   if (!kind) return;
+  if (w.autoGem) {
+    app.settings.autoGem = false;
+    w.autoGem = false;
+    store.saveSettings(app.settings);
+    toast('護盾改為手動使用（可在設定重新開啟自動）');
+    return;
+  }
   if (w.player.gemCd[n] > 0) toast(`${GEMS[kind].label}冷卻中（${Math.ceil(w.player.gemCd[n])} 秒）`);
   else app.input.gem[n] = true;
 }
@@ -2829,6 +2863,7 @@ async function openSettings() {
     ['saver', '省電模式', '畫面改為每秒 30 幀'],
     ['shake', '畫面震動', '受傷與 Boss 攻擊時震動畫面'],
     ['refillPrompt', '出發前提醒補藥水', '藥水沒有帶滿時，出發前詢問要不要補齊'],
+    ['autoGem', '自動使用護盾', 'HP 低於 50% 時自動開血量護盾、中異常狀態時自動開抗異常護盾'],
   ];
   // 本次開啟設定後是否已重設新手提示（按鈕改為「已重設」）。
   let tipsReset = false;
@@ -2849,6 +2884,8 @@ async function openSettings() {
       continue;
     }
     app.settings[v] = !app.settings[v];
+    // 探險中改設定時，自動使用護盾立即生效。
+    if (app.world) app.world.autoGem = app.settings.autoGem;
     store.saveSettings(app.settings);
   }
 }
