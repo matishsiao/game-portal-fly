@@ -1,6 +1,8 @@
 // 像素圖資料（全部原創）：以字元陣列描述，每個字元對應調色盤中的一個顏色，'.' 為透明。
 // 角色有站立與左右腳交替的走路幀；怪物有 2 幀；Boss 以 2 倍大小繪製。
 
+import { HOME_MATS } from './homeData.js';
+
 /** 共用顏色。 */
 const O = '#1a1020';
 
@@ -805,9 +807,39 @@ export const ITEM_ART = {
   staff: { palette: { o: O, W: '#8a5a2a', G: '#c8a8ff', L: '#ffffff' }, rows: ['.....oo.', '....oGLo', '....oGGo', '...oWoo.', '..oWo...', '.oWo....', 'oWo.....', 'oo......'] },
   axe: { palette: { o: O, S: '#c0c6d0', D: '#7a808e', W: '#8a5a2a' }, rows: ['..oooo..', '.oSSSDo.', 'oSSSoWo.', 'oSDoWo..', '.ooWo...', '..oWo...', '.oWo....', '.oo.....'] },
   cure: { palette: { o: O, C: '#c8b8a0', B: '#5ab8e8', b: '#c8f0ff' }, rows: ['..oo..', '..CC..', '.oBBo.', 'oBbBBo', 'oBBBBo', '.oooo.'] },
+  // 家具製作書：捲起來的藍色設計圖（白色格線、紅色綁繩）。
+  blueprint: { palette: { o: O, B: '#2a5a9a', b: '#5a90d8', W: '#d8ecff', R: '#c0303a' }, rows: ['.oooooooo.', 'obBBBBBBbo', 'oBWBWBWBBo', 'oBBBBBBBBo', 'oBWWWWBWBo', 'oRRBBBBBBo', 'oBBBWBWBBo', 'obBBBBBBbo', '.oooooooo.'] },
+  // 種子袋：麻布小袋，袋口冒出綠芽。
+  seedBag: { palette: { o: O, B: '#b08a52', b: '#d8b47a', G: '#4fc078', g: '#2a7a4a' }, rows: ['...oo...', '..oGGo..', '...og...', '..oooo..', '.obBBBo.', 'obBBBBBo', 'oBBBBBBo', '.oooooo.'] },
   ...ticketArt(),
   ...gemArt(),
+  ...homeMatArt(),
 };
+
+/**
+ * 家園材料在地城中的掉落圖（以 hm-材料 命名）：綁成一小捆的材料，顏色依材料。
+ * @returns {Record<string, {palette: Record<string, string>, rows: string[]}>} 材料圖。
+ */
+function homeMatArt() {
+  const out = {};
+  for (const m of HOME_MATS) {
+    out[`hm-${m.key}`] = { palette: { o: O, M: m.color, L: mixHex(m.color, '#ffffff', 0.45), D: mixHex(m.color, '#000000', 0.35), R: '#8a5a2a' }, rows: ['..oooo..', '.oLLMMo.', 'oLMMMMDo', 'oRRRRRRo', 'oMMMMDDo', '.oMDDDo.', '..oooo..'] };
+  }
+  return out;
+}
+
+/**
+ * 混合兩個 #rrggbb 顏色。
+ * @param {string} a 顏色 a。
+ * @param {string} b 顏色 b。
+ * @param {number} t 比例（0 為 a、1 為 b）。
+ * @returns {string} 混合後的顏色。
+ */
+function mixHex(a, b, t) {
+  const pa = [1, 3, 5].map((i) => parseInt(a.slice(i, i + 2), 16));
+  const pb = [1, 3, 5].map((i) => parseInt(b.slice(i, i + 2), 16));
+  return `#${pa.map((v, i) => Math.round(v + (pb[i] - v) * t).toString(16).padStart(2, '0')).join('')}`;
+}
 
 /**
  * 寶石圖（每種寶石一張，以 gem-種類 命名）：切面的菱形寶石，顏色依種類。

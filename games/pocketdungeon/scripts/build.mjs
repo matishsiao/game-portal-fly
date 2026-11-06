@@ -19,7 +19,8 @@ const DIST = join(ROOT, 'dist');
 function listFiles(dir) {
   const out = [];
   for (const name of readdirSync(dir).sort()) {
-    if (name.startsWith('.')) continue;
+    // 開發用頁面（例如家園審圖頁）不放進正式版。
+    if (name.startsWith('.') || (dir === SRC && name === 'dev')) continue;
     const full = join(dir, name);
     if (statSync(full).isDirectory()) out.push(...listFiles(full));
     else out.push(full);

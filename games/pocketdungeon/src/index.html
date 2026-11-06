@@ -72,11 +72,23 @@
       <button type="button" role="tab" data-tab="smith">鐵匠</button>
       <button type="button" role="tab" data-tab="gem">寶石</button>
       <button type="button" role="tab" data-tab="bag">倉庫</button>
+      <button type="button" role="tab" data-tab="home">家園</button>
       <button type="button" role="tab" data-tab="skill">技能</button>
       <button type="button" role="tab" data-tab="hero">角色</button>
     </nav>
     <section id="village-panel" class="village-panel" role="tabpanel"></section>
     <p id="village-message" class="village-message" aria-live="polite"></p>
+  </main>
+
+  <main id="house" class="screen house" hidden>
+    <header class="village-bar house-bar-top">
+      <button type="button" id="house-back-btn" class="bar-btn">‹ 村莊</button>
+      <b id="house-title" class="house-title">我的家</b>
+      <button type="button" id="house-edit-btn" class="bar-btn house-edit-btn">佈置</button>
+    </header>
+    <div id="house-stage" class="house-stage"><canvas id="house-canvas" class="house-canvas" aria-label="我的家：點地板走過去，點工作台製作家具"></canvas></div>
+    <p id="house-message" class="village-message" aria-live="polite"></p>
+    <div id="house-bar" class="house-bar"></div>
   </main>
 
   <main id="game" class="game" hidden>

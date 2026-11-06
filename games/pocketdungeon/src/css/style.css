@@ -450,7 +450,7 @@ button:focus-visible {
 
 .village-tabs {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(8, 1fr);
   gap: 4px;
 }
 
@@ -3978,4 +3978,170 @@ button:focus-visible {
     animation: none;
     box-shadow: 0 0 0 3px #ffd34d;
   }
+}
+
+/* ── 家園 ── */
+.home-grid {
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+}
+
+.home-grid .inv-cell img {
+  width: 74%;
+  height: 74%;
+}
+
+.home-cell.locked {
+  opacity: 0.75;
+  border-style: dashed;
+}
+
+.home-card {
+  display: grid;
+  gap: 2px;
+  margin: 8px 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.chip-row {
+  display: flex;
+  gap: 6px;
+  margin: 8px 0;
+}
+
+.chip-btn {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.chip-btn.on {
+  background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
+  color: #fff;
+}
+
+.home-detail {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.home-detail img {
+  width: 96px;
+  height: 96px;
+  flex: none;
+  image-rendering: pixelated;
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.home-needs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.home-need {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px 2px 2px;
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 13px;
+}
+
+.home-need img {
+  width: 24px;
+  height: 24px;
+  image-rendering: pixelated;
+}
+
+.home-need.short {
+  color: #e04a5a;
+}
+
+.shop-row img.icon {
+  image-rendering: pixelated;
+}
+
+/* ── 家裡場景 ── */
+.house {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.house-bar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.house-title {
+  font-size: 18px;
+  color: #fff;
+}
+
+.house-edit-btn.on {
+  background: #ffe14d;
+  color: #3a2a10;
+}
+
+.house-stage {
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  max-height: 62vh;
+  border-radius: 14px;
+  background: #1a1020;
+  box-shadow: var(--shadow);
+}
+
+.house-canvas {
+  display: block;
+  image-rendering: pixelated;
+  touch-action: none;
+}
+
+.house-bar {
+  display: grid;
+  gap: 8px;
+}
+
+.house-bar .palette {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.house-bar .palette .inv-cell {
+  flex: none;
+  width: 64px;
+}
+
+.house-bar .palette .inv-cell.on {
+  outline: 3px solid #ffe14d;
+}
+
+.house-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.house-actions button {
+  flex: 1;
+  min-width: 72px;
+  padding: 8px;
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  font-weight: 600;
 }

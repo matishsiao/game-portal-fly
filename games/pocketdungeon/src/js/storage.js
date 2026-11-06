@@ -1,6 +1,7 @@
 // 本機儲存：角色、探險與設定存在 IndexedDB（資料庫 pocketdungeon）；大廳讀取用的摘要與統計存在 localStorage。
 // IndexedDB 無法使用時改存記憶體（關閉後遺失）。所有讀寫都容錯，任何儲存錯誤不讓遊戲停止。
 
+import { newHome, normalizeHome } from './pd/home.js';
 import { AREAS, AREA_KEYS, CLASS_KEYS, CLASSES, SHARED_SLOTS, STATUS, MATERIALS, CRAFT, LIMITS, GIFT, MAX_DEPTH, TICKET } from './pd/data.js';
 import { newSkills, SKILLS, SKILL_SLOTS, bookSkillIds } from './pd/skills.js';
 import { levelCap, parseGem, socketCount } from './pd/rules.js';
@@ -161,7 +162,7 @@ export function isValidCharacter(ch) {
     && ch.skills.slots.every((id) => id === null || (SKILLS[id] && (SKILLS[id].cls === ch.cls || (SKILLS[id].book && (ch.skills.learned || []).includes(id)))))
     && (ch.skillBooks === undefined || isStackMap(ch.skillBooks, bookSkillIds()))
     && (ch.gifts === undefined || isStackMap(ch.gifts, ['1', '2', '3', '4', '5'])) && (ch.tickets === undefined || isStackMap(ch.tickets, ['1', '2', '3', '4', '5'])) && (ch.shards === undefined || isStackMap(ch.shards, bookSkillIds()))
-    && (ch.cures === undefined || n(ch.cures))
+    && (ch.cures === undefined || n(ch.cures)) && (ch.home === undefined || (!!ch.home && typeof ch.home === 'object' && Array.isArray(ch.home.recipes)))
     && (ch.mats === undefined || isStackMap(ch.mats, MATERIALS.map((m) => m.key))) && (ch.books === undefined || isStackMap(ch.books, CRAFT.books)) && (ch.gems === undefined || (typeof ch.gems === 'object' && Object.entries(ch.gems).every(([k, v]) => parseGem(k) && Number.isInteger(v) && v >= 0)));
 }
 
@@ -188,6 +189,7 @@ export function newCharacter(cls, name) {
   return {
     id: cls, cls, name: [...(name.trim() || CLASSES[cls].name)].slice(0, 8).join(''), level: 1, xp: 0, gold: 50,
     equipped: { weapon: null, offhand: null, helmet: null, armor: null, boots: null, acc1: null, acc2: null }, bag: [], bagSize: 20, bagExpand: 0, potions: 3, scroll: 1, cures: 1, gems: {}, mats: {}, books: {}, skillBooks: {}, gifts: {}, shards: {}, tickets: { 1: TICKET.start },
+    home: newHome(),
     unlocked: { grass: 1 }, clears: {}, rebirth: 0, shop: null, created: Date.now(), skills: newSkills(cls),
     stats: { playMs: 0, kills: 0, maxHit: 0, legends: 0, deaths: 0, runs: 0 },
   };
@@ -239,6 +241,8 @@ export async function loadAll() {
         if (Number.isInteger(ch.unlocked[k]) && ch.unlocked[k] > cap) ch.unlocked[k] = cap;
       }
     }
+    // 家園加入之前的角色：建立等級 1 的空房子；已有家園時修復不合法的欄位（不讓角色因此無法讀取）。
+    if (ch && typeof ch === 'object') ch.home = normalizeHome(ch.home);
     // 裝備欄擴充前（武器、防具、飾品 3 格）的角色：飾品移到飾品 1，補上新欄位。
     if (ch && ch.equipped && 'accessory' in ch.equipped) {
       const { accessory, ...rest } = ch.equipped;

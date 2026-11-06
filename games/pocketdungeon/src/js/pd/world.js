@@ -3,6 +3,8 @@
 //
 // 座標單位為「格」，(x, y) 為實體中心；地圖格子 (i, j) 的範圍為 [i, i + 1) × [j, j + 1)。
 
+import { HOME_DROP, CROPS } from './homeData.js';
+import { addHomeMat, addSeed, gainRecipe, homeMatName, recipeName, rollHomeMat, rollRecipe, rollSeed, bossRecipe } from './home.js';
 import { CLASSES, MONSTERS, BOSSES, LIMITS, BOSS_HEAL, EVOLVE, REBIRTH, STATUS, STATUS_BOSS, STATUS_REPEAT, AUTO_SHIELD_HP, GEMS, GEM_RULES, DIFFICULTY, CRAFT, BAG_EXPAND, CRIT_MULT, SKILL_BOOK, MAT_DROP, MATERIALS } from './data.js';
 import { generateFloor, walkable, STAIRS, SPIKES, WALL } from './dungeon.js';
 import {
@@ -1299,6 +1301,7 @@ export class World {
     }
     // 製作書：一般怪物 1%、菁英 10%、Boss 30%。
     if (!m.small && this.rng() < (m.boss ? CRAFT.drop.boss : m.elite ? CRAFT.drop.elite : CRAFT.drop.monster)) this.dropBook(m.x + 0.4, m.y + 0.4);
+    if (!m.small) this.dropHome(m, src);
     if (MONSTERS[m.type] && MONSTERS[m.type].deathPool && !m.small) {
       // 岩漿史萊姆：死亡處留下一灘 3 秒的熔岩。
       this.hazards.push({ kind: 'circle', x: m.x, y: m.y, r: 0.9, life: 3, pct: 0.04 });
@@ -1391,6 +1394,33 @@ export class World {
    */
   dropGem(x, y, bonus = 0) {
     this.addPickup({ kind: 'gem', x, y, gem: rollGem(this.level, this.rng, bonus), t: 0 });
+  }
+
+  /**
+   * 家園掉落：該區域的家園材料（一般怪物 10%、菁英 40%、Boss 必掉）、家具製作書（一般怪物與菁英；
+   * Boss 有機率掉自己的主題裝飾配方，進化 Boss 必掉）與種子。
+   * @param {object} m 被擊倒的怪物。
+   * @param {'monster' | 'elite' | 'boss'} src 掉落來源。
+   */
+  dropHome(m, src) {
+    if (this.rng() < HOME_DROP.mat[src]) {
+      const [lo, hi] = HOME_DROP.mat.count[src];
+      this.addPickup({ kind: 'homeMat', x: m.x + 0.5, y: m.y - 0.3, mat: rollHomeMat(this.area, this.rng), n: lo + Math.floor(this.rng() * (hi - lo + 1)), t: 0 });
+    }
+    if (m.boss) {
+      const key = bossRecipe(m.type);
+      if (key && (m.evolved || this.rng() < HOME_DROP.bossTheme)) this.addPickup({ kind: 'recipe', x: m.x - 0.6, y: m.y + 0.5, recipe: key, t: 0 });
+    } else if (this.rng() < HOME_DROP.recipe[src]) this.dropRecipe(m.x - 0.4, m.y + 0.4);
+    if (!m.boss && this.rng() < HOME_DROP.seed[src]) this.addPickup({ kind: 'seed', x: m.x, y: m.y - 0.5, seed: rollSeed(this.rng), t: 0 });
+  }
+
+  /**
+   * 掉落一本家具製作書（依區域與稀有度抽選，盡量抽尚未學會的）。
+   * @param {number} x 座標 x。
+   * @param {number} y 座標 y。
+   */
+  dropRecipe(x, y) {
+    this.addPickup({ kind: 'recipe', x, y, recipe: rollRecipe(this.ch, this.area, this.rng), t: 0 });
   }
 
   /**
@@ -1845,6 +1875,25 @@ export class World {
           this.ch.gold += gold;
           this.loot.gold += gold;
         }
+      } else if (it.kind === 'homeMat') {
+        // 家園材料：不佔背包格，頭上飄出名稱與數量；達到上限時換成金幣。
+        const got = addHomeMat(this.ch, it.mat, it.n);
+        if (got > 0) {
+          this.loot.homeMats = (this.loot.homeMats || 0) + got;
+          this.effect('text', p.x, p.y - 1, { text: `+${homeMatName(it.mat)}×${got}`, color: '#f0d8a0' });
+        }
+        if (got < it.n) {
+          const gold = MAT_DROP.matGold * (it.n - got);
+          this.ch.gold += gold;
+          this.loot.gold += gold;
+        }
+      } else if (it.kind === 'recipe') {
+        const r = gainRecipe(this.ch, it.recipe);
+        if (r.learned) this.loot.recipes = (this.loot.recipes || 0) + 1;
+        else this.loot.gold += r.gold;
+        this.events.push({ type: 'message', text: r.learned ? `撿到${recipeName(it.recipe)}！${r.message}` : r.message });
+      } else if (it.kind === 'seed') {
+        if (addSeed(this.ch, it.seed, 1)) this.effect('text', p.x, p.y - 1, { text: `+${CROPS[it.seed].name}種子`, color: '#a8f0a0' });
       } else if (it.kind === 'book') {
         if (addBook(this.ch, it.slot)) {
           this.loot.books = (this.loot.books || 0) + 1;
@@ -1890,6 +1939,8 @@ export class World {
       if (c.evolved) this.dropItem(c.x + 0.4, c.y + 0.2, 'evolved', EVOLVE.levelBonus);
       else if (c.boss || this.rng() < 0.6) this.dropItem(c.x + 0.4, c.y + 0.2, c.boss ? 'boss' : 'chest');
       if (!c.boss && this.rng() < CRAFT.drop.chest) this.dropBook(c.x - 0.3, c.y + 0.6);
+      if (!c.boss && this.rng() < HOME_DROP.recipe.chest) this.dropRecipe(c.x + 0.3, c.y + 0.6);
+      if (!c.boss && this.rng() < HOME_DROP.seed.chest) this.addPickup({ kind: 'seed', x: c.x - 0.5, y: c.y - 0.2, seed: rollSeed(this.rng), t: 0 });
       // Boss 寶箱有 25% 機會出現背包擴充袋（進化 Boss 50%）。
       if (c.boss && this.rng() < (c.evolved ? EVOLVE.pouch : 0.25)) this.addPickup({ kind: 'bagExpand', x: c.x, y: c.y + 0.5, t: 0 });
       if (this.rng() < 0.3) this.addPickup({ kind: 'potion', x: c.x - 0.4, y: c.y + 0.2, t: 0 });

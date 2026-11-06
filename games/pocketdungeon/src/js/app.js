@@ -9,6 +9,10 @@ import { Renderer } from './pd/render.js';
 import { heroDataUrl, itemDataUrl, monsterDataUrl } from './pd/sprites.js';
 import * as village from './pd/village.js';
 import * as skills from './pd/skills.js';
+import * as home from './pd/home.js';
+import { HOME_ITEMS, HOME_ITEM_KEYS, HOME_MATS, HOME_RARITY, FURNITURE_CATS, DECOR_CATS, CROPS, CROP_KEYS, LAND } from './pd/homeData.js';
+import { homeArt, iconArt, toDataUrl } from './pd/homeArt.js';
+import { HouseView } from './houseView.js';
 import { pendingTips, tipText } from './pd/tips.js';
 import { ICONS, PASSIVE_ICONS, fillIcons, skillIcon } from './icons.js';
 
@@ -32,6 +36,7 @@ const $ = (id) => document.getElementById(id);
 const els = {
   home: $('home'),
   village: $('village'),
+  house: $('house'),
   game: $('game'),
   themeBtn: $('theme-btn'),
   offlineStatus: $('offline-status'),
@@ -88,6 +93,9 @@ const app = {
   bagTab: 'mine',
   /** 技能分頁目前的子頁面（active 主動、passive 被動）。 */
   skillTab: 'active',
+  /** 家園分頁目前的子頁面（mats 材料、book 圖鑑）與圖鑑分類（furniture 家具、decor 裝飾）。 */
+  homeTab: 'mats',
+  homeBook: 'furniture',
   world: null,
   renderer: null,
   raf: 0,
@@ -295,7 +303,7 @@ async function confirmDialog(title, text, okLabel) {
 
 /**
  * 切換畫面（首頁、村莊、地城）。進入村莊或地城時加入一筆瀏覽紀錄，讓返回鍵先回首頁。
- * @param {'home' | 'village' | 'game'} name 畫面。
+ * @param {'home' | 'village' | 'house' | 'game'} name 畫面。
  */
 function showScreen(name) {
   if (name !== 'home' && app.screen === 'home') history.pushState({ screen: name }, '');
@@ -305,6 +313,8 @@ function showScreen(name) {
   if (name === 'village') app.lastTab = null;
   els.home.hidden = name !== 'home';
   els.village.hidden = name !== 'village';
+  els.house.hidden = name !== 'house';
+  if (name !== 'house') stopHouse();
   els.game.hidden = name !== 'game';
   document.body.classList.toggle('in-game', name === 'game');
 }
@@ -458,7 +468,7 @@ function renderVillage() {
   for (const b of els.villageTabs.querySelectorAll('button')) b.setAttribute('aria-selected', String(b.dataset.tab === app.tab));
   // 倉庫裡有比目前穿的更好的裝備時，「倉庫」分頁加上提醒點。
   els.villageTabs.querySelector('[data-tab="bag"]').classList.toggle('has-up', ch.bag.some((it) => village.isUpgrade(ch, it)));
-  const panels = { gate: gatePanel, shop: shopPanel, smith: smithPanel, gem: gemPanel, bag: bagPanel, skill: skillPanel, hero: heroPanel };
+  const panels = { gate: gatePanel, shop: shopPanel, smith: smithPanel, gem: gemPanel, bag: bagPanel, home: homePanel, skill: skillPanel, hero: heroPanel };
   els.villagePanel.innerHTML = panels[app.tab](ch);
   // 剛進入區域畫面時，地圖捲到目前進度的關卡。
   if (app.tab === 'gate' && app.gateArea && app.lastTab !== 'gate') {
@@ -769,7 +779,7 @@ function shopPanel(ch) {
   const books = ch.shopBooks.length
     ? ch.shopBooks.map((slot, i) => `<div class="shop-row"><img src="${itemDataUrl('book')}" alt="" class="icon"><div class="item-main"><b>${village.bookName(slot)}</b><span class="item-stats">在鐵匠用材料合成一件${ITEM_SLOTS[slot]}・持有 ${(ch.books && ch.books[slot]) || 0} 本</span></div><button type="button" class="buy-btn" data-buy-book="${i}">${CRAFT.bookPrice}G</button></div>`).join('')
     : '<p class="muted">今天的製作書都賣完了。</p>';
-  return `<h3>入場卷 <small class="muted">（每趟出發用 1 張・每種每天限購 ${TICKET.shopDaily} 張）</small></h3>${ticketRows}${ticketNote}<h3>道具</h3>${goods}<h3>製作書 <small class="muted">（每次返回村莊時刷新）</small></h3>${books}<h3>今日裝備 <small class="muted">（每次返回村莊時刷新）</small></h3>${items}<h3>賣出 <small class="muted">背包 ${village.bagUsed(ch)}／${village.bagLimit(ch)} 格</small></h3>${sell}`;
+  return `<h3>入場卷 <small class="muted">（每趟出發用 1 張・每種每天限購 ${TICKET.shopDaily} 張）</small></h3>${ticketRows}${ticketNote}<h3>道具</h3>${goods}${homeShopHtml(ch)}<h3>製作書 <small class="muted">（每次返回村莊時刷新）</small></h3>${books}<h3>今日裝備 <small class="muted">（每次返回村莊時刷新）</small></h3>${items}<h3>賣出 <small class="muted">背包 ${village.bagUsed(ch)}／${village.bagLimit(ch)} 格</small></h3>${sell}`;
 }
 
 /**
@@ -812,6 +822,348 @@ function statDiff(ch, item, slot) {
     if (d) parts.push(`<span class="${d > 0 ? 'up' : 'down'}">${name}${d > 0 ? '▲' : '▼'}${Math.abs(d)}</span>`);
   }
   return parts;
+}
+
+/** 家園圖示的 data URL 快取（代碼與是否為剪影）。 */
+const homeIconCache = new Map();
+
+/**
+ * 家具或裝飾的圖示 data URL：已完成美術的物件縮放到 64 × 64 的框內；
+ * 尚未完成美術的物件改用家具製作書圖示；locked 時畫成灰色剪影（圖鑑中還沒學會的配方）。
+ * @param {string} key 家具或裝飾代碼。
+ * @param {boolean} [locked=false] 是否畫成剪影。
+ * @returns {string} data URL。
+ */
+function homeIconUrl(key, locked = false) {
+  const id = `${key}-${locked}`;
+  if (!homeIconCache.has(id)) {
+    const src = homeArt(key) || iconArt('blueprint');
+    const box = 64;
+    const scale = Math.max(1, Math.floor(box / Math.max(src.width, src.height)));
+    const c = document.createElement('canvas');
+    c.width = box;
+    c.height = box;
+    const g = c.getContext('2d');
+    g.imageSmoothingEnabled = false;
+    const w = src.width * scale;
+    const h = src.height * scale;
+    const fit = Math.min(1, box / Math.max(w, h));
+    g.drawImage(src, Math.round((box - w * fit) / 2), Math.round((box - h * fit) / 2), Math.round(w * fit), Math.round(h * fit));
+    if (locked) {
+      g.globalCompositeOperation = 'source-in';
+      g.fillStyle = '#5a5068';
+      g.fillRect(0, 0, box, box);
+    }
+    homeIconCache.set(id, c.toDataURL());
+  }
+  return homeIconCache.get(id);
+}
+
+/**
+ * 家園材料、種子、肥料、作物等 32 像素圖示的 data URL（放大 2 倍）。
+ * @param {string} key 圖示代碼。
+ * @returns {string} data URL。
+ */
+function homeSmallIcon(key) {
+  const id = `icon-${key}`;
+  if (!homeIconCache.has(id)) homeIconCache.set(id, toDataUrl(iconArt(key), 2));
+  return homeIconCache.get(id);
+}
+
+/**
+ * 家園分頁：子頁面「材料」（家園材料、種子、肥料、土地等級）與「圖鑑」（家具 50 種、裝飾 100 種的配方收集與製作）。
+ * @param {object} ch 角色。
+ * @returns {string} HTML。
+ */
+function homePanel(ch) {
+  const h = home.homeOf(ch);
+  const prog = home.recipeProgress(ch);
+  const tabs = [['mats', '材料'], ['book', `圖鑑 ${prog.furniture + prog.decor}／${prog.furnitureTotal + prog.decorTotal}`]]
+    .map(([k, name]) => `<button type="button" role="tab" data-home-tab="${k}" aria-selected="${app.homeTab === k}">${name}</button>`).join('');
+  if (app.homeTab === 'book') {
+    const type = app.homeBook;
+    const cats = type === 'furniture' ? FURNITURE_CATS : DECOR_CATS;
+    const kinds = [['furniture', `家具 ${prog.furniture}／${prog.furnitureTotal}`], ['decor', `裝飾 ${prog.decor}／${prog.decorTotal}`]]
+      .map(([k, name]) => `<button type="button" class="chip-btn${type === k ? ' on' : ''}" data-home-book="${k}">${name}</button>`).join('');
+    const groups = Object.entries(cats).map(([cat, name]) => {
+      const keys = HOME_ITEM_KEYS.filter((k) => HOME_ITEMS[k].type === type && HOME_ITEMS[k].cat === cat);
+      const cells = keys.map((k) => {
+        const it = HOME_ITEMS[k];
+        const known = home.knowsRecipe(ch, k);
+        const have = h.inventory[k] || 0;
+        return `<button type="button" class="inv-cell home-cell r${it.rarity}${known ? '' : ' locked'}" data-home-item="${k}" aria-label="${it.name}${known ? '' : '（尚未學會）'}"><img src="${homeIconUrl(k, !known)}" alt="">${have ? `<b class="cell-count">${have}</b>` : ''}<small class="cell-name">${known ? it.name : '？？？'}</small></button>`;
+      }).join('');
+      return `<h3>${name} <small class="muted">${keys.filter((k) => home.knowsRecipe(ch, k)).length}／${keys.length}</small></h3><div class="inv-grid home-grid">${cells}</div>`;
+    }).join('');
+    return `<div class="sub-tabs" role="tablist">${tabs}</div><div class="chip-row">${kinds}</div><p class="muted small">點圖示看材料與製作。灰色剪影是還沒學會的配方：打怪、開寶箱、商店或獎勵禮包可以取得家具製作書。</p>${groups}`;
+  }
+  const mats = HOME_MATS.map((m) => {
+    const area = m.area ? AREAS[m.area].name : '商店、棉花';
+    return `<span class="inv-cell stack static home-mat" title="${m.name}（${area}）"><img src="${homeSmallIcon(m.key)}" alt="${m.name}"><b class="cell-count">${h.mats[m.key] || 0}</b><small class="cell-name">${m.name}</small></span>`;
+  }).join('');
+  const seeds = CROP_KEYS.filter((k) => h.seeds[k] > 0).map((k) => `<span class="inv-cell stack static" title="${CROPS[k].name}種子"><img src="${homeSmallIcon('seed')}" alt=""><b class="cell-count">${h.seeds[k]}</b><small class="cell-name">${CROPS[k].name}</small></span>`).join('');
+  const fert = `<span class="inv-cell stack static" title="肥料"><img src="${homeSmallIcon('fertilizer')}" alt=""><b class="cell-count">${h.fertilizer}</b><small class="cell-name">肥料</small></span>`;
+  const land = LAND[h.level - 1];
+  return `<div class="sub-tabs" role="tablist">${tabs}</div>
+    <div class="home-card"><b>我的房子・土地等級 ${h.level}</b><span class="muted small">房子 ${land.house[0]}×${land.house[1]} 格・庭院田地 ${land.plots} 塊・已擺放 ${h.placed.length} 件・庫存 ${Object.values(h.inventory).reduce((a, b) => a + b, 0)} 件</span><button type="button" class="primary-btn go-house" data-go-house="1">🏠 回家</button><span class="muted small">在家裡可以走動、到工作台製作家具，按「佈置」擺放家具。擴建與庭院種植會在下一個版本開放。</span></div>
+    <h3>家園材料 <small class="muted">（不佔背包・每種上限 999）</small></h3><div class="inv-grid home-grid">${mats}</div>
+    <p class="muted small">每個地城會掉不同的材料：${HOME_MATS.filter((m) => m.area).map((m) => `${AREAS[m.area].name}→${m.name}`).join('、')}；深淵會掉各種材料。木材、石塊、布料也可以在商店買。</p>
+    <h3>種子與肥料</h3><div class="inv-grid home-grid">${seeds}${fert}</div>
+    <p class="muted small">🎁 肥料只能從學習遊戲的獎勵禮包取得，可以讓作物立刻長大一階。</p>`;
+}
+
+/**
+ * 商店的家園區：基本家園材料、今天的家具製作書與種子。
+ * @param {object} ch 角色。
+ * @returns {string} HTML。
+ */
+function homeShopHtml(ch) {
+  const h = home.homeOf(ch);
+  const shop = home.homeShop(ch, village.localDay(), Math.random);
+  const mats = HOME_MATS.filter((m) => m.shop).map((m) => `<div class="shop-row"><img src="${homeSmallIcon(m.key)}" alt="" class="icon"><div class="item-main"><b>${m.name}</b><span class="item-stats">家園材料・持有 ${h.mats[m.key] || 0}</span></div><button type="button" class="buy-btn" data-buy-home-mat="${m.key}" data-n="1">${m.shop}G</button><button type="button" class="buy-btn" data-buy-home-mat="${m.key}" data-n="10">×10<small>${m.shop * 10}G</small></button></div>`).join('');
+  const recipes = shop.recipes.length
+    ? shop.recipes.map((k, i) => `<div class="shop-row"><img src="${homeIconUrl(k)}" alt="" class="icon"><div class="item-main"><span class="item-title"><span class="rarity r${HOME_ITEMS[k].rarity}">${HOME_RARITY[HOME_ITEMS[k].rarity]}</span> <b>${home.recipeName(k)}</b></span><span class="item-stats">買下後直接學會・${HOME_ITEMS[k].type === 'furniture' ? '家具' : '裝飾'}</span></div><button type="button" class="buy-btn" data-buy-recipe="${i}">${home.recipePrice(k)}G</button></div>`).join('')
+    : '<p class="muted">今天的家具製作書都賣完了，明天再來。</p>';
+  const seeds = CROP_KEYS.map((k) => `<div class="shop-row"><img src="${homeSmallIcon('seed')}" alt="" class="icon"><div class="item-main"><b>${CROPS[k].name}種子</b><span class="item-stats">${CROPS[k].tree ? '果樹・可以重複收成' : '收成一次'}・約 ${CROPS[k].hours} 小時成熟・持有 ${h.seeds[k] || 0}</span></div><button type="button" class="buy-btn" data-buy-seed="${k}">${CROPS[k].seedPrice}G</button></div>`).join('');
+  return `<h3>家園材料</h3>${mats}<h3>家具製作書 <small class="muted">（每天刷新）</small></h3>${recipes}<h3>種子</h3>${seeds}`;
+}
+
+/**
+ * 圖鑑中的一件家具或裝飾：顯示大圖、稀有度、擺放方式、需要的材料與金幣，已學會時可以製作。
+ * @param {object} ch 角色。
+ * @param {string} key 家具或裝飾代碼。
+ * @returns {Promise<{ok: boolean, message: string} | null>} 製作結果；關閉時為 null。
+ */
+async function openHomeItem(ch, key) {
+  const it = HOME_ITEMS[key];
+  const known = home.knowsRecipe(ch, key);
+  const h = home.homeOf(ch);
+  const place = { floor: '擺在地上（會擋路）', small: '小擺設（可以放在桌上）', rug: '鋪在地上（可以在上面擺家具）', wall: '掛在牆上', floorTile: '地板樣式（整間房子）', wallTile: '牆面樣式（整間房子）' }[it.place];
+  const src = it.src === 'default' ? '一開始就會做' : it.src === 'any' ? '打怪、寶箱、商店、獎勵禮包' : AREAS[it.src] ? `只在「${AREAS[it.src].name}」掉落` : `只有 Boss「${BOSSES[it.src].name}」會掉`;
+  const mats = Object.entries(it.mats).map(([m, n]) => {
+    const have = h.mats[m] || 0;
+    return `<span class="home-need${have >= n ? '' : ' short'}"><img src="${homeSmallIcon(m)}" alt="">${home.homeMatName(m)} ${have}／${n}</span>`;
+  }).join('');
+  const miss = known ? home.craftMissing(ch, key) : [];
+  const act = await openModal({
+    title: known ? it.name : `${it.name}（尚未學會）`,
+    html: `<div class="home-detail"><img src="${homeIconUrl(key, !known)}" alt=""><div><span class="rarity r${it.rarity}">${HOME_RARITY[it.rarity]}</span> ${it.type === 'furniture' ? '家具' : '裝飾'}・${it.size.join('×')} 格${it.yard ? '・庭院' : ''}<br><small class="muted">${place}<br>製作書來源：${src}</small></div></div>
+      <p class="home-needs">${mats}<span class="home-need${ch.gold >= it.gold ? '' : ' short'}">💰 ${it.gold}G</span></p>${h.inventory[key] ? `<p class="muted small">庫存 ${h.inventory[key]} 件</p>` : ''}${known && miss.length ? `<p class="muted small">${miss.join('、')}</p>` : ''}`,
+    actions: [{ label: '關閉', value: null }, ...(known ? [{ label: '製作', value: 'craft', className: 'primary', disabled: miss.length > 0 }] : [])],
+  });
+  return act === 'craft' ? home.craftHomeItem(ch, key) : null;
+}
+
+// ---------- 家裡場景 ----------
+
+/**
+ * 走進家裡：切換到家裡畫面並啟動場景。
+ * @param {object} ch 角色。
+ */
+function enterHouse(ch) {
+  showScreen('house');
+  window.scrollTo(0, 0);
+  $('house-title').textContent = `${ch.name} 的家`;
+  $('house-message').textContent = '';
+  app.house = new HouseView($('house-canvas'), ch, {
+    interact: (t) => houseInteract(ch, t),
+    place: (pv) => housePlace(ch, pv),
+    select: () => renderHouseBar(ch),
+    message: (text) => houseMessage(text, true),
+    busy: () => !els.modal.hidden,
+  });
+  app.houseTab = app.houseTab || 'furniture';
+  app.house.start();
+  fitHouse();
+  renderHouseBar(ch);
+}
+
+/** 停止家裡場景（離開家裡畫面時）。 */
+function stopHouse() {
+  if (!app.house) return;
+  app.house.stop();
+  app.house = null;
+}
+
+/** 離開家裡，回到村莊的家園分頁。 */
+async function leaveHouse() {
+  const ch = currentChar();
+  stopHouse();
+  if (ch) await store.saveProgress(ch);
+  app.tab = 'home';
+  showScreen('village');
+  renderVillage();
+}
+
+/** 依畫面大小縮放家裡的畫布（保持比例、不超過畫面高度的六成）。 */
+function fitHouse() {
+  if (!app.house) return;
+  const c = $('house-canvas');
+  const stage = $('house-stage');
+  const maxW = stage.clientWidth || window.innerWidth - 32;
+  const maxH = window.innerHeight * 0.62;
+  const scale = Math.min(maxW / c.width, maxH / c.height);
+  c.style.width = `${Math.floor(c.width * scale)}px`;
+  c.style.height = `${Math.floor(c.height * scale)}px`;
+}
+
+/**
+ * 家裡畫面的訊息。
+ * @param {string} text 訊息。
+ * @param {boolean} [warn=false] 是否為警告。
+ */
+function houseMessage(text, warn = false) {
+  const el = $('house-message');
+  el.textContent = text;
+  el.classList.toggle('warn', warn);
+}
+
+/**
+ * 與家裡的物件互動：工作台開啟製作清單；其他功能家具與田地說明之後的版本會開放。
+ * @param {object} ch 角色。
+ * @param {{kind: 'item' | 'plot', index: number}} t 互動目標。
+ */
+async function houseInteract(ch, t) {
+  if (t.kind === 'plot') {
+    houseMessage('這是田地。種植與收成會在下一個版本開放。');
+    return;
+  }
+  const p = ch.home.placed[t.index];
+  if (!p) return;
+  const it = HOME_ITEMS[p.id];
+  if (it.func === 'craft') {
+    await openWorkbench(ch);
+    renderHouseBar(ch);
+    return;
+  }
+  const later = { brew: '藥草台：合成藥水與料理會在下一個版本開放。', chest: '家用寶箱：存放物品會在下一個版本開放。', display: '展示架：展示傳說裝備會在下一個版本開放。' };
+  houseMessage(later[it.func] || `這是「${it.name}」。`);
+}
+
+/**
+ * 工作台：列出已學會的配方（可以製作的排前面），點了開啟材料與製作。
+ * @param {object} ch 角色。
+ */
+async function openWorkbench(ch) {
+  for (;;) {
+    const keys = ch.home.recipes.slice().sort((a, b) => (home.craftMissing(ch, a).length ? 1 : 0) - (home.craftMissing(ch, b).length ? 1 : 0));
+    const menu = keys.map((k) => ({
+      label: `<img src="${homeIconUrl(k)}" alt=""><small class="cell-name">${HOME_ITEMS[k].name}</small>${ch.home.inventory[k] ? `<b class="cell-count">${ch.home.inventory[k]}</b>` : ''}`,
+      value: k,
+      className: `inv-cell home-cell r${HOME_ITEMS[k].rarity}${home.craftMissing(ch, k).length ? ' none' : ''}`,
+    }));
+    const key = await openModal({
+      title: '工作台',
+      html: '<p class="muted small">點配方看材料與製作；亮的是材料足夠、可以馬上做的。做好的家具放進庫存，按「佈置」擺出來。</p>',
+      menu,
+      menuClass: 'menu-grid home-grid',
+      actions: [{ label: '關閉', value: null }],
+    });
+    if (!key) return;
+    const r = await openHomeItem(ch, key);
+    if (r) {
+      houseMessage(r.message, !r.ok);
+      if (r.ok) await store.saveProgress(ch);
+    }
+  }
+}
+
+/**
+ * 佈置模式中擺放或移動物件。
+ * @param {object} ch 角色。
+ * @param {{at: string, x: number, y: number}} pv 擺放位置。
+ */
+async function housePlace(ch, pv) {
+  const v = app.house;
+  const r = v.moving >= 0 ? home.moveItem(ch, v.moving, pv.at, pv.x, pv.y) : home.placeItem(ch, v.pick, pv.at, pv.x, pv.y);
+  houseMessage(r.message, !r.ok);
+  if (!r.ok) return;
+  if (v.moving >= 0) {
+    v.selected = v.moving;
+    v.moving = -1;
+  } else if (!(ch.home.inventory[v.pick] > 0)) v.pick = null;
+  v.preview = null;
+  await store.saveProgress(ch);
+  renderHouseBar(ch);
+}
+
+/**
+ * 家裡畫面下方的操作列：走動時顯示說明；佈置時顯示庫存（家具、裝飾、樣式）與選取物件的操作。
+ * @param {object} ch 角色。
+ */
+function renderHouseBar(ch) {
+  const v = app.house;
+  const bar = $('house-bar');
+  if (!v) return;
+  $('house-edit-btn').classList.toggle('on', v.mode === 'edit');
+  $('house-edit-btn').textContent = v.mode === 'edit' ? '完成' : '佈置';
+  if (v.mode !== 'edit') {
+    bar.innerHTML = '<p class="muted small">點地板走過去；點工作台製作家具。鍵盤：方向鍵或 WASD 移動，空白鍵與旁邊的物件互動。</p>';
+    return;
+  }
+  const h = ch.home;
+  if (v.selected >= 0 && h.placed[v.selected]) {
+    const p = h.placed[v.selected];
+    bar.innerHTML = `<p class="small">已選取「${HOME_ITEMS[p.id].name}」${v.moving >= 0 ? '：點新的位置放下' : ''}</p><div class="house-actions"><button type="button" data-house-act="move">移動</button><button type="button" data-house-act="flip">翻轉</button><button type="button" data-house-act="store">收回</button><button type="button" data-house-act="done">取消選取</button></div>`;
+    return;
+  }
+  const tabs = [['furniture', '家具'], ['decor', '裝飾'], ['tile', '地板牆面']].map(([k, name]) => `<button type="button" class="chip-btn${app.houseTab === k ? ' on' : ''}" data-house-tab="${k}">${name}</button>`).join('');
+  let cells;
+  if (app.houseTab === 'tile') {
+    cells = [...home.ownedTiles(ch, 'floorTile'), ...home.ownedTiles(ch, 'wallTile')].map((k) => {
+      const on = h.tiles.floor === k || h.tiles.wall === k;
+      return `<button type="button" class="inv-cell home-cell r${HOME_ITEMS[k].rarity}${on ? ' on' : ''}" data-house-tile="${k}"><img src="${homeIconUrl(k)}" alt=""><small class="cell-name">${HOME_ITEMS[k].name}</small></button>`;
+    }).join('');
+  } else {
+    cells = Object.keys(h.inventory).filter((k) => HOME_ITEMS[k].type === app.houseTab && !['floorTile', 'wallTile'].includes(HOME_ITEMS[k].place))
+      .map((k) => `<button type="button" class="inv-cell home-cell r${HOME_ITEMS[k].rarity}${v.pick === k ? ' on' : ''}" data-house-pick="${k}"><img src="${homeIconUrl(k)}" alt=""><b class="cell-count">${h.inventory[k]}</b><small class="cell-name">${HOME_ITEMS[k].name}</small></button>`).join('');
+  }
+  const hint = v.pick ? `點格子擺放「${HOME_ITEMS[v.pick].name}」（綠色可以擺、紅色不行）。` : app.houseTab === 'tile' ? '點樣式套用到整間房子。' : '選一件庫存，再點格子擺放；點已擺好的物件可以移動、翻轉或收回。';
+  bar.innerHTML = `<div class="chip-row">${tabs}</div><p class="muted small">${hint}</p><div class="palette">${cells || '<span class="muted small">庫存是空的：到工作台製作。</span>'}</div>`;
+}
+
+/**
+ * 家裡畫面下方操作列的點擊。
+ * @param {MouseEvent} e 點擊事件。
+ */
+async function onHouseBarClick(e) {
+  const b = e.target.closest('button');
+  const ch = currentChar();
+  const v = app.house;
+  if (!b || !ch || !v) return;
+  const d = b.dataset;
+  let r = null;
+  if (d.houseTab) app.houseTab = d.houseTab;
+  else if (d.housePick) {
+    v.pick = v.pick === d.housePick ? null : d.housePick;
+    v.preview = null;
+  } else if (d.houseTile) r = home.applyTile(ch, d.houseTile);
+  else if (d.houseAct === 'move') {
+    v.moving = v.selected;
+    houseMessage('點新的位置放下');
+  } else if (d.houseAct === 'flip') r = home.flipItem(ch, v.selected);
+  else if (d.houseAct === 'store') {
+    r = home.storeItem(ch, v.selected);
+    v.selected = -1;
+    v.moving = -1;
+  } else if (d.houseAct === 'done') {
+    v.selected = -1;
+    v.moving = -1;
+  }
+  if (r) {
+    houseMessage(r.message, !r.ok);
+    if (r.ok) await store.saveProgress(ch);
+  }
+  renderHouseBar(ch);
+}
+
+/** 切換走動與佈置模式。 */
+function toggleHouseEdit() {
+  const ch = currentChar();
+  if (!app.house || !ch) return;
+  app.house.setMode(app.house.mode === 'edit' ? 'walk' : 'edit');
+  houseMessage('');
+  renderHouseBar(ch);
 }
 
 /**
@@ -1076,7 +1428,7 @@ async function openBagCell(ch, key) {
     });
     if (!act) return null;
     // 開啟（可以連續開全部），彙整得到的內容。
-    const total = { gold: 0, mats: {}, shards: {}, potions: 0, cures: 0, pouch: 0, converted: 0, tickets: {} };
+    const total = { gold: 0, mats: {}, shards: {}, potions: 0, cures: 0, pouch: 0, converted: 0, tickets: {}, fertilizer: 0, seeds: {}, recipes: [] };
     let opened = 0;
     let last = null;
     for (let i = 0; i < (act === 'all' ? n : 1); i++) {
@@ -1088,6 +1440,11 @@ async function openBagCell(ch, key) {
       if (last.tickets.n) total.tickets[last.tickets.tier] = (total.tickets[last.tickets.tier] || 0) + last.tickets.n;
       for (const [m, c] of Object.entries(last.mats)) total.mats[m] = (total.mats[m] || 0) + c;
       for (const [s2, c] of Object.entries(last.shards)) total.shards[s2] = (total.shards[s2] || 0) + c;
+      // 家園：肥料、種子與家具製作書（學過的已自動賣出，金幣算進總額）。
+      total.fertilizer += last.home.fertilizer;
+      for (const [s2, c] of Object.entries(last.home.seeds)) total.seeds[s2] = (total.seeds[s2] || 0) + c;
+      if (last.home.recipe) total.recipes.push(last.home.recipe);
+      total.gold += last.home.recipeGold;
     }
     if (!opened) return { r: last };
     const matList = Object.entries(total.mats).map(([m, c]) => `<span class="loot-chip"><img src="${itemDataUrl(m)}" alt="">${MATERIALS.find((x) => x.key === m).name} ×${c}</span>`).join('');
@@ -1097,6 +1454,9 @@ async function openBagCell(ch, key) {
       total.potions ? `<span class="loot-chip"><img src="${itemDataUrl('potion')}" alt="">回復藥水 ×${total.potions}</span>` : '',
       total.cures ? `<span class="loot-chip"><img src="${itemDataUrl('cure')}" alt="">淨化藥水 ×${total.cures}</span>` : '',
       total.pouch ? `<span class="loot-chip"><img src="${itemDataUrl('pouch')}" alt="">背包擴充袋 ×${total.pouch}</span>` : '',
+      total.fertilizer ? `<span class="loot-chip"><img src="${homeSmallIcon('fertilizer')}" alt="">肥料 ×${total.fertilizer}</span>` : '',
+      ...Object.entries(total.seeds).map(([s2, c]) => `<span class="loot-chip"><img src="${homeSmallIcon('seed')}" alt="">${CROPS[s2].name}種子 ×${c}</span>`),
+      ...total.recipes.map((key) => `<span class="loot-chip r${HOME_ITEMS[key].rarity}"><img src="${homeIconUrl(key)}" alt="">${home.recipeName(key)}</span>`),
     ].join('');
     const goldNote = total.converted ? `<small class="muted">（含超過上限換成的 ${total.converted}G）</small>` : '';
     await openModal({ title: `開啟了 ${opened} 個${GIFT.names[k]}`, html: `<p class="gold-text">金幣 +${total.gold}G ${goldNote}</p>${extras ? `<h3>道具</h3><div class="loot-chips">${extras}</div>` : ''}<h3>裝備材料</h3><div class="loot-chips">${matList}</div><h3>技能書碎片</h3><div class="loot-chips">${shardList}</div>${last.ok ? '' : `<p class="notice-inline">${last.message}，其餘的禮包沒有開啟。</p>`}`, actions: [{ label: '好', value: null, className: 'primary' }] });
@@ -1605,6 +1965,20 @@ async function onVillageClick(e) {
     renderVillage();
     return;
   }
+  if (d.homeTab || d.homeBook) {
+    if (d.homeTab) app.homeTab = d.homeTab;
+    if (d.homeBook) app.homeBook = d.homeBook;
+    renderVillage();
+    return;
+  }
+  if (d.goHouse) {
+    enterHouse(ch);
+    return;
+  }
+  if (d.homeItem) {
+    r = await openHomeItem(ch, d.homeItem);
+    if (!r) return;
+  }
   if (d.cell || d.sharedCell) {
     const out = d.cell ? await openBagCell(ch, d.cell) : await openSharedCell(ch, d.sharedCell);
     if (!out) return;
@@ -1661,6 +2035,9 @@ async function onVillageClick(e) {
   else if (d.buy === 'scroll') r = village.buyScroll(ch);
   else if (d.buy === 'pouch') r = village.buyBagExpand(ch);
   else if (d.buyTicket) r = village.buyTicket(ch, Number(d.buyTicket));
+  else if (d.buyHomeMat) r = home.buyHomeMat(ch, d.buyHomeMat, Number(d.n || 1));
+  else if (d.buyRecipe !== undefined) r = home.buyRecipe(ch, Number(d.buyRecipe));
+  else if (d.buySeed) r = home.buySeed(ch, d.buySeed);
   else if (d.fuseAll) {
     r = await fuseAllDialog(ch);
     if (!r) return;
@@ -3060,6 +3437,10 @@ function bindEvents() {
     renderVillage();
   });
   els.villagePanel.addEventListener('click', onVillageClick);
+  $('house-back-btn').addEventListener('click', leaveHouse);
+  $('house-edit-btn').addEventListener('click', toggleHouseEdit);
+  $('house-bar').addEventListener('click', onHouseBarClick);
+  window.addEventListener('resize', fitHouse);
   $('pause-btn').addEventListener('click', pauseGame);
   $('resume-btn').addEventListener('click', resumeGame);
   $('scroll-btn').addEventListener('click', useScroll);

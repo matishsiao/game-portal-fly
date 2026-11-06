@@ -2,6 +2,7 @@
 // 所有函式直接修改傳入的角色資料，回傳結果與要顯示的訊息。
 
 import { AREAS, AREA_KEYS, LIMITS, MAX_DEPTH, RARITIES, ENHANCE, EQUIP_SLOTS, SHARED_SLOTS, CLASSES, REBIRTH, GEMS, GEM_RULES, MATERIALS, CRAFT, ITEM_SLOTS, BAG_EXPAND, SKILL_BOOK, GIFT, TICKET } from './data.js';
+import { giftHome } from './home.js';
 import { learnBook, SKILLS, bookSkillIds, passiveBonus } from './skills.js';
 import { makeItem, itemValue, sellPrice, enhanceCost, tryEnhance, rollRarity, dungeonLevel, levelCap, parseGem, gemName, socketCount, weaponHands, characterStats, powerScore } from './rules.js';
 
@@ -484,7 +485,7 @@ export function addGift(ch, tier, n = 1) {
  * @param {object} ch 角色（會被修改）。
  * @param {number} tier 等級（1～5）。
  * @param {() => number} rng 亂數函式。
- * @returns {{ok: boolean, message: string, gold?: number, mats?: Record<string, number>, shards?: Record<string, number>, potions?: number, cures?: number, pouch?: number, converted?: number, tickets?: {tier: number, n: number}}} 結果與內容。
+ * @returns {{ok: boolean, message: string, gold?: number, mats?: Record<string, number>, shards?: Record<string, number>, potions?: number, cures?: number, pouch?: number, converted?: number, tickets?: {tier: number, n: number}, home?: {fertilizer: number, seeds: Record<string, number>, recipe: string | null, recipeGold: number}}} 結果與內容（home 為家園物品）。
  */
 export function openGift(ch, tier, rng) {
   if (!(ch.gifts && ch.gifts[String(tier)] > 0)) return { ok: false, message: '沒有這個禮包' };
@@ -525,7 +526,9 @@ export function openGift(ch, tier, rng) {
   ch.bagExpand = (ch.bagExpand || 0) + pouch;
   for (const [m, n] of Object.entries(mats)) addMaterial(ch, m, n);
   for (const [id, n] of Object.entries(shards)) addStack(ch, 'shards', id, n);
-  return { ok: true, message: `開啟${GIFT.names[k]}：金幣 +${gold}`, gold, mats, shards, potions, cures, pouch, converted, tickets };
+  // 家園：肥料、種子，有機會得到一本家具製作書（學過的自動賣出，金幣另計）。
+  const home = giftHome(ch, tier, rng);
+  return { ok: true, message: `開啟${GIFT.names[k]}：金幣 +${gold}`, gold, mats, shards, potions, cures, pouch, converted, tickets, home };
 }
 
 /**

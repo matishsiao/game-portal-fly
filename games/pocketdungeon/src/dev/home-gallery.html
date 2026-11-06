@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>家園審圖</title>
+  <style>
+    body { margin: 0; padding: 16px; background: #241a30; color: #f0e6d8; font: 14px/1.5 system-ui, sans-serif; }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    h2 { font-size: 16px; margin: 24px 0 8px; border-bottom: 1px solid #4a3a5a; padding-bottom: 4px; }
+    .grid { display: flex; flex-wrap: wrap; gap: 12px; }
+    figure { margin: 0; padding: 8px; background: #3a2e48; border-radius: 8px; text-align: center; }
+    figcaption { font-size: 12px; color: #c8b8d8; margin-top: 4px; }
+    canvas { image-rendering: pixelated; display: block; margin: 0 auto; }
+    .room { overflow-x: auto; }
+    label { margin-right: 12px; }
+  </style>
+</head>
+<body>
+  <h1>家園審圖頁</h1>
+  <p>開發用：列出已完成美術的家具、裝飾、地板牆面、作物與圖示（含動態幀），不放進正式版。
+    <label>放大 <select id="scale"><option>2</option><option selected>3</option><option>4</option></select> 倍</label></p>
+  <div id="out"></div>
+  <script type="module" src="home-gallery.js"></script>
+</body>
+</html>
