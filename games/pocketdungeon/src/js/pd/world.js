@@ -3,8 +3,8 @@
 //
 // 座標單位為「格」，(x, y) 為實體中心；地圖格子 (i, j) 的範圍為 [i, i + 1) × [j, j + 1)。
 
-import { HOME_DROP, CROPS } from './homeData.js';
-import { addHomeMat, addSeed, gainRecipe, homeMatName, recipeName, rollHomeMat, rollRecipe, rollSeed, bossRecipe } from './home.js';
+import { HOME_DROP, CROPS, MEAT, MEAL_BUFFS } from './homeData.js';
+import { addHomeMat, addSeed, addGood, gainRecipe, homeMatName, recipeName, rollHomeMat, rollRecipe, rollSeed, bossRecipe } from './home.js';
 import { CLASSES, MONSTERS, BOSSES, LIMITS, BOSS_HEAL, EVOLVE, REBIRTH, STATUS, STATUS_BOSS, STATUS_REPEAT, AUTO_SHIELD_HP, GEMS, GEM_RULES, DIFFICULTY, CRAFT, BAG_EXPAND, CRIT_MULT, SKILL_BOOK, MAT_DROP, MATERIALS } from './data.js';
 import { generateFloor, walkable, STAIRS, SPIKES, WALL } from './dungeon.js';
 import {
@@ -70,7 +70,7 @@ export class World {
   /**
    * 建立探險。
    * @param {object} character 角色資料（會被修改：經驗、等級、金幣、背包）。
-   * @param {{area: string, depth: number, seed: number, floor?: number, potions?: number, scroll?: number, cures?: number}} run 探險設定。
+   * @param {{area: string, depth: number, seed: number, floor?: number, potions?: number, scroll?: number, cures?: number, meal?: {key: string, buff: string, pct: number} | null}} run 探險設定（meal 為出發前吃的料理加成）。
    * @param {() => number} [rng=Math.random] 戰鬥用亂數。
    */
   constructor(character, run, rng = Math.random) {
@@ -84,6 +84,8 @@ export class World {
     this.time = 0;
     this.events = [];
     this.loot = { gold: 0, xp: 0, items: [], gems: [], kills: 0, damageTaken: 0, potionsUsed: 0, levelsGained: 0, maxHit: 0 };
+    /** 料理加成（只對這一趟有效）。 */
+    this.meal = run.meal && MEAL_BUFFS[run.meal.buff] ? { key: run.meal.key, buff: run.meal.buff, pct: run.meal.pct } : null;
     this.player = this.makePlayer(run.potions ?? 3, run.scroll ?? 1, run.cures ?? 0);
     /** 帶進地城的技能（2～4 格，依角色在村莊的設定與轉職次數，探險中不變）。 */
     // 被動技能：技能傷害與冷卻在出發時套用（探險中不變）。
@@ -141,8 +143,16 @@ export class World {
     p.actives = s.actives;
     // 普通攻擊命中時的異常狀態：武器附帶的，加上被動技能（毒塗箭、冰心）。
     p.attackStatus = [this.ch.equipped.weapon && this.ch.equipped.weapon.status, pb.poisonProc && ['poison', pb.poisonProc / 100], pb.stunProc && ['stun', pb.stunProc / 100]].filter(Boolean);
+    // 料理加成：最大 HP、攻擊、移動速度、經驗值（裝備掉落率在掉落時套用）。
+    const meal = this.meal;
+    // 料理對某種屬性的倍率。
+    const boost = (kind) => (meal && meal.buff === kind ? 1 + meal.pct / 100 : 1);
+    s.hp = Math.round(s.hp * boost('hp'));
+    p.maxHp = s.hp;
+    p.atk = Math.round(s.atk * boost('atk'));
+    if (meal && meal.buff === 'xp') p.xpPct += meal.pct;
     const prof = speedProfile(s.spd);
-    p.move = prof.move;
+    p.move = prof.move * boost('move');
     p.interval = prof.interval * (1 - pb.interval / 100) * (CLASSES[this.ch.cls].attack.rate || 1);
     p.hp = heal ? s.hp : Math.max(1, Math.round(s.hp * ratio));
   }
@@ -1272,7 +1282,7 @@ export class World {
       this.evolveBoss(m);
       return;
     }
-    const chance = m.boss ? 1 : m.elite ? 0.4 : 0.08;
+    const chance = (m.boss ? 1 : m.elite ? 0.4 : 0.08) * (this.meal && this.meal.buff === 'drop' ? 1 + this.meal.pct / 100 : 1);
     if (m.evolved) {
       // 進化 Boss：必掉 2 件更好的裝備（等級 +3）。
       for (let k = 0; k < EVOLVE.items; k++) this.dropItem(m.x + 0.3 + k * 0.5, m.y, 'evolved', EVOLVE.levelBonus);
@@ -1412,6 +1422,8 @@ export class World {
       if (key && (m.evolved || this.rng() < HOME_DROP.bossTheme)) this.addPickup({ kind: 'recipe', x: m.x - 0.6, y: m.y + 0.5, recipe: key, t: 0 });
     } else if (this.rng() < HOME_DROP.recipe[src]) this.dropRecipe(m.x - 0.4, m.y + 0.4);
     if (!m.boss && this.rng() < HOME_DROP.seed[src]) this.addPickup({ kind: 'seed', x: m.x, y: m.y - 0.5, seed: rollSeed(this.rng), t: 0 });
+    // 獸肉：野生動物類的怪物才會掉（料理用；牧場動物不產肉）。
+    if (MEAT.monsters.includes(m.type) && this.rng() < MEAT[src]) this.addPickup({ kind: 'meat', x: m.x + 0.3, y: m.y + 0.5, n: m.boss ? MEAT.bossCount : 1, t: 0 });
   }
 
   /**
@@ -1892,6 +1904,9 @@ export class World {
         if (r.learned) this.loot.recipes = (this.loot.recipes || 0) + 1;
         else this.loot.gold += r.gold;
         this.events.push({ type: 'message', text: r.learned ? `撿到${recipeName(it.recipe)}！${r.message}` : r.message });
+      } else if (it.kind === 'meat') {
+        const got = addGood(this.ch, 'meat', it.n || 1);
+        if (got > 0) this.effect('text', p.x, p.y - 1, { text: `+獸肉×${got}`, color: '#f0b090' });
       } else if (it.kind === 'seed') {
         if (addSeed(this.ch, it.seed, 1)) this.effect('text', p.x, p.y - 1, { text: `+${CROPS[it.seed].name}種子`, color: '#a8f0a0' });
       } else if (it.kind === 'book') {
@@ -2100,6 +2115,7 @@ export class World {
       area: this.area, depth: this.depth, seed: this.seed, floor: this.floorIndex, elapsed: this.elapsed, time: this.time,
       loot: { ...this.loot, items: this.loot.items.map((i) => i.id) },
       player: { x: p.x, y: p.y, hp: p.hp, potions: p.potions, scroll: p.scroll, cures: p.cures, facing: p.facing },
+      meal: this.meal,
       monsters: this.monsters.map((m) => ({ type: m.type, x: m.x, y: m.y, hp: m.hp, maxHp: m.maxHp, boss: m.boss, elite: m.elite, small: m.small, abyss: m.abyss, evolved: !!m.evolved, split: m.split, phase2: m.phase2, summoned: m.summoned, heals: m.heals || 0, awake: !!m.awake, affix: m.affix, enraged: !!m.enraged })),
       pickups: this.pickups.map((it) => ({ ...it })),
       chests: this.chests.map((c) => ({ ...c })),
@@ -2115,7 +2131,7 @@ export class World {
    * @returns {World} 探險。
    */
   static restore(character, snap, rng = Math.random) {
-    const w = new World(character, { area: snap.area, depth: snap.depth, seed: snap.seed, floor: snap.floor, potions: snap.player.potions, scroll: snap.player.scroll, cures: snap.player.cures || 0 }, rng);
+    const w = new World(character, { area: snap.area, depth: snap.depth, seed: snap.seed, floor: snap.floor, potions: snap.player.potions, scroll: snap.player.scroll, cures: snap.player.cures || 0, meal: snap.meal || null }, rng);
     w.elapsed = snap.elapsed;
     w.time = snap.time || 0;
     w.loot = { ...snap.loot, items: character.bag.filter((i) => snap.loot.items.includes(i.id)), gems: snap.loot.gems || [] };

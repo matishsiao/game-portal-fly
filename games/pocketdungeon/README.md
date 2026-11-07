@@ -14,10 +14,11 @@
 | `npm run build` | 建置到 `dist/`，並在 `sw.js` 寫入版本號、版本標籤與預先快取清單 |
 | `npm run preview` | 建置並以 `dist/` 啟動，**啟用** Service Worker，用於驗證離線功能 |
 | `npm run preview:https` | 同上但使用 HTTPS（mkcert 憑證），供手機透過區網測試（選用） |
-| `npm test` | 單元測試：經驗與屬性公式、傷害、裝備與強化、地城生成、碰撞、攻擊範圍、閃避與無敵、怪物（44 種）與 Boss（11 種）行為（回復、進化）、技能（解鎖、技能點、30 個技能的效果、技能欄依獲得的技能數開放）、異常狀態（中毒、睡眠、暈眩）、寶石（鑲嵌、合成、加成、護盾）、快照還原、村莊規則 |
+| `npm test` | 單元測試：經驗與屬性公式、傷害、裝備與強化、地城生成、碰撞、攻擊範圍、閃避與無敵、怪物（44 種）與 Boss（11 種）行為（回復、進化）、技能（解鎖、技能點、30 個技能的效果、技能欄依獲得的技能數開放）、異常狀態（中毒、睡眠、暈眩）、寶石（鑲嵌、合成、加成、護盾）、快照還原、村莊規則、家園（材料與配方、擺放、擴建、種植與時鐘保護、牧場、藥草台與料理加成、寶箱與展示架、染色、學科連動、市集） |
 | `npm run check:dungeons` | 地城生成驗證：每個區域、深度 1～5 各 200 層，檢查連通性、樓梯可到達、配置規則與生成時間（≤ 50 ms） |
 | `npm run check:balance` | 數值平衡驗證：練到 Lv.30 的探險次數（40～70 趟）、Boss 擊殺時間（≤ 120 秒）與單次傷害（≤ 35% HP）、怪物不會 3 下打倒玩家 |
 | `npm run icons` | 重新產生 `src/icons/` 圖示 |
+| `node scripts/gen-home-links.mjs` | 從自然探險與社會科學題庫重新產生家園學科連動的知識卡清單（`src/js/pd/homeLinks.js`；題庫變動時執行，測試會檢查是否一致） |
 
 ## 專案結構
 
@@ -25,7 +26,8 @@
 src/
   index.html, css/style.css, manifest.webmanifest, icons/
   sw.js                 Service Worker 樣板（版本與資源清單由 build 填入）
-  js/app.js             首頁、村莊（地城入口、商店、鐵匠、寶石、倉庫、技能、角色）、地城畫面、遊戲迴圈、輸入、HUD、離線狀態
+  js/app.js             首頁、村莊（地城入口、商店、鐵匠、寶石、倉庫、家園、技能、角色）、地城畫面、家裡畫面、遊戲迴圈、輸入、HUD、離線狀態
+  js/houseView.js       家裡場景（家園）：房子與庭院的繪製、走動、互動與佈置預覽
   js/storage.js         本機儲存：IndexedDB（角色、探險、設定）與 localStorage（大廳摘要、統計、設定）
   js/pd/data.js         資料表：職業、區域、怪物、Boss、異常狀態、寶石、稀有度、裝備名稱、強化與道具價格
   js/pd/rules.js        成長與裝備規則（純邏輯）：經驗曲線、屬性、傷害公式、怪物強度、裝備產生與強化、寶石加成
@@ -35,7 +37,12 @@ src/
   js/pd/village.js      村莊規則（純邏輯）：商店、買賣、穿脫、強化、分解與合成、寶石鑲嵌與合成、解鎖、探險結算
   js/pd/render.js       畫面繪製：地圖、角色、預警、效果、戰爭迷霧、小地圖
   js/pd/sprites.js      原創像素圖資料
-scripts/                build、serve、check-dungeons、check-balance、make-icons
+  js/pd/homeData.js     家園資料：材料、家具與裝飾、作物、牧場、料理、土地、學科連動、觀察日記
+  js/pd/home.js         家園規則（純邏輯）：存檔修復、配方與製作、擺放、擴建、種植、牧場、藥草台、寶箱、染色、市集
+  js/pd/homeArt.js, homeDraw.js, homeArt/  家園美術（每格 32 像素，以部件繪製）
+  js/pd/homeLinks.js    家園學科連動的知識卡清單（由 scripts/gen-home-links.mjs 產生）
+  dev/home-gallery.html 家園審圖頁（不放進正式版）
+scripts/                build、serve、check-dungeons、check-balance、make-icons、gen-home-links
 tests/                  node:test 單元測試
 ```
 

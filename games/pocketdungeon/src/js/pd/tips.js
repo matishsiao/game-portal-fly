@@ -127,6 +127,30 @@ export const TIPS = [
     text: `使用後背包上限 +${BAG_EXPAND.step} 格（最多 ${BAG_EXPAND.max} 格）。點擴充袋或背包標題旁的「擴充」使用。`,
     has: (ch) => (ch.bagExpand || 0) > 0,
   },
+  {
+    id: 'homemat', icon: 'blueprint', title: '家園材料與家具製作書', any: true,
+    text: '打怪撿到的木材、石塊等「家園材料」和家具製作書不佔背包。到「家園」分頁按「回家」，在工作台製作家具，再按「佈置」擺進房子裡。',
+    has: (ch) => !!ch.home && Object.values(ch.home.mats || {}).some((n) => n > 0),
+    go: { label: '去家園', tab: 'home' },
+  },
+  {
+    id: 'homefarm', icon: 'seedBag', title: '庭院種植', any: true,
+    text: '家裡的庭院最下面一排是田地：點田地種下種子，作物會依照實際時間長大（離開遊戲也會長）。紅草可以在藥草台做成回復藥水，果樹收成後還會再結果。',
+    has: (ch) => !!ch.home && Object.values(ch.home.seeds || {}).some((n) => n > 0) && ch.home.plots.every((p) => !p.crop),
+    go: { label: '去家園', tab: 'home' },
+  },
+  {
+    id: 'homemeat', icon: 'meat', title: '獸肉', any: true,
+    text: '打倒野豬、冰原狼等野生動物會掉「獸肉」。在家裡的藥草台可以做成燉肉等料理，吃了以後下一趟探險有小幅加成。',
+    has: (ch) => !!ch.home && (ch.home.produce || {}).meat > 0,
+    go: { label: '去家園', tab: 'home' },
+  },
+  {
+    id: 'homelink', icon: 'seedBag', title: '學科連動', any: true,
+    text: '在自然探險、社會科學收集到的知識卡，會讓家園解鎖新的動植物：例如學「動物朋友」就能養雞和乳牛、學「臺灣的地理」就能種鳳梨和茶樹。到「家園」分頁的「連動・日記」看看還能解鎖什麼。',
+    has: (ch) => !!ch.home && (ch.home.links || []).length > 0,
+    go: { label: '去家園', tab: 'home' },
+  },
 ];
 
 /**

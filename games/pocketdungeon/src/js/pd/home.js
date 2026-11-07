@@ -1,7 +1,13 @@
 // 家園規則（純邏輯）：家園存檔的建立與修復、家園材料、家具製作書（配方）、種子與肥料、
-// 地城掉落的抽選、家園商店與製作。所有函式直接修改傳入的角色資料。
+// 地城掉落的抽選、家園商店與製作、擺放、擴建、種植、牧場、藥草台與料理、寶箱與展示架、染色、學科連動與市集。
+// 所有函式直接修改傳入的角色資料。
 
-import { HOME_MATS, HOME_MAT_KEYS, HOME_DROP, HOME_SHOP, HOME_MAX, HOME_ITEMS, HOME_ITEM_KEYS, DEFAULT_RECIPES, CROPS, CROP_KEYS, START_SEEDS, HOME_GIFT, LAND, YARD_ROWS } from './homeData.js';
+import {
+  HOME_MATS, HOME_MAT_KEYS, HOME_DROP, HOME_SHOP, HOME_MAX, HOME_ITEMS, HOME_ITEM_KEYS, DEFAULT_RECIPES, CROPS, CROP_KEYS, START_SEEDS, HOME_GIFT, LAND,
+  GROW, ANIMALS, RANCH, GOODS, GOOD_KEYS, DYE_KEYS, MEALS, MEAL_KEYS, MEAL_BUFFS, BREWS, HOME_CHEST, SHELF_SLOTS, MARKET, LINKS, DIARY,
+} from './homeData.js';
+import { LINK_CARDS } from './homeLinks.js';
+import { LIMITS } from './data.js';
 
 /**
  * 建立新角色的家園：等級 1 的空房子（地板、牆面為木頭）、預設配方與起始種子，工作台放在房間左上。
@@ -10,9 +16,19 @@ import { HOME_MATS, HOME_MAT_KEYS, HOME_DROP, HOME_SHOP, HOME_MAX, HOME_ITEMS, H
 export function newHome() {
   return {
     level: 1, mats: {}, recipes: DEFAULT_RECIPES.slice(), seeds: { ...START_SEEDS }, produce: {}, fertilizer: 0,
-    inventory: {}, placed: [{ id: 'workbench', at: 'house', x: 0, y: 0, rot: 0 }], plots: [], chest: [],
+    inventory: {}, placed: [{ id: 'workbench', at: 'house', x: 0, y: 0, rot: 0 }], plots: emptyPlots(LAND[0].plots), chest: [],
     tiles: { floor: 'woodFloor', wall: 'woodWall' }, lastSeen: 0, shop: null,
+    meals: {}, meal: null, diary: [], links: [], market: null,
   };
+}
+
+/**
+ * 建立指定數量的空田地。
+ * @param {number} n 數量。
+ * @returns {Array<{crop: null, grown: number}>} 田地。
+ */
+function emptyPlots(n) {
+  return Array.from({ length: n }, () => ({ crop: null, grown: 0 }));
 }
 
 /**
@@ -30,27 +46,80 @@ export function normalizeHome(h) {
     mats: stackMap(h.mats, HOME_MAT_KEYS),
     recipes: Array.isArray(h.recipes) ? [...new Set([...DEFAULT_RECIPES, ...h.recipes.filter((k) => HOME_ITEMS[k])])] : base.recipes,
     seeds: h.seeds === undefined ? base.seeds : stackMap(h.seeds, CROP_KEYS),
-    produce: stackMap(h.produce, CROP_KEYS),
+    produce: stackMap(h.produce, GOOD_KEYS),
     fertilizer: count(h.fertilizer),
     inventory: stackMap(h.inventory, HOME_ITEM_KEYS),
     placed: [],
-    plots: Array.isArray(h.plots) ? h.plots.filter((p) => p && (p.crop === null || CROPS[p.crop])).slice(0, LAND[level - 1].plots) : [],
-    chest: Array.isArray(h.chest) ? h.chest : [],
+    plots: normalizePlots(h.plots, LAND[level - 1].plots),
+    chest: Array.isArray(h.chest) ? h.chest.filter((it) => it && typeof it === 'object') : [],
     tiles: {
       floor: h.tiles && HOME_ITEMS[h.tiles.floor] && HOME_ITEMS[h.tiles.floor].place === 'floorTile' ? h.tiles.floor : 'woodFloor',
       wall: h.tiles && HOME_ITEMS[h.tiles.wall] && HOME_ITEMS[h.tiles.wall].place === 'wallTile' ? h.tiles.wall : 'woodWall',
     },
     lastSeen: Number.isFinite(h.lastSeen) && h.lastSeen >= 0 ? h.lastSeen : 0,
     shop: h.shop && typeof h.shop.day === 'string' && Array.isArray(h.shop.recipes) ? { day: h.shop.day, recipes: h.shop.recipes.filter((k) => HOME_ITEMS[k]) } : null,
+    meals: stackMap(h.meals, MEAL_KEYS),
+    meal: MEALS[h.meal] ? h.meal : null,
+    diary: Array.isArray(h.diary) ? [...new Set(h.diary.filter((k) => DIARY[k]))] : [],
+    links: Array.isArray(h.links) ? [...new Set(h.links.filter((k) => LINKS[k]))] : [],
+    market: h.market && typeof h.market.day === 'string' && h.market.sold && typeof h.market.sold === 'object' ? { day: h.market.day, sold: stackMap(h.market.sold, GOOD_KEYS) } : null,
   };
   // 擺放：依序檢查（物件要存在、位置要符合擺放規則且不和先前的重疊）；不合法的收回庫存。
   for (const p of Array.isArray(h.placed) ? h.placed : []) {
     if (!p || !HOME_ITEMS[p.id]) continue;
     const at = p.at === undefined ? 'house' : p.at;
-    const rot = p.rot === 1 ? 1 : 0;
-    if (Number.isInteger(p.x) && Number.isInteger(p.y) && placeCheck(out, p.id, at, p.x, p.y).ok) out.placed.push({ id: p.id, at, x: p.x, y: p.y, rot });
-    else out.inventory[p.id] = Math.min(HOME_MAX, (out.inventory[p.id] || 0) + 1);
+    if (Number.isInteger(p.x) && Number.isInteger(p.y) && placeCheck(out, p.id, at, p.x, p.y).ok) out.placed.push(cleanPlaced(p, at));
+    else unplace(out, cleanPlaced(p, at));
   }
+  return out;
+}
+
+/**
+ * 修復一筆擺放資料：只保留合法欄位（翻轉、染色、動物的飼料與產出、展示架上的裝備）。
+ * @param {object} p 擺放資料。
+ * @param {string} at 區域。
+ * @returns {object} 修復後的擺放資料。
+ */
+function cleanPlaced(p, at) {
+  const it = HOME_ITEMS[p.id];
+  const out = { id: p.id, at, x: p.x, y: p.y, rot: p.rot === 1 ? 1 : 0 };
+  if (DYE_KEYS.includes(p.dye) && it.type !== 'animal') out.dye = p.dye;
+  if (it.type === 'animal') {
+    // 非負數，否則為 0（上限為 max）。
+    const num = (v, max) => (Number.isFinite(v) && v > 0 ? Math.min(v, max) : 0);
+    const period = ANIMALS[p.id].hours * 3600e3;
+    out.food = num(p.food, RANCH.feedHours * 3600e3);
+    out.prog = num(p.prog, period);
+    out.stock = Math.floor(num(p.stock, RANCH.maxStock));
+  }
+  if (it.func === 'display') out.show = Array.isArray(p.show) ? p.show.filter((x) => x && typeof x === 'object').slice(0, SHELF_SLOTS) : [];
+  return out;
+}
+
+/**
+ * 把一件不能留在原位的擺放物件收回庫存；展示架上的裝備改放進家用寶箱（不受格數限制，避免遺失）。
+ * @param {object} h 家園資料（會被修改）。
+ * @param {object} p 擺放資料。
+ */
+function unplace(h, p) {
+  h.inventory[p.id] = Math.min(HOME_MAX, (h.inventory[p.id] || 0) + 1);
+  if (p.show) h.chest.push(...p.show);
+}
+
+/**
+ * 修復田地：作物要存在、生長時間為非負數，數量補齊或截到土地等級的田地數。
+ * @param {any} plots 田地資料。
+ * @param {number} n 田地數。
+ * @returns {Array<{crop: string | null, grown: number}>} 田地。
+ */
+function normalizePlots(plots, n) {
+  const out = emptyPlots(n);
+  if (!Array.isArray(plots)) return out;
+  // 修復一塊田地。
+  plots.slice(0, n).forEach((p, i) => {
+    if (!p || !CROPS[p.crop]) return;
+    out[i] = { crop: p.crop, grown: Number.isFinite(p.grown) && p.grown > 0 ? Math.min(p.grown, cropTotalMs(p.crop)) : 0 };
+  });
   return out;
 }
 
@@ -89,7 +158,7 @@ export function homeOf(ch) {
 /**
  * 增減一種可堆疊的家園物品（材料、種子、作物、庫存家具），數量限制在 0～上限。
  * @param {object} ch 角色（會被修改）。
- * @param {'mats' | 'seeds' | 'produce' | 'inventory'} field 欄位。
+ * @param {'mats' | 'seeds' | 'produce' | 'inventory' | 'meals'} field 欄位。
  * @param {string} key 代碼。
  * @param {number} n 數量（負數為扣除）。
  * @returns {number} 實際增減的數量。
@@ -432,11 +501,11 @@ export function homeLayout(level) {
   const [w, h] = land.house;
   const house = { x: 1, y: 1, w, h };
   const door = { x: 1 + Math.floor(w / 2), y: h + 1 };
-  const yard = { x: 1, y: h + 2, w, h: YARD_ROWS };
+  const yard = { x: 1, y: h + 2, w, h: land.yard };
   // 田地：庭院最下面一排，置中排列。
   const left = yard.x + Math.floor((w - land.plots) / 2);
   const plots = Array.from({ length: land.plots }, (_, k) => ({ x: left + k, y: yard.y + yard.h - 1 }));
-  return { cols: w + 2, rows: h + 2 + YARD_ROWS, house, yard, wall: { x: 1, y: 0, w }, door, plots };
+  return { cols: w + 2, rows: h + 2 + land.yard, house, yard, wall: { x: 1, y: 0, w }, door, plots };
 }
 
 /**
@@ -513,6 +582,7 @@ export function placeCheck(h, id, at, x, y, ignore = -1) {
   const keep = [{ x: layout.door.x, y: layout.door.y - 1, w: 1, h: 1 }, { x: layout.door.x, y: layout.door.y + 1, w: 1, h: 1 }];
   if (keep.some((k) => overlap(k, r)) && it.place !== 'rug') return { ok: false, reason: '不能擋住門口' };
   if (layout.plots.some((pl) => overlap({ ...pl, w: 1, h: 1 }, r))) return { ok: false, reason: '這裡是田地' };
+  if (it.type === 'animal' && others.filter((o) => HOME_ITEMS[o.p.id].type === 'animal').length >= LAND[h.level - 1].animals) return { ok: false, reason: `土地等級 ${h.level} 最多養 ${LAND[h.level - 1].animals} 隻動物` };
   if (it.place === 'floor') {
     if (others.some((o) => o.p.at !== 'wall' && (blocks(o.p) || HOME_ITEMS[o.p.id].place === 'small') && overlap(o.r, r))) return { ok: false, reason: '這裡已經有東西了' };
     // 擺下後所有空地都要從門口走得到。
@@ -590,7 +660,7 @@ export function placeItem(ch, id, at, x, y) {
   const c = placeCheck(h, id, at, x, y);
   if (!c.ok) return { ok: false, message: c.reason };
   addHomeStack(ch, 'inventory', id, -1);
-  h.placed.push({ id, at, x, y, rot: 0 });
+  h.placed.push(cleanPlaced({ id, x, y, rot: 0 }, at));
   return { ok: true, message: `擺好了「${HOME_ITEMS[id].name}」` };
 }
 
@@ -637,6 +707,11 @@ export function storeItem(ch, index) {
   const h = homeOf(ch);
   const p = h.placed[index];
   if (!p) return { ok: false, message: '找不到這件物品' };
+  if (p.show && p.show.length) return { ok: false, message: '先把展示架上的裝備拿下來' };
+  if (HOME_ITEMS[p.id].func === 'chest' && h.chest.length > HOME_CHEST.slots * Math.min(HOME_CHEST.maxChests, placedChests(h) - 1)) {
+    return { ok: false, message: '寶箱裡的東西太多，先拿出一些再收回' };
+  }
+  if (p.stock) return { ok: false, message: '先收取動物的產物再收回' };
   const layout = homeLayout(h.level);
   const r = placedRect(p, layout);
   const remove = new Set([index]);
@@ -749,4 +824,631 @@ export function findPath(grid, from, to) {
     }
   }
   return null;
+}
+
+// ---------- 擴建 ----------
+
+/**
+ * 擴建到下一個土地等級還缺少的條件與材料。
+ * @param {object} ch 角色。
+ * @returns {{max: boolean, next: object | null, missing: string[]}} max 為已是最高等級；missing 空陣列表示可以擴建。
+ */
+export function expandNeed(ch) {
+  const h = homeOf(ch);
+  const next = LAND[h.level];
+  if (!next) return { max: true, next: null, missing: [] };
+  const missing = [];
+  if (next.need.level && ch.level < next.need.level && !(ch.rebirth > 0)) missing.push(`角色等級要到 ${next.need.level}`);
+  if (next.need.rebirth && !((ch.rebirth || 0) >= next.need.rebirth)) missing.push('要先轉職');
+  if (next.need.area && !(ch.unlocked && ch.unlocked[next.need.area] >= 1)) missing.push('要先解鎖魔王城');
+  for (const [m, n] of Object.entries(next.mats)) {
+    const have = h.mats[m] || 0;
+    if (have < n) missing.push(`${homeMatName(m)}還差 ${n - have}`);
+  }
+  if (ch.gold < next.price) missing.push(`金幣還差 ${next.price - ch.gold}G`);
+  return { max: false, next, missing };
+}
+
+/**
+ * 擴建土地：扣除金幣與材料，房子與庭院變大、田地增加。原本的家具位置不變（以區域左上角為原點）；
+ * 門口位置改變後擋到門口的家具收回庫存。
+ * @param {object} ch 角色（會被修改）。
+ * @returns {{ok: boolean, message: string, stored?: number}} 結果；stored 為被收回庫存的物件數。
+ */
+export function expandHome(ch) {
+  const need = expandNeed(ch);
+  if (need.max) return { ok: false, message: '已經是最大的土地了' };
+  if (need.missing.length) return { ok: false, message: need.missing.join('、') };
+  const h = homeOf(ch);
+  ch.gold -= need.next.price;
+  for (const [m, n] of Object.entries(need.next.mats)) addHomeMat(ch, m, -n);
+  h.level++;
+  h.plots = [...h.plots, ...emptyPlots(need.next.plots - h.plots.length)];
+  const stored = revalidate(h);
+  const [w, hh] = need.next.house;
+  return { ok: true, stored, message: `擴建完成！房子變成 ${w}×${hh} 格、庭院田地 ${need.next.plots} 塊、最多養 ${need.next.animals} 隻動物${stored ? `（有 ${stored} 件物品擋到新的門口，已收回庫存）` : ''}` };
+}
+
+/**
+ * 重新檢查所有擺放：依序放回，不合法的收回庫存。
+ * @param {object} h 家園資料（會被修改）。
+ * @returns {number} 收回的件數。
+ */
+function revalidate(h) {
+  const all = h.placed;
+  h.placed = [];
+  let stored = 0;
+  for (const p of all) {
+    if (placeCheck(h, p.id, p.at, p.x, p.y).ok) h.placed.push(p);
+    else {
+      unplace(h, p);
+      stored++;
+    }
+  }
+  return stored;
+}
+
+// ---------- 時間、種植與牧場 ----------
+
+/**
+ * 作物從種下到成熟的毫秒數。
+ * @param {string} key 作物代碼。
+ * @returns {number} 毫秒。
+ */
+export function cropTotalMs(key) {
+  return CROPS[key].hours * 3600e3;
+}
+
+/**
+ * 田地的生長階段：-1 空地、0 剛種下、1 成長中、2 成熟。
+ * @param {{crop: string | null, grown: number}} plot 田地。
+ * @returns {number} 階段。
+ */
+export function cropStage(plot) {
+  if (!plot || !plot.crop) return -1;
+  const total = cropTotalMs(plot.crop);
+  return plot.grown >= total ? 2 : plot.grown >= total * GROW.mid ? 1 : 0;
+}
+
+/**
+ * 作物還要多久成熟（毫秒）。
+ * @param {{crop: string | null, grown: number}} plot 田地。
+ * @returns {number} 毫秒（空地或已成熟為 0）。
+ */
+export function cropLeftMs(plot) {
+  if (!plot || !plot.crop) return 0;
+  return Math.max(0, cropTotalMs(plot.crop) - plot.grown);
+}
+
+/**
+ * 依實際時間推進作物與動物：距離上次記錄的時間（最多 24 小時）加到每塊田的生長與每隻動物的產出；
+ * 時鐘被往回調時不倒扣、也不前進（記錄的時間保持不變，等時鐘追上後才繼續）。
+ * @param {object} ch 角色（會被修改）。
+ * @param {number} now 現在時間（毫秒）。
+ * @returns {number} 這次推進的毫秒數。
+ */
+export function tickHome(ch, now) {
+  const h = homeOf(ch);
+  if (!Number.isFinite(now)) return 0;
+  if (!h.lastSeen) {
+    h.lastSeen = now;
+    return 0;
+  }
+  const dt = Math.min(now - h.lastSeen, GROW.maxStepMs);
+  if (!(dt > 0)) return 0;
+  h.lastSeen = now;
+  for (const p of h.plots) if (p.crop) p.grown = Math.min(cropTotalMs(p.crop), p.grown + dt);
+  for (const p of h.placed) {
+    if (HOME_ITEMS[p.id].type !== 'animal') continue;
+    const period = ANIMALS[p.id].hours * 3600e3;
+    const use = Math.min(dt, p.food);
+    p.food -= use;
+    p.prog += use;
+    while (p.prog >= period && p.stock < RANCH.maxStock) {
+      p.prog -= period;
+      p.stock++;
+    }
+    if (p.stock >= RANCH.maxStock) p.prog = Math.min(p.prog, period);
+  }
+  return dt;
+}
+
+/**
+ * 某個學科連動是否已解鎖（解鎖紀錄存在家園中，學習遊戲的資料被清除也不會失去）。
+ * @param {object} ch 角色。
+ * @param {string} key 連動代碼。
+ * @returns {boolean} 已解鎖時為 true。
+ */
+export function linkOn(ch, key) {
+  return !key || homeOf(ch).links.includes(key);
+}
+
+/**
+ * 依學習遊戲收集的知識卡更新學科連動：新解鎖的記錄下來；節慶連動解鎖時自動學會節慶裝飾的配方。
+ * @param {object} ch 角色（會被修改）。
+ * @param {{science?: Iterable<string>, social?: Iterable<string>}} cards 自然探險與社會科學已收集的知識卡代碼。
+ * @returns {string[]} 新解鎖的連動代碼。
+ */
+export function syncLinks(ch, cards) {
+  const h = homeOf(ch);
+  const have = { science: new Set(cards.science || []), social: new Set(cards.social || []) };
+  const fresh = [];
+  for (const [key, link] of Object.entries(LINKS)) {
+    if (h.links.includes(key)) continue;
+    if ((LINK_CARDS[key] || []).some((id) => have[link.game].has(id))) {
+      h.links.push(key);
+      fresh.push(key);
+    }
+  }
+  if (h.links.includes('festival')) {
+    for (const k of HOME_ITEM_KEYS) if (HOME_ITEMS[k].src === 'festival' && !h.recipes.includes(k)) h.recipes.push(k);
+  }
+  return fresh;
+}
+
+/**
+ * 種植：消耗一顆種子種在空的田地上（需要學科連動的作物要先解鎖）。
+ * @param {object} ch 角色（會被修改）。
+ * @param {number} index 田地索引。
+ * @param {string} crop 作物代碼。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function plant(ch, index, crop) {
+  const h = homeOf(ch);
+  const p = h.plots[index];
+  const c = CROPS[crop];
+  if (!p || !c) return { ok: false, message: '不能種在這裡' };
+  if (p.crop) return { ok: false, message: '這塊田已經種了東西' };
+  if (!linkOn(ch, c.link)) return { ok: false, message: `${c.name}還不會種：到${LINKS[c.link].hint}收集知識卡就能種` };
+  if (!(h.seeds[crop] > 0)) return { ok: false, message: `沒有${c.name}種子` };
+  addSeed(ch, crop, -1);
+  h.plots[index] = { crop, grown: 0 };
+  return { ok: true, message: `種下了${c.name}，大約 ${c.hours} 小時成熟` };
+}
+
+/**
+ * 施肥：讓一塊田的作物立刻長大一階（成長中的直接成熟）。
+ * @param {object} ch 角色（會被修改）。
+ * @param {number} index 田地索引。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function fertilize(ch, index) {
+  const h = homeOf(ch);
+  const p = h.plots[index];
+  const stage = cropStage(p);
+  if (stage < 0) return { ok: false, message: '先種下作物再施肥' };
+  if (stage === 2) return { ok: false, message: '已經成熟了，可以收成' };
+  if (h.fertilizer < 1) return { ok: false, message: '沒有肥料：在學習遊戲過關可以得到' };
+  h.fertilizer--;
+  const total = cropTotalMs(p.crop);
+  p.grown = stage === 0 ? Math.ceil(total * GROW.mid) : total;
+  return { ok: true, message: stage === 0 ? `${CROPS[p.crop].name}長大了一些！` : `${CROPS[p.crop].name}成熟了！` };
+}
+
+/**
+ * 隨機整數（含兩端）。
+ * @param {[number, number]} range 範圍。
+ * @param {() => number} rng 亂數函式。
+ * @returns {number} 整數。
+ */
+function rollRange([lo, hi], rng) {
+  return lo + Math.floor(rng() * (hi - lo + 1));
+}
+
+/**
+ * 第一次收成或收取時記錄觀察日記。
+ * @param {object} h 家園資料（會被修改）。
+ * @param {string} key 作物或動物代碼。
+ * @returns {string | null} 第一次時回傳代碼，否則為 null。
+ */
+function noteDiary(h, key) {
+  if (!DIARY[key] || h.diary.includes(key)) return null;
+  h.diary.push(key);
+  return key;
+}
+
+/**
+ * 收成成熟的作物：得到物產（果樹偶爾多得木材）；果樹回到成長中重新結果，其他作物收成後田地清空。
+ * @param {object} ch 角色（會被修改）。
+ * @param {number} index 田地索引。
+ * @param {() => number} rng 亂數函式。
+ * @returns {{ok: boolean, message: string, good?: string, n?: number, wood?: number, diary?: string | null}} 結果；diary 為第一次收成時的觀察日記代碼。
+ */
+export function harvest(ch, index, rng) {
+  const h = homeOf(ch);
+  const p = h.plots[index];
+  if (cropStage(p) !== 2) return { ok: false, message: '還沒成熟' };
+  const c = CROPS[p.crop];
+  const key = p.crop;
+  const n = addGood(ch, key, rollRange(c.yield, rng));
+  const wood = c.tree && c.bonus && rng() < c.bonus ? addHomeMat(ch, 'wood', 1) : 0;
+  if (c.tree) p.grown = cropTotalMs(key) - c.regrow * 3600e3;
+  else h.plots[index] = { crop: null, grown: 0 };
+  const diary = noteDiary(h, key);
+  return { ok: true, good: key, n, wood, diary, message: `收成${GOODS[key].name} ×${n}${wood ? '，還撿到木材 ×1' : ''}${c.tree ? `；${c.regrow} 小時後會再結果` : ''}` };
+}
+
+/**
+ * 剷除田地上的作物（例如不想要的果樹）。
+ * @param {object} ch 角色（會被修改）。
+ * @param {number} index 田地索引。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function clearPlot(ch, index) {
+  const h = homeOf(ch);
+  const p = h.plots[index];
+  if (!p || !p.crop) return { ok: false, message: '這塊田是空的' };
+  const name = CROPS[p.crop].name;
+  h.plots[index] = { crop: null, grown: 0 };
+  return { ok: true, message: `剷除了${name}` };
+}
+
+/**
+ * 增減物產（作物收成、動物產物、獸肉、染料）。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string} key 物產代碼。
+ * @param {number} [n=1] 數量（負數為扣除）。
+ * @returns {number} 實際增減的數量。
+ */
+export function addGood(ch, key, n = 1) {
+  return addHomeStack(ch, 'produce', key, n);
+}
+
+/**
+ * 已擺放的動物數與庫存中的動物數。
+ * @param {object} h 家園資料。
+ * @returns {number} 隻數。
+ */
+function animalCount(h) {
+  const placed = h.placed.filter((p) => HOME_ITEMS[p.id].type === 'animal').length;
+  return placed + Object.keys(ANIMALS).reduce((sum, k) => sum + (h.inventory[k] || 0), 0);
+}
+
+/**
+ * 在商店購買牧場動物（放進庫存，到家裡佈置時擺在庭院）。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string} key 動物代碼。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function buyAnimal(ch, key) {
+  const a = ANIMALS[key];
+  if (!a) return { ok: false, message: '沒有這種動物' };
+  const h = homeOf(ch);
+  const name = HOME_ITEMS[key].name;
+  if (!linkOn(ch, a.link)) return { ok: false, message: `還不能養${name}：到${LINKS[a.link].hint}收集知識卡就能養` };
+  if (h.level < a.land) return { ok: false, message: `${name}需要土地等級 ${a.land}` };
+  if (animalCount(h) >= LAND[h.level - 1].animals) return { ok: false, message: `土地等級 ${h.level} 最多養 ${LAND[h.level - 1].animals} 隻動物，擴建後可以養更多` };
+  if (ch.gold < a.price) return { ok: false, message: `金幣不足（需要 ${a.price}G）` };
+  ch.gold -= a.price;
+  addHomeStack(ch, 'inventory', key, 1);
+  return { ok: true, message: `買下了${name}！回家按「佈置」把牠放到庭院` };
+}
+
+/**
+ * 購買牧草（飼料）。
+ * @param {object} ch 角色（會被修改）。
+ * @param {number} [n=1] 數量。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function buyFeed(ch, n = 1) {
+  const price = RANCH.feedPrice * n;
+  if ((homeOf(ch).produce[RANCH.feed] || 0) + n > HOME_MAX) return { ok: false, message: `牧草已經快滿了（上限 ${HOME_MAX}）` };
+  if (ch.gold < price) return { ok: false, message: `金幣不足（需要 ${price}G）` };
+  ch.gold -= price;
+  addGood(ch, RANCH.feed, n);
+  return { ok: true, message: `買下牧草 ×${n}` };
+}
+
+/**
+ * 動物目前的狀態。
+ * @param {object} p 擺放的動物。
+ * @returns {{hungry: boolean, ready: number, leftMs: number}} hungry 為沒有飼料；ready 為可收取的產物份數；leftMs 為下一份產物還要多久（有飼料時）。
+ */
+export function animalState(p) {
+  const period = ANIMALS[p.id].hours * 3600e3;
+  return { hungry: p.food <= 0, ready: p.stock, leftMs: p.stock >= RANCH.maxStock ? 0 : Math.max(0, period - p.prog) };
+}
+
+/**
+ * 餵動物一份牧草（可以吃 24 小時；還剩一半以上時不用餵）。
+ * @param {object} ch 角色（會被修改）。
+ * @param {number} index 擺放索引。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function feedAnimal(ch, index) {
+  const h = homeOf(ch);
+  const p = h.placed[index];
+  if (!p || HOME_ITEMS[p.id].type !== 'animal') return { ok: false, message: '這不是動物' };
+  const full = RANCH.feedHours * 3600e3;
+  const name = HOME_ITEMS[p.id].name;
+  if (p.food > full / 2) return { ok: false, message: `${name}還很飽（還可以吃 ${Math.ceil(p.food / 3600e3)} 小時）` };
+  if (!(h.produce[RANCH.feed] > 0)) return { ok: false, message: '沒有牧草：在庭院種牧草，或到商店購買' };
+  addGood(ch, RANCH.feed, -1);
+  p.food = full;
+  return { ok: true, message: `餵了${name}牧草，接下來 ${RANCH.feedHours} 小時會持續產出` };
+}
+
+/**
+ * 收取動物累積的產物。
+ * @param {object} ch 角色（會被修改）。
+ * @param {number} index 擺放索引。
+ * @returns {{ok: boolean, message: string, good?: string, n?: number, diary?: string | null}} 結果。
+ */
+export function collectAnimal(ch, index) {
+  const h = homeOf(ch);
+  const p = h.placed[index];
+  if (!p || HOME_ITEMS[p.id].type !== 'animal') return { ok: false, message: '這不是動物' };
+  if (!p.stock) return { ok: false, message: '還沒有產物' };
+  const good = ANIMALS[p.id].product;
+  const n = addGood(ch, good, p.stock);
+  p.stock = 0;
+  const diary = noteDiary(h, p.id);
+  return { ok: true, good, n, diary, message: `收取${GOODS[good].name} ×${n}` };
+}
+
+// ---------- 藥草台與料理 ----------
+
+/**
+ * 材料表缺少的物產說明。
+ * @param {object} h 家園資料。
+ * @param {Record<string, number>} need 物產與數量。
+ * @returns {string[]} 缺少的說明（空陣列表示足夠）。
+ */
+function goodsMissing(h, need) {
+  return Object.entries(need).filter(([k, n]) => (h.produce[k] || 0) < n).map(([k, n]) => `${GOODS[k].name}還差 ${n - (h.produce[k] || 0)}`);
+}
+
+/**
+ * 藥草台配方（藥水、布料、染料）或料理缺少的東西。
+ * @param {object} ch 角色。
+ * @param {string} key 配方或料理代碼。
+ * @returns {string[]} 缺少的說明（空陣列表示可以製作）。
+ */
+export function brewMissing(ch, key) {
+  const h = homeOf(ch);
+  const r = BREWS[key] || MEALS[key];
+  if (!r) return ['沒有這個配方'];
+  const miss = [];
+  if (r.link && !linkOn(ch, r.link)) miss.push(`到${LINKS[r.link].hint}收集知識卡才會做`);
+  return [...miss, ...goodsMissing(h, r.in)];
+}
+
+/**
+ * 在藥草台製作：藥水（加到身上的藥水）、布料（家園材料）、染料（物產）或料理（放進料理庫存）。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string} key 配方或料理代碼。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function brew(ch, key) {
+  const miss = brewMissing(ch, key);
+  if (miss.length) return { ok: false, message: miss.join('、') };
+  const r = BREWS[key] || MEALS[key];
+  const h = homeOf(ch);
+  const out = MEALS[key] ? { kind: 'meal', key, n: 1 } : r.out;
+  // 先確認放得下，再扣材料。
+  if (out.kind === 'potion' && (ch.potions || 0) >= LIMITS.potionHold) return { ok: false, message: `藥水最多持有 ${LIMITS.potionHold} 瓶` };
+  if (out.kind === 'cure' && (ch.cures || 0) >= LIMITS.cureHold) return { ok: false, message: `淨化藥水最多持有 ${LIMITS.cureHold} 瓶` };
+  const room = { mat: () => HOME_MAX - (h.mats[out.key] || 0), good: () => HOME_MAX - (h.produce[out.key] || 0), meal: () => HOME_MAX - (h.meals[out.key] || 0) }[out.kind];
+  if (room && room() < out.n) return { ok: false, message: '已經放不下了' };
+  for (const [k, n] of Object.entries(r.in)) addGood(ch, k, -n);
+  if (out.kind === 'potion') ch.potions = (ch.potions || 0) + out.n;
+  else if (out.kind === 'cure') ch.cures = (ch.cures || 0) + out.n;
+  else if (out.kind === 'mat') addHomeMat(ch, out.key, out.n);
+  else if (out.kind === 'good') addGood(ch, out.key, out.n);
+  else addHomeStack(ch, 'meals', out.key, out.n);
+  return { ok: true, message: `做好了${r.name}${out.n > 1 ? ` ×${out.n}` : ''}！` };
+}
+
+/**
+ * 料理的加成說明，例如「最大 HP +10%」。
+ * @param {string} key 料理代碼。
+ * @returns {string} 說明。
+ */
+export function mealText(key) {
+  const b = MEAL_BUFFS[MEALS[key].buff];
+  return `${b.name} +${b.pct}%`;
+}
+
+/**
+ * 吃一份料理：下一趟探險有效（一次只能吃一種，原本吃的放回料理庫存）。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string} key 料理代碼。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function eatMeal(ch, key) {
+  const h = homeOf(ch);
+  if (!MEALS[key] || !(h.meals[key] > 0)) return { ok: false, message: '沒有這道料理' };
+  if (h.meal === key) return { ok: false, message: `已經吃了${MEALS[key].name}` };
+  const prev = h.meal;
+  if (prev) addHomeStack(ch, 'meals', prev, 1);
+  addHomeStack(ch, 'meals', key, -1);
+  h.meal = key;
+  return { ok: true, message: `吃了${MEALS[key].name}：下一趟探險${mealText(key)}${prev ? `（${MEALS[prev].name}放回去了）` : ''}` };
+}
+
+/**
+ * 出發時取用料理加成（吃過的料理只對這一趟有效）。
+ * @param {object} ch 角色（會被修改）。
+ * @returns {{key: string, buff: string, pct: number} | null} 加成；沒有吃料理時為 null。
+ */
+export function takeMeal(ch) {
+  const h = homeOf(ch);
+  if (!h.meal) return null;
+  const key = h.meal;
+  h.meal = null;
+  return { key, buff: MEALS[key].buff, pct: MEAL_BUFFS[MEALS[key].buff].pct };
+}
+
+// ---------- 家用寶箱、展示架與染色 ----------
+
+/**
+ * 擺出來的家用寶箱數。
+ * @param {object} h 家園資料。
+ * @returns {number} 個數。
+ */
+function placedChests(h) {
+  return h.placed.filter((p) => HOME_ITEMS[p.id].func === 'chest').length;
+}
+
+/**
+ * 家用寶箱的總格數：每擺出一個寶箱 20 格（最多計算 3 個）。
+ * @param {object} h 家園資料。
+ * @returns {number} 格數。
+ */
+export function chestCapacity(h) {
+  return HOME_CHEST.slots * Math.min(HOME_CHEST.maxChests, placedChests(h));
+}
+
+/**
+ * 把背包中的裝備放進家用寶箱。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string} id 裝備 id。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function chestDeposit(ch, id) {
+  const h = homeOf(ch);
+  const idx = ch.bag.findIndex((i) => i.id === id);
+  if (idx < 0) return { ok: false, message: '只能放入背包中的裝備' };
+  if (h.chest.length >= chestCapacity(h)) return { ok: false, message: `家用寶箱已滿（${chestCapacity(h)} 格）` };
+  const [item] = ch.bag.splice(idx, 1);
+  h.chest.push(item);
+  return { ok: true, message: `${item.name} 放進家用寶箱` };
+}
+
+/**
+ * 從家用寶箱拿出裝備放進背包。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string} id 裝備 id。
+ * @param {boolean} bagRoom 背包是否還有空位。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function chestWithdraw(ch, id, bagRoom) {
+  const h = homeOf(ch);
+  const idx = h.chest.findIndex((i) => i.id === id);
+  if (idx < 0) return { ok: false, message: '寶箱裡沒有這件裝備' };
+  if (!bagRoom) return { ok: false, message: '背包已滿' };
+  const [item] = h.chest.splice(idx, 1);
+  ch.bag.push(item);
+  return { ok: true, message: `拿出 ${item.name}` };
+}
+
+/**
+ * 把背包中的裝備放到展示架上。
+ * @param {object} ch 角色（會被修改）。
+ * @param {number} index 展示架的擺放索引。
+ * @param {string} id 裝備 id。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function shelfPut(ch, index, id) {
+  const p = homeOf(ch).placed[index];
+  if (!p || !p.show) return { ok: false, message: '這不是展示架' };
+  if (p.show.length >= SHELF_SLOTS) return { ok: false, message: `展示架最多放 ${SHELF_SLOTS} 件` };
+  const idx = ch.bag.findIndex((i) => i.id === id);
+  if (idx < 0) return { ok: false, message: '只能展示背包中的裝備' };
+  const [item] = ch.bag.splice(idx, 1);
+  p.show.push(item);
+  return { ok: true, message: `把 ${item.name} 擺上展示架` };
+}
+
+/**
+ * 從展示架拿下裝備放回背包。
+ * @param {object} ch 角色（會被修改）。
+ * @param {number} index 展示架的擺放索引。
+ * @param {string} id 裝備 id。
+ * @param {boolean} bagRoom 背包是否還有空位。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function shelfTake(ch, index, id, bagRoom) {
+  const p = homeOf(ch).placed[index];
+  const idx = p && p.show ? p.show.findIndex((i) => i.id === id) : -1;
+  if (idx < 0) return { ok: false, message: '展示架上沒有這件裝備' };
+  if (!bagRoom) return { ok: false, message: '背包已滿' };
+  const [item] = p.show.splice(idx, 1);
+  ch.bag.push(item);
+  return { ok: true, message: `拿下 ${item.name}` };
+}
+
+/**
+ * 替已擺放的家具或裝飾染色（消耗一份染料）；dye 為 null 時改回原色（不消耗）。
+ * @param {object} ch 角色（會被修改）。
+ * @param {number} index 擺放索引。
+ * @param {string | null} dye 染料代碼。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function dyeItem(ch, index, dye) {
+  const h = homeOf(ch);
+  const p = h.placed[index];
+  if (!p || HOME_ITEMS[p.id].type === 'animal') return { ok: false, message: '這個不能染色' };
+  const name = HOME_ITEMS[p.id].name;
+  if (!dye) {
+    if (!p.dye) return { ok: false, message: '已經是原色了' };
+    delete p.dye;
+    return { ok: true, message: `「${name}」改回原色` };
+  }
+  if (!DYE_KEYS.includes(dye)) return { ok: false, message: '沒有這種染料' };
+  if (p.dye === dye) return { ok: false, message: '已經是這個顏色了' };
+  if (!(h.produce[dye] > 0)) return { ok: false, message: `沒有${GOODS[dye].name}：在藥草台用星光花製作` };
+  addGood(ch, dye, -1);
+  p.dye = dye;
+  return { ok: true, message: `用${GOODS[dye].name}替「${name}」染色` };
+}
+
+// ---------- 市集 ----------
+
+/**
+ * 字串雜湊成 0～1 的數（決定每天每種物產的需求）。
+ * @param {string} s 字串。
+ * @returns {number} 0～1。
+ */
+function strHash(s) {
+  let x = 2166136261;
+  for (let i = 0; i < s.length; i++) x = Math.imul(x ^ s.charCodeAt(i), 16777619) >>> 0;
+  return (x % 10007) / 10007;
+}
+
+/**
+ * 今天市集對某種物產的需求倍率（每天不同、固定）。
+ * @param {string} key 物產代碼。
+ * @param {string} day 本地日期。
+ * @returns {number} 倍率（MARKET.low～high）。
+ */
+export function marketDemand(key, day) {
+  return MARKET.low + (MARKET.high - MARKET.low) * strHash(`${day}:${key}`);
+}
+
+/**
+ * 今天的市集收購價：基本價 × 需求倍率 × 供給（今天已賣出越多，價格越低）。
+ * @param {object} ch 角色。
+ * @param {string} key 物產代碼。
+ * @param {string} day 本地日期。
+ * @returns {number} 每份的金幣（至少 1）。
+ */
+export function marketPrice(ch, key, day) {
+  const h = homeOf(ch);
+  const sold = h.market && h.market.day === day ? h.market.sold[key] || 0 : 0;
+  const supply = Math.max(MARKET.floor, 1 - MARKET.drop * sold);
+  return Math.max(1, Math.round(GOODS[key].price * marketDemand(key, day) * supply));
+}
+
+/**
+ * 在市集賣出物產（要先解鎖市集；一份一份賣，每賣一份價格就重新計算）。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string} key 物產代碼。
+ * @param {number} n 數量。
+ * @param {string} day 本地日期。
+ * @returns {{ok: boolean, message: string, gold?: number}} 結果。
+ */
+export function sellGood(ch, key, n, day) {
+  const h = homeOf(ch);
+  if (!linkOn(ch, 'market')) return { ok: false, message: `市集還沒開張：到${LINKS.market.hint}收集知識卡` };
+  if (!GOODS[key] || !((h.produce[key] || 0) >= n) || !(n > 0)) return { ok: false, message: '數量不足' };
+  if (!h.market || h.market.day !== day) h.market = { day, sold: {} };
+  let gold = 0;
+  for (let i = 0; i < n; i++) {
+    gold += marketPrice(ch, key, day);
+    h.market.sold[key] = (h.market.sold[key] || 0) + 1;
+  }
+  addGood(ch, key, -n);
+  ch.gold += gold;
+  return { ok: true, gold, message: `賣出${GOODS[key].name} ×${n}，得到 ${gold}G` };
 }

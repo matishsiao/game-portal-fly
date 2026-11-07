@@ -4070,6 +4070,111 @@ button:focus-visible {
   image-rendering: pixelated;
 }
 
+/* 家園分頁：五個子頁面可以換行；擴建、狀態、連動與觀察日記。 */
+.home-tabs {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.home-tabs button {
+  padding: 2px;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.home-expand {
+  display: grid;
+  gap: 4px;
+  margin: 8px 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.home-status {
+  color: #2a8a4a;
+  font-weight: 600;
+}
+
+.link-list,
+.diary-list {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link-row,
+.diary-row {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.link-row:not(.on) {
+  opacity: 0.8;
+}
+
+.diary-row {
+  grid-template-columns: 40px 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+.diary-row img {
+  width: 40px;
+  height: 40px;
+  image-rendering: pixelated;
+}
+
+.diary-row p {
+  margin: 2px 0 0;
+}
+
+.diary-row.locked img {
+  filter: grayscale(1) brightness(0.6);
+}
+
+.shop-row.locked {
+  opacity: 0.7;
+}
+
+.item-stats em {
+  font-style: normal;
+  font-weight: 700;
+}
+
+.item-stats em.up {
+  color: #2a8a4a;
+}
+
+.item-stats em.down {
+  color: #c04a3a;
+}
+
+.meal-chip small {
+  font-size: 11px;
+}
+
+.menu-grid .menu-sep {
+  grid-column: 1 / -1;
+  background: none;
+  box-shadow: none;
+  opacity: 1;
+}
+
+.dye-dot {
+  display: block;
+  width: 60%;
+  aspect-ratio: 1;
+  margin: auto;
+  border-radius: 50%;
+  background: conic-gradient(#e04a4a, #f0a040, #4ac070, #4a8ae0, #a04ae0, #e04a4a);
+}
+
 /* ── 家裡場景 ── */
 .house {
   display: flex;

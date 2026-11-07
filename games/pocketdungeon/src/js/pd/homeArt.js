@@ -11,6 +11,8 @@ import { ART as smallLights } from './homeArt/smallLights.js';
 import { ART as wallGarden } from './homeArt/wallGarden.js';
 import { ART as themeBoss } from './homeArt/themeBoss.js';
 import { TILES as moreTiles, CROPS as moreCrops, ART as rugs } from './homeArt/tilesCrops.js';
+import { ART as ranchFestival } from './homeArt/ranchFestival.js';
+import { CROPS as farmCrops, ICONS as farmIcons } from './homeArt/farmIcons.js';
 
 export { HT, mix, ramp };
 
@@ -581,9 +583,9 @@ export const CROP_ART = {
 };
 
 // 其餘物件、地板牆面、地毯與作物的美術分組放在 homeArt/ 下，合併進同一份表。
-Object.assign(HOME_ART, bedroomLiving, kitchenWorkYard, smallLights, wallGarden, themeBoss, rugs);
+Object.assign(HOME_ART, bedroomLiving, kitchenWorkYard, smallLights, wallGarden, themeBoss, rugs, ranchFestival);
 Object.assign(TILE_ART, moreTiles);
-Object.assign(CROP_ART, moreCrops);
+Object.assign(CROP_ART, moreCrops, farmCrops);
 
 /**
  * 家園材料圖示（32 × 32）。
@@ -758,6 +760,9 @@ export const ICON_ART = {
   },
 };
 
+// 物產、染料與料理圖示。
+Object.assign(ICON_ART, farmIcons);
+
 /**
  * 取得家具或裝飾的圖（有快取）。
  * @param {string} key 代碼（HOME_ART 中沒有的回傳 null）。
@@ -771,6 +776,93 @@ export function homeArt(key, frame = 0) {
   const id = `h-${key}-${f}`;
   if (!cache.has(id)) cache.set(id, piece(a.size[0], a.size[1], a.up, a.draw, f));
   return cache.get(id);
+}
+
+/**
+ * RGB 轉 HSL。
+ * @param {number} r 紅（0～255）。
+ * @param {number} g 綠（0～255）。
+ * @param {number} b 藍（0～255）。
+ * @returns {[number, number, number]} 色相（0～360）、飽和度與亮度（0～1）。
+ */
+function toHsl(r, g, b) {
+  r /= 255;
+  g /= 255;
+  b /= 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  if (max === min) return [0, 0, l];
+  const d = max - min;
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  const h = max === r ? ((g - b) / d + (g < b ? 6 : 0)) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  return [h * 60, s, l];
+}
+
+/**
+ * HSL 轉 RGB。
+ * @param {number} h 色相（0～360）。
+ * @param {number} s 飽和度（0～1）。
+ * @param {number} l 亮度（0～1）。
+ * @returns {[number, number, number]} 紅、綠、藍（0～255）。
+ */
+function toRgb(h, s, l) {
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+  const p = 2 * l - q;
+  // 依色相位移計算一個色版。
+  const ch = (t) => {
+    t = ((t % 1) + 1) % 1;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    return p;
+  };
+  const hh = h / 360;
+  return [ch(hh + 1 / 3), ch(hh), ch(hh - 1 / 3)].map((v) => Math.round(v * 255));
+}
+
+/**
+ * 染色後的家具或裝飾圖（有快取）：找出圖中最主要的顏色（色相），把相近色相的像素轉到染料的色相，
+ * 保留明暗與其他顏色（例如木框染成紅色時，金屬與玻璃不變）。
+ * @param {string} key 代碼。
+ * @param {number} frame 動態幀。
+ * @param {number} hue 染料的色相（0～360）。
+ * @returns {HTMLCanvasElement | null} 畫布。
+ */
+export function dyedArt(key, frame, hue) {
+  const src = homeArt(key, frame);
+  if (!src) return null;
+  const id = `d-${key}-${frame % homeFrames(key)}-${hue}`;
+  if (cache.has(id)) return cache.get(id);
+  const c = makeCanvas(src.width, src.height);
+  const g = c.getContext('2d');
+  g.drawImage(src, 0, 0);
+  const img = g.getImageData(0, 0, c.width, c.height);
+  const d = img.data;
+  // 主要色相：飽和度夠高的像素以 10° 分組計數。
+  const bins = new Array(36).fill(0);
+  for (let i = 0; i < d.length; i += 4) {
+    if (d[i + 3] < 128) continue;
+    const [h, s, l] = toHsl(d[i], d[i + 1], d[i + 2]);
+    if (s > 0.25 && l > 0.15 && l < 0.9) bins[Math.floor(h / 10) % 36]++;
+  }
+  const top = bins.indexOf(Math.max(...bins));
+  if (bins[top] > 0) {
+    const base = top * 10 + 5;
+    for (let i = 0; i < d.length; i += 4) {
+      if (d[i + 3] === 0) continue;
+      const [h, s, l] = toHsl(d[i], d[i + 1], d[i + 2]);
+      const diff = ((h - base + 540) % 360) - 180;
+      if (s < 0.12 || Math.abs(diff) > 45) continue;
+      const [r, gg, b] = toRgb((hue + diff + 360) % 360, Math.max(s, 0.35), l);
+      d[i] = r;
+      d[i + 1] = gg;
+      d[i + 2] = b;
+    }
+    g.putImageData(img, 0, 0);
+  }
+  cache.set(id, c);
+  return c;
 }
 
 /**

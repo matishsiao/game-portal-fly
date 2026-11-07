@@ -242,7 +242,12 @@ export async function loadAll() {
       }
     }
     // 家園加入之前的角色：建立等級 1 的空房子；已有家園時修復不合法的欄位（不讓角色因此無法讀取）。
-    if (ch && typeof ch === 'object') ch.home = normalizeHome(ch.home);
+    if (ch && typeof ch === 'object') {
+      ch.home = normalizeHome(ch.home);
+      // 家用寶箱與展示架上的裝備：格式不合法的移除（與背包相同的檢查）。
+      ch.home.chest = ch.home.chest.filter(isValidItem);
+      for (const p of ch.home.placed) if (p.show) p.show = p.show.filter(isValidItem);
+    }
     // 裝備欄擴充前（武器、防具、飾品 3 格）的角色：飾品移到飾品 1，補上新欄位。
     if (ch && ch.equipped && 'accessory' in ch.equipped) {
       const { accessory, ...rest } = ch.equipped;
@@ -409,6 +414,19 @@ export function persistent() {
 }
 
 // ---------- localStorage（大廳摘要、統計、設定） ----------
+
+/**
+ * 讀取自然探險與社會科學已收集的知識卡代碼（同一網站的 localStorage；家園學科連動用）。
+ * @returns {{science: string[], social: string[]}} 知識卡代碼。
+ */
+export function loadLearnCards() {
+  // 某個遊戲已收集的知識卡代碼。
+  const ids = (key) => {
+    const data = readJson(key);
+    return data && typeof data === 'object' && !Array.isArray(data) ? Object.keys(data) : [];
+  };
+  return { science: ids('science.cards'), social: ids('social.cards') };
+}
 
 /**
  * 讀取並解析 JSON；不存在或解析失敗時回傳 null。

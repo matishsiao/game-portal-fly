@@ -811,6 +811,8 @@ export const ITEM_ART = {
   blueprint: { palette: { o: O, B: '#2a5a9a', b: '#5a90d8', W: '#d8ecff', R: '#c0303a' }, rows: ['.oooooooo.', 'obBBBBBBbo', 'oBWBWBWBBo', 'oBBBBBBBBo', 'oBWWWWBWBo', 'oRRBBBBBBo', 'oBBBWBWBBo', 'obBBBBBBbo', '.oooooooo.'] },
   // 種子袋：麻布小袋，袋口冒出綠芽。
   seedBag: { palette: { o: O, B: '#b08a52', b: '#d8b47a', G: '#4fc078', g: '#2a7a4a' }, rows: ['...oo...', '..oGGo..', '...og...', '..oooo..', '.obBBBo.', 'obBBBBBo', 'oBBBBBBo', '.oooooo.'] },
+  // 獸肉：帶骨的肉塊（料理用）。
+  meat: { palette: { o: O, M: '#c0503a', L: '#e88a6a', D: '#802a1e', W: '#f0e6d0' }, rows: ['.....oo.', '..oooWWo', '.oLLMoWo', 'oLMMMMo.', 'oMMMMDo.', 'oMMMDDo.', '.oDDDo..', '..ooo...'] },
   ...ticketArt(),
   ...gemArt(),
   ...homeMatArt(),

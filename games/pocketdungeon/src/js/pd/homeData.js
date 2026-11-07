@@ -268,10 +268,30 @@ const DECOR = [
   D('boss', 'demonThrone', '魔王王座', 'floor', [2, 2], 3, 'dark:12,cloth:4', { src: 'demonLord' }),
 ];
 
-/** 家具與裝飾目錄（依代碼查詢）。 */
-export const HOME_ITEMS = Object.fromEntries([...FURNITURE, ...DECOR].map((it) => [it.key, it]));
+/**
+ * 牧場動物（不計入家具與裝飾的數量）：在商店購買後放進庫存，佈置時擺在庭院（每隻佔 2×2 格、會擋路）。
+ * 動物的產出規則見 ANIMALS。
+ */
+const RANCH_ITEMS = [
+  entry('animal', 'ranch', 'chicken', '雞', 'floor', [2, 2], 0, 'wood:2', { src: 'ranch', yard: true }),
+  entry('animal', 'ranch', 'beehive', '蜂箱', 'floor', [2, 2], 0, 'wood:2', { src: 'ranch', yard: true }),
+  entry('animal', 'ranch', 'cow', '乳牛', 'floor', [2, 2], 1, 'wood:2', { src: 'ranch', yard: true }),
+  entry('animal', 'ranch', 'sheep', '綿羊', 'floor', [2, 2], 1, 'wood:2', { src: 'ranch', yard: true }),
+];
 
-/** 目錄代碼（家具在前、裝飾在後）。 */
+/**
+ * 節慶裝飾（不計入裝飾 100 種，另列為「節慶」圖鑑）：在社會科學收集「家鄉與文化」或「社會」主題的知識卡後自動學會配方。
+ */
+const FESTIVAL = [
+  entry('festival', 'festival', 'springCouplet', '春聯', 'wall', [1, 1], 1, 'cloth:2', { src: 'festival' }),
+  entry('festival', 'festival', 'sachet', '端午香包', 'wall', [1, 1], 1, 'cloth:2,feather:1', { src: 'festival' }),
+  entry('festival', 'festival', 'moonLantern', '中秋燈籠', 'small', [1, 1], 1, 'cloth:2,wood:1', { src: 'festival' }),
+];
+
+/** 家具、裝飾、牧場動物與節慶裝飾的目錄（依代碼查詢）。 */
+export const HOME_ITEMS = Object.fromEntries([...FURNITURE, ...DECOR, ...RANCH_ITEMS, ...FESTIVAL].map((it) => [it.key, it]));
+
+/** 目錄代碼（家具、裝飾、牧場動物、節慶裝飾）。 */
 export const HOME_ITEM_KEYS = Object.keys(HOME_ITEMS);
 
 /** 新角色預設學會的配方。 */
@@ -291,7 +311,16 @@ export const CROPS = {
   antidote: { name: '解毒草', produce: '解毒草', tree: false, hours: 3, yield: [2, 3], seedPrice: 30, seedWeight: 4 },
   starflower: { name: '星光花', produce: '星光花', tree: false, hours: 8, yield: [1, 2], seedPrice: 150, seedWeight: 1 },
   cotton: { name: '棉花', produce: '棉花', tree: false, hours: 4, yield: [2, 3], seedPrice: 30, seedWeight: 3 },
+  hay: { name: '牧草', produce: '牧草', tree: false, hours: 2, yield: [3, 4], seedPrice: 10, seedWeight: 4 },
+  // 臺灣特產（社會科學連動）：不會從地城掉落，解鎖後在商店販售種子。
+  pineapple: { name: '鳳梨', produce: '鳳梨', tree: false, hours: 8, yield: [1, 2], seedPrice: 250, seedWeight: 0, special: true, link: 'twGeo' },
+  tea: { name: '茶樹', produce: '茶葉', tree: true, hours: 6, regrow: 4, yield: [2, 3], seedPrice: 300, seedWeight: 0, special: true, link: 'twGeo', bonus: 0 },
+  rice: { name: '稻米', produce: '稻米', tree: false, hours: 4, yield: [3, 4], seedPrice: 60, seedWeight: 0, special: true, link: 'twGeo' },
+  mango: { name: '芒果樹', produce: '芒果', tree: true, hours: 8, regrow: 5, yield: [2, 3], seedPrice: 350, seedWeight: 0, special: true, link: 'twGeo', bonus: 0.2 },
 };
+// 較難照顧的作物：在自然探險收集植物單元的知識卡後才能種（種子仍可從地城取得、先存起來）。
+CROPS.grape.link = 'plants';
+CROPS.starflower.link = 'plants';
 
 /** 作物代碼。 */
 export const CROP_KEYS = Object.keys(CROPS);
@@ -306,16 +335,170 @@ export const START_SEEDS = { apple: 2 };
 export const HOME_GIFT = { fertilizer: [1, 1, 2, 2, 3], seeds: [1, 2, 2, 3, 3], recipeChance: [0.1, 0.15, 0.2, 0.3, 0.4] };
 
 /**
- * 土地等級：house 為房子室內大小（寬、高，不含牆）；庭院與室內同寬、高 YARD_ROWS 格，最下面一排是田地；plots 為庭院田地數；price 為擴建金幣；mats 為擴建材料；
+ * 土地等級：house 為房子室內大小（寬、高，不含牆）；yard 為庭院高度（與室內同寬，最下面一排是田地）；plots 為庭院田地數；animals 為可以養的動物數；price 為擴建金幣；mats 為擴建材料；
  * need 為解鎖條件（level 角色等級、rebirth 轉職次數、area 已解鎖區域）。
  */
-/** 庭院的高度（格）。 */
-export const YARD_ROWS = 4;
-
 export const LAND = [
-  { house: [6, 5], plots: 2, price: 0, mats: {}, need: {} },
-  { house: [8, 6], plots: 4, price: 2000, mats: { wood: 20, stone: 10 }, need: { level: 10 } },
-  { house: [10, 8], plots: 6, price: 6000, mats: { wood: 40, stone: 25 }, need: { level: 20 } },
-  { house: [12, 10], plots: 9, price: 15000, mats: { wood: 60, stone: 40, clay: 20 }, need: { rebirth: 1 } },
-  { house: [14, 12], plots: 12, price: 40000, mats: { wood: 100, stone: 60, clay: 30 }, need: { area: 'demon' } },
+  { house: [6, 5], yard: 5, plots: 2, animals: 1, price: 0, mats: {}, need: {} },
+  { house: [8, 6], yard: 6, plots: 4, animals: 2, price: 2000, mats: { wood: 20, stone: 10 }, need: { level: 10 } },
+  { house: [10, 8], yard: 7, plots: 6, animals: 3, price: 6000, mats: { wood: 40, stone: 25 }, need: { level: 20 } },
+  { house: [12, 10], yard: 8, plots: 9, animals: 4, price: 15000, mats: { wood: 60, stone: 40, clay: 20 }, need: { rebirth: 1 } },
+  { house: [14, 12], yard: 9, plots: 12, animals: 6, price: 40000, mats: { wood: 100, stone: 60, clay: 30 }, need: { area: 'demon' } },
 ];
+
+/** 等級 1 的庭院高度（格；舊版固定值，保留給測試與說明）。 */
+export const YARD_ROWS = LAND[0].yard;
+
+/** 作物生長：第 2 階段（成長中）開始的比例；單次最多計算的生長時間（防止調時鐘）。 */
+export const GROW = { mid: 0.3, maxStepMs: 24 * 3600 * 1000 };
+
+/**
+ * 牧場動物：product 為產物、hours 為每次產出所需的時間（有飼料時才會累積）、price 為商店售價、land 為需要的土地等級、
+ * link 為解鎖需要的學科連動。餵一次牧草可以吃 feedHours 小時；產物最多累積 maxStock 份。
+ */
+export const ANIMALS = {
+  chicken: { product: 'egg', hours: 4, price: 300, land: 1, link: 'animals' },
+  beehive: { product: 'honey', hours: 6, price: 500, land: 1, link: 'bees' },
+  cow: { product: 'milk', hours: 6, price: 1500, land: 2, link: 'animals' },
+  sheep: { product: 'wool', hours: 8, price: 1500, land: 2, link: 'animals' },
+};
+/** 牧場規則。 */
+export const RANCH = { feedHours: 24, maxStock: 3, feed: 'hay', feedPrice: 15 };
+
+/**
+ * 家園物產（作物收成、動物產物、獸肉、染料）：name 名稱、price 市集基本收購價。
+ * 作物收成的代碼與作物相同。
+ */
+export const GOODS = {
+  apple: { name: '蘋果', price: 25 },
+  orange: { name: '橘子', price: 25 },
+  grape: { name: '葡萄', price: 35 },
+  redHerb: { name: '紅草', price: 8 },
+  blueHerb: { name: '藍草', price: 10 },
+  antidote: { name: '解毒草', price: 10 },
+  starflower: { name: '星光花', price: 60 },
+  cotton: { name: '棉花', price: 10 },
+  hay: { name: '牧草', price: 4 },
+  pineapple: { name: '鳳梨', price: 90 },
+  tea: { name: '茶葉', price: 50 },
+  rice: { name: '稻米', price: 15 },
+  mango: { name: '芒果', price: 60 },
+  egg: { name: '雞蛋', price: 30 },
+  milk: { name: '牛奶', price: 70 },
+  wool: { name: '羊毛', price: 80 },
+  honey: { name: '蜂蜜', price: 70 },
+  meat: { name: '獸肉', price: 25 },
+  dyeRed: { name: '紅色染料', price: 40, dye: 0 },
+  dyeOrange: { name: '橙色染料', price: 40, dye: 30 },
+  dyeGreen: { name: '綠色染料', price: 40, dye: 120 },
+  dyeBlue: { name: '藍色染料', price: 40, dye: 215 },
+  dyePurple: { name: '紫色染料', price: 40, dye: 280 },
+};
+
+/** 物產代碼。 */
+export const GOOD_KEYS = Object.keys(GOODS);
+
+/** 染料代碼（dye 為目標色相角度）。 */
+export const DYE_KEYS = GOOD_KEYS.filter((k) => GOODS[k].dye !== undefined);
+
+/**
+ * 會掉「獸肉」的地城野生動物（牧場動物不產肉）：一般 25%、菁英 60%、Boss（巨角牛王）必掉 2 份。
+ */
+export const MEAT = { monsters: ['boar', 'iceWolf', 'yeti', 'crab', 'lizardman', 'drake', 'wyvern', 'bullKing'], monster: 0.25, elite: 0.6, boss: 1, bossCount: 2 };
+
+/**
+ * 料理加成（一次只能吃一種，只對下一趟探險有效）：hp 最大 HP、atk 攻擊、move 移動速度、drop 裝備掉落率、xp 經驗值（百分比）。
+ */
+export const MEAL_BUFFS = {
+  hp: { name: '最大 HP', pct: 10 },
+  atk: { name: '攻擊', pct: 5 },
+  move: { name: '移動速度', pct: 5 },
+  drop: { name: '裝備掉落率', pct: 10 },
+  xp: { name: '經驗值', pct: 10 },
+};
+
+/**
+ * 料理：in 為材料（物產）、buff 為加成種類、link 為需要的學科連動（起司需要「微生物與食物保存」）。
+ */
+export const MEALS = {
+  appleJuice: { name: '蘋果汁', in: { apple: 3 }, buff: 'hp' },
+  orangeJuice: { name: '橘子汁', in: { orange: 3 }, buff: 'move' },
+  grapeJuice: { name: '葡萄汁', in: { grape: 3 }, buff: 'xp' },
+  omelette: { name: '蛋餅', in: { egg: 2, redHerb: 1 }, buff: 'atk' },
+  pudding: { name: '布丁', in: { egg: 1, milk: 2 }, buff: 'hp' },
+  cheese: { name: '起司', in: { milk: 3 }, buff: 'drop', link: 'microbes' },
+  honeyCake: { name: '蜂蜜蛋糕', in: { honey: 1, egg: 1, milk: 1 }, buff: 'drop' },
+  meatStew: { name: '燉肉', in: { meat: 2, redHerb: 1 }, buff: 'atk' },
+  riceBall: { name: '飯糰', in: { rice: 2, meat: 1 }, buff: 'hp' },
+  pineappleCake: { name: '鳳梨酥', in: { pineapple: 1, egg: 1 }, buff: 'move' },
+  mangoIce: { name: '芒果冰', in: { mango: 2, milk: 1 }, buff: 'xp' },
+  oolongTea: { name: '烏龍茶', in: { tea: 2, honey: 1 }, buff: 'xp' },
+};
+
+/** 料理代碼。 */
+export const MEAL_KEYS = Object.keys(MEALS);
+
+/**
+ * 藥草台的其他配方：out 為產物（potion 回復藥水、cure 淨化藥水、家園材料或物產）、in 為材料（物產）。
+ */
+export const BREWS = {
+  potion: { name: '回復藥水', in: { redHerb: 2 }, out: { kind: 'potion', n: 1 } },
+  cure: { name: '淨化藥水', in: { antidote: 2 }, out: { kind: 'cure', n: 1 } },
+  clothCotton: { name: '布料（棉花）', in: { cotton: 2 }, out: { kind: 'mat', key: 'cloth', n: 1 } },
+  clothWool: { name: '布料（羊毛）', in: { wool: 1 }, out: { kind: 'mat', key: 'cloth', n: 2 } },
+  dyeRed: { name: '紅色染料', in: { redHerb: 2, starflower: 1 }, out: { kind: 'good', key: 'dyeRed', n: 1 } },
+  dyeOrange: { name: '橙色染料', in: { orange: 2, starflower: 1 }, out: { kind: 'good', key: 'dyeOrange', n: 1 } },
+  dyeGreen: { name: '綠色染料', in: { antidote: 2, starflower: 1 }, out: { kind: 'good', key: 'dyeGreen', n: 1 } },
+  dyeBlue: { name: '藍色染料', in: { blueHerb: 2, starflower: 1 }, out: { kind: 'good', key: 'dyeBlue', n: 1 } },
+  dyePurple: { name: '紫色染料', in: { grape: 2, starflower: 1 }, out: { kind: 'good', key: 'dyePurple', n: 1 } },
+};
+
+/** 家用寶箱：每個擺出來的寶箱提供的格數與最多計算的寶箱數。 */
+export const HOME_CHEST = { slots: 20, maxChests: 3 };
+
+/** 展示架可以展示的裝備數。 */
+export const SHELF_SLOTS = 2;
+
+/**
+ * 市集（社會科學「經濟」主題連動）：每天每種物產有不同的需求（price 的 low～high 倍），
+ * 同一天每賣出一份，市集上的貨變多、收購價下降 drop（最低為 floor 倍）。
+ */
+export const MARKET = { low: 0.8, high: 1.25, drop: 0.04, floor: 0.5 };
+
+/**
+ * 學科連動：在自然探險（science）或社會科學（social）收集到 cards 任一張知識卡就解鎖。
+ * units 與 topics 為對應的單元與主題（給玩家看的說明；卡片清單由 scripts/gen-home-links.mjs 從題庫產生）。
+ */
+export const LINKS = {
+  animals: { game: 'science', name: '雞、乳牛、綿羊', hint: '自然探險「動物朋友」「動物的身體、生活與繁殖」「生殖」' },
+  bees: { game: 'science', name: '蜂箱', hint: '自然探險「昆蟲世界」「生態系」' },
+  plants: { game: 'science', name: '葡萄藤與星光花', hint: '自然探險「植物朋友」「植物的構造、繁殖與養分」「生物體的營養」' },
+  microbes: { game: 'science', name: '起司', hint: '自然探險「微生物與食物保存」' },
+  twGeo: { game: 'social', name: '臺灣特產作物（鳳梨、茶樹、稻米、芒果樹）', hint: '社會科學「臺灣的地理」「產業與經濟地理」' },
+  festival: { game: 'social', name: '節慶裝飾（春聯、端午香包、中秋燈籠）', hint: '社會科學「家鄉與文化」「社會」' },
+  market: { game: 'social', name: '村莊市集', hint: '社會科學「經濟」' },
+};
+
+/**
+ * 觀察日記：第一次收成或收取產物時顯示的小知識；more 為可以學到更多的學習遊戲單元。
+ * 內容須經過獨立的科學與社會正確性審查。
+ */
+export const DIARY = {
+  apple: { text: '蘋果樹春天開花，花謝了以後才慢慢長出果實；切開蘋果，可以看到中間的種子，種子能長成新的蘋果樹。', more: '自然探險「植物朋友」' },
+  orange: { text: '橘子是柑橘類水果，含有維生素 C。剝橘子皮時聞到的香味，來自果皮上一顆顆小油點裡的油。', more: '自然探險「植物的構造、繁殖與養分」' },
+  grape: { text: '葡萄是攀緣植物，會用細細的捲鬚纏住支架往上爬，讓葉子照到更多陽光。', more: '自然探險「植物的構造、繁殖與養分」' },
+  redHerb: { text: '植物的綠葉會利用陽光，把水和二氧化碳製造成養分，同時放出氧氣，這叫做「光合作用」。', more: '自然探險「植物的構造、繁殖與養分」' },
+  blueHerb: { text: '植物的根從土壤吸收水分，水分經過莖運送到葉子；大部分的水最後會從葉子變成水蒸氣散到空氣中。', more: '自然探險「植物的構造、繁殖與養分」' },
+  antidote: { text: '有些植物會長出苦味或有毒的物質，讓動物不想吃它，用來保護自己。不認識的野草不可以隨便放進嘴裡。', more: '自然探險「生物與環境」' },
+  starflower: { text: '很多花有鮮豔的顏色和香味，可以吸引蜜蜂、蝴蝶來採蜜；牠們身上沾到的花粉被帶到別朵花上，就是「傳粉」。', more: '自然探險「植物的構造、繁殖與養分」' },
+  cotton: { text: '棉花白白軟軟的棉絮長在種子上，是種子表面的纖維；把棉絮紡成線，就能織成棉布。', more: '自然探險「植物的構造、繁殖與養分」' },
+  hay: { text: '牛和羊是草食動物，吃草獲得養分；草靠陽光製造養分。「草 → 牛」就是一段簡單的食物鏈。', more: '自然探險「生物與環境」' },
+  chicken: { text: '母雞沒有公雞也會生蛋，但這種蛋孵不出小雞；受精的雞蛋在適當的溫度下，大約 21 天會孵出小雞。', more: '自然探險「動物朋友」' },
+  cow: { text: '乳牛要生下小牛以後才會分泌乳汁。牛的胃分成四個部分，會把吞下的草再送回嘴裡慢慢嚼，這叫做「反芻」。', more: '自然探險「動物的身體、生活與繁殖」' },
+  sheep: { text: '許多飼養的綿羊，羊毛會一直長、不會自己掉光，所以要定期剪毛。剪毛就像剪頭髮，剪對了不會痛。', more: '自然探險「動物的身體、生活與繁殖」' },
+  beehive: { text: '蜜蜂是昆蟲：身體分成頭、胸、腹三部分，有六隻腳。蜜蜂採蜜時順便幫花傳粉，植物才能結出果實和種子。', more: '自然探險「昆蟲世界」' },
+  pineapple: { text: '臺灣的鳳梨主要種在南部，例如屏東、臺南、嘉義、高雄；那裡氣候溫暖、陽光充足，適合鳳梨生長。', more: '社會科學「臺灣的地理」' },
+  tea: { text: '臺灣的茶園多在丘陵、臺地和山坡地，例如新北坪林、南投、嘉義阿里山；這些地方常有雲霧、排水良好，適合種茶。', more: '社會科學「臺灣的地理」' },
+  rice: { text: '稻米是臺灣最重要的糧食作物。平原地勢平坦、灌溉方便，適合種水稻；臺灣氣候溫暖，西部許多地方一年可以收成兩次。', more: '社會科學「產業與經濟地理」' },
+  mango: { text: '芒果喜歡溫暖、陽光充足的氣候，臺灣的芒果主要產在臺南、屏東、高雄等南部地區，夏天是盛產的季節。', more: '社會科學「產業與經濟地理」' },
+};

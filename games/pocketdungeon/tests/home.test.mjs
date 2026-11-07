@@ -25,10 +25,13 @@ test('目錄有家具 50 種、裝飾 100 種，材料與來源都合法', () =>
   const items = Object.values(HOME_ITEMS);
   assert.equal(items.filter((i) => i.type === 'furniture').length, 50);
   assert.equal(items.filter((i) => i.type === 'decor').length, 100);
-  assert.equal(new Set(items.map((i) => i.name)).size, 150, '名稱不重複');
+  assert.equal(new Set(items.map((i) => i.name)).size, items.length, '名稱不重複');
+  // 牧場動物與節慶裝飾另外計算。
+  assert.equal(items.filter((i) => i.type === 'animal').length, 4);
+  assert.equal(items.filter((i) => i.type === 'festival').length, 3);
   for (const it of items) {
     for (const [m, n] of Object.entries(it.mats)) assert.ok(HOME_MAT_KEYS.includes(m) && n > 0, `${it.key} 材料 ${m}`);
-    assert.ok(it.src === 'default' || it.src === 'any' || AREAS[it.src] || BOSSES[it.src], `${it.key} 來源 ${it.src}`);
+    assert.ok(['default', 'any', 'ranch', 'festival'].includes(it.src) || AREAS[it.src] || BOSSES[it.src], `${it.key} 來源 ${it.src}`);
   }
   // 每隻 Boss 一件主題裝飾；每個區域至少一件主題裝飾。
   for (const b of Object.keys(BOSSES)) assert.ok(home.bossRecipe(b), `${b} 主題裝飾`);

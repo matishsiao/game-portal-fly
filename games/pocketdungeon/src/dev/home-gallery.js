@@ -1,7 +1,7 @@
 // 家園審圖頁：列出已完成美術的物件（含所有動態幀）、地板牆面、作物各階段、圖示，以及一間示範房間。
 
 import { HOME_ART, TILE_ART, CROP_ART, MAT_ART, ICON_ART, homeArt, homeFrames, tileArt, cropArt, iconArt, HT } from '../js/pd/homeArt.js';
-import { HOME_ITEMS, HOME_ITEM_KEYS, HOME_MATS, CROPS, CROP_KEYS, FURNITURE_CATS, DECOR_CATS } from '../js/pd/homeData.js';
+import { HOME_ITEMS, HOME_ITEM_KEYS, HOME_MATS, CROPS, CROP_KEYS, FURNITURE_CATS, DECOR_CATS, GOODS, GOOD_KEYS, MEALS, MEAL_KEYS } from '../js/pd/homeData.js';
 
 const out = document.getElementById('out');
 const scaleSel = document.getElementById('scale');
@@ -99,7 +99,7 @@ function render() {
   });
   // 依分類排列，方便逐組檢查；?group=分類代碼 只看某一組。
   const only = new URLSearchParams(location.search).get('group');
-  const cats = { ...FURNITURE_CATS, ...DECOR_CATS };
+  const cats = { ...FURNITURE_CATS, ...DECOR_CATS, ranch: '牧場動物', festival: '節慶裝飾' };
   for (const [cat, name] of Object.entries(cats)) {
     if (only && only !== cat) continue;
     const keys = HOME_ITEM_KEYS.filter((k) => HOME_ITEMS[k].cat === cat && HOME_ART[k]);
@@ -129,8 +129,13 @@ function render() {
   if (noCrop.length) out.append(Object.assign(document.createElement('p'), { textContent: `尚未完成的作物：${noCrop.map((k) => CROPS[k].name).join('、')}` }));
   section('家園材料與圖示', [
     ...Object.keys(MAT_ART).map((key) => figure(scaled(iconArt(key), s), HOME_MATS.find((m) => m.key === key).name)),
-    ...Object.keys(ICON_ART).map((key) => figure(scaled(iconArt(key), s), { seed: '種子', fertilizer: '肥料', blueprint: '家具製作書' }[key])),
+    ...['seed', 'fertilizer', 'blueprint'].map((key) => figure(scaled(iconArt(key), s), { seed: '種子', fertilizer: '肥料', blueprint: '家具製作書' }[key])),
   ]);
+  // 物產與料理圖示（尚未完成的列在最後）。
+  section('物產與染料', GOOD_KEYS.filter((k) => ICON_ART[k]).map((k) => figure(scaled(iconArt(k), s), GOODS[k].name)));
+  section('料理', MEAL_KEYS.filter((k) => ICON_ART[k]).map((k) => figure(scaled(iconArt(k), s), MEALS[k].name)));
+  const noIcon = [...GOOD_KEYS.filter((k) => !ICON_ART[k]).map((k) => GOODS[k].name), ...MEAL_KEYS.filter((k) => !ICON_ART[k]).map((k) => MEALS[k].name)];
+  if (noIcon.length) out.append(Object.assign(document.createElement('p'), { textContent: `尚未完成的圖示：${noIcon.join('、')}` }));
 }
 
 scaleSel.addEventListener('change', render);

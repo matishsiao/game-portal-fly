@@ -1,9 +1,9 @@
 // 家裡場景（瀏覽器）：繪製房子與庭院（牆、地板、田地、家具、角色），處理點選移動、鍵盤移動、互動與佈置模式的預覽。
 // 規則（能不能擺、找路）在 pd/home.js；這裡只負責畫面與輸入，資料變更透過 hooks 交給 app.js。
 
-import { HOME_ITEMS } from './pd/homeData.js';
-import { homeLayout, placedRect, walkGrid, findPath, placedAt, areaAt, placeCheck } from './pd/home.js';
-import { homeArt, homeFrames, tileArt, HT } from './pd/homeArt.js';
+import { HOME_ITEMS, ANIMALS, GOODS, RANCH } from './pd/homeData.js';
+import { homeLayout, placedRect, walkGrid, findPath, placedAt, areaAt, placeCheck, cropStage, animalState } from './pd/home.js';
+import { homeArt, homeFrames, tileArt, cropArt, iconArt, dyedArt, HT } from './pd/homeArt.js';
 import { R, ramp, rect, px, hash, ellipse, makeCanvas, soil } from './pd/homeDraw.js';
 import { heroArt } from './pd/sprites.js';
 
@@ -64,7 +64,7 @@ export class HouseView {
    * 建立場景。
    * @param {HTMLCanvasElement} canvas 畫布。
    * @param {object} ch 角色（讀取家園資料；不直接修改）。
-   * @param {{interact: (target: {kind: 'item' | 'plot', index: number}) => void, place: (cell: {at: string, x: number, y: number}) => void, select: (index: number) => void, message: (text: string) => void, busy: () => boolean}} hooks 互動、擺放、選取、訊息的回呼，以及是否有對話框開著（開著時不處理輸入）。
+   * @param {{interact: (target: {kind: 'item' | 'plot', index: number}) => void, place: (cell: {at: string, x: number, y: number}) => void, select: (index: number) => void, message: (text: string) => void, busy: () => boolean, itemArt: (item: object) => HTMLCanvasElement}} hooks 互動、擺放、選取、訊息的回呼、是否有對話框開著（開著時不處理輸入），以及裝備的圖（展示架用）。
    */
   constructor(canvas, ch, hooks) {
     this.canvas = canvas;
@@ -335,15 +335,24 @@ export class HouseView {
     const floorKey = tileArt(h.tiles.floor) ? h.tiles.floor : 'woodFloor';
     for (let j = 0; j < l.house.h; j++) for (let i = 0; i < l.house.w; i++) g.drawImage(tileArt(floorKey, i, j), (l.house.x + i) * HT, Y(l.house.y + j));
     this.drawWalls(l, h);
-    // 田地與作物位置。
-    for (const pl of l.plots) g.drawImage(soilTile(), pl.x * HT, Y(pl.y) - 8);
+    // 田地與作物（成熟的作物閃閃發光）。
+    // 畫一塊田地（空地或作物）。
+    l.plots.forEach((pl, i) => {
+      const plot = h.plots[i];
+      const stage = cropStage(plot);
+      const art = stage >= 0 ? cropArt(plot.crop, stage) : null;
+      g.drawImage(art || soilTile(), pl.x * HT, Y(pl.y) - 8);
+      if (stage === 2) this.sparkle(pl.x * HT, Y(pl.y) - 8, i);
+    });
     // 動態物件目前的幀。
     const frameNo = (key) => Math.floor(this.time * 4) % homeFrames(key);
+    // 擺放物件的圖（染色過的用染色版）。
+    const artOf = (p) => (p.dye && GOODS[p.dye] ? dyedArt(p.id, frameNo(p.id), GOODS[p.dye].dye) : homeArt(p.id, frameNo(p.id)));
     // 地毯（最底層）與牆飾。
     for (const p of h.placed) {
       const place = HOME_ITEMS[p.id].place;
       if (place !== 'rug' && place !== 'wall') continue;
-      const art = homeArt(p.id, frameNo(p.id));
+      const art = artOf(p);
       if (!art) continue;
       const r = placedRect(p, l);
       this.blit(art, r.x * HT, place === 'wall' ? Y(0) - 4 : Y(r.y + r.h) - art.height, p.rot);
@@ -353,11 +362,20 @@ export class HouseView {
     for (const p of h.placed) {
       const it = HOME_ITEMS[p.id];
       if (it.place !== 'floor' && it.place !== 'small') continue;
-      const art = homeArt(p.id, frameNo(p.id));
+      const art = artOf(p);
       const r = placedRect(p, l);
       const onTable = it.place === 'small' && h.placed.some((q) => HOME_ITEMS[q.id].top && HOME_ITEMS[q.id].place === 'floor' && placedRect(q, l).x <= r.x && placedRect(q, l).x + placedRect(q, l).w > r.x && placedRect(q, l).y <= r.y && placedRect(q, l).y + placedRect(q, l).h > r.y);
       const base = Y(r.y + r.h);
-      sprites.push({ z: base + (onTable ? 1 : 0), draw: () => (art ? this.blit(art, r.x * HT, base - art.height - (onTable ? TABLE_LIFT : 0), p.rot) : this.placeholder(r, Y)) });
+      sprites.push({
+        z: base + (onTable ? 1 : 0),
+        // 畫出物件，以及展示架上的裝備、動物的狀態泡泡。
+        draw: () => {
+          if (art) this.blit(art, r.x * HT, base - art.height - (onTable ? TABLE_LIFT : 0), p.rot);
+          else this.placeholder(r, Y);
+          if (p.show && p.show.length && art) this.drawShelf(p, r, base - art.height);
+          if (it.type === 'animal') this.drawBubble(p, r, Y);
+        },
+      });
     }
     const p = this.player;
     sprites.push({ z: Y(p.y + 1) - 2, draw: () => this.drawPlayer(p, Y) });
@@ -419,6 +437,74 @@ export class HouseView {
     g.scale(-1, 1);
     g.drawImage(art, 0, 0);
     g.restore();
+  }
+
+  /**
+   * 成熟作物上的閃光（幾個十字星輪流亮起）。
+   * @param {number} x 作物圖左上 x。
+   * @param {number} y 作物圖左上 y。
+   * @param {number} seed 每塊田不同的相位。
+   */
+  sparkle(x, y, seed) {
+    const g = this.g;
+    const t = this.time * 2 + seed * 0.7;
+    for (let k = 0; k < 3; k++) {
+      const a = (Math.sin(t + k * 2.1) + 1) / 2;
+      if (a < 0.55) continue;
+      const sx = x + 6 + ((k * 11 + seed * 5) % 20);
+      const sy = y + 4 + ((k * 7 + seed * 3) % 14);
+      g.globalAlpha = a;
+      rect(g, sx - 2, sy, 5, 1, '#fff8c0');
+      rect(g, sx, sy - 2, 1, 5, '#fff8c0');
+      px(g, sx, sy, '#ffffff');
+    }
+    g.globalAlpha = 1;
+  }
+
+  /**
+   * 展示架上的裝備（每件放大 2 倍，排在架子上）。
+   * @param {object} p 展示架的擺放資料。
+   * @param {{x: number, y: number, w: number, h: number}} r 佔用的地圖格。
+   * @param {number} top 展示架圖的上緣（畫布 y）。
+   */
+  drawShelf(p, r, top) {
+    const g = this.g;
+    // 畫一件展示的裝備。
+    p.show.forEach((item, k) => {
+      const art = this.hooks.itemArt && this.hooks.itemArt(item);
+      if (!art) return;
+      const w = art.width * 2;
+      const hh = art.height * 2;
+      const cx = r.x * HT + (r.w * HT * (k + 1)) / (p.show.length + 1);
+      g.drawImage(art, Math.round(cx - w / 2), Math.round(top + 14 - hh / 2), w, hh);
+    });
+  }
+
+  /**
+   * 動物頭上的泡泡：有產物時顯示產物圖示，沒有飼料時顯示牧草圖示。
+   * @param {object} p 動物的擺放資料。
+   * @param {{x: number, y: number, w: number, h: number}} r 佔用的地圖格。
+   * @param {(row: number) => number} Y 列轉像素。
+   */
+  drawBubble(p, r, Y) {
+    const st = animalState(p);
+    const icon = st.ready ? iconArt(ANIMALS[p.id].product) : st.hungry ? iconArt(RANCH.feed) : null;
+    if (!icon) return;
+    const g = this.g;
+    const bob = Math.round(Math.sin(this.time * 3) * 1.5);
+    const x = r.x * HT + r.w * HT - 22;
+    const y = Y(r.y) - 18 + bob;
+    rect(g, x, y, 22, 20, '#3a2a3a');
+    rect(g, x + 1, y + 1, 20, 18, st.ready ? '#fff8e8' : '#ffe0e0');
+    rect(g, x + 8, y + 20, 6, 2, '#3a2a3a');
+    rect(g, x + 9, y + 19, 4, 1, st.ready ? '#fff8e8' : '#ffe0e0');
+    g.drawImage(icon, x + 3, y + 2, 16, 16);
+    if (st.ready > 1) {
+      rect(g, x + 15, y - 3, 9, 9, '#c0303a');
+      g.fillStyle = '#ffffff';
+      g.font = 'bold 8px sans-serif';
+      g.fillText(String(st.ready), x + 17, y + 4);
+    }
   }
 
   /**
