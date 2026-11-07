@@ -1117,14 +1117,13 @@ export const CROPS = {
       sparkle(g, 21, top - 3, 1, '#c8e0ff', '#ffffff');
       return;
     }
-    // 光暈。
+    // 光芒：不畫半透明光暈（深色背景上會變成灰色圓盤），改在五個花瓣之間點上不透明的暖黃短光芒。
     const cx = 16;
     const cy = 11;
-    g.globalAlpha = 0.18;
-    ellipse(g, cx, cy, 12, 11, '#fff2a0');
-    g.globalAlpha = 0.28;
-    ellipse(g, cx, cy, 8, 7.5, '#fff6c0');
-    g.globalAlpha = 1;
+    for (let k = 0; k < 5; k++) {
+      const a = -Math.PI / 2 + ((k + 0.5) * Math.PI * 2) / 5;
+      for (const [d, c] of [[6.5, '#fff0a0'], [8, '#ffe070']]) px(g, Math.round(cx + Math.cos(a) * d), Math.round(cy + Math.sin(a) * d), c);
+    }
     // 星形花瓣：以極座標判斷像素是否落在五角星內。
     const petal = ramp('#f6d860');
     /**

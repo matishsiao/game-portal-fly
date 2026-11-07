@@ -86,7 +86,13 @@
       <b id="house-title" class="house-title">我的家</b>
       <button type="button" id="house-edit-btn" class="bar-btn house-edit-btn">佈置</button>
     </header>
-    <div id="house-stage" class="house-stage"><canvas id="house-canvas" class="house-canvas" aria-label="我的家：點地板走過去，點工作台製作家具"></canvas></div>
+    <div class="house-view">
+      <div id="house-stage" class="house-stage"><canvas id="house-canvas" class="house-canvas" aria-label="我的家：點地板走過去，點工作台製作家具"></canvas></div>
+      <div id="house-mini" class="house-mini">
+        <button type="button" id="house-mini-toggle" class="house-mini-label" aria-expanded="true">地圖</button>
+        <canvas id="house-mini-canvas" class="house-mini-canvas" aria-label="家園小地圖：點一下移動視角"></canvas>
+      </div>
+    </div>
     <p id="house-message" class="village-message" aria-live="polite"></p>
     <div id="house-bar" class="house-bar"></div>
   </main>

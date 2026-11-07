@@ -1,5 +1,6 @@
 // 家園美術：牧場動物（2×2 的圍欄與動物）與節慶裝飾（繪製規則見 homeDraw.js 開頭說明）。
-// 四座牧場圍欄共用同一套矮木圍欄（後欄與兩側先畫、動物畫在中間、前欄最後畫），讓並排時風格一致；
+// 四座牧場圍欄共用同一套圍欄畫法（後欄與兩側先畫、動物畫在中間、前欄最後畫），讓並排時風格一致；
+// 雞舍用矮木圍欄、牛欄用較高較粗的深色木欄、羊圈用淺色細橫木欄（見 FENCE）；
 // 牆飾畫在 32 × 32 的牆面上（不畫地面投影，改在右下方畫一層淡淡的牆面投影）。
 
 import { mix, ramp, R, rect, px, hash, ellipse, orb, shadow, woodGrain, weave, block, post } from '../homeDraw.js';
@@ -102,20 +103,29 @@ function sprite(g, x, y, rows, pal) {
 }
 
 /**
- * 柔和的光暈（多層半透明同心橢圓）。
+ * 光點：在橢圓周圍點上一圈不透明的暖色小光點（不用半透明圓盤，避免在深色背景上變得灰濁）；
+ * 每隔一點畫成十字小星芒，k 改變光點的相位，可用來做兩幀的閃爍。
  * @param {CanvasRenderingContext2D} g 繪圖環境。
  * @param {number} cx 中心 x。
  * @param {number} cy 中心 y。
- * @param {number} rad 半徑。
+ * @param {number} rad 半徑（垂直方向壓扁為 0.75 倍）。
  * @param {string} c 光的顏色。
- * @param {number} [k=1] 亮度倍率。
+ * @param {number} [k=1] 相位。
  */
 function glow(g, cx, cy, rad, c, k = 1) {
-  for (const [s, a] of [[1, 0.06], [0.78, 0.08], [0.56, 0.1], [0.36, 0.14]]) {
-    g.globalAlpha = Math.min(1, a * k);
-    ellipse(g, cx, cy, rad * s, rad * s * 0.9, c);
+  const core = mix(c, '#ffffff', 0.55);
+  for (let i = 0; i < 8; i++) {
+    const a = ((i + k * 0.5) * Math.PI * 2) / 8;
+    const r = rad * (i % 2 ? 0.92 : 1.05);
+    const x = Math.round(cx + Math.cos(a) * r);
+    const y = Math.round(cy + Math.sin(a) * r * 0.75);
+    if (i % 2) {
+      px(g, x, y, c);
+      continue;
+    }
+    for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) px(g, x + dx, y + dy, c);
+    px(g, x, y, core);
   }
-  g.globalAlpha = 1;
 }
 
 /**
@@ -175,37 +185,52 @@ function fluff(g, cx, cy, rx, ry, r, seed = 0) {
 }
 
 /**
+ * 圍欄的樣式：橫木與木樁的色階、木樁高與寬、每道橫木相對地面的上緣偏移與高度。
+ * wood 為雞舍用的矮木圍欄；sturdy 為牛欄用的高而粗壯的深色木欄；light 為羊圈用的淺色細橫木欄。
+ */
+const FENCE = {
+  wood: { rail: C.fence, post: C.postWood, h: 11, pw: 3, rails: [[-9, 4], [-5, 4]] },
+  sturdy: { rail: ramp('#8a5a32'), post: ramp('#5e3a22'), h: 14, pw: 4, rails: [[-12, 5], [-6, 5]] },
+  light: { rail: ramp('#e0d0aa'), post: ramp('#b8986a'), h: 10, pw: 2, rails: [[-8, 3], [-4, 3]] },
+};
+
+/**
  * 圍欄木樁：尖頂、左亮右暗、木紋點。
  * @param {CanvasRenderingContext2D} g 繪圖環境。
  * @param {number} x 左 x。
  * @param {number} base 底部 y（地面）。
  * @param {number} h 高。
+ * @param {object} [st=FENCE.wood] 圍欄樣式（決定色階與木樁寬）。
  */
-function fencePost(g, x, base, h) {
-  const p = C.postWood;
-  post(g, x, base - h + 2, 3, h - 2, p);
-  rect(g, x - 1, base - h + 1, 5, 1, p.o);
-  rect(g, x, base - h, 3, 1, p.o);
-  px(g, x + 1, base - h - 1, p.o);
-  rect(g, x, base - h + 1, 3, 1, p.l);
-  px(g, x + 1, base - h, p.h);
-  rect(g, x, base - 1, 3, 1, p.d);
+function fencePost(g, x, base, h, st = FENCE.wood) {
+  const p = st.post;
+  const w = st.pw;
+  post(g, x, base - h + 2, w, h - 2, p);
+  rect(g, x - 1, base - h + 1, w + 2, 1, p.o);
+  rect(g, x, base - h, w, 1, p.o);
+  rect(g, x + (w > 2 ? 1 : 0), base - h - 1, Math.max(1, w - 2), 1, p.o);
+  rect(g, x, base - h + 1, w, 1, p.l);
+  rect(g, x + (w > 2 ? 1 : 0), base - h, Math.max(1, w - 2), 1, p.h);
+  rect(g, x, base - 1, w, 1, p.d);
+  if (w > 3) px(g, x + 1, base - Math.round(h / 2), p.d);
 }
 
 /**
- * 圍欄橫木（水平，4 像素高：外框、亮面、基底、陰影與木紋）。
+ * 圍欄橫木（水平，預設 4 像素高：外框、亮面、基底、陰影與木紋）。
  * @param {CanvasRenderingContext2D} g 繪圖環境。
  * @param {number} x0 左 x。
  * @param {number} x1 右 x（不含）。
  * @param {number} y 上緣 y。
  * @param {number} seed 木紋種子。
+ * @param {object} [r=C.fence] 橫木色階。
+ * @param {number} [hh=4] 橫木高（含上下外框，至少 3）。
  */
-function fenceRail(g, x0, x1, y, seed) {
-  const r = C.fence;
-  rect(g, x0, y, x1 - x0, 4, r.o);
+function fenceRail(g, x0, x1, y, seed, r = C.fence, hh = 4) {
+  rect(g, x0, y, x1 - x0, hh, r.o);
   rect(g, x0, y + 1, x1 - x0, 1, r.l);
-  rect(g, x0, y + 2, x1 - x0, 1, r.b);
-  woodGrain(g, x0, y + 1, x1 - x0, 2, r, seed);
+  if (hh > 3) rect(g, x0, y + 2, x1 - x0, hh - 3, r.b);
+  if (hh > 4) rect(g, x0, y + hh - 2, x1 - x0, 1, r.d);
+  if (hh > 3) woodGrain(g, x0, y + 1, x1 - x0, hh - 2, r, seed);
 }
 
 /** 圍欄的尺寸：木樁高、後欄地面 y（相對於佔地上緣）、前欄距畫布底部、左右木樁 x。 */
@@ -240,20 +265,24 @@ function penGround(g, H, up, r, seed) {
  * @param {CanvasRenderingContext2D} g 繪圖環境。
  * @param {number} H 畫布高。
  * @param {number} up 佔地上緣 y。
+ * @param {object} [st=FENCE.wood] 圍欄樣式。
  */
-function penBack(g, H, up) {
+function penBack(g, H, up, st = FENCE.wood) {
   const yb = up + PEN.back;
   const yf = H - PEN.front;
-  fenceRail(g, PEN.left + 2, PEN.right + 1, yb - 9, 1);
-  fenceRail(g, PEN.left + 2, PEN.right + 1, yb - 5, 2);
-  for (const x of [PEN.left, 21, 40, PEN.right]) fencePost(g, x, yb, PEN.h);
+  st.rails.forEach(
+    // 後欄的每一道橫木。
+    ([dy, hh], k) => fenceRail(g, PEN.left + 2, PEN.right + 1, yb + dy, 1 + k, st.rail, hh),
+  );
+  for (const x of [PEN.left, 21, 40, PEN.right]) fencePost(g, x, yb, st.h, st);
   // 兩側欄：由後往前的直向橫木條，中段一根木樁。
+  const top = yb + st.rails[0][0] + 1;
   for (const x of [PEN.left, PEN.right]) {
-    const r = C.fence;
-    rect(g, x, yb - 8, 3, yf - yb, r.o);
-    rect(g, x + 1, yb - 8, 1, yf - yb, x < 32 ? r.l : r.b);
-    for (let y = yb - 6; y < yf - 9; y += 5) px(g, x + 1, y, r.d);
-    fencePost(g, x, Math.round((yb + yf) / 2), PEN.h);
+    const r = st.rail;
+    rect(g, x, top, st.pw, yf - yb, r.o);
+    rect(g, x + 1, top, Math.max(1, st.pw - 2), yf - yb, x < 32 ? r.l : r.b);
+    for (let y = top + 2; y < yf - 9; y += 5) px(g, x + 1, y, r.d);
+    fencePost(g, x, Math.round((yb + yf) / 2), st.h, st);
   }
 }
 
@@ -261,15 +290,18 @@ function penBack(g, H, up) {
  * 圍欄的前半部：前欄（兩道橫木、中央的木樁）與兩端的角樁，畫在動物之後。
  * @param {CanvasRenderingContext2D} g 繪圖環境。
  * @param {number} H 畫布高。
+ * @param {object} [st=FENCE.wood] 圍欄樣式。
  */
-function penFront(g, H) {
+function penFront(g, H, st = FENCE.wood) {
   const yf = H - PEN.front;
   g.globalAlpha = 0.18;
   rect(g, 2, yf - 1, 60, 2, '#000000');
   g.globalAlpha = 1;
-  fenceRail(g, PEN.left + 2, PEN.right + 1, yf - 9, 3);
-  fenceRail(g, PEN.left + 2, PEN.right + 1, yf - 5, 4);
-  for (const x of [PEN.left, 21, 40, PEN.right]) fencePost(g, x, yf, PEN.h);
+  st.rails.forEach(
+    // 前欄的每一道橫木。
+    ([dy, hh], k) => fenceRail(g, PEN.left + 2, PEN.right + 1, yf + dy, 3 + k, st.rail, hh),
+  );
+  for (const x of [PEN.left, 21, 40, PEN.right]) fencePost(g, x, yf, st.h, st);
 }
 
 /**
@@ -533,6 +565,47 @@ function wallDrop(g, x0, y0, w, h, inside) {
   g.globalAlpha = 1;
 }
 
+/**
+ * 一堆乾草：半橢圓的草堆（外框、左亮右暗、零星的深淺草屑），兩側各垂下一縷草。
+ * @param {CanvasRenderingContext2D} g 繪圖環境。
+ * @param {number} cx 中心 x。
+ * @param {number} by 底部 y（草堆的地面）。
+ * @param {number} rx 水平半徑。
+ * @param {number} ry 高度。
+ */
+function hayPile(g, cx, by, rx, ry) {
+  const hy = C.hay;
+  shadow(g, cx, by, rx * 2);
+  // 逐點判斷乾草堆的顏色。
+  paint(g, cx - rx - 1, by - ry - 1, rx * 2 + 3, ry + 2, function hayPixel(x, y) {
+    if (!inEll(x, y, cx, by, rx, ry) || y > by - 1) return null;
+    if (!inEll(x, y, cx, by, rx - 1, ry - 1)) return hy.o;
+    const v = hash(x >> 1, y, 9);
+    if (v < 0.18) return hy.d;
+    if (v > 0.85) return hy.h;
+    return x < cx - 2 ? hy.l : hy.b;
+  });
+  for (const [x, y] of [[cx - rx + 2, by - 2], [cx + rx - 3, by - 3]]) line(g, x, y, x + (x < cx ? -3 : 3), y + 1, hy.b);
+}
+
+/**
+ * 木製水槽：粗木板釘成的長槽（深色木頭、正面兩道箍條），槽裡裝滿水並帶一道反光。
+ * @param {CanvasRenderingContext2D} g 繪圖環境。
+ * @param {number} x 左 x。
+ * @param {number} y 上緣 y。
+ * @param {number} w 寬。
+ */
+function trough(g, x, y, w) {
+  const r = R.darkWood;
+  shadow(g, x + w / 2, y + 10, w + 4);
+  block(g, x, y, w, 4, 5, r, 'wood', 7);
+  rect(g, x + 1, y + 1, w - 2, 2, R.water.d);
+  rect(g, x + 1, y + 1, w - 2, 1, R.water.b);
+  rect(g, x + 2, y + 1, Math.round(w / 3), 1, R.water.l);
+  px(g, x + 3, y + 1, R.water.h);
+  for (const bx of [x + 2, x + w - 4]) rect(g, bx, y + 4, 2, 5, R.iron.b);
+}
+
 /** 牧場動物與節慶裝飾的繪製方式（格式同 HOME_ART）。 */
 export const ART = {
   // ── 牧場動物 ──
@@ -657,7 +730,7 @@ export const ART = {
   cow: {
     size: [2, 2], up: 18, frames: 2,
     /**
-     * 乳牛圍欄：矮木圍欄裡的泥地與後方一堆乾草，黑白斑乳牛（粉紅鼻頭、小角、粉紅乳房）；
+     * 乳牛圍欄：較高較粗的深色木欄裡的泥地，左後方一座木水槽、右後方一堆乾草，黑白斑乳牛（粉紅鼻頭、小角、粉紅乳房）；
      * 第 2 幀低頭吃草並甩動尾巴。
      * @param {CanvasRenderingContext2D} g 繪圖環境。
      * @param {number} W 寬。
@@ -667,30 +740,20 @@ export const ART = {
     draw(g, W, H, f) {
       const up = 18;
       penGround(g, H, up, C.dirt, 2);
-      penBack(g, H, up);
-      // 乾草堆。
-      const hy = C.hay;
-      shadow(g, 49, up + 26, 20);
-      // 逐點判斷乾草堆的顏色。
-      paint(g, 38, up + 9, 23, 18, function hayPixel(x, y) {
-        if (!inEll(x, y, 49, up + 26, 10, 14) || y > up + 25) return null;
-        if (!inEll(x, y, 49, up + 26, 9, 13)) return hy.o;
-        const v = hash(x >> 1, y, 9);
-        if (v < 0.18) return hy.d;
-        if (v > 0.85) return hy.h;
-        return x < 47 ? hy.l : hy.b;
-      });
-      for (const [x, y] of [[41, up + 24], [56, up + 23]]) line(g, x, y, x + (x < 49 ? -3 : 3), y + 1, hy.b);
-      for (const [x, y, s] of [[8, 60, 1], [44, 64, 2], [18, 70, 3]]) strands(g, x, y, hy, s);
-      for (const [x, y] of [[8, 46], [52, 72]]) tuft(g, x, y);
+      penBack(g, H, up, FENCE.sturdy);
+      // 乾草堆與左後方的木水槽。
+      hayPile(g, 49, up + 26, 10, 14);
+      trough(g, 6, up + 13, 17);
+      for (const [x, y, s2] of [[8, 60, 1], [44, 64, 2], [18, 70, 3]]) strands(g, x, y, C.hay, s2);
+      for (const [x, y] of [[52, 72]]) tuft(g, x, y);
       cowFig(g, 35, H - 13, f);
-      penFront(g, H);
+      penFront(g, H, FENCE.sturdy);
     },
   },
   sheep: {
     size: [2, 2], up: 16, frames: 2,
     /**
-     * 綿羊圍欄：矮木圍欄裡的草地，一隻蓬鬆的綿羊（深色臉與腳）與一隻小羊；
+     * 綿羊圍欄：淺色細橫木欄裡的草地，左後方一小堆乾草，一隻蓬鬆的綿羊（深色臉與腳）與一隻小羊；
      * 第 2 幀綿羊低頭吃草、小羊跳起來。
      * @param {CanvasRenderingContext2D} g 繪圖環境。
      * @param {number} W 寬。
@@ -707,17 +770,19 @@ export const ART = {
         px(g, x + 1, y + 1, c);
         px(g, x, y + 1, R.gold.b);
       }
-      penBack(g, H, up);
+      penBack(g, H, up, FENCE.light);
+      // 左後方一小堆乾草。
+      hayPile(g, 14, up + 22, 8, 10);
       sheepFig(g, 38, H - 21, 1, 0, f === 1, 1);
       sheepFig(g, 17, H - 12, 0.6, f === 1 ? 4 : 0, false, 7);
-      penFront(g, H);
+      penFront(g, H, FENCE.light);
     },
   },
   // ── 節慶裝飾 ──
   springCouplet: {
     size: [1, 1], up: 0,
     /**
-     * 春聯（斗方）：菱形的紅紙，金色外框與內框、紙面細紋與灑金點，中央是幾筆粗金色抽象筆觸，上方以紅繩掛在釘上。
+     * 春聯（斗方）：菱形的紅紙，粗金邊與內側細金線、四角灑金點，中央是帶暗紅字影的金色「春」字，上方以紅繩掛在釘上。
      * @param {CanvasRenderingContext2D} g 繪圖環境。
      */
     draw(g) {
@@ -733,40 +798,44 @@ export const ART = {
       const inD = (x, y, k = 0) => Math.abs(x + 0.5 - cx) + Math.abs(y + 0.5 - cy) <= 13 - k;
       wallDrop(g, 2, 3, 28, 28, inD);
       const r = C.paperRed;
-      // 紙面：外框、金邊、紅紙（左上亮、右下暗）與內側細金線。
+      // 紙面：外框、粗金邊、紅色窄帶與內側細金線，紅紙左上亮、右下暗。
       paint(g, 2, 3, 29, 29, function couplPixel(x, y) {
         if (!inD(x, y)) return null;
         if (!inD(x, y, 1)) return r.o;
         if (!inD(x, y, 2)) return x + y < cx + cy ? R.gold.h : R.gold.b;
-        if (!inD(x, y, 3)) return R.gold.d;
-        if (!inD(x, y, 4)) return r.d;
-        if (!inD(x, y, 5)) return x + y < cx + cy ? R.gold.l : R.gold.d;
+        if (!inD(x, y, 3)) return r.d;
+        if (!inD(x, y, 4)) return x + y < cx + cy ? R.gold.l : R.gold.d;
         const t = (x - cx) + (y - cy);
-        if (t < -9) return r.l;
-        if (t > 8) return r.d;
+        if (t < -8) return r.l;
+        if (t > 7) return r.d;
         return r.b;
       });
-      weave(g, 9, 11, 14, 12, r);
-      for (const [x, y] of [[11, 13], [21, 15], [12, 22], [19, 24], [16, 9]]) px(g, x, y, R.gold.l);
-      // 中央的抽象金色筆觸（像毛筆寫的字，但不是真的字）。
-      const ink = { o: R.gold.o, b: R.gold.b, l: R.gold.h, d: R.gold.d };
-      sprite(g, 10, 11, [
-        '.....oo.....',
-        '....olbo....',
-        '.ooooobbooo.',
-        'olllbbbbbbbo',
-        '.oooobbooddo',
-        '..olbo.obo..',
-        '.olbo..olbo.',
-        'olbbooooobbo',
-        '.oobbbbbbbo.',
-        '...ooobboo..',
-        '.....obbo...',
-        '....obdo....',
-        '.....oo.....',
-      ], ink);
-      px(g, 8, 17, ink.b);
-      px(g, 23, 17, ink.b);
+      // 四角的灑金點。
+      for (const [x, y] of [[16, 7], [7, 17], [25, 17], [16, 27]]) px(g, x, y, R.gold.l);
+      // 中央的金色「春」字：上方三橫穿一豎，下方撇捺張開，中間夾著「日」；先畫右下的暗紅字影再畫金字。
+      const chun = [
+        '......x......',
+        '...xxxxxxx...',
+        '......x......',
+        '....xxxxx....',
+        '......x......',
+        '.xxxxxxxxxxx.',
+        '.....x.x.....',
+        '....x...x....',
+        '...x.xxx.x...',
+        '..x..x.x..x..',
+        '.x...xxx...x.',
+        '.....x.x.....',
+        '.....xxx.....',
+      ];
+      // 逐列點出字影。
+      chun.forEach((row, j) => {
+        for (let i = 0; i < row.length; i++) if (row[i] === 'x') px(g, 11 + i, 12 + j, r.o);
+      });
+      // 逐列點出金字（左上的筆畫用亮金色）。
+      chun.forEach((row, j) => {
+        for (let i = 0; i < row.length; i++) if (row[i] === 'x') px(g, 10 + i, 11 + j, i + j < 9 ? R.gold.h : R.gold.l);
+      });
       // 掛釘與紅繩。
       rect(g, 15, 0, 3, 2, R.iron.o);
       px(g, 16, 0, R.iron.l);
@@ -838,7 +907,7 @@ export const ART = {
   moonLantern: {
     size: [1, 1], up: 6, frames: 2,
     /**
-     * 中秋燈籠（兔子燈）：白紙糊的小兔身體裡透出暖黃燭光（兩幀明暗閃爍），粉紅長耳、紅眼睛、
+     * 中秋燈籠（兔子燈）：白紙糊的小兔身體裡透出暖黃燭光（兩幀明暗閃爍，周圍的暖橘光點交錯閃動），粉紅長耳、紅眼睛、
      * 背上的紅花，底下兩個小木輪與一根提燈的竹竿。
      * @param {CanvasRenderingContext2D} g 繪圖環境。
      * @param {number} W 寬。
@@ -848,7 +917,7 @@ export const ART = {
     draw(g, W, H, f) {
       const l = C.lamp;
       const warm = f ? '#ffd070' : '#ffb848';
-      glow(g, 16, H - 13, 13, '#ffe090', f ? 2.2 : 1.5);
+      glow(g, 17, H - 14, 13, f ? '#ffc040' : '#ffa830', f);
       shadow(g, 16, H - 3, 20);
       // 提燈的竹竿與吊繩。
       line(g, 26, H - 30, 22, H - 16, R.lightWood.o);

@@ -1123,7 +1123,7 @@ function enterHouse(ch) {
     busy: () => !els.modal.hidden,
     // 展示架上裝備的圖。
     itemArt: (item) => itemArt(itemIconName(item)),
-  });
+  }, { stage: $('house-stage'), mini: $('house-mini-canvas') });
   app.houseTab = app.houseTab || 'furniture';
   app.house.start();
   // 依實際時間推進作物與動物（每秒）。
@@ -1134,6 +1134,7 @@ function enterHouse(ch) {
   );
   if (linkNote) houseMessage(linkNote);
   fitHouse();
+  setHouseMini(!$('house-mini').classList.contains('closed'));
   renderHouseBar(ch);
 }
 
@@ -1155,14 +1156,57 @@ async function leaveHouse() {
   renderVillage();
 }
 
-/** 依畫面大小縮放家裡的畫布（保持比例、不超過畫面高度的六成）。 */
+/** 記住小地圖開關的 localStorage 鍵。 */
+const HOUSE_MINI_KEY = 'pd.houseMini';
+
+/**
+ * 讀取小地圖是否展開（讀不到時預設展開）。
+ * @returns {boolean} 展開時為 true。
+ */
+function loadHouseMini() {
+  try {
+    return localStorage.getItem(HOUSE_MINI_KEY) !== 'off';
+  } catch {
+    return true;
+  }
+}
+
+/**
+ * 展開或收起家裡的小地圖。
+ * @param {boolean} open 是否展開。
+ */
+function setHouseMini(open) {
+  $('house-mini').classList.toggle('closed', !open);
+  $('house-mini-toggle').setAttribute('aria-expanded', String(open));
+  const ch = currentChar();
+  const lv = ch && ch.home ? ch.home.level : 1;
+  const max = LAND.length;
+  $('house-mini-toggle').textContent = `地圖・土地 ${lv}/${max} ${open ? '▴' : '▾'}`;
+  $('house-mini-toggle').title = lv < max ? '虛線框是土地擴建到最大時的範圍，點小地圖可以移動視角' : '土地已擴建到最大，點小地圖可以移動視角';
+}
+
+/** 切換小地圖展開或收起，並記住選擇。 */
+function toggleHouseMini() {
+  const open = $('house-mini').classList.contains('closed');
+  setHouseMini(open);
+  try {
+    localStorage.setItem(HOUSE_MINI_KEY, open ? 'on' : 'off');
+  } catch {
+    // 無法儲存時只影響這次。
+  }
+}
+
+/** 家裡畫面每格最小的顯示大小（CSS 像素）；整張地圖放不下時改成放大並讓鏡頭跟著角色。 */
+const HOUSE_MIN_TILE = 40;
+
+/** 依畫面大小縮放家裡的畫布：整張放得下而且每格夠大時整張顯示，否則固定放大、由鏡頭跟隨角色（小地圖看全貌）。 */
 function fitHouse() {
   if (!app.house) return;
   const c = $('house-canvas');
   const stage = $('house-stage');
   const maxW = stage.clientWidth || window.innerWidth - 32;
   const maxH = window.innerHeight * 0.62;
-  const scale = Math.min(maxW / c.width, maxH / c.height);
+  const scale = Math.max(Math.min(maxW / c.width, maxH / c.height), HOUSE_MIN_TILE / 32);
   c.style.width = `${Math.floor(c.width * scale)}px`;
   c.style.height = `${Math.floor(c.height * scale)}px`;
 }
@@ -3845,6 +3889,8 @@ function bindEvents() {
   els.villagePanel.addEventListener('click', onVillageClick);
   $('house-back-btn').addEventListener('click', leaveHouse);
   $('house-edit-btn').addEventListener('click', toggleHouseEdit);
+  $('house-mini-toggle').addEventListener('click', toggleHouseMini);
+  setHouseMini(loadHouseMini());
   $('house-bar').addEventListener('click', onHouseBarClick);
   window.addEventListener('resize', fitHouse);
   $('pause-btn').addEventListener('click', pauseGame);

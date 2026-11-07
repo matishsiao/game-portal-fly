@@ -424,7 +424,8 @@ export const CROPS = {
     const h = [6, 13, 21][stage];
     const back = ramp(stage === 0 ? '#6aa848' : '#3e8a38');
     const front = ramp(stage === 0 ? '#7ab850' : '#58a640');
-    const tip = stage === 2 ? ramp('#dcb848') : null;
+    // 成熟時只有草尖帶一點偏黃綠的金色，整叢仍以綠色為主。
+    const tip = stage === 2 ? ramp('#bcb44c') : null;
     for (const [cx, by, s, r] of [[16, 31, 1, back], [9, 36, 0.82, front], [23, 36, 0.86, front]]) {
       const hh = Math.round(h * s);
       const spread = 1 + h / 8;
@@ -432,11 +433,7 @@ export const CROPS = {
         // 每片草莖：往兩側彎出，越外側越矮。
         (k) => [cx + (k > 0 ? 1 : 0), by, cx + Math.round(k * spread), by - Math.round(hh * (1 - Math.abs(k) * 0.12)), 2, 1.8, tip],
       );
-      blades(g, list, r, 0.84);
-    }
-    if (stage === 2) {
-      // 少許成熟的穗粒。
-      for (const [x, y] of [[13, 13], [19, 12], [7, 20], [26, 19]]) dots(g, [[x, y, R.gold.l], [x, y + 1, R.gold.b]], R.gold.o);
+      blades(g, list, r, 0.9);
     }
   },
   /**
@@ -812,13 +809,33 @@ export const ICONS = {
     ellipse(g, 15, 11, 7, 2.5, rc.b);
     ellipse(g, 13, 10.5, 3, 1, rc.h);
     for (let k = 0; k < 8; k++) px(g, 9 + Math.floor(hash(k, 4) * 14), 10 + Math.floor(hash(k, 8) * 4), k % 2 ? rc.l : rc.d);
-    // 袋口翻折邊與正面的紅色「米」字印。
+    // 袋口翻折邊與正面的紅色「米」字印：上方兩點向內斜、一橫、一豎，下方兩撇往外斜。
     rect(g, 6, 14, 20, 1, sack.d);
     const mk = R.red;
-    for (const [x, y] of [[16, 18], [16, 19], [16, 20], [16, 21], [16, 22], [16, 23], [13, 20], [14, 20], [15, 20], [17, 20], [18, 20], [19, 20], [14, 18], [18, 18], [14, 22], [13, 23], [18, 22], [19, 23], [15, 21], [17, 21]]) {
-      px(g, x, y, mk.b);
-    }
-    px(g, 16, 18, mk.l);
+    const glyph = [
+      '.....x.....',
+      '.xx..x..xx.',
+      '..xx.x.xx..',
+      '.....x.....',
+      'xxxxxxxxxxx',
+      '....xxx....',
+      '...x.x.x...',
+      '..x..x..x..',
+      '.x...x...x.',
+      'x....x....x',
+    ];
+    // 米字印在一張米白色的方形紙標上（外框與右下陰影），字才不會被麻布紋吃掉。
+    const lb = R.cream;
+    rect(g, 9, 15, 15, 13, sack.o);
+    rect(g, 10, 16, 13, 11, lb.b);
+    rect(g, 10, 16, 13, 1, lb.h);
+    rect(g, 10, 16, 1, 11, lb.l);
+    rect(g, 22, 17, 1, 10, lb.d);
+    rect(g, 11, 26, 11, 1, lb.d);
+    // 逐列點出紅色的字。
+    glyph.forEach((row, j) => {
+      for (let i = 0; i < row.length; i++) if (row[i] === 'x') px(g, 11 + i, 16 + j, mk.b);
+    });
   },
   /** 繪製「芒果」圖示。 */
   mango(g) {
@@ -1080,31 +1097,56 @@ export const ICONS = {
   },
   /** 繪製「蛋餅」圖示。 */
   omelette(g) {
-    plate(g, 16, 21, 14, 8);
-    const crust = ramp('#e2b878');
-    const eggR = ramp('#f2cc3a');
+    plate(g, 16, 22, 14, 7);
+    const crust = ramp('#e0b070');
+    const eggR = ramp('#f6d03a');
     const sauce = ramp('#6a3a22');
-    for (const [x, y] of [[10, 16], [22, 16], [16, 22]]) {
-      // 一段蛋餅捲，切面朝上：側面一圈餅皮厚度，頂面是餅皮與蛋層捲成的螺旋。
-      ellipse(g, x, y + 2, 6.5, 4.5, crust.o);
-      ellipse(g, x, y + 2, 5.5, 3.5, crust.d);
-      ellipse(g, x, y, 6.5, 4.5, crust.o);
-      ellipse(g, x, y, 5.5, 3.5, crust.l);
-      ellipse(g, x, y, 4.5, 2.6, eggR.b);
-      ellipse(g, x, y, 3.3, 1.8, R.cream.l);
-      ellipse(g, x, y, 2, 1, eggR.l);
-      px(g, x, y, R.cream.h);
-      px(g, x - 3, y - 2, crust.h);
-      px(g, x + 4, y + 1, eggR.d);
-      px(g, x + 3, y, eggR.d);
-    }
-    // 淋上的醬油膏與蔥花。
-    for (let x = 6; x < 27; x++) {
-      const y = 15 + Math.round(Math.sin(x * 0.7) * 1.5) + (x > 12 && x < 20 ? 6 : 0);
-      px(g, x, y, sauce.b);
-      if (x % 3 === 0) px(g, x, y + 1, sauce.d);
-    }
-    for (const [x, y] of [[8, 14], [20, 13], [24, 18], [14, 22], [18, 24]]) px(g, x, y, R.leaf.l);
+    /**
+     * 一段橫躺的蛋餅捲：後方是烙得金黃的餅皮圓柱，正面朝外是圓形切面，
+     * 切面上以粗線畫出一圈半的餅皮螺旋，夾著鮮黃的蛋層。
+     * @param {number} cx 切面中心 x。
+     * @param {number} cy 切面中心 y。
+     * @param {number} r 切面半徑。
+     * @param {number} len 圓柱頂面露在切面上方的高度。
+     */
+    const roll = (cx, cy, r, len) => {
+      // 餅皮圓柱的頂面（往後上方延伸的一條帶狀面）：外框、金黃餅皮與兩道烙痕。
+      const t = cy - r - len - 1;
+      rect(g, cx - r, t, r * 2 + 1, 1, crust.o);
+      rect(g, cx - r - 1, t + 1, r * 2 + 3, cy - t, crust.o);
+      rect(g, cx - r, t + 1, r * 2 + 1, cy - t - 1, crust.l);
+      rect(g, cx - r + 1, t + 1, r - 1, 1, crust.h);
+      rect(g, cx + r - 1, t + 2, 2, cy - t - 2, crust.b);
+      px(g, cx - r + 1, t + 3, crust.b);
+      // 頂面中央一道彎彎的醬油膏與一點蔥花。
+      for (let k = -2; k <= 2; k++) px(g, cx + k, t + 2 + (k % 2 ? 1 : 0), sauce.b);
+      px(g, cx + 3, t + 2, R.leaf.l);
+      // 切面：深色外框圈，內部依極座標畫出粗的餅皮螺旋線與蛋層。
+      ellipse(g, cx + 0.5, cy + 0.5, r + 1.5, r + 1.5, crust.o);
+      paint(
+        g, cx - r, cy - r, cx + r, cy + r,
+        // 圓形切面內的像素。
+        (x, y) => Math.hypot(x - cx, y - cy) <= r + 0.3,
+        // 外圈是餅皮；往內以螺旋線分出餅皮與蛋層，中心是一點蛋黃。
+        (x, y) => {
+          const dx = x - cx;
+          const dy = y - cy;
+          const d = Math.hypot(dx, dy);
+          if (d > r - 0.8) return dx + dy < 0 ? crust.b : crust.d;
+          if (d < 0.5) return eggR.h;
+          const turn = (Math.atan2(dy, dx) / (Math.PI * 2) + 1) % 1;
+          const s2 = (d / r) * 1.6 - turn * 0.8;
+          const f = ((s2 % 0.8) + 0.8) % 0.8;
+          if (f < 0.3) return crust.d;
+          return dx + dy < -2 ? eggR.l : eggR.b;
+        },
+        null,
+      );
+    };
+    // 後排兩段、前排一段。
+    roll(9, 15, 5, 3);
+    roll(23, 15, 5, 3);
+    roll(16, 23, 5, 3);
   },
   /** 繪製「布丁」圖示。 */
   pudding(g) {
@@ -1271,35 +1313,80 @@ export const ICONS = {
   },
   /** 繪製「鳳梨酥」圖示。 */
   pineappleCake(g) {
-    const ps = ramp('#d8963a');
-    const fill = ramp('#e8a020');
+    const ps = ramp('#d8a04a');
+    const top = ramp('#eabc62');
+    const shell = ramp('#f2d898');
+    const fill = ramp('#d8861a');
     /**
-     * 一塊烤得金黃的酥皮：頂面中央烤色較亮、四周較深，表面帶烘烤斑點。
-     * @param {number} x 左上 x。
-     * @param {number} y 左上 y。
-     * @param {number} w 寬。
-     * @param {number} top 頂面高。
-     * @param {number} front 正面高。
+     * 判斷像素中心是否在圓角矩形內。
+     * @param {number} x 像素 x。
+     * @param {number} y 像素 y。
+     * @param {number} X 左。
+     * @param {number} Y 上。
+     * @param {number} W 寬。
+     * @param {number} H 高。
+     * @param {number} r 圓角半徑。
+     * @returns {boolean} 是否在內。
      */
-    const pastry = (x, y, w, top, front) => {
-      block(g, x, y, w, top, front, ps);
-      rect(g, x + 2, y + 1, w - 4, top - 2, ps.l);
-      rect(g, x + 3, y + 1, Math.floor(w / 3), 1, ps.h);
-      rect(g, x + 1, y + top - 1, w - 2, 1, mix(ps.l, ps.b, 0.5));
-      for (let k = 0; k < w; k++) {
-        if (hash(k, x) < 0.35) px(g, x + k, y + top + 1 + Math.floor(hash(x, k) * (front - 3)), ps.d);
-        if (hash(k, y) < 0.25) px(g, x + 2 + Math.floor(hash(y, k) * (w - 4)), y + 1 + Math.floor(hash(k, 3) * (top - 2)), ps.l);
-      }
+    const inRR = (x, y, X, Y, W, H, r) => {
+      const qx = x + 0.5;
+      const qy = y + 0.5;
+      if (qx < X || qx > X + W || qy < Y || qy > Y + H) return false;
+      const dx = Math.max(X + r - qx, 0, qx - (X + W - r));
+      const dy = Math.max(Y + r - qy, 0, qy - (Y + H - r));
+      return dx * dx + dy * dy <= r * r;
+    };
+    /**
+     * 一塊圓角的烤酥皮：頂面金黃（左上受光、中央一抹高光），四周烤色漸深，正面較暗；
+     * cut 為真時正面是切開的斷面（米黃酥皮包著琥珀色鳳梨餡）。
+     * @param {number} X 左上 x。
+     * @param {number} Y 左上 y。
+     * @param {number} W 寬。
+     * @param {number} T 頂面高。
+     * @param {number} F 正面高。
+     * @param {boolean} cut 是否為切開的一塊。
+     */
+    const pastry = (X, Y, W, T, F, cut) => {
+      paint(
+        g, X, Y, X + W - 1, Y + T + F - 1,
+        // 圓角的整塊輪廓。
+        (x, y) => inRR(x, y, X, Y, W, T + F, 2.6),
+        // 依位置決定頂面、圓邊或正面（斷面）的顏色。
+        (x, y) => {
+          const lx = x - X;
+          const ly = y - Y;
+          if (ly < T) {
+            // 頂面：邊緣一圈烤色、左上亮、中央偏左上一抹高光、右下略暗。
+            const edge = Math.min(lx, W - 1 - lx, ly);
+            if (edge === 0) return lx < W - 2 && ly < T - 1 ? top.l : top.b;
+            if (ly === T - 1) return top.b;
+            if (ly === 1 && lx >= 3 && lx < W * 0.55) return top.h;
+            if (lx > W - 4 || (ly === T - 2 && lx > W * 0.5)) return mix(top.b, top.l, 0.4);
+            return hash(x, y, 5) < 0.12 ? mix(top.l, top.b, 0.6) : top.l;
+          }
+          const fy = ly - T;
+          if (!cut) {
+            // 正面：上緣受光的圓邊、往下與往右漸暗，散落烤斑。
+            if (fy === 0) return lx === 0 ? ps.l : mix(ps.l, ps.b, 0.5);
+            if (lx === 0) return ps.l;
+            if (lx >= W - 2 || fy >= F - 2) return ps.d;
+            return hash(x, y, 11) < 0.1 ? ps.d : ps.b;
+          }
+          // 斷面：外圍一圈米黃酥皮（右側與底部較暗），中央琥珀色的鳳梨餡與纖維。
+          if (fy === 0) return mix(ps.l, ps.b, 0.5);
+          const inner = lx >= 2 && lx <= W - 3 && fy >= 2 && fy <= F - 3;
+          if (!inner) return lx >= W - 2 || fy >= F - 2 ? shell.d : lx < 2 ? shell.l : shell.b;
+          if (fy === 2) return fill.l;
+          if (lx === W - 3) return fill.d;
+          return (lx * 3 + fy * 5) % 11 === 0 ? fill.d : fill.b;
+        },
+        ps.o,
+      );
     };
     // 後方完整的一塊。
-    pastry(3, 6, 17, 6, 10);
+    pastry(3, 5, 18, 7, 9, false);
     // 前方切開的一塊：正面露出鳳梨餡。
-    pastry(13, 14, 16, 5, 11);
-    rect(g, 15, 21, 12, 7, fill.o);
-    rect(g, 16, 22, 10, 5, fill.b);
-    rect(g, 16, 22, 10, 1, fill.l);
-    for (const [x, y] of [[18, 24], [21, 23], [24, 25], [17, 26]]) rect(g, x, y, 2, 1, fill.d);
-    px(g, 17, 22, fill.h);
+    pastry(12, 14, 17, 6, 10, true);
   },
   /** 繪製「芒果冰」圖示。 */
   mangoIce(g) {

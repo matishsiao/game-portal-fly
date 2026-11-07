@@ -4198,20 +4198,66 @@ button:focus-visible {
   color: #3a2a10;
 }
 
+.house-view {
+  position: relative;
+}
+
 .house-stage {
-  display: grid;
-  place-items: center;
+  display: flex;
   overflow: auto;
+  scrollbar-width: none;
   max-height: 62vh;
   border-radius: 14px;
   background: #1a1020;
   box-shadow: var(--shadow);
 }
 
+.house-stage::-webkit-scrollbar {
+  display: none;
+}
+
 .house-canvas {
   display: block;
+  flex: none;
+  margin: auto;
   image-rendering: pixelated;
   touch-action: none;
+}
+
+/* 家園小地圖（右上角；虛線是土地擴建到最大時的範圍） */
+.house-mini {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 10px;
+  background: rgba(16, 8, 24, 0.62);
+  pointer-events: none;
+}
+
+.house-mini-label {
+  pointer-events: auto;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.house-mini-canvas {
+  display: block;
+  pointer-events: auto;
+  image-rendering: pixelated;
+  touch-action: none;
+  cursor: pointer;
+}
+
+.house-mini.closed .house-mini-canvas {
+  display: none;
 }
 
 .house-bar {

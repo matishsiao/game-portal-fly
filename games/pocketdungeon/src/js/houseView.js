@@ -1,7 +1,7 @@
 // 家裡場景（瀏覽器）：繪製房子與庭院（牆、地板、田地、家具、角色），處理點選移動、鍵盤移動、互動與佈置模式的預覽。
 // 規則（能不能擺、找路）在 pd/home.js；這裡只負責畫面與輸入，資料變更透過 hooks 交給 app.js。
 
-import { HOME_ITEMS, ANIMALS, GOODS, RANCH } from './pd/homeData.js';
+import { HOME_ITEMS, ANIMALS, GOODS, RANCH, LAND } from './pd/homeData.js';
 import { homeLayout, placedRect, walkGrid, findPath, placedAt, areaAt, placeCheck, cropStage, animalState } from './pd/home.js';
 import { homeArt, homeFrames, tileArt, cropArt, iconArt, dyedArt, HT } from './pd/homeArt.js';
 import { R, ramp, rect, px, hash, ellipse, makeCanvas, soil } from './pd/homeDraw.js';
@@ -13,6 +13,10 @@ const TOP = 16;
 const SPEED = 4.5;
 /** 放在桌面上的小擺設往上抬的像素。 */
 const TABLE_LIFT = 14;
+/** 小地圖每格的像素。 */
+const MINI_CELL = 4;
+/** 小地圖的顏色。 */
+const MINI = { ghost: 'rgba(255,255,255,0.07)', edge: 'rgba(255,255,255,0.55)', wall: '#5a4638', floor: '#c8a070', door: '#f0d090', grass: '#4f9a42', plot: '#7a5030', ready: '#ffe14d', item: '#7a5a8a', func: '#4ab0e0', animal: '#ffffff', player: '#ff4a4a', view: '#ffffff' };
 
 /**
  * 庭院草地的一格（依位置變化的草葉與小花）。
@@ -65,8 +69,9 @@ export class HouseView {
    * @param {HTMLCanvasElement} canvas 畫布。
    * @param {object} ch 角色（讀取家園資料；不直接修改）。
    * @param {{interact: (target: {kind: 'item' | 'plot', index: number}) => void, place: (cell: {at: string, x: number, y: number}) => void, select: (index: number) => void, message: (text: string) => void, busy: () => boolean, itemArt: (item: object) => HTMLCanvasElement}} hooks 互動、擺放、選取、訊息的回呼、是否有對話框開著（開著時不處理輸入），以及裝備的圖（展示架用）。
+   * @param {{stage?: HTMLElement, mini?: HTMLCanvasElement}} [view] 可捲動的外框（鏡頭跟隨角色）與小地圖畫布；沒有時不跟隨、不畫小地圖。
    */
-  constructor(canvas, ch, hooks) {
+  constructor(canvas, ch, hooks, view = {}) {
     this.canvas = canvas;
     this.g = canvas.getContext('2d');
     this.ch = ch;
@@ -82,11 +87,18 @@ export class HouseView {
     this.raf = 0;
     this.last = 0;
     this.keys = new Set();
+    this.stage = view.stage || null;
+    this.mini = view.mini || null;
+    this.miniG = this.mini ? this.mini.getContext('2d') : null;
+    /** 鏡頭：free 為玩家自己移動過視角（角色再走動前不跟隨）；snap 為下一幀直接對準角色。 */
+    this.cam = { free: false, snap: true };
     this.resetPlayer();
     this.onPointer = this.onPointer.bind(this);
     this.onMove = this.onMove.bind(this);
     this.onKey = this.onKey.bind(this);
     this.onKeyUp = this.onKeyUp.bind(this);
+    this.onMini = this.onMini.bind(this);
+    this.onWheel = this.onWheel.bind(this);
     this.frame = this.frame.bind(this);
   }
 
@@ -102,6 +114,8 @@ export class HouseView {
     this.canvas.addEventListener('pointermove', this.onMove);
     document.addEventListener('keydown', this.onKey);
     document.addEventListener('keyup', this.onKeyUp);
+    if (this.mini) this.mini.addEventListener('pointerdown', this.onMini);
+    if (this.stage) this.stage.addEventListener('wheel', this.onWheel, { passive: true });
     this.resize();
     this.last = performance.now();
     this.raf = requestAnimationFrame(this.frame);
@@ -114,6 +128,8 @@ export class HouseView {
     this.canvas.removeEventListener('pointermove', this.onMove);
     document.removeEventListener('keydown', this.onKey);
     document.removeEventListener('keyup', this.onKeyUp);
+    if (this.mini) this.mini.removeEventListener('pointerdown', this.onMini);
+    if (this.stage) this.stage.removeEventListener('wheel', this.onWheel);
   }
 
   /** 依地圖大小調整畫布（原始解析度），畫面大小由 CSS 縮放。 */
@@ -121,6 +137,12 @@ export class HouseView {
     const l = homeLayout(this.ch.home.level);
     this.canvas.width = l.cols * HT;
     this.canvas.height = l.rows * HT + TOP;
+    if (this.mini) {
+      const max = homeLayout(LAND.length);
+      this.mini.width = Math.max(max.cols, l.cols) * MINI_CELL;
+      this.mini.height = Math.max(max.rows, l.rows) * MINI_CELL;
+    }
+    this.cam.snap = true;
   }
 
   /**
@@ -145,6 +167,8 @@ export class HouseView {
     this.time += dt;
     this.update(dt);
     this.draw();
+    this.follow(dt);
+    this.drawMini();
     this.raf = requestAnimationFrame(this.frame);
   }
 
@@ -166,6 +190,7 @@ export class HouseView {
       }
     }
     if (p.path.length) {
+      this.cam.free = false;
       const next = p.path[0];
       const dx = next.x - p.x;
       const dy = next.y - p.y;
@@ -317,6 +342,128 @@ export class HouseView {
    */
   onKeyUp(e) {
     this.keys.delete(e.key.length === 1 ? e.key.toLowerCase() : e.key);
+  }
+
+  /**
+   * 畫布每個原始像素在畫面上的大小（CSS 像素）。
+   * @returns {number} 縮放倍率。
+   */
+  viewScale() {
+    return this.canvas.clientWidth / this.canvas.width || 1;
+  }
+
+  /**
+   * 把視角移到某個地圖位置的中心（外框可以捲動時才有作用）。
+   * @param {number} x 地圖 x（格，可以有小數）。
+   * @param {number} y 地圖 y（格，可以有小數）。
+   * @param {number} k 這一幀靠近的比例（1 為直接對準）。
+   */
+  centerOn(x, y, k) {
+    const st = this.stage;
+    if (!st) return;
+    const s = this.viewScale();
+    const tx = this.canvas.offsetLeft + (x + 0.5) * HT * s - st.clientWidth / 2;
+    const ty = this.canvas.offsetTop + (TOP + (y + 0.5) * HT) * s - st.clientHeight / 2;
+    st.scrollLeft += (tx - st.scrollLeft) * k;
+    st.scrollTop += (ty - st.scrollTop) * k;
+  }
+
+  /**
+   * 鏡頭跟隨：走動模式下平滑對準角色；玩家自己移動過視角或在佈置模式時不跟隨。
+   * @param {number} dt 秒。
+   */
+  follow(dt) {
+    if (!this.stage) return;
+    if (this.cam.snap) {
+      this.cam.snap = false;
+      this.centerOn(this.player.x, this.player.y, 1);
+      return;
+    }
+    if (this.mode !== 'walk' || this.cam.free) return;
+    this.centerOn(this.player.x, this.player.y, Math.min(1, dt * 6));
+  }
+
+  /**
+   * 點小地圖：視角移到點的位置（角色再走動前不會被拉回）。
+   * @param {PointerEvent} e 指標事件。
+   */
+  onMini(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const r = this.mini.getBoundingClientRect();
+    const x = ((e.clientX - r.left) / r.width) * this.mini.width / MINI_CELL;
+    const y = ((e.clientY - r.top) / r.height) * this.mini.height / MINI_CELL;
+    const l = homeLayout(this.ch.home.level);
+    this.cam.free = true;
+    this.centerOn(Math.min(l.cols - 1, Math.max(0, x - 0.5)), Math.min(l.rows - 1, Math.max(0, y - 0.5)), 1);
+  }
+
+  /** 用滑鼠滾輪捲動畫面時暫停跟隨。 */
+  onWheel() {
+    this.cam.free = true;
+  }
+
+  /**
+   * 小地圖：目前的房子與庭院（牆、地板、草地、田地、家具、動物、角色），虛線框是土地擴建到最大的範圍，白框是目前看得到的區域。
+   */
+  drawMini() {
+    const g = this.miniG;
+    if (!g) return;
+    const h = this.ch.home;
+    const l = homeLayout(h.level);
+    const C = MINI_CELL;
+    const W = this.mini.width;
+    const H = this.mini.height;
+    g.clearRect(0, 0, W, H);
+    // 擴建到最大的範圍（已經最大時就是目前的範圍）。
+    const max = homeLayout(LAND.length);
+    if (h.level < LAND.length) {
+      g.fillStyle = MINI.ghost;
+      g.fillRect(0, 0, max.cols * C, max.rows * C);
+      g.strokeStyle = MINI.edge;
+      g.lineWidth = 1;
+      g.setLineDash([2, 2]);
+      g.strokeRect(0.5, 0.5, max.cols * C - 1, max.rows * C - 1);
+      g.setLineDash([]);
+    }
+    // 一格的顏色。
+    const cell = (x, y, color) => {
+      g.fillStyle = color;
+      g.fillRect(x * C, y * C, C, C);
+    };
+    for (let y = 0; y < l.rows; y++) {
+      for (let x = 0; x < l.cols; x++) {
+        const inHouse = x >= l.house.x && x < l.house.x + l.house.w && y >= l.house.y && y < l.house.y + l.house.h;
+        if (inHouse) cell(x, y, MINI.floor);
+        else if (y <= l.door.y) cell(x, y, x === l.door.x && y === l.door.y ? MINI.door : MINI.wall);
+        else cell(x, y, MINI.grass);
+      }
+    }
+    // 田地（成熟的是黃色）。
+    l.plots.forEach((pl, i) => cell(pl.x, pl.y, cropStage(h.plots[i]) === 2 ? MINI.ready : MINI.plot));
+    // 擋路的家具與動物（功能家具是藍色，方便找工作台、藥草台）。
+    for (const p of h.placed) {
+      const it = HOME_ITEMS[p.id];
+      if (it.place !== 'floor') continue;
+      const r = placedRect(p, l);
+      g.fillStyle = it.type === 'animal' ? MINI.animal : it.func ? MINI.func : MINI.item;
+      g.fillRect(r.x * C + 1, r.y * C + 1, r.w * C - 2, r.h * C - 2);
+    }
+    // 角色（閃爍）。
+    if (Math.floor(this.time * 3) % 3) {
+      g.fillStyle = MINI.player;
+      g.fillRect(Math.round(this.player.x * C) - 1, Math.round(this.player.y * C) - 1, C + 2, C + 2);
+    }
+    // 目前看得到的區域（畫面放大、地圖比外框大時）。
+    const st = this.stage;
+    if (st && (st.scrollWidth > st.clientWidth + 1 || st.scrollHeight > st.clientHeight + 1)) {
+      const s = this.viewScale() * HT / C;
+      const vx = (st.scrollLeft - this.canvas.offsetLeft) / s;
+      const vy = (st.scrollTop - this.canvas.offsetTop) / s - (TOP / HT) * C;
+      g.strokeStyle = MINI.view;
+      g.lineWidth = 1;
+      g.strokeRect(Math.round(vx) + 0.5, Math.round(vy) + 0.5, Math.round(st.clientWidth / s) - 1, Math.round(st.clientHeight / s) - 1);
+    }
   }
 
   /** 重畫整個場景。 */
