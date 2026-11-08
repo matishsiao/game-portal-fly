@@ -904,10 +904,11 @@ export function heroDataUrl(cls, scale = 4) {
  * 以 data URL 取得怪物或 Boss 圖（介面中的 <img> 用，例如地城入口的 Boss 頭像）。
  * @param {string} type 種類。
  * @param {number} [scale=3] 放大倍率。
+ * @param {boolean} [evolved=false] 是否用進化 Boss 的配色。
  * @returns {string} data URL。
  */
-export function monsterDataUrl(type, scale = 3) {
-  const src = monsterArt(type).frames[0];
+export function monsterDataUrl(type, scale = 3, evolved = false) {
+  const src = monsterArt(type, evolved).frames[0];
   const c = makeCanvas(src.width * scale, src.height * scale);
   const g = c.getContext('2d');
   g.imageSmoothingEnabled = false;

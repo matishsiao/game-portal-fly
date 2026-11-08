@@ -5,7 +5,7 @@
 
 import { HOME_DROP, CROPS, MEAT, MEAL_BUFFS } from './homeData.js';
 import { addHomeMat, addSeed, addGood, gainRecipe, homeMatName, recipeName, rollHomeMat, rollRecipe, rollSeed, bossRecipe } from './home.js';
-import { CLASSES, MONSTERS, BOSSES, LIMITS, BOSS_HEAL, EVOLVE, REBIRTH, STATUS, STATUS_BOSS, STATUS_REPEAT, AUTO_SHIELD_HP, GEMS, GEM_RULES, DIFFICULTY, CRAFT, BAG_EXPAND, CRIT_MULT, SKILL_BOOK, MAT_DROP, MATERIALS } from './data.js';
+import { CLASSES, MONSTERS, BOSSES, FLOORS, LIMITS, BOSS_HEAL, EVOLVE, REBIRTH, STATUS, STATUS_BOSS, STATUS_REPEAT, AUTO_SHIELD_HP, GEMS, GEM_RULES, DIFFICULTY, CRAFT, BAG_EXPAND, CRIT_MULT, SKILL_BOOK, MAT_DROP, MATERIALS } from './data.js';
 import { generateFloor, walkable, STAIRS, SPIKES, WALL } from './dungeon.js';
 import {
   characterStats, speedProfile, damage, dungeonLevel, monsterStats, killReward, rollRarity, rarityWeights, makeItem, gainXp, sellPrice, rollGem, gemName, pick,
@@ -70,7 +70,7 @@ export class World {
   /**
    * 建立探險。
    * @param {object} character 角色資料（會被修改：經驗、等級、金幣、背包）。
-   * @param {{area: string, depth: number, seed: number, floor?: number, potions?: number, scroll?: number, cures?: number, meal?: {key: string, buff: string, pct: number} | null}} run 探險設定（meal 為出發前吃的料理加成）。
+   * @param {{area: string, depth: number, seed: number, floor?: number, potions?: number, scroll?: number, cures?: number, meal?: {key: string, buff: string, pct: number} | null, evo?: boolean}} run 探險設定（meal 為出發前吃的料理加成；evo 為進化 Boss 挑戰：直接進 Boss 層打進化 Boss）。
    * @param {() => number} [rng=Math.random] 戰鬥用亂數。
    */
   constructor(character, run, rng = Math.random) {
@@ -79,7 +79,9 @@ export class World {
     this.area = run.area;
     this.depth = run.depth;
     this.seed = run.seed;
-    this.floorIndex = run.floor || 0;
+    /** 進化 Boss 挑戰（區域地圖的第 6 關）：沒有一般樓層，一進去就是進化 Boss。 */
+    this.evo = !!run.evo;
+    this.floorIndex = run.floor ?? (this.evo ? FLOORS : 0);
     this.elapsed = 0;
     this.time = 0;
     this.events = [];
@@ -179,7 +181,7 @@ export class World {
     this.bossDefeated = false;
     this.nextId = 1;
     for (const m of f.monsters) this.spawnMonster(m.type, m.x, m.y, { elite: m.elite });
-    if (f.boss) this.spawnMonster(f.boss.type, f.boss.x, f.boss.y, { boss: true, abyss: this.area === 'expert' });
+    if (f.boss) this.spawnMonster(f.boss.type, f.boss.x, f.boss.y, { boss: true, abyss: this.area === 'expert', evolved: this.evo });
     this.player.x = f.start.x;
     this.player.y = f.start.y;
     this.player.path = [];
@@ -198,11 +200,11 @@ export class World {
   }
 
   /**
-   * 這一關（區域＋深度）的代碼，用來記錄角色的破關次數與 Boss 是否已進化。
-   * @returns {string} 例如「easy-2」。
+   * 這一關（區域＋深度）的代碼，用來記錄角色的破關次數與 Boss 是否已進化；進化 Boss 挑戰另外記錄。
+   * @returns {string} 例如「easy-2」；進化 Boss 挑戰為「easy-evo」。
    */
   stageKey() {
-    return `${this.area}-${this.depth}`;
+    return this.evo ? `${this.area}-evo` : `${this.area}-${this.depth}`;
   }
 
   /**
@@ -210,6 +212,7 @@ export class World {
    * @returns {boolean} 可能進化時為 true。
    */
   canEvolve() {
+    if (this.evo) return false;
     const clears = (this.ch.clears && this.ch.clears[this.stageKey()]) || 0;
     return clears >= EVOLVE.clears;
   }
@@ -2115,7 +2118,7 @@ export class World {
       area: this.area, depth: this.depth, seed: this.seed, floor: this.floorIndex, elapsed: this.elapsed, time: this.time,
       loot: { ...this.loot, items: this.loot.items.map((i) => i.id) },
       player: { x: p.x, y: p.y, hp: p.hp, potions: p.potions, scroll: p.scroll, cures: p.cures, facing: p.facing },
-      meal: this.meal,
+      meal: this.meal, evo: this.evo,
       monsters: this.monsters.map((m) => ({ type: m.type, x: m.x, y: m.y, hp: m.hp, maxHp: m.maxHp, boss: m.boss, elite: m.elite, small: m.small, abyss: m.abyss, evolved: !!m.evolved, split: m.split, phase2: m.phase2, summoned: m.summoned, heals: m.heals || 0, awake: !!m.awake, affix: m.affix, enraged: !!m.enraged })),
       pickups: this.pickups.map((it) => ({ ...it })),
       chests: this.chests.map((c) => ({ ...c })),
@@ -2131,7 +2134,7 @@ export class World {
    * @returns {World} 探險。
    */
   static restore(character, snap, rng = Math.random) {
-    const w = new World(character, { area: snap.area, depth: snap.depth, seed: snap.seed, floor: snap.floor, potions: snap.player.potions, scroll: snap.player.scroll, cures: snap.player.cures || 0, meal: snap.meal || null }, rng);
+    const w = new World(character, { area: snap.area, depth: snap.depth, seed: snap.seed, floor: snap.floor, potions: snap.player.potions, scroll: snap.player.scroll, cures: snap.player.cures || 0, meal: snap.meal || null, evo: !!snap.evo }, rng);
     w.elapsed = snap.elapsed;
     w.time = snap.time || 0;
     w.loot = { ...snap.loot, items: character.bag.filter((i) => snap.loot.items.includes(i.id)), gems: snap.loot.gems || [] };

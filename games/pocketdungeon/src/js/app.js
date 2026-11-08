@@ -2,7 +2,7 @@
 
 import * as store from './storage.js';
 import { trackPlay, guardFreeze } from './playlog.js';
-import { CLASSES, CLASS_KEYS, AREAS, AREA_KEYS, RARITIES, LIMITS, EQUIP_SLOTS, ITEM_SLOTS, BAG_EXPAND, EVOLVE, SHARED_SLOTS, REBIRTH, STATUS, GEMS, GEM_RULES, MATERIALS, CRAFT, WEAPON_HANDS, BOSSES, GIFT, TICKET } from './pd/data.js';
+import { CLASSES, CLASS_KEYS, AREAS, AREA_KEYS, RARITIES, LIMITS, EQUIP_SLOTS, ITEM_SLOTS, BAG_EXPAND, EVOLVE, SHARED_SLOTS, REBIRTH, STATUS, GEMS, GEM_RULES, MATERIALS, CRAFT, WEAPON_HANDS, BOSSES, GIFT, TICKET, FLOORS } from './pd/data.js';
 import { xpToNext, characterStats, speedProfile, describeStats, sellPrice, enhanceCost, levelCap, gemName, gemEffect, parseGem, socketCount, statusText, gemBonus, itemStats, weaponHands, dungeonLevel, powerScore } from './pd/rules.js';
 import { World } from './pd/world.js';
 import { Renderer } from './pd/render.js';
@@ -345,8 +345,8 @@ function renderHome() {
   if (run && app.chars.has(run.charId)) {
     const ch = app.chars.get(run.charId);
     const s = run.snap;
-    const floor = s.floor >= 3 ? 'Boss 層' : `第 ${s.floor + 1} 層`;
-    els.continueDetail.textContent = `${ch.name}（${village.classTitle(ch)} Lv.${ch.level}）・${AREAS[s.area].name} 深度 ${s.depth}・${floor}・${formatTime(s.elapsed * 1000)}`;
+    const floor = s.evo ? '進化 Boss 挑戰' : s.floor >= 3 ? `深度 ${s.depth}・Boss 層` : `深度 ${s.depth}・第 ${s.floor + 1} 層`;
+    els.continueDetail.textContent = `${ch.name}（${village.classTitle(ch)} Lv.${ch.level}）・${AREAS[s.area].name} ${floor}・${formatTime(s.elapsed * 1000)}`;
     els.continueBtn.hidden = false;
   } else {
     els.continueBtn.hidden = true;
@@ -673,11 +673,17 @@ function areaView(ch, area) {
     return `<button type="button" class="map-node ${cls}${current === n ? ' current' : ''}" style="${pct(n.x, n.y)}" data-map-node="${area}:${n.depth}" aria-label="深度 ${n.depth}${open ? (clears ? `，破關 ${clears} 次` : '，可挑戰') : '，尚未開放'}">
       <span class="pin">${open ? '' : '✝'}</span>${evo}<small class="pin-label">${ai + 1}-${n.depth}${clears ? `<i>✓${clears}</i>` : ''}</small></button>`;
   });
-  const bossImg = `<img class="map-boss big" style="${pct(boss.x, boss.y)}" src="${monsterDataUrl(a.boss[0], 3)}" alt="Boss"><span class="map-boss-tag" style="${pct(boss.x, boss.y + 34)}">Boss</span>`;
+  // 第 6 關：進化 Boss 挑戰（最後一個深度破關後開放，點 Boss 頭像進入）。
+  const evoOpen = village.evoUnlocked(ch, area);
+  const evoClears = (ch.clears && ch.clears[`${area}-evo`]) || 0;
+  const evoNo = nodes.length + 1;
+  const bossImg = `<button type="button" class="map-boss-btn${evoOpen ? '' : ' locked'}${evoOpen && !evoClears && !current ? ' current' : ''}" style="${pct(boss.x, boss.y)}" data-map-node="${area}:evo" aria-label="第 ${evoNo} 關：進化 Boss${evoOpen ? (evoClears ? `，打倒 ${evoClears} 次` : '，可挑戰') : '，尚未開放'}">
+      <img class="map-boss big${evoOpen ? '' : ' locked'}" src="${monsterDataUrl(a.boss[0], 3, evoOpen)}" alt="">${evoOpen ? '<i class="pin-evo" aria-hidden="true">🔥</i>' : '<i class="boss-lock" aria-hidden="true">🔒</i>'}
+      <span class="map-boss-tag">${ai + 1}-${evoNo} 進化 Boss${evoClears ? ` ✓${evoClears}` : ''}</span></button>`;
   return `<div class="area-head-bar"><button type="button" class="link-btn" data-gate-back="1">‹ 所有區域</button></div>
     <div class="area-banner theme-${a.theme}"><div class="area-top"><img class="area-boss" src="${monsterDataUrl(a.boss[0], 2)}" alt=""><div class="area-title"><b>${ai + 1}・${a.name}</b><small>${a.boss.length > 1 ? '隨機強化 Boss' : `Boss：${BOSSES[a.boss[0]].name}`}・每趟 3 層＋Boss</small></div><span class="rec-chip">Lv.${a.recommend[0]}～${a.recommend[1]}</span></div>${ticketNeed(ch, area)}</div>
     <div class="world-map" style="aspect-ratio:${width} / ${height}">${svg}${bossImg}${pins.join('')}</div>
-    <p class="muted small">點關卡查看並出發：藍色為已破關、金色為目前可挑戰、墓碑為尚未開放。</p>`;
+    <p class="muted small">點關卡查看並出發：藍色為已破關、金色為目前可挑戰、墓碑為尚未開放。最後的 Boss 頭像是第 ${evoNo} 關「進化 Boss」：打過深度 ${nodes.length} 後開放，一進去就是進化 Boss。</p>`;
 }
 
 /**
@@ -688,20 +694,32 @@ function areaView(ch, area) {
  */
 async function openMapNode(ch, key) {
   const [area, depthText] = key.split(':');
-  const depth = Number(depthText);
+  const evoStage = depthText === 'evo';
   const a = AREAS[area];
+  const last = a.maxDepth || 5;
+  const depth = evoStage ? last : Number(depthText);
   const max = village.maxDepth(ch, area);
   const ai = AREA_KEYS.indexOf(area);
-  const title = `${ai + 1}-${depth}　${a.name} 深度 ${depth}`;
-  const boss = `<div class="node-head"><img src="${monsterDataUrl(a.boss[0], 3)}" alt=""><div><b>${a.boss.length > 1 ? '隨機強化 Boss' : `Boss：${BOSSES[a.boss[0]].name}`}</b><small class="muted">${village.depthLabel(area, depth)}・建議 Lv.${a.recommend[0]}～${a.recommend[1]}</small></div></div>`;
-  if (depth > max) {
+  const bossName = a.boss.length > 1 ? '隨機強化 Boss' : `Boss：${BOSSES[a.boss[0]].name}`;
+  const evoLevel = Math.round(dungeonLevel(area, depth, FLOORS));
+  const title = evoStage ? `${ai + 1}-${last + 1}　${a.name} 進化 Boss` : `${ai + 1}-${depth}　${a.name} 深度 ${depth}`;
+  const boss = evoStage
+    ? `<div class="node-head"><img src="${monsterDataUrl(a.boss[0], 3, true)}" alt=""><div><b>🔥 進化${a.boss.length > 1 ? 'Boss（隨機）' : BOSSES[a.boss[0]].name}</b><small class="muted">地城 Lv.${evoLevel}・比深度 ${last} 的 Boss 更強</small></div></div>`
+    : `<div class="node-head"><img src="${monsterDataUrl(a.boss[0], 3)}" alt=""><div><b>${bossName}</b><small class="muted">${village.depthLabel(area, depth)}・建議 Lv.${a.recommend[0]}～${a.recommend[1]}</small></div></div>`;
+  if (evoStage && !village.evoUnlocked(ch, area)) {
+    await openModal({ title, html: `${boss}<p>🔒 打倒深度 ${last} 的 Boss 後開放。</p><p class="muted small">進去就直接在 Boss 房間挑戰進化 Boss（血量 ×${EVOLVE.hp}、攻擊 ×${EVOLVE.atk}、招式更快），沒有一般樓層。</p>`, actions: [{ label: '知道了', value: null, className: 'primary' }] });
+    return;
+  }
+  if (!evoStage && depth > max) {
     const prev = AREA_KEYS[ai - 1];
     const why = !village.areaUnlocked(ch, area) ? `擊敗${AREAS[prev].name}的 Boss 後解鎖。` : `擊敗深度 ${depth - 1} 的 Boss 後解鎖。`;
     await openModal({ title, html: `${boss}<p>🔒 ${why}</p>`, actions: [{ label: '知道了', value: null, className: 'primary' }] });
     return;
   }
-  const clears = (ch.clears && ch.clears[`${area}-${depth}`]) || 0;
-  const evo = clears >= EVOLVE.clears ? `<p class="evo-note">🔥 打倒 Boss 時有 ${Math.round(EVOLVE.chance * 100)}% 機率復活成進化 Boss（獎勵更好）</p>` : `<p class="muted small">再破關 ${EVOLVE.clears - clears} 次後，Boss 有機會進化。</p>`;
+  const clears = (ch.clears && ch.clears[`${area}-${evoStage ? 'evo' : depth}`]) || 0;
+  const evo = evoStage
+    ? `<p class="evo-note">🔥 直接在 Boss 房間挑戰進化 Boss：血量 ×${EVOLVE.hp}、攻擊 ×${EVOLVE.atk}。打倒後必掉 ${EVOLVE.items} 件等級 +${EVOLVE.levelBonus} 的裝備、2 顆寶石和技能書，金幣 ×${EVOLVE.gold}、經驗 ×${EVOLVE.xp}。</p>`
+    : clears >= EVOLVE.clears ? `<p class="evo-note">🔥 打倒 Boss 時有 ${Math.round(EVOLVE.chance * 100)}% 機率復活成進化 Boss（獎勵更好）</p>` : `<p class="muted small">再破關 ${EVOLVE.clears - clears} 次後，Boss 有機會進化。</p>`;
   // 入場卷：有就出發（用掉 1 張）；沒有但金幣夠時可以「購買並出發」；都沒有時提示到其他遊戲過關拿禮包（禮包一定有入場卷）。
   const tier = village.ticketTier(area);
   const have = village.ticketCount(ch, tier);
@@ -722,7 +740,7 @@ async function openMapNode(ch, key) {
   const stuck = pending ? { label: `領取禮包（${pending}）`, value: 'gift', className: 'primary' } : soldOut ? { label: '知道了', value: false, className: 'primary' } : { label: '前往商店', value: 'shop', className: 'primary' };
   const go = await openModal({
     title,
-    html: `${boss}<div class="mini-tiles"><span class="mini-tile"><small>樓層</small><b>3＋Boss</b></span><span class="mini-tile"><small>破關</small><b>${clears} 次</b></span><span class="mini-tile"><small>地城等級</small><b>${Math.round(dungeonLevel(area, depth, 0))}</b></span></div>${ticketLine}${evo}${app.run ? '<p class="notice-inline">有探險尚未結束，請先完成或放棄那一趟。</p>' : ''}`,
+    html: `${boss}<div class="mini-tiles"><span class="mini-tile"><small>樓層</small><b>${evoStage ? '只有 Boss' : '3＋Boss'}</b></span><span class="mini-tile"><small>${evoStage ? '打倒' : '破關'}</small><b>${clears} 次</b></span><span class="mini-tile"><small>地城等級</small><b>${evoStage ? evoLevel : Math.round(dungeonLevel(area, depth, 0))}</b></span></div>${ticketLine}${evo}${app.run ? '<p class="notice-inline">有探險尚未結束，請先完成或放棄那一趟。</p>' : ''}`,
     actions: [{ label: '取消', value: false }, canGo ? { label: goLabel, value: true, className: 'primary' } : stuck],
   });
   if (go === 'gift') {
@@ -743,7 +761,7 @@ async function openMapNode(ch, key) {
       return;
     }
   }
-  startRun(area, depth);
+  startRun(area, depth, evoStage);
 }
 
 /**
@@ -2880,8 +2898,9 @@ async function offerRefill(ch) {
  * 開始新的探險。
  * @param {string} area 區域代碼。
  * @param {number} depth 深度。
+ * @param {boolean} [evo=false] 是否為進化 Boss 挑戰（區域地圖的第 6 關，直接進 Boss 層）。
  */
-async function startRun(area, depth) {
+async function startRun(area, depth, evo = false) {
   const ch = currentChar();
   if (!ch || app.run) return;
   if (!(await offerRefill(ch))) return;
@@ -2894,7 +2913,7 @@ async function startRun(area, depth) {
   const seed = (Math.floor(Math.random() * 0x7fffffff) ^ Date.now()) >>> 0;
   // 出發前吃的料理：只對這一趟有效。
   const meal = home.takeMeal(ch);
-  const world = new World(ch, { area, depth, seed, potions: carry.potions, scroll: carry.scroll, cures: carry.cures, meal });
+  const world = new World(ch, { area, depth, seed, potions: carry.potions, scroll: carry.scroll, cures: carry.cures, meal, evo });
   store.recordStart(area, depth);
   enterWorld(world, ch, false);
   await saveRun();
@@ -3121,7 +3140,7 @@ async function finishRun(w, ch, result, { silent }) {
   const items = r.items.length ? `<ul class="loot-list">${r.items.map((it) => `<li>${itemTitle(it)}</li>`).join('')}</ul>` : '<p class="muted">這趟沒有取得裝備。</p>';
   const html = `${newRecord ? '<span class="record-badge">最快擊敗紀錄！</span>' : ''}
     <dl class="result-list">
-      <dt>地城</dt><dd>${AREAS[r.area].name} 深度 ${r.depth}${r.result === 'victory' ? `（第 ${r.clears} 次破關${r.evolved ? '・進化 Boss' : ''}）` : ''}</dd>
+      <dt>地城</dt><dd>${AREAS[r.area].name} ${r.evo ? '進化 Boss 挑戰' : `深度 ${r.depth}`}${r.result === 'victory' ? `（第 ${r.clears} 次${r.evo ? '打倒' : `破關${r.evolved ? '・進化 Boss' : ''}`}）` : ''}</dd>
       <dt>耗時</dt><dd>${formatTime(r.ms)}</dd>
       <dt>擊倒數</dt><dd>${r.kills}</dd>
       <dt>受到傷害</dt><dd>${r.damageTaken}</dd>
@@ -3251,7 +3270,7 @@ function updateHud(force) {
   });
   set('floor', `${w.area}/${w.floorIndex}`, () => {
     const rb = w.ch.rebirth || 0;
-    $('hud-floor').textContent = `${AREAS[w.area].name} ${w.depth}-${w.floorIndex >= 3 ? 'B' : w.floorIndex + 1}${rb ? ` ${'★'.repeat(rb)}` : ''}`;
+    $('hud-floor').textContent = `${AREAS[w.area].name} ${w.evo ? '進化 Boss' : `${w.depth}-${w.floorIndex >= 3 ? 'B' : w.floorIndex + 1}`}${rb ? ` ${'★'.repeat(rb)}` : ''}`;
   });
   set('gold', w.loot.gold, () => {
     $('hud-gold').textContent = w.loot.gold;

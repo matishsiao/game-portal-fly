@@ -948,6 +948,17 @@ export function unlockAfterBoss(ch, area, depth) {
 }
 
 /**
+ * 區域的進化 Boss 挑戰（地圖第 6 關）是否開放：這個區域的最後一個深度破關過至少 1 次。
+ * @param {object} ch 角色。
+ * @param {string} area 區域代碼。
+ * @returns {boolean} 開放時為 true。
+ */
+export function evoUnlocked(ch, area) {
+  const last = AREAS[area].maxDepth || MAX_DEPTH;
+  return !!(ch.clears && ch.clears[`${area}-${last}`] > 0);
+}
+
+/**
  * 推薦等級的說明文字。
  * @param {string} area 區域代碼。
  * @param {number} depth 深度。
@@ -977,7 +988,7 @@ export function packForRun(ch) {
  * @param {object} ch 角色（會被修改）。
  * @param {object} world 探險。
  * @param {'victory' | 'dead' | 'recall' | 'abandon'} result 結果。
- * @returns {{result: string, area: string, depth: number, ms: number, kills: number, damageTaken: number, xp: number, gold: number, goldLost: number, items: object[], unlocks: string[], levels: number}} 結算內容。
+ * @returns {{result: string, area: string, depth: number, ms: number, kills: number, damageTaken: number, xp: number, gold: number, goldLost: number, items: object[], unlocks: string[], levels: number, evo: boolean}} 結算內容（evo 為進化 Boss 挑戰）。
  */
 export function settleRun(ch, world, result) {
   const loot = world.loot;
@@ -997,9 +1008,9 @@ export function settleRun(ch, world, result) {
   s.legends += loot.items.filter((i) => i.rarity === RARITIES.length - 1).length;
   s.runs++;
   if (result === 'dead' || result === 'abandon') s.deaths++;
-  const unlocks = result === 'victory' ? unlockAfterBoss(ch, world.area, world.depth) : [];
+  const unlocks = result === 'victory' && !world.evo ? unlockAfterBoss(ch, world.area, world.depth) : [];
   if (result === 'victory') {
-    // 記錄這一關的破關次數（滿 5 次後 Boss 可能進化）。
+    // 記錄這一關的破關次數（滿 5 次後 Boss 可能進化；進化 Boss 挑戰記在「區域-evo」）。
     const key = world.stageKey();
     ch.clears = ch.clears || {};
     ch.clears[key] = (ch.clears[key] || 0) + 1;
@@ -1007,7 +1018,7 @@ export function settleRun(ch, world, result) {
   return {
     result, area: world.area, depth: world.depth, ms, kills: loot.kills, damageTaken: loot.damageTaken, xp: loot.xp,
     gold: loot.gold - goldLost, goldLost, items: loot.items, gems: loot.gems || [], unlocks, levels: loot.levelsGained, potionsUsed: loot.potionsUsed,
-    evolved: !!world.evolvedDefeated, clears: (ch.clears && ch.clears[world.stageKey()]) || 0,
+    evolved: !!world.evolvedDefeated, clears: (ch.clears && ch.clears[world.stageKey()]) || 0, evo: !!world.evo,
   };
 }
 

@@ -361,3 +361,30 @@ test('出發前補齊藥水：計算缺額與價格；補到每趟上限為止�
   assert.equal(ch.cures, 0);
   assert.match(r2.message, /金幣不足/);
 });
+
+test('進化 Boss 挑戰（地圖第 6 關）：最後一個深度破關後開放，直接進 Boss 層打進化 Boss，另外記錄次數、不再進化也不解鎖', () => {
+  const ch = hero();
+  const last = AREAS.easy.maxDepth || 5;
+  assert.equal(v.evoUnlocked(ch, 'easy'), false);
+  ch.clears = { [`easy-${last}`]: 1 };
+  assert.equal(v.evoUnlocked(ch, 'easy'), true);
+  const w = new World(ch, { area: 'easy', depth: last, seed: 3, potions: 0, scroll: 0, evo: true }, seededRng(1));
+  assert.equal(w.floorIndex, 3, '一進去就是 Boss 層');
+  const boss = w.monsters.find((m) => m.boss);
+  assert.ok(boss && boss.evolved, 'Boss 是進化版');
+  assert.equal(w.canEvolve(), false);
+  assert.equal(w.stageKey(), 'easy-evo');
+  // 快照還原後仍是進化 Boss 挑戰。
+  const back = World.restore(ch, w.snapshot(), seededRng(2));
+  assert.equal(back.evo, true);
+  assert.ok(back.monsters.find((m) => m.boss).evolved);
+  const unlockedBefore = JSON.stringify(ch.unlocked);
+  w.killMonster(boss);
+  assert.equal(w.evolvedDefeated, true);
+  const r = v.settleRun(ch, w, 'victory');
+  assert.equal(r.evo, true);
+  assert.deepEqual(r.unlocks, []);
+  assert.equal(JSON.stringify(ch.unlocked), unlockedBefore);
+  assert.equal(ch.clears['easy-evo'], 1);
+  assert.equal(ch.clears[`easy-${last}`], 1, '不算一般深度的破關');
+});
