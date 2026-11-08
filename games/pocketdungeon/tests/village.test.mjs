@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as v from '../src/js/pd/village.js';
 import { seededRng, makeItem, characterStats, levelCap, gainXp, dungeonLevel } from '../src/js/pd/rules.js';
-import { skillLevel, skillPoints } from '../src/js/pd/skills.js';
+import { skillLevel, skillPoints, bookSkillIds } from '../src/js/pd/skills.js';
 import { World } from '../src/js/pd/world.js';
 import { LIMITS, AREAS } from '../src/js/pd/data.js';
 
@@ -387,4 +387,42 @@ test('進化 Boss 挑戰（地圖第 6 關）：最後一個深度破關後開�
   assert.equal(JSON.stringify(ch.unlocked), unlockedBefore);
   assert.equal(ch.clears['easy-evo'], 1);
   assert.equal(ch.clears[`easy-${last}`], 1, '不算一般深度的破關');
+});
+
+test('共用倉庫也能存堆疊類道具：同種疊成 1 格、和裝備共用 20 格，可以存取 1 個或全部', () => {
+  const a = hero();
+  const b = { ...hero(), id: 'mage', cls: 'mage' };
+  const shared = v.newShared();
+  a.mats = { iron: 5 };
+  a.books = { weapon: 2 };
+  a.gifts = { 3: 1 };
+  const sb = bookSkillIds()[0];
+  a.skillBooks = { [sb]: 3 };
+  a.shards = { [sb]: 2 };
+  assert.ok(v.depositStack(a, shared, 'mats', 'iron', 2).ok);
+  assert.equal(a.mats.iron, 3);
+  assert.ok(v.depositStack(a, shared, 'mats', 'iron', 'all').ok);
+  assert.equal(a.mats.iron, undefined, '全部存入後背包不再佔格');
+  assert.equal(shared.stacks.mats.iron, 5);
+  for (const [f, k] of [['books', 'weapon'], ['gifts', '3'], ['skillBooks', sb], ['shards', sb]]) assert.ok(v.depositStack(a, shared, f, k, 'all').ok, f);
+  assert.equal(v.sharedUsed(shared), 5, '每種道具 1 格');
+  assert.equal(v.depositStack(a, shared, 'mats', 'iron').ok, false, '已經沒有了');
+  // 共用 20 格：裝備 15 件放滿。
+  for (let i = 0; i < 15; i++) {
+    const it = makeItem({ slot: 'helmet', cls: 'warrior', level: 1, rarity: 0 }, seededRng(i + 1));
+    a.bag.push(it);
+    assert.ok(v.depositItem(a, shared, it.id).ok);
+  }
+  assert.equal(v.sharedUsed(shared), 20);
+  a.mats = { steel: 1 };
+  assert.equal(v.depositStack(a, shared, 'mats', 'steel').ok, false, '新種類需要空格');
+  // 其他角色取出。
+  assert.ok(v.withdrawStack(b, shared, 'skillBooks', sb, 1).ok);
+  assert.equal(b.skillBooks[sb], 1);
+  assert.equal(shared.stacks.skillBooks[sb], 2);
+  assert.ok(v.withdrawStack(b, shared, 'gifts', '3', 'all').ok);
+  assert.equal(b.gifts['3'], 1);
+  assert.equal(shared.stacks.gifts['3'], undefined);
+  assert.equal(v.sharedUsed(shared), 19);
+  assert.equal(v.withdrawStack(b, shared, 'gifts', '3').ok, false);
 });

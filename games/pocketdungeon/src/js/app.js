@@ -78,7 +78,7 @@ const app = {
   /** 清除「已領取」顯示的時間；在這之前領取的不再列出。 */
   claimCleared: 0,
   /** 共用倉庫（所有角色共用的 20 格裝備與金幣）。 */
-  shared: { items: [], gold: 0 },
+  shared: village.newShared(),
   /** 進行中的探險 {charId, snap}。 */
   run: null,
   current: null,
@@ -1835,11 +1835,7 @@ function bagPanel(ch) {
   const used = village.bagUsed(ch);
   const cells = [
     ...ch.bag.map((it) => itemCell(it, `item:${it.id}`, 'data-cell', village.isUpgrade(ch, it))),
-    ...MATERIALS.filter((m) => ch.mats && ch.mats[m.key] > 0).map((m, k) => stackCell(m.key, ch.mats[m.key], `mat:${m.key}`, `r${MATERIALS.indexOf(m)}`, m.name)),
-    ...CRAFT.books.filter((b) => ch.books && ch.books[b] > 0).map((b) => stackCell('book', ch.books[b], `book:${b}`, 'book', village.bookName(b))),
-    ...Object.keys(ch.gifts || {}).filter((t) => ch.gifts[t] > 0).sort().map((t) => stackCell('gift', ch.gifts[t], `gift:${t}`, `gift-cell tier${t}`, `${GIFT.names[t - 1]}`)),
-    ...Object.keys(ch.shards || {}).filter((id) => ch.shards[id] > 0).map((id) => stackCell('shard', ch.shards[id], `shard:${id}`, `sbook r${skills.SKILLS[id].rarity || 0}${ch.shards[id] >= GIFT.shardNeed ? ' ready' : ''}`, `技能書碎片「${skills.SKILLS[id].name}」`)),
-    ...Object.keys(ch.skillBooks || {}).filter((id) => ch.skillBooks[id] > 0).map((id) => stackCell('skillbook', ch.skillBooks[id], `sbook:${id}`, `sbook r${skills.SKILLS[id].rarity || 0}${skills.learnedBooks(ch).includes(id) ? ' learned' : ''}`, `${RARITIES[skills.SKILLS[id].rarity || 0].name}技能書「${skills.SKILLS[id].name}」`)),
+    ...stackCells(ch, ch, 'data-cell'),
   ];
   // 空格：顯示剩下的容量（擴充背包時看得到成長）。
   for (let k = used; k < limit; k++) cells.push('<span class="inv-cell empty" aria-hidden="true"></span>');
@@ -1850,7 +1846,7 @@ function bagPanel(ch) {
     ? `<button type="button" class="expand-btn${full ? '' : ' ready'}" data-use-pouch="1"${full ? ' disabled' : ''} aria-label="使用背包擴充袋"><img src="${itemDataUrl('pouch')}" alt=""><span><b>${full ? '已達上限' : `擴充 +${BAG_EXPAND.step} 格`}</b><small>擴充袋 ×${ch.bagExpand}</small></span></button>`
     : '';
   // 子頁面：個人（裝備欄與背包）、共用（所有角色共用的金幣與倉庫）。
-  const tabs = [['mine', '個人'], ['shared', `共用 ${app.shared.items.length}／${SHARED_SLOTS}`]].map(([k, name]) => `<button type="button" role="tab" data-bag-tab="${k}" aria-selected="${app.bagTab === k}">${name}</button>`).join('');
+  const tabs = [['mine', '個人'], ['shared', `共用 ${village.sharedUsed(app.shared)}／${SHARED_SLOTS}`]].map(([k, name]) => `<button type="button" role="tab" data-bag-tab="${k}" aria-selected="${app.bagTab === k}">${name}</button>`).join('');
   if (app.bagTab === 'shared') return `<div class="sub-tabs" role="tablist">${tabs}</div>${sharedHtml(ch)}`;
   // 道具：藥水、卷軸、入場卷、擴充袋與寶石，不佔背包格子；點了顯示用途與前往相關分頁。
   const goods = [
@@ -1902,10 +1898,31 @@ function itemCell(it, key, attr = 'data-cell', up = false) {
  * @param {string} key 點擊時的代碼。
  * @param {string} cls 額外的 class（材料以稀有度著色）。
  * @param {string} name 名稱（無障礙標籤）。
+ * @param {string} [attr='data-cell'] 點擊代碼的屬性名稱。
  * @returns {string} HTML。
  */
-function stackCell(icon, n, key, cls, name) {
-  return `<button type="button" class="inv-cell stack ${cls}" data-cell="${key}" aria-label="${name} ×${n}"><img src="${itemDataUrl(icon)}" alt=""><b class="cell-count">${n}</b></button>`;
+function stackCell(icon, n, key, cls, name, attr = 'data-cell') {
+  return `<button type="button" class="inv-cell stack ${cls}" ${attr}="${key}" aria-label="${name} ×${n}"><img src="${itemDataUrl(icon)}" alt=""><b class="cell-count">${n}</b></button>`;
+}
+
+/**
+ * 堆疊類道具的格子（裝備材料、製作書、獎勵禮包、技能書碎片、技能書），背包與共用倉庫共用。
+ * @param {{mats?: object, books?: object, gifts?: object, shards?: object, skillBooks?: object}} src 道具來源（角色或共用倉庫的 stacks）。
+ * @param {object} ch 目前的角色（標示已學會的技能書）。
+ * @param {string} attr 點擊代碼的屬性名稱。
+ * @returns {string[]} 格子的 HTML。
+ */
+function stackCells(src, ch, attr) {
+  const has = (f, k) => src[f] && src[f][k] > 0;
+  // 技能稀有度。
+  const rar = (id) => skills.SKILLS[id].rarity || 0;
+  return [
+    ...MATERIALS.filter((m) => has('mats', m.key)).map((m) => stackCell(m.key, src.mats[m.key], `mat:${m.key}`, `r${MATERIALS.indexOf(m)}`, m.name, attr)),
+    ...CRAFT.books.filter((b) => has('books', b)).map((b) => stackCell('book', src.books[b], `book:${b}`, 'book', village.bookName(b), attr)),
+    ...Object.keys(src.gifts || {}).filter((t) => has('gifts', t)).sort().map((t) => stackCell('gift', src.gifts[t], `gift:${t}`, `gift-cell tier${t}`, `${GIFT.names[t - 1]}`, attr)),
+    ...Object.keys(src.shards || {}).filter((id) => has('shards', id)).map((id) => stackCell('shard', src.shards[id], `shard:${id}`, `sbook r${rar(id)}${src.shards[id] >= GIFT.shardNeed ? ' ready' : ''}`, `技能書碎片「${skills.SKILLS[id].name}」`, attr)),
+    ...Object.keys(src.skillBooks || {}).filter((id) => has('skillBooks', id)).map((id) => stackCell('skillbook', src.skillBooks[id], `sbook:${id}`, `sbook r${rar(id)}${skills.learnedBooks(ch).includes(id) ? ' learned' : ''}`, `${RARITIES[rar(id)].name}技能書「${skills.SKILLS[id].name}」`, attr)),
+  ];
 }
 
 /**
@@ -1963,6 +1980,52 @@ async function openGoodsCell(ch, kind, id) {
   return null;
 }
 
+/** 背包堆疊類道具視窗裡的「存入共用倉庫」按鈕。 */
+const SHARE_ACTION = { label: '存入共用倉庫', value: 'share' };
+
+/** 背包格子種類對應的角色欄位（共用倉庫用）。 */
+const STACK_FIELD = { mat: 'mats', book: 'books', sbook: 'skillBooks', gift: 'gifts', shard: 'shards' };
+
+/**
+ * 把背包的堆疊類道具存入共用倉庫：只有 1 個時直接存入，多個時詢問存 1 個或全部。
+ * @param {object} ch 角色。
+ * @param {string} field 欄位（mats、books、skillBooks、gifts、shards）。
+ * @param {string} key 種類。
+ * @returns {Promise<{r: {ok: boolean, message: string}, shared: boolean} | null>} 結果；取消時為 null。
+ */
+async function shareStack(ch, field, key) {
+  const n = (ch[field] && ch[field][key]) || 0;
+  let amount = 1;
+  if (n > 1) {
+    amount = await openModal({
+      title: '存入共用倉庫',
+      html: `<p>${village.stackName(field, key)}：持有 ${n} 個。存入後所有角色都能取出。</p>`,
+      actions: [{ label: '取消', value: null }, { label: '存 1 個', value: 1 }, { label: `全部存入（${n}）`, value: 'all', className: 'primary' }],
+    });
+    if (!amount) return null;
+  }
+  return { r: village.depositStack(ch, app.shared, field, key, amount), shared: true };
+}
+
+/**
+ * 點共用倉庫裡的堆疊類道具：顯示名稱與數量，取出 1 個或全部到背包。
+ * @param {object} ch 角色。
+ * @param {string} field 欄位。
+ * @param {string} key 種類。
+ * @returns {Promise<{r: {ok: boolean, message: string}, shared: boolean} | null>} 結果；關閉時為 null。
+ */
+async function openSharedStack(ch, field, key) {
+  const n = (app.shared.stacks[field] && app.shared.stacks[field][key]) || 0;
+  if (!n) return null;
+  const mine = (ch[field] && ch[field][key]) || 0;
+  const act = await openModal({
+    title: '共用倉庫',
+    html: `<p><b>${village.stackName(field, key)}</b> ×${n}</p><p class="muted small">${ch.name}身上有 ${mine} 個。取出後放進${ch.name}的背包（新的種類需要 1 格空位）。</p>`,
+    actions: [{ label: '關閉', value: null }, ...(n > 1 ? [{ label: '取出 1 個', value: 1 }] : []), { label: n > 1 ? `全部取出（${n}）` : '取出到背包', value: 'all', className: 'primary' }],
+  });
+  return act ? { r: village.withdrawStack(ch, app.shared, field, key, act), shared: true } : null;
+}
+
 /**
  * 點背包格子：顯示內容與可做的操作，並執行玩家選的操作。
  * @param {object} ch 角色。
@@ -1981,8 +2044,9 @@ async function openBagCell(ch, key) {
         <ul><li>金幣 ${GIFT.gold[k]}G</li><li>入場卷 ${TICKET.gift[k]} 張（${TICKET.names[village.progressTicketTier(ch) - 1]}，依目前進度）</li><li>裝備材料 ${GIFT.mats[k]} 個（等級愈高，高品質材料愈多）</li><li>技能書碎片 ${GIFT.shards[k]} 片（同一本的碎片 ${GIFT.shardNeed} 片合成 1 本技能書）</li><li>家園材料 ${HOME_GIFT.mats[k]} 個（已解鎖地城的材料或布料）、肥料 ${HOME_GIFT.fertilizer[k]} 個、種子 ${HOME_GIFT.seeds[k]} 顆</li>
         <li>機率：回復藥水 ${GIFT.potions[k]} 瓶（${Math.round(GIFT.potionChance[k] * 100)}%）、淨化藥水 ${GIFT.cures[k]} 瓶（${Math.round(GIFT.cureChance[k] * 100)}%）、背包擴充袋（${Math.round(GIFT.pouchChance[k] * 100)}%）</li></ul>
         <p class="muted">藥水超過持有上限（各 ${LIMITS.potionHold} 瓶）或背包已擴充到 ${BAG_EXPAND.max} 格時，改為金幣。</p>`,
-      actions: [{ label: '關閉', value: null }, ...(n > 1 ? [{ label: `全部開啟（${n}）`, value: 'all' }] : []), { label: '開啟', value: 'one', className: 'primary' }],
+      actions: [{ label: '關閉', value: null }, SHARE_ACTION, ...(n > 1 ? [{ label: `全部開啟（${n}）`, value: 'all' }] : []), { label: '開啟', value: 'one', className: 'primary' }],
     });
+    if (act === 'share') return shareStack(ch, 'gifts', id);
     if (!act) return null;
     // 開啟（可以連續開全部），彙整得到的內容。
     const total = { gold: 0, mats: {}, shards: {}, potions: 0, cures: 0, pouch: 0, converted: 0, tickets: {}, homeMats: {}, fertilizer: 0, seeds: {}, recipes: [] };
@@ -2029,8 +2093,9 @@ async function openBagCell(ch, key) {
       html: `<div class="skill-detail"><span class="skill-ico big">${skillIcon(id, s2.kind)}</span><div><span class="item-title"><span class="rarity r${s2.rarity || 0}">${RARITIES[s2.rarity || 0].name}</span> <b class="item-name r${s2.rarity || 0}">${s2.name}</b></span><small class="muted">適合職業：${skills.suitedName(id, CLASSES)}</small></div></div>
         <p>${skills.describeSkill(id, 1, skills.skillScale(ch, id))}</p>
         <p>集滿 ${GIFT.shardNeed} 片可以合成 1 本完整的技能書（目前 ${have}／${GIFT.shardNeed}）。</p>`,
-      actions: [{ label: '關閉', value: null }, ...(have >= GIFT.shardNeed ? [{ label: '合成技能書', value: 'combine', className: 'primary' }] : [])],
+      actions: [{ label: '關閉', value: null }, SHARE_ACTION, ...(have >= GIFT.shardNeed ? [{ label: '合成技能書', value: 'combine', className: 'primary' }] : [])],
     });
+    if (act === 'share') return shareStack(ch, 'shards', id);
     return act === 'combine' ? { r: village.combineShards(ch, id) } : null;
   }
   if (kind === 'sbook') {
@@ -2044,8 +2109,9 @@ async function openBagCell(ch, key) {
     const act = await openModal({
       title: `${RARITIES[s.rarity || 0].name}技能書 ×${ch.skillBooks[id]}`,
       html,
-      actions: [{ label: '關閉', value: null }, { label: `賣出 ${village.skillBookPrice(id)}G`, value: 'sell' }, ...(learned ? [] : [{ label: '學習', value: 'learn', className: 'primary' }])],
+      actions: [{ label: '關閉', value: null }, SHARE_ACTION, { label: `賣出 ${village.skillBookPrice(id)}G`, value: 'sell' }, ...(learned ? [] : [{ label: '學習', value: 'learn', className: 'primary' }])],
     });
+    if (act === 'share') return shareStack(ch, 'skillBooks', id);
     if (act === 'learn') return { r: village.useSkillBook(ch, id) };
     if (act === 'sell') return { r: village.sellSkillBook(ch, id) };
     return null;
@@ -2056,7 +2122,8 @@ async function openBagCell(ch, key) {
     const html = kind === 'mat'
       ? `<p><span class="rarity r${mat}">${RARITIES[mat].name}</span> 合成材料。分解${RARITIES[mat].name}裝備取得（分解時有 ${Math.round(CRAFT.bonus * 100)}% 機率多得 1 個高一階的材料）。</p><p>在鐵匠的「製作」用 ${CRAFT.cost} 個合成一件${RARITIES[mat].name}裝備（還需要製作書）。</p>`
       : `<p>合成一件${ITEM_SLOTS[id]}，每次用掉 1 本。需要同品質的材料 ${CRAFT.cost} 個，品質決定裝備的稀有度。</p>`;
-    const act = await openModal({ title, html, actions: [{ label: '關閉', value: null }, { label: '到鐵匠製作', value: 'smith', className: 'primary' }] });
+    const act = await openModal({ title, html, actions: [{ label: '關閉', value: null }, SHARE_ACTION, { label: '到鐵匠製作', value: 'smith', className: 'primary' }] });
+    if (act === 'share') return shareStack(ch, kind === 'mat' ? 'mats' : 'books', id);
     if (act === 'smith') {
       app.tab = 'smith';
       renderVillage();
@@ -2268,7 +2335,7 @@ async function openPassive(ch, id) {
 }
 
 /**
- * 共用倉庫區塊：所有角色共用的金幣（存入、取出）與 20 格裝備（取出）。
+ * 共用倉庫區塊：所有角色共用的金幣（存入、取出）與 20 格道具（裝備與堆疊類道具，取出）。
  * @param {object} ch 目前的角色。
  * @returns {string} HTML。
  */
@@ -2277,11 +2344,12 @@ function sharedHtml(ch) {
   const gold = `<div class="shop-row shared-gold"><img src="${itemDataUrl('coin')}" alt="" class="icon"><div class="item-main"><b>共用金幣 ${sh.gold}G</b><span class="item-stats">身上 ${ch.gold}G</span></div>
     <span class="row-actions"><button type="button" class="buy-btn" data-gold-in="100">存 100</button><button type="button" class="buy-btn" data-gold-in="all">全部存入</button>
     <button type="button" class="sell-btn" data-gold-out="100">取 100</button><button type="button" class="sell-btn" data-gold-out="all">全部取出</button></span></div>`;
-  const cells = sh.items.map((it) => itemCell(it, it.id, 'data-shared-cell'));
-  for (let k = sh.items.length; k < SHARED_SLOTS; k++) cells.push('<span class="inv-cell empty" aria-hidden="true"></span>');
-  const items = `<div class="inv-grid">${cells.join('')}</div>${sh.items.length ? '' : '<p class="muted small">共用倉庫是空的。點背包的裝備選「存入共用倉庫」，其他角色就能取出。</p>'}`;
-  return `<h3>共用倉庫 <small class="muted">所有角色共用・${sh.items.length}／${SHARED_SLOTS} 格（不能擴充）</small></h3>${gold}${items}
-    <p class="muted small">點格子查看並取出到背包。要存入裝備，請到「個人」點背包中的裝備選「存入共用倉庫」。</p>`;
+  const used = village.sharedUsed(sh);
+  const cells = [...sh.items.map((it) => itemCell(it, it.id, 'data-shared-cell')), ...stackCells(sh.stacks, ch, 'data-shared-stack')];
+  for (let k = used; k < SHARED_SLOTS; k++) cells.push('<span class="inv-cell empty" aria-hidden="true"></span>');
+  const items = `<div class="inv-grid">${cells.join('')}</div>${used ? '' : '<p class="muted small">共用倉庫是空的。到「個人」點背包的道具選「存入共用倉庫」，其他角色就能取出。</p>'}`;
+  return `<h3>共用倉庫 <small class="muted">所有角色共用・${used}／${SHARED_SLOTS} 格（不能擴充）</small></h3>${gold}${items}
+    <p class="muted small">點格子查看並取出到背包。裝備、裝備材料、製作書、技能書、獎勵禮包與技能書碎片都能存入（同種道具疊成 1 格），請到「個人」點背包中的道具選「存入共用倉庫」。</p>`;
 }
 
 /**
@@ -2542,6 +2610,15 @@ async function onVillageClick(e) {
   if (d.homeItem) {
     r = await openHomeItem(ch, d.homeItem);
     if (!r) return;
+  }
+  if (d.sharedStack) {
+    const [kind, id] = d.sharedStack.split(':');
+    const out = await openSharedStack(ch, STACK_FIELD[kind], id);
+    if (!out) return;
+    if (out.r.ok) await store.saveShared(ch, app.shared);
+    villageMessage(out.r.message, !out.r.ok);
+    renderVillage();
+    return;
   }
   if (d.cell || d.sharedCell) {
     const out = d.cell ? await openBagCell(ch, d.cell) : await openSharedCell(ch, d.sharedCell);

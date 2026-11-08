@@ -738,12 +738,85 @@ export function weaponOwner(item) {
   return cls ? cls.name : '其他職業';
 }
 
+/** 可以存進共用倉庫的堆疊類道具（欄位與背包相同）：裝備材料、製作書、技能書、獎勵禮包、技能書碎片。 */
+export const SHARED_STACKS = ['mats', 'books', 'skillBooks', 'gifts', 'shards'];
+
 /**
  * 建立空的共用倉庫。
- * @returns {{items: object[], gold: number}} 共用倉庫。
+ * @returns {{items: object[], gold: number, stacks: Record<string, Record<string, number>>}} 共用倉庫（stacks 為堆疊類道具，同種疊成 1 格）。
  */
 export function newShared() {
-  return { items: [], gold: 0 };
+  return { items: [], gold: 0, stacks: Object.fromEntries(SHARED_STACKS.map((f) => [f, {}])) };
+}
+
+/**
+ * 共用倉庫已使用的格數：每件裝備 1 格，每種堆疊類道具 1 格（同種疊在一起）。
+ * @param {{items: object[], stacks?: Record<string, Record<string, number>>}} shared 共用倉庫。
+ * @returns {number} 格數。
+ */
+export function sharedUsed(shared) {
+  const st = shared.stacks || {};
+  return shared.items.length + SHARED_STACKS.reduce((n, f) => n + Object.values(st[f] || {}).filter((v) => v > 0).length, 0);
+}
+
+/**
+ * 堆疊類道具的名稱（訊息用）。
+ * @param {string} field 欄位。
+ * @param {string} key 種類。
+ * @returns {string} 名稱。
+ */
+export function stackName(field, key) {
+  if (field === 'mats') return MATERIALS.find((m) => m.key === key).name;
+  if (field === 'books') return bookName(key);
+  if (field === 'skillBooks') return `技能書「${SKILLS[key].name}」`;
+  if (field === 'gifts') return GIFT.names[Number(key) - 1];
+  return `技能書碎片「${SKILLS[key].name}」`;
+}
+
+/**
+ * 把背包中的堆疊類道具存入共用倉庫（已有同種時疊上去，沒有時需要 1 格空位）。
+ * @param {object} ch 角色（會被修改）。
+ * @param {object} shared 共用倉庫（會被修改）。
+ * @param {string} field 欄位（SHARED_STACKS 之一）。
+ * @param {string} key 種類。
+ * @param {number | 'all'} [n=1] 數量或全部。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function depositStack(ch, shared, field, key, n = 1) {
+  if (!SHARED_STACKS.includes(field)) return { ok: false, message: '這個道具不能存入共用倉庫' };
+  const have = (ch[field] && ch[field][key]) || 0;
+  if (!have) return { ok: false, message: '沒有這個道具' };
+  shared.stacks = shared.stacks || {};
+  const box = (shared.stacks[field] = shared.stacks[field] || {});
+  const inShared = box[key] || 0;
+  if (!inShared && sharedUsed(shared) >= SHARED_SLOTS) return { ok: false, message: `共用倉庫已滿（${SHARED_SLOTS} 格）` };
+  const k = Math.min(n === 'all' ? have : n, have, LIMITS.stack - inShared);
+  if (!(k > 0)) return { ok: false, message: '共用倉庫的這種道具已經放滿' };
+  addStack(ch, field, key, -k);
+  box[key] = inShared + k;
+  return { ok: true, message: `${stackName(field, key)} ×${k} 存入共用倉庫` };
+}
+
+/**
+ * 從共用倉庫取出堆疊類道具放進角色的背包。
+ * @param {object} ch 角色（會被修改）。
+ * @param {object} shared 共用倉庫（會被修改）。
+ * @param {string} field 欄位（SHARED_STACKS 之一）。
+ * @param {string} key 種類。
+ * @param {number | 'all'} [n=1] 數量或全部。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function withdrawStack(ch, shared, field, key, n = 1) {
+  const box = (shared.stacks && shared.stacks[field]) || {};
+  const inShared = box[key] || 0;
+  if (!inShared) return { ok: false, message: '共用倉庫裡沒有這個道具' };
+  const have = (ch[field] && ch[field][key]) || 0;
+  const k = Math.min(n === 'all' ? inShared : n, inShared, LIMITS.stack - have);
+  if (!(k > 0)) return { ok: false, message: '背包裡的這種道具已經放滿' };
+  if (!addStack(ch, field, key, k)) return { ok: false, message: `背包已滿（${bagLimit(ch)} 格）` };
+  if (inShared - k > 0) box[key] = inShared - k;
+  else delete box[key];
+  return { ok: true, message: `取出${stackName(field, key)} ×${k}` };
 }
 
 /**
@@ -756,7 +829,7 @@ export function newShared() {
 export function depositItem(ch, shared, id) {
   const idx = ch.bag.findIndex((i) => i.id === id);
   if (idx < 0) return { ok: false, message: '只能存入背包中的裝備，請先卸下' };
-  if (shared.items.length >= SHARED_SLOTS) return { ok: false, message: `共用倉庫已滿（${SHARED_SLOTS} 格）` };
+  if (sharedUsed(shared) >= SHARED_SLOTS) return { ok: false, message: `共用倉庫已滿（${SHARED_SLOTS} 格）` };
   const [item] = ch.bag.splice(idx, 1);
   shared.items.push(item);
   return { ok: true, message: `${item.name} 存入共用倉庫` };

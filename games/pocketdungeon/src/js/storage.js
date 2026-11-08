@@ -197,7 +197,7 @@ export function newCharacter(cls, name) {
 
 /**
  * 讀取全部資料並驗證。
- * @returns {Promise<{characters: Map<string, object>, run: object | null, meta: object, shared: {items: object[], gold: number}, claimed: string[], claimedAt: Object<string, number>, claimCleared: number, problems: string[]}>} 角色、進行中的探險、設定、共用倉庫、已領取的獲得紀錄（含領取時間與清除顯示的時間）與資料損毀說明。
+ * @returns {Promise<{characters: Map<string, object>, run: object | null, meta: object, shared: {items: object[], gold: number, stacks: Record<string, Record<string, number>>}, claimed: string[], claimedAt: Object<string, number>, claimCleared: number, problems: string[]}>} 角色、進行中的探險、設定、共用倉庫、已領取的獲得紀錄（含領取時間與清除顯示的時間）與資料損毀說明。
  */
 export async function loadAll() {
   const problems = [];
@@ -263,6 +263,7 @@ export async function loadAll() {
     problems.push('共用倉庫資料損毀，已重設為空（各角色的資料不受影響）');
     shared = { items: [], gold: 0 };
   }
+  normalizeShared(shared);
   if (meta.v !== FORMAT) problems.push('存檔格式版本無法辨識');
   const runMap = await readAll('run');
   let run = runMap.get('run') || null;
@@ -310,7 +311,25 @@ export function saveProgress(ch, run) {
  * @returns {boolean} 合法時為 true。
  */
 function isValidShared(sh) {
-  return !!sh && Array.isArray(sh.items) && sh.items.length <= SHARED_SLOTS && sh.items.every(isValidItem) && Number.isFinite(sh.gold) && sh.gold >= 0;
+  if (!sh || !Array.isArray(sh.items) || !sh.items.every(isValidItem) || !Number.isFinite(sh.gold) || sh.gold < 0) return false;
+  const st = sh.stacks;
+  if (st !== undefined && (!st || typeof st !== 'object')) return false;
+  // 堆疊類道具：每個欄位只能放該欄位合法的種類與數量。
+  const keys = { mats: MATERIALS.map((m) => m.key), books: CRAFT.books, skillBooks: bookSkillIds(), gifts: ['1', '2', '3', '4', '5'], shards: bookSkillIds() };
+  if (st && !Object.entries(st).every(([f, map]) => keys[f] && isStackMap(map, keys[f]))) return false;
+  const kinds = st ? Object.values(st).reduce((n, map) => n + Object.values(map).filter((v) => v > 0).length, 0) : 0;
+  return sh.items.length + kinds <= SHARED_SLOTS;
+}
+
+/**
+ * 補齊共用倉庫的欄位（舊存檔沒有堆疊類道具的欄位）。
+ * @param {object} sh 共用倉庫（會被修改）。
+ * @returns {object} 共用倉庫。
+ */
+function normalizeShared(sh) {
+  sh.stacks = sh.stacks || {};
+  for (const f of ['mats', 'books', 'skillBooks', 'gifts', 'shards']) sh.stacks[f] = sh.stacks[f] || {};
+  return sh;
 }
 
 /**
