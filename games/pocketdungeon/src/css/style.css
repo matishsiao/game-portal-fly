@@ -4260,6 +4260,251 @@ button:focus-visible {
   display: none;
 }
 
+/* 佈置模式（手遊式建造介面）：標題列變色、畫面加框、下方是佈置面板 */
+.house.editing .house-bar-top {
+  background: linear-gradient(135deg, #f0b23a, #d9772a);
+}
+
+.house.editing .house-title {
+  color: #2a1606;
+}
+
+.house.editing .house-edit-btn.on {
+  background: #4fc06a;
+  color: #fff;
+}
+
+.house.editing .house-stage {
+  outline: 3px solid #f0b23a;
+  outline-offset: -3px;
+}
+
+.build-panel {
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.build-panel .sub-tabs {
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0;
+}
+
+.build-body {
+  display: grid;
+  gap: 6px;
+}
+
+.build-body p {
+  margin: 0;
+}
+
+.build-body .palette {
+  padding: 3px;
+}
+
+/* 佈置模式：整個畫面固定在視窗內（不用捲動），地圖佔滿剩下的空間，佈置面板從下方彈出 */
+.house.editing {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  width: 100%;
+  height: 100dvh;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.house.editing .house-view {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.house.editing .house-stage {
+  flex: 1;
+  max-height: none;
+}
+
+.house.editing .village-message {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  z-index: 3;
+  max-width: 86%;
+  padding: 4px 12px;
+  border-radius: 10px;
+  background: rgba(16, 8, 24, 0.82);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.house.editing .village-message:empty {
+  display: none;
+}
+
+.house.editing .house-bar {
+  flex: none;
+  margin: 0 calc(-1 * max(16px, env(safe-area-inset-left))) calc(-1 * max(12px, env(safe-area-inset-bottom)));
+}
+
+.house.editing .build-panel {
+  max-height: 42dvh;
+  overflow-y: auto;
+  padding: 8px 16px max(12px, env(safe-area-inset-bottom));
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.45);
+}
+
+.house.editing .build-panel.pop {
+  animation: sheet-up 0.22s ease-out;
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+.build-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.build-head .sub-tabs {
+  flex: 1;
+}
+
+.sheet-toggle {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.build-panel.closed .build-body {
+  display: none;
+}
+
+.cell-size {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  padding: 0 3px;
+  border-radius: 6px;
+  background: rgba(240, 178, 58, 0.92);
+  color: #2a1606;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 14px;
+}
+
+/* 左上角：擺放中或選取中的物件資訊 */
+.house-pick-info {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100% - 120px);
+  padding: 6px 10px 6px 6px;
+  border-radius: 12px;
+  background: rgba(16, 8, 24, 0.82);
+  color: #fff;
+  pointer-events: none;
+}
+
+.house-pick-info img {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  image-rendering: pixelated;
+  object-fit: contain;
+}
+
+.house-pick-info span {
+  display: grid;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.house-pick-info b {
+  font-size: 14px;
+}
+
+.house-pick-info small {
+  font-size: 11px;
+  color: #e8dcf0;
+}
+
+.house-pick-info small.ok {
+  color: #7cf09a;
+}
+
+.house-pick-info small.bad {
+  color: #ff8a8a;
+}
+
+/* 跟著物件的浮動按鈕（✕／✓、移動、翻轉、染色、收回） */
+.house-float {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  gap: 8px;
+  z-index: 2;
+  will-change: transform;
+}
+
+.float-btn {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.float-btn.yes {
+  background: #3cb45a;
+}
+
+.float-btn.yes.off {
+  background: #7a7a7a;
+}
+
+.float-btn.no {
+  background: #d84a4a;
+}
+
+.float-btn.act {
+  background: #3a6ad0;
+  font-size: 16px;
+}
+
+.float-btn.act i {
+  font-style: normal;
+}
+
+.float-btn.act small {
+  margin-top: -6px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
 .house-bar {
   display: grid;
   gap: 8px;

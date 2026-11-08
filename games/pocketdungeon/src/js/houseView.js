@@ -69,7 +69,7 @@ export class HouseView {
    * @param {HTMLCanvasElement} canvas 畫布。
    * @param {object} ch 角色（讀取家園資料；不直接修改）。
    * @param {{interact: (target: {kind: 'item' | 'plot', index: number}) => void, place: (cell: {at: string, x: number, y: number}) => void, select: (index: number) => void, message: (text: string) => void, busy: () => boolean, itemArt: (item: object) => HTMLCanvasElement}} hooks 互動、擺放、選取、訊息的回呼、是否有對話框開著（開著時不處理輸入），以及裝備的圖（展示架用）。
-   * @param {{stage?: HTMLElement, mini?: HTMLCanvasElement}} [view] 可捲動的外框（鏡頭跟隨角色）與小地圖畫布；沒有時不跟隨、不畫小地圖。
+   * @param {{stage?: HTMLElement, mini?: HTMLCanvasElement, float?: HTMLElement}} [view] 可捲動的外框（鏡頭跟隨角色）、小地圖畫布，以及跟著虛影或選取物件移動的浮動按鈕列；沒有時不跟隨、不畫小地圖、不顯示浮動按鈕。
    */
   constructor(canvas, ch, hooks, view = {}) {
     this.canvas = canvas;
@@ -80,21 +80,26 @@ export class HouseView {
     /** 佈置模式：要擺放的庫存物件代碼，或要移動的擺放索引。 */
     this.pick = null;
     this.moving = -1;
-    /** 佈置模式：目前選取的已擺放物件與預覽格。 */
+    /** 佈置模式：目前選取的已擺放物件；預覽（擺放中的虛影位置，按 ✓ 才真的擺上去）；是否正在拖曳虛影。 */
     this.selected = -1;
     this.preview = null;
+    this.drag = false;
     this.time = 0;
     this.raf = 0;
     this.last = 0;
+    /** 目前按住的指標（起點、捲動起點、目前位置、是否拖動過）；沒有按住時為 null。 */
+    this.press = null;
     this.keys = new Set();
     this.stage = view.stage || null;
     this.mini = view.mini || null;
+    this.float = view.float || null;
     this.miniG = this.mini ? this.mini.getContext('2d') : null;
     /** 鏡頭：free 為玩家自己移動過視角（角色再走動前不跟隨）；snap 為下一幀直接對準角色。 */
     this.cam = { free: false, snap: true };
     this.resetPlayer();
     this.onPointer = this.onPointer.bind(this);
     this.onMove = this.onMove.bind(this);
+    this.onUp = this.onUp.bind(this);
     this.onKey = this.onKey.bind(this);
     this.onKeyUp = this.onKeyUp.bind(this);
     this.onMini = this.onMini.bind(this);
@@ -112,6 +117,8 @@ export class HouseView {
   start() {
     this.canvas.addEventListener('pointerdown', this.onPointer);
     this.canvas.addEventListener('pointermove', this.onMove);
+    this.canvas.addEventListener('pointerup', this.onUp);
+    this.canvas.addEventListener('pointercancel', this.onUp);
     document.addEventListener('keydown', this.onKey);
     document.addEventListener('keyup', this.onKeyUp);
     if (this.mini) this.mini.addEventListener('pointerdown', this.onMini);
@@ -126,6 +133,9 @@ export class HouseView {
     cancelAnimationFrame(this.raf);
     this.canvas.removeEventListener('pointerdown', this.onPointer);
     this.canvas.removeEventListener('pointermove', this.onMove);
+    this.canvas.removeEventListener('pointerup', this.onUp);
+    this.canvas.removeEventListener('pointercancel', this.onUp);
+    if (this.float) this.float.hidden = true;
     document.removeEventListener('keydown', this.onKey);
     document.removeEventListener('keyup', this.onKeyUp);
     if (this.mini) this.mini.removeEventListener('pointerdown', this.onMini);
@@ -155,6 +165,75 @@ export class HouseView {
     this.moving = -1;
     this.selected = -1;
     this.preview = null;
+    this.drag = false;
+    this.press = null;
+  }
+
+  /**
+   * 開始擺放（手遊式）：選好庫存物件或按「移動」後，虛影先出現在畫面中央附近可以擺的位置，再拖曳或點地圖調整，按 ✓ 確認。
+   * @param {{pick?: string, moving?: number}} what 要擺的庫存物件代碼，或要移動的擺放索引。
+   */
+  beginPlace(what) {
+    this.pick = what.pick || null;
+    this.moving = what.moving >= 0 ? what.moving : -1;
+    this.drag = false;
+    this.preview = this.moving >= 0 ? this.ghostOfPlaced(this.moving) : this.autoSpot();
+  }
+
+  /** 取消擺放（移動中的物件回到選取狀態）。 */
+  cancelPlace() {
+    if (this.moving >= 0) this.selected = this.moving;
+    this.pick = null;
+    this.moving = -1;
+    this.preview = null;
+    this.drag = false;
+  }
+
+  /**
+   * 擺放中物件的代碼。
+   * @returns {string | null} 代碼；沒有在擺放時為 null。
+   */
+  placingId() {
+    return this.pick || (this.moving >= 0 && this.ch.home.placed[this.moving] ? this.ch.home.placed[this.moving].id : null);
+  }
+
+  /**
+   * 已擺放物件目前位置的虛影（移動的起點）。
+   * @param {number} index 擺放索引。
+   * @returns {{at: string, x: number, y: number, ok: boolean, reason?: string}} 預覽。
+   */
+  ghostOfPlaced(index) {
+    const p = this.ch.home.placed[index];
+    const c = placeCheck(this.ch.home, p.id, p.at, p.x, p.y, index);
+    return { at: p.at, x: p.x, y: p.y, ok: c.ok, reason: c.reason };
+  }
+
+  /**
+   * 找一個靠近目前畫面中央、可以擺的位置；整張地圖都不能擺時回傳最近的位置（紅色）。
+   * @returns {{at: string, x: number, y: number, ok: boolean, reason?: string} | null} 預覽。
+   */
+  autoSpot() {
+    const l = homeLayout(this.ch.home.level);
+    let cx = l.cols / 2;
+    let cy = l.rows / 2;
+    const st = this.stage;
+    if (st && st.clientWidth) {
+      const s = this.viewScale();
+      cx = (st.scrollLeft - this.canvas.offsetLeft + st.clientWidth / 2) / s / HT;
+      cy = ((st.scrollTop - this.canvas.offsetTop + st.clientHeight / 2) / s - TOP) / HT;
+    }
+    const cells = [];
+    for (let y = 0; y < l.rows; y++) for (let x = 0; x < l.cols; x++) cells.push({ x, y, d: (x + 0.5 - cx) ** 2 + (y + 0.5 - cy) ** 2 });
+    // 依離畫面中央的距離排序。
+    cells.sort((a, b) => a.d - b.d);
+    let first = null;
+    for (const c of cells) {
+      const pv = this.previewAt(c);
+      if (!pv) continue;
+      if (pv.ok) return pv;
+      if (!first) first = pv;
+    }
+    return first;
   }
 
   /**
@@ -167,8 +246,10 @@ export class HouseView {
     this.time += dt;
     this.update(dt);
     this.draw();
+    this.edgeScroll(dt);
     this.follow(dt);
     this.drawMini();
+    this.positionFloat();
     this.raf = requestAnimationFrame(this.frame);
   }
 
@@ -235,51 +316,155 @@ export class HouseView {
   }
 
   /**
-   * 指標移動：佈置模式下更新預覽位置（滑鼠）。
-   * @param {PointerEvent} e 指標事件。
+   * 指標在畫布上的原始像素座標。
+   * @param {PointerEvent | {clientX: number, clientY: number}} e 指標事件或座標。
+   * @returns {{x: number, y: number}} 畫布像素座標。
    */
-  onMove(e) {
-    if (this.mode !== 'edit' || (!this.pick && this.moving < 0) || e.pointerType === 'touch') return;
-    this.preview = this.previewAt(this.cellOf(e));
+  canvasPx(e) {
+    const r = this.canvas.getBoundingClientRect();
+    return { x: ((e.clientX - r.left) / r.width) * this.canvas.width, y: ((e.clientY - r.top) / r.height) * this.canvas.height };
   }
 
   /**
-   * 某一格的擺放預覽（區域、區域內座標與能不能擺）。
+   * 指標是否按在擺放中的虛影上（含物件圖往上突出的部分，四周多留一點方便手指按）。
+   * @param {PointerEvent} e 指標事件。
+   * @returns {boolean} 按在虛影上時為 true。
+   */
+  onGhost(e) {
+    const id = this.placingId();
+    const pv = this.preview;
+    if (!id || !pv) return false;
+    const r = placedRect({ id, at: pv.at, x: pv.x, y: pv.y }, homeLayout(this.ch.home.level));
+    const art = homeArt(id);
+    const bottom = pv.at === 'wall' ? TOP + HT : TOP + (r.y + r.h) * HT;
+    const top = pv.at === 'wall' ? 0 : bottom - Math.max(r.h * HT, art ? art.height : 0);
+    const m = 10;
+    const c = this.canvasPx(e);
+    return c.x >= r.x * HT - m && c.x <= (r.x + r.w) * HT + m && c.y >= top - m && c.y <= bottom + m;
+  }
+
+  /**
+   * 指標移動：拖曳虛影時移動物品（到畫面邊緣時由 edgeScroll 自動捲動）；拖曳其他地方時平移地圖。
+   * @param {PointerEvent} e 指標事件。
+   */
+  onMove(e) {
+    const pr = this.press;
+    if (!pr || pr.id !== e.pointerId) return;
+    pr.cx = e.clientX;
+    pr.cy = e.clientY;
+    if (this.drag) {
+      this.dragTo(e);
+      return;
+    }
+    const dx = e.clientX - pr.x;
+    const dy = e.clientY - pr.y;
+    if (!pr.moved && Math.hypot(dx, dy) < 8) return;
+    pr.moved = true;
+    if (!this.stage) return;
+    this.cam.free = true;
+    this.stage.scrollLeft = pr.sl - dx;
+    this.stage.scrollTop = pr.st - dy;
+  }
+
+  /**
+   * 把虛影移到指標所在的格子（位置有變時通知 app 更新資訊卡）。
+   * @param {{clientX: number, clientY: number}} e 指標座標。
+   */
+  dragTo(e) {
+    const pv = this.previewAt(this.cellOf(e));
+    if (!pv) return;
+    const old = this.preview;
+    if (old && old.at === pv.at && old.x === pv.x && old.y === pv.y) return;
+    this.preview = pv;
+    this.hooks.pending();
+  }
+
+  /**
+   * 拖曳虛影到畫面邊緣時自動捲動地圖（越靠邊越快），並讓虛影跟著手指的新位置。
+   * @param {number} dt 秒。
+   */
+  edgeScroll(dt) {
+    const pr = this.press;
+    const st = this.stage;
+    if (!this.drag || !pr || !st || pr.cx == null) return;
+    const r = st.getBoundingClientRect();
+    const edge = 48;
+    // 某一邊的捲動速度（-1～1）。
+    const push = (v, lo, hi) => (v < lo + edge ? -(lo + edge - v) / edge : v > hi - edge ? (v - (hi - edge)) / edge : 0);
+    const vx = push(pr.cx, r.left, r.right);
+    const vy = push(pr.cy, r.top, r.bottom);
+    if (!vx && !vy) return;
+    const speed = 520 * dt;
+    st.scrollLeft += Math.max(-1, Math.min(1, vx)) * speed;
+    st.scrollTop += Math.max(-1, Math.min(1, vy)) * speed;
+    this.cam.free = true;
+    this.dragTo({ clientX: pr.cx, clientY: pr.cy });
+  }
+
+  /**
+   * 放開指標：結束拖曳；沒有拖動時當成點一下（擺放中把虛影移過去、佈置時選取物件、走動時走過去）。
+   * @param {PointerEvent} e 指標事件。
+   */
+  onUp(e) {
+    const pr = this.press;
+    if (!pr || pr.id !== e.pointerId) return;
+    this.press = null;
+    const wasDrag = this.drag;
+    this.drag = false;
+    if (this.canvas.hasPointerCapture && this.canvas.hasPointerCapture(e.pointerId)) this.canvas.releasePointerCapture(e.pointerId);
+    if (wasDrag || pr.moved || e.type === 'pointercancel') return;
+    this.tap(this.cellOf(e));
+  }
+
+  /**
+   * 手指（或滑鼠）在某一格時的擺放預覽：物件以手指為中心，超出區域時推回區域內；附上能不能擺。
    * @param {{x: number, y: number}} cell 地圖座標。
    * @returns {{at: string, x: number, y: number, ok: boolean, reason?: string} | null} 預覽；不在任何區域時為 null。
    */
   previewAt(cell) {
     const l = homeLayout(this.ch.home.level);
-    const id = this.pick || (this.moving >= 0 && this.ch.home.placed[this.moving].id);
+    const id = this.placingId();
     if (!id) return null;
+    const it = HOME_ITEMS[id];
     // 牆飾：點在牆面那排或室內第一排都掛到牆上。
-    const wall = HOME_ITEMS[id].place === 'wall';
+    const wall = it.place === 'wall';
     const a = areaAt(l, cell.x, wall && cell.y === l.house.y ? l.wall.y : cell.y);
     if (!a) return null;
-    const c = placeCheck(this.ch.home, id, a.at, a.x, a.y, this.moving);
-    return { ...a, ok: c.ok, reason: c.reason };
+    const area = a.at === 'yard' ? l.yard : a.at === 'wall' ? { ...l.wall, h: 1 } : l.house;
+    const [w, hh] = it.size;
+    const ph = a.at === 'wall' ? 1 : hh;
+    const x = Math.max(0, Math.min(area.w - w, a.x - Math.floor((w - 1) / 2)));
+    const y = Math.max(0, Math.min(area.h - ph, a.y - Math.floor((ph - 1) / 2)));
+    const c = placeCheck(this.ch.home, id, a.at, x, y, this.moving);
+    return { at: a.at, x, y, ok: c.ok, reason: c.reason };
   }
 
   /**
-   * 點畫面：走動模式走過去（點到功能家具或田地時走到旁邊並互動）；佈置模式擺放、移動或選取物件。
+   * 按下畫面：按在擺放中的虛影上時開始拖曳物品，否則記下起點（拖動就平移地圖，沒拖動就在放開時當成點一下）。
    * @param {PointerEvent} e 指標事件。
    */
   onPointer(e) {
     e.preventDefault();
-    if (this.hooks.busy()) return;
-    const cell = this.cellOf(e);
+    if (this.hooks.busy() || this.press) return;
+    const st = this.stage;
+    this.press = { id: e.pointerId, x: e.clientX, y: e.clientY, cx: e.clientX, cy: e.clientY, sl: st ? st.scrollLeft : 0, st: st ? st.scrollTop : 0, moved: false };
+    this.drag = this.mode === 'edit' && this.onGhost(e);
+    if (this.canvas.setPointerCapture) this.canvas.setPointerCapture(e.pointerId);
+  }
+
+  /**
+   * 點一下地圖：走動模式走過去（點到功能家具或田地時走到旁邊並互動）；佈置模式擺放中時把虛影移過去，否則選取物件。
+   * @param {{x: number, y: number}} cell 地圖座標。
+   */
+  tap(cell) {
     const h = this.ch.home;
     const l = homeLayout(h.level);
     if (this.mode === 'edit') {
-      if (this.pick || this.moving >= 0) {
+      if (this.placingId()) {
         const pv = this.previewAt(cell);
-        this.preview = pv;
         if (!pv) return;
-        if (!pv.ok) {
-          this.hooks.message(pv.reason);
-          return;
-        }
-        this.hooks.place(pv);
+        this.preview = pv;
+        this.hooks.pending();
         return;
       }
       this.selected = placedAt(h, cell.x, cell.y === l.house.y && placedAt(h, cell.x, cell.y) < 0 ? l.wall.y : cell.y);
@@ -466,6 +651,44 @@ export class HouseView {
     }
   }
 
+  /**
+   * 地圖矩形在 .house-view 裡的位置（CSS 像素，已扣掉捲動）。
+   * @param {{x: number, y: number, w: number, h: number}} r 地圖矩形。
+   * @param {boolean} wall 是否為牆飾（畫在牆面那排）。
+   * @returns {{left: number, top: number, width: number, height: number}} 位置。
+   */
+  viewRect(r, wall) {
+    const s = this.viewScale();
+    const st = this.stage;
+    const sl = st ? st.scrollLeft : 0;
+    const stp = st ? st.scrollTop : 0;
+    const top = wall ? 0 : TOP + r.y * HT;
+    return { left: this.canvas.offsetLeft - sl + r.x * HT * s, top: this.canvas.offsetTop - stp + top * s, width: r.w * HT * s, height: (wall ? TOP + HT : r.h * HT) * s };
+  }
+
+  /** 浮動按鈕列跟著虛影（擺放中）或選取的物件；放在物件下方，太靠下時改放上方。 */
+  positionFloat() {
+    const el = this.float;
+    if (!el) return;
+    const h = this.ch.home;
+    const l = homeLayout(h.level);
+    const id = this.placingId();
+    let target = null;
+    if (this.mode === 'edit' && id && this.preview) target = { r: placedRect({ id, at: this.preview.at, x: this.preview.x, y: this.preview.y }, l), wall: this.preview.at === 'wall' };
+    else if (this.mode === 'edit' && this.selected >= 0 && h.placed[this.selected]) target = { r: placedRect(h.placed[this.selected], l), wall: h.placed[this.selected].at === 'wall' };
+    el.hidden = !target;
+    if (!target) return;
+    const v = this.viewRect(target.r, target.wall);
+    const box = el.parentElement;
+    const fw = el.offsetWidth;
+    const fh = el.offsetHeight;
+    const vh = this.stage ? this.stage.clientHeight : box.clientHeight;
+    let top = v.top + v.height + 6;
+    if (top + fh > vh - 4) top = Math.max(4, v.top - fh - 6);
+    const left = Math.max(4, Math.min(box.clientWidth - fw - 4, v.left + v.width / 2 - fw / 2));
+    el.style.transform = `translate(${Math.round(left)}px, ${Math.round(top)}px)`;
+  }
+
   /** 重畫整個場景。 */
   draw() {
     const g = this.g;
@@ -495,8 +718,11 @@ export class HouseView {
     const frameNo = (key) => Math.floor(this.time * 4) % homeFrames(key);
     // 擺放物件的圖（染色過的用染色版）。
     const artOf = (p) => (p.dye && GOODS[p.dye] ? dyedArt(p.id, frameNo(p.id), GOODS[p.dye].dye) : homeArt(p.id, frameNo(p.id)));
+    // 移動中的物件只畫虛影，原位置不畫（像手遊把建築拿起來）。
+    const lifted = this.mode === 'edit' && this.moving >= 0 && this.preview ? h.placed[this.moving] : null;
     // 地毯（最底層）與牆飾。
     for (const p of h.placed) {
+      if (p === lifted) continue;
       const place = HOME_ITEMS[p.id].place;
       if (place !== 'rug' && place !== 'wall') continue;
       const art = artOf(p);
@@ -508,7 +734,7 @@ export class HouseView {
     const sprites = [];
     for (const p of h.placed) {
       const it = HOME_ITEMS[p.id];
-      if (it.place !== 'floor' && it.place !== 'small') continue;
+      if (p === lifted || (it.place !== 'floor' && it.place !== 'small')) continue;
       const art = artOf(p);
       const r = placedRect(p, l);
       const onTable = it.place === 'small' && h.placed.some((q) => HOME_ITEMS[q.id].top && HOME_ITEMS[q.id].place === 'floor' && placedRect(q, l).x <= r.x && placedRect(q, l).x + placedRect(q, l).w > r.x && placedRect(q, l).y <= r.y && placedRect(q, l).y + placedRect(q, l).h > r.y);
@@ -705,7 +931,7 @@ export class HouseView {
       for (let j = 0; j <= a.h; j++) rect(g, a.x * HT, Y(a.y + j), a.w * HT, 1, '#ffffff');
     }
     g.globalAlpha = 1;
-    if (this.selected >= 0 && h.placed[this.selected]) {
+    if (this.selected >= 0 && h.placed[this.selected] && !this.placingId()) {
       const r = placedRect(h.placed[this.selected], l);
       const y = h.placed[this.selected].at === 'wall' ? Y(0) : Y(r.y);
       g.strokeStyle = Math.floor(this.time * 3) % 2 ? '#ffe14d' : '#ffffff';
@@ -713,19 +939,39 @@ export class HouseView {
       g.strokeRect(r.x * HT + 1, y + 1, r.w * HT - 2, r.h * HT - 2);
     }
     const pv = this.preview;
-    const id = this.pick || (this.moving >= 0 && h.placed[this.moving] && h.placed[this.moving].id);
+    const id = this.placingId();
     if (pv && id) {
       const r = placedRect({ id, at: pv.at, x: pv.x, y: pv.y }, l);
       const y = pv.at === 'wall' ? Y(0) : Y(r.y);
-      const art = homeArt(id);
+      const hh = pv.at === 'wall' ? TOP + HT : r.h * HT;
+      const color = pv.ok ? '#4fe078' : '#e04a5a';
+      // 佔用的格子：每格一個半透明方塊與外框（手遊式的地基）。
+      for (let j = 0; j < (pv.at === 'wall' ? 1 : r.h); j++) {
+        for (let i = 0; i < r.w; i++) {
+          const cy = pv.at === 'wall' ? y : y + j * HT;
+          const ch = pv.at === 'wall' ? hh : HT;
+          g.globalAlpha = 0.35;
+          rect(g, (r.x + i) * HT + 1, cy + 1, HT - 2, ch - 2, color);
+          g.globalAlpha = 0.9;
+          g.strokeStyle = color;
+          g.lineWidth = 1;
+          g.strokeRect((r.x + i) * HT + 1.5, cy + 1.5, HT - 3, ch - 3);
+        }
+      }
+      g.globalAlpha = 1;
+      // 物件虛影（上下輕輕浮動，表示還沒放下）。
+      const lift = this.moving >= 0 ? h.placed[this.moving] : null;
+      const art = lift && lift.dye && GOODS[lift.dye] ? dyedArt(id, 0, GOODS[lift.dye].dye) : homeArt(id);
       if (art) {
-        g.globalAlpha = 0.6;
-        g.drawImage(art, r.x * HT, pv.at === 'wall' ? Y(0) - 4 : Y(r.y + r.h) - art.height);
+        const bob = Math.round(Math.sin(this.time * 5) * 1.5) - 3;
+        g.globalAlpha = 0.85;
+        this.blit(art, r.x * HT, (pv.at === 'wall' ? Y(0) - 4 : Y(r.y + r.h) - art.height) + bob, lift ? lift.rot : 0);
         g.globalAlpha = 1;
       }
-      g.globalAlpha = 0.35;
-      rect(g, r.x * HT, y, r.w * HT, r.h * HT, pv.ok ? '#4fe078' : '#e04a5a');
-      g.globalAlpha = 1;
+      // 外框（擺放中的整體範圍）。
+      g.strokeStyle = Math.floor(this.time * 3) % 2 ? color : '#ffffff';
+      g.lineWidth = 2;
+      g.strokeRect(r.x * HT + 1, y + 1, r.w * HT - 2, hh - 2);
     }
   }
 }

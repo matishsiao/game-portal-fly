@@ -1113,17 +1113,17 @@ function enterHouse(ch) {
   app.house = new HouseView($('house-canvas'), ch, {
     // 與物件或田地互動。
     interact: (t) => houseInteract(ch, t),
-    // 佈置模式中擺放或移動。
-    place: (pv) => housePlace(ch, pv),
+    // 擺放中的虛影位置改變（更新資訊卡與 ✓ 按鈕）。
+    pending: () => renderHouseEditUI(ch),
     // 選取物件後更新操作列。
-    select: () => renderHouseBar(ch),
+    select: () => renderHouseEditUI(ch),
     // 顯示警告訊息。
     message: (text) => houseMessage(text, true),
     // 對話框開著時不處理輸入。
     busy: () => !els.modal.hidden,
     // 展示架上裝備的圖。
     itemArt: (item) => itemArt(itemIconName(item)),
-  }, { stage: $('house-stage'), mini: $('house-mini-canvas') });
+  }, { stage: $('house-stage'), mini: $('house-mini-canvas'), float: $('house-float') });
   app.houseTab = app.houseTab || 'furniture';
   app.house.start();
   // 依實際時間推進作物與動物（每秒）。
@@ -1205,7 +1205,8 @@ function fitHouse() {
   const c = $('house-canvas');
   const stage = $('house-stage');
   const maxW = stage.clientWidth || window.innerWidth - 32;
-  const maxH = window.innerHeight * 0.62;
+  const editing = app.house.mode === 'edit';
+  const maxH = editing ? stage.clientHeight || window.innerHeight * 0.5 : window.innerHeight * 0.62;
   const scale = Math.max(Math.min(maxW / c.width, maxH / c.height), HOUSE_MIN_TILE / 32);
   c.style.width = `${Math.floor(c.width * scale)}px`;
   c.style.height = `${Math.floor(c.height * scale)}px`;
@@ -1501,46 +1502,137 @@ async function openWorkbench(ch) {
 }
 
 /**
- * 佈置模式中擺放或移動物件。
+ * 確認擺放（按 ✓）：把虛影的位置真的擺上去或移過去；不能擺時只顯示原因。
  * @param {object} ch 角色。
- * @param {{at: string, x: number, y: number}} pv 擺放位置。
  */
-async function housePlace(ch, pv) {
+async function houseConfirmPlace(ch) {
   const v = app.house;
-  const r = v.moving >= 0 ? home.moveItem(ch, v.moving, pv.at, pv.x, pv.y) : home.placeItem(ch, v.pick, pv.at, pv.x, pv.y);
+  const pv = v && v.preview;
+  if (!pv) return;
+  if (!pv.ok) {
+    houseMessage(pv.reason, true);
+    return;
+  }
+  const moving = v.moving;
+  const r = moving >= 0 ? home.moveItem(ch, moving, pv.at, pv.x, pv.y) : home.placeItem(ch, v.pick, pv.at, pv.x, pv.y);
   houseMessage(r.message, !r.ok);
   if (!r.ok) return;
-  if (v.moving >= 0) {
-    v.selected = v.moving;
-    v.moving = -1;
-  } else if (!(ch.home.inventory[v.pick] > 0)) v.pick = null;
+  v.pick = null;
+  v.moving = -1;
   v.preview = null;
+  v.selected = moving >= 0 ? moving : -1;
   await store.saveProgress(ch);
   renderHouseBar(ch);
 }
 
 /**
- * 家裡畫面下方的操作列：走動時顯示說明；佈置時顯示庫存（家具、裝飾、樣式）與選取物件的操作。
+ * 物件可以擺的區域（資訊卡用）。
+ * @param {object} it 家具或裝飾資料。
+ * @returns {string} 區域說明。
+ */
+function homeAreaText(it) {
+  if (it.place === 'wall') return '牆面';
+  if (it.yard) return '庭院';
+  if (it.place === 'small' || it.place === 'rug') return '室內或庭院';
+  return '室內';
+}
+
+/**
+ * 佈置模式的畫面上資訊：左上角的資訊卡（擺放中或選取中的物件圖示、名稱、大小、區域、庫存，不能擺時的原因），
+ * 以及跟著物件的浮動按鈕（擺放中是 ✕／✓；選取已擺好的物件時是移動、翻轉、染色、收回）。
+ * @param {object} ch 角色。
+ */
+function renderHouseEditUI(ch) {
+  const v = app.house;
+  const info = $('house-pick-info');
+  const fl = $('house-float');
+  if (!v || v.mode !== 'edit') {
+    info.hidden = true;
+    fl.hidden = true;
+    fl.innerHTML = '';
+    return;
+  }
+  const h = ch.home;
+  const id = v.placingId();
+  const sel = !id && v.selected >= 0 ? h.placed[v.selected] : null;
+  const key = id || (sel && sel.id);
+  if (!key) {
+    info.hidden = true;
+    fl.innerHTML = '';
+    return;
+  }
+  const it = HOME_ITEMS[key];
+  const pv = v.preview;
+  const state = id
+    ? (pv ? (pv.ok ? '<small class="ok">可以擺在這裡</small>' : `<small class="bad">${esc(pv.reason || '不能擺在這裡')}</small>`) : '<small class="bad">沒有可以擺的位置</small>')
+    : '<small class="muted">已選取</small>';
+  const stock = v.pick ? `・庫存 ${h.inventory[v.pick] || 0}` : v.moving >= 0 ? '・移動中' : '';
+  info.innerHTML = `<img src="${homeIconUrl(key)}" alt=""><span><b>${esc(it.name)}</b><small>大小 ${it.size[0]}×${it.place === 'wall' ? 1 : it.size[1]} 格・${homeAreaText(it)}${stock}</small>${state}</span>`;
+  info.hidden = false;
+  if (id) {
+    fl.innerHTML = `<button type="button" class="float-btn no" data-float="cancel" aria-label="取消">✕</button><button type="button" class="float-btn yes${pv && pv.ok ? '' : ' off'}" data-float="ok" aria-label="放在這裡">✓</button>`;
+  } else {
+    const dye = ANIMALS[sel.id] ? '' : '<button type="button" class="float-btn act" data-float="dye"><i>🎨</i><small>染色</small></button>';
+    fl.innerHTML = `<button type="button" class="float-btn act" data-float="move"><i>✥</i><small>移動</small></button><button type="button" class="float-btn act" data-float="flip"><i>⇋</i><small>翻轉</small></button>${dye}<button type="button" class="float-btn act" data-float="store"><i>📦</i><small>收回</small></button><button type="button" class="float-btn no" data-float="done" aria-label="取消選取">✕</button>`;
+  }
+}
+
+/**
+ * 浮動按鈕的點擊：✓ 確認擺放、✕ 取消；選取物件時移動、翻轉、染色、收回、取消選取。
+ * @param {MouseEvent} e 點擊事件。
+ */
+async function onHouseFloatClick(e) {
+  const b = e.target.closest('button');
+  const ch = currentChar();
+  const v = app.house;
+  if (!b || !ch || !v) return;
+  const act = b.dataset.float;
+  let r = null;
+  if (act === 'ok') {
+    await houseConfirmPlace(ch);
+    return;
+  }
+  if (act === 'cancel') {
+    v.cancelPlace();
+    houseMessage('');
+  } else if (act === 'move') {
+    v.beginPlace({ moving: v.selected });
+    v.selected = -1;
+    houseMessage('拖曳或點地圖移動，按 ✓ 放下');
+  } else if (act === 'flip') r = home.flipItem(ch, v.selected);
+  else if (act === 'dye') r = await openDye(ch, v.selected);
+  else if (act === 'store') {
+    r = home.storeItem(ch, v.selected);
+    if (r.ok) v.selected = -1;
+  } else if (act === 'done') v.selected = -1;
+  if (r) {
+    houseMessage(r.message, !r.ok);
+    if (r.ok) await store.saveProgress(ch);
+  }
+  renderHouseBar(ch);
+}
+
+/**
+ * 家裡畫面下方：走動時顯示說明；佈置模式是獨立的佈置面板（分類、庫存格子，格子上標示大小與數量）。
  * @param {object} ch 角色。
  */
 function renderHouseBar(ch) {
   const v = app.house;
   const bar = $('house-bar');
   if (!v) return;
-  $('house-edit-btn').classList.toggle('on', v.mode === 'edit');
-  $('house-edit-btn').textContent = v.mode === 'edit' ? '完成' : '佈置';
-  if (v.mode !== 'edit') {
+  const editing = v.mode === 'edit';
+  $('house').classList.toggle('editing', editing);
+  $('house-edit-btn').classList.toggle('on', editing);
+  $('house-edit-btn').textContent = editing ? '完成' : '佈置';
+  $('house-back-btn').hidden = editing;
+  $('house-title').textContent = editing ? '🛠 佈置模式' : `${ch.name} 的家`;
+  renderHouseEditUI(ch);
+  if (!editing) {
     bar.innerHTML = '<p class="muted small">點地板走過去；點工作台製作家具、藥草台做藥水與料理、田地種植與收成、動物餵牧草與收取產物。鍵盤：方向鍵或 WASD 移動，空白鍵與旁邊的物件互動。</p>';
     return;
   }
   const h = ch.home;
-  if (v.selected >= 0 && h.placed[v.selected]) {
-    const p = h.placed[v.selected];
-    const dye = ANIMALS[p.id] ? '' : '<button type="button" data-house-act="dye">染色</button>';
-    bar.innerHTML = `<p class="small">已選取「${HOME_ITEMS[p.id].name}」${v.moving >= 0 ? '：點新的位置放下' : ''}</p><div class="house-actions"><button type="button" data-house-act="move">移動</button><button type="button" data-house-act="flip">翻轉</button>${dye}<button type="button" data-house-act="store">收回</button><button type="button" data-house-act="done">取消選取</button></div>`;
-    return;
-  }
-  const tabs = [['furniture', '家具'], ['decor', '裝飾'], ['tile', '地板牆面']].map(([k, name]) => `<button type="button" class="chip-btn${app.houseTab === k ? ' on' : ''}" data-house-tab="${k}">${name}</button>`).join('');
+  const tabs = [['furniture', '家具'], ['decor', '裝飾'], ['tile', '地板牆面']].map(([k, name]) => `<button type="button" role="tab" data-house-tab="${k}" aria-selected="${app.houseTab === k}">${name}</button>`).join('');
   let cells;
   if (app.houseTab === 'tile') {
     cells = [...home.ownedTiles(ch, 'floorTile'), ...home.ownedTiles(ch, 'wallTile')].map((k) => {
@@ -1550,15 +1642,21 @@ function renderHouseBar(ch) {
   } else {
     // 「裝飾」頁也列出節慶裝飾；「家具」頁也列出牧場動物。
     const types = app.houseTab === 'decor' ? ['decor', 'festival'] : ['furniture', 'animal'];
-    cells = Object.keys(h.inventory).filter((k) => types.includes(HOME_ITEMS[k].type) && !['floorTile', 'wallTile'].includes(HOME_ITEMS[k].place))
-      .map((k) => `<button type="button" class="inv-cell home-cell r${HOME_ITEMS[k].rarity}${v.pick === k ? ' on' : ''}" data-house-pick="${k}"><img src="${homeIconUrl(k)}" alt=""><b class="cell-count">${h.inventory[k]}</b><small class="cell-name">${HOME_ITEMS[k].name}</small></button>`).join('');
+    cells = Object.keys(h.inventory).filter((k) => h.inventory[k] > 0 && types.includes(HOME_ITEMS[k].type) && !['floorTile', 'wallTile'].includes(HOME_ITEMS[k].place))
+      .map((k) => {
+        const it = HOME_ITEMS[k];
+        return `<button type="button" class="inv-cell home-cell r${it.rarity}${v.pick === k ? ' on' : ''}" data-house-pick="${k}"><img src="${homeIconUrl(k)}" alt=""><b class="cell-count">${h.inventory[k]}</b><b class="cell-size">${it.size[0]}×${it.place === 'wall' ? 1 : it.size[1]}</b><small class="cell-name">${it.name}</small></button>`;
+      }).join('');
   }
-  const hint = v.pick ? `點格子擺放「${HOME_ITEMS[v.pick].name}」（綠色可以擺、紅色不行）。` : app.houseTab === 'tile' ? '點樣式套用到整間房子。' : '選一件庫存，再點格子擺放；點已擺好的物件可以移動、翻轉或收回。';
-  bar.innerHTML = `<div class="chip-row">${tabs}</div><p class="muted small">${hint}</p><div class="palette">${cells || '<span class="muted small">庫存是空的：到工作台製作。</span>'}</div>`;
+  const hint = v.placingId() ? '拖曳虛影或點地圖調整位置，按 ✓ 放下、✕ 取消。' : app.houseTab === 'tile' ? '點樣式套用到整間房子。' : '選一件物品，它會出現在畫面上；點已擺好的物件可以移動、翻轉、染色或收回。';
+  const open = app.houseSheet !== false;
+  const pop = app.houseSheetPop ? ' pop' : '';
+  app.houseSheetPop = false;
+  bar.innerHTML = `<div class="build-panel${open ? '' : ' closed'}${pop}"><div class="build-head"><div class="sub-tabs" role="tablist">${tabs}</div><button type="button" class="sheet-toggle" data-house-sheet="1" aria-expanded="${open}" aria-label="${open ? '收起佈置面板' : '展開佈置面板'}">${open ? '▾' : '▴'}</button></div><div class="build-body"><p class="muted small">${hint}</p><div class="palette">${cells || '<span class="muted small">庫存是空的：到工作台製作。</span>'}</div></div></div>`;
 }
 
 /**
- * 家裡畫面下方操作列的點擊。
+ * 佈置面板的點擊：收起或展開面板、切換分類、選擇庫存物品（虛影出現在畫面上）、套用地板牆面樣式。
  * @param {MouseEvent} e 點擊事件。
  */
 async function onHouseBarClick(e) {
@@ -1568,24 +1666,25 @@ async function onHouseBarClick(e) {
   if (!b || !ch || !v) return;
   const d = b.dataset;
   let r = null;
-  if (d.houseTab) app.houseTab = d.houseTab;
-  else if (d.housePick) {
-    v.pick = v.pick === d.housePick ? null : d.housePick;
-    v.preview = null;
-  } else if (d.houseTile) r = home.applyTile(ch, d.houseTile);
-  else if (d.houseAct === 'move') {
-    v.moving = v.selected;
-    houseMessage('點新的位置放下');
-  } else if (d.houseAct === 'flip') r = home.flipItem(ch, v.selected);
-  else if (d.houseAct === 'dye') r = await openDye(ch, v.selected);
-  else if (d.houseAct === 'store') {
-    r = home.storeItem(ch, v.selected);
-    v.selected = -1;
-    v.moving = -1;
-  } else if (d.houseAct === 'done') {
-    v.selected = -1;
-    v.moving = -1;
+  if (d.houseSheet) {
+    app.houseSheet = app.houseSheet === false;
+    app.houseSheetPop = app.houseSheet;
+    renderHouseBar(ch);
+    fitHouse();
+    return;
   }
+  if (d.houseTab) {
+    app.houseTab = d.houseTab;
+    app.houseSheet = true;
+  } else if (d.housePick) {
+    v.selected = -1;
+    if (v.pick === d.housePick) v.cancelPlace();
+    else {
+      v.beginPlace({ pick: d.housePick });
+      if (!v.preview) houseMessage('目前沒有地方可以擺這件物品', true);
+      else houseMessage('');
+    }
+  } else if (d.houseTile) r = home.applyTile(ch, d.houseTile);
   if (r) {
     houseMessage(r.message, !r.ok);
     if (r.ok) await store.saveProgress(ch);
@@ -1598,8 +1697,12 @@ function toggleHouseEdit() {
   const ch = currentChar();
   if (!app.house || !ch) return;
   app.house.setMode(app.house.mode === 'edit' ? 'walk' : 'edit');
+  app.houseSheet = true;
+  app.houseSheetPop = true;
   houseMessage('');
   renderHouseBar(ch);
+  fitHouse();
+  window.scrollTo(0, 0);
 }
 
 /**
@@ -3892,6 +3995,7 @@ function bindEvents() {
   $('house-mini-toggle').addEventListener('click', toggleHouseMini);
   setHouseMini(loadHouseMini());
   $('house-bar').addEventListener('click', onHouseBarClick);
+  $('house-float').addEventListener('click', onHouseFloatClick);
   window.addEventListener('resize', fitHouse);
   $('pause-btn').addEventListener('click', pauseGame);
   $('resume-btn').addEventListener('click', resumeGame);
