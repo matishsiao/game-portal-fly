@@ -3,7 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as home from '../src/js/pd/home.js';
-import { HOME_ITEMS, HOME_ITEM_KEYS, HOME_MATS, HOME_MAT_KEYS, HOME_MAX, DEFAULT_RECIPES, CROPS, LAND, HOME_SHOP } from '../src/js/pd/homeData.js';
+import { HOME_ITEMS, HOME_ITEM_KEYS, HOME_MATS, HOME_MAT_KEYS, HOME_MAX, DEFAULT_RECIPES, CROPS, LAND, HOME_SHOP, HOME_GIFT } from '../src/js/pd/homeData.js';
 import { AREAS, AREA_KEYS, BOSSES } from '../src/js/pd/data.js';
 import { seededRng } from '../src/js/pd/rules.js';
 import { openGift } from '../src/js/pd/village.js';
@@ -146,6 +146,36 @@ test('獎勵禮包也會開出肥料與種子', () => {
   assert.equal(r.home.fertilizer, 2);
   assert.equal(Object.values(r.home.seeds).reduce((a, b) => a + b, 0), 2);
   assert.equal(ch.home.fertilizer, 2);
+});
+
+test('獎勵禮包開出家園材料：數量依禮包等級，種類只來自已解鎖地城的材料與布料', () => {
+  const ch = hero();
+  ch.unlocked = { grass: 1, easy: 1 };
+  ch.gifts = { 5: 30 };
+  const allowed = new Set(['wood', 'stone', 'cloth']);
+  const seen = new Set();
+  for (let i = 0; i < 30; i++) {
+    // 清空裝備材料與技能書碎片，避免背包塞滿（這裡只看家園材料）。
+    ch.mats = {};
+    ch.shards = {};
+    const before = { ...ch.home.mats };
+    const r = openGift(ch, 5, seededRng(100 + i));
+    assert.ok(r.ok);
+    const n = Object.values(r.home.mats).reduce((a, b) => a + b, 0);
+    assert.equal(n, HOME_GIFT.mats[4]);
+    for (const [m, c] of Object.entries(r.home.mats)) {
+      assert.ok(allowed.has(m), `不該開出 ${m}`);
+      assert.equal((ch.home.mats[m] || 0) - (before[m] || 0), c);
+      seen.add(m);
+    }
+  }
+  assert.deepEqual([...seen].sort(), ['cloth', 'stone', 'wood']);
+  // 解鎖龍之峽谷後也可能開到龍鱗。
+  ch.unlocked.dragon = 1;
+  const pool = new Set();
+  for (let i = 0; i < 200; i++) pool.add(home.rollGiftMat(ch, seededRng(i)));
+  assert.ok(pool.has('scale'));
+  assert.ok(!pool.has('gear'), '還沒解鎖機械工坊');
 });
 
 test('地城：打怪掉落家園材料，Boss 有機會掉主題裝飾製作書，撿起來會加入家園', () => {

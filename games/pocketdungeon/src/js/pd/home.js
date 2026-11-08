@@ -450,14 +450,31 @@ export function craftHomeItem(ch, key) {
 }
 
 /**
- * 開啟獎勵禮包時額外得到的家園物品：肥料、種子，有機會得到一本一般家具製作書（已學會的自動賣出）。
+ * 禮包開出的家園材料種類：從角色已解鎖地城的材料與布料（商店材料，不分區域）中平均抽一種。
+ * @param {object} ch 角色。
+ * @param {() => number} rng 亂數函式。
+ * @returns {string} 材料代碼。
+ */
+export function rollGiftMat(ch, rng) {
+  const pool = HOME_MATS.filter((m) => !m.area || (ch.unlocked && ch.unlocked[m.area] >= 1));
+  return pool[Math.floor(rng() * pool.length)].key;
+}
+
+/**
+ * 開啟獎勵禮包時額外得到的家園物品：家園材料、肥料、種子，有機會得到一本一般家具製作書（已學會的自動賣出）。
+ * 家園材料超過持有上限的部分不加入。
  * @param {object} ch 角色（會被修改）。
  * @param {number} tier 禮包等級（1～5）。
  * @param {() => number} rng 亂數函式。
- * @returns {{fertilizer: number, seeds: Record<string, number>, recipe: string | null, recipeGold: number}} 內容。
+ * @returns {{mats: Record<string, number>, fertilizer: number, seeds: Record<string, number>, recipe: string | null, recipeGold: number}} 內容（mats 為實際加入的家園材料）。
  */
 export function giftHome(ch, tier, rng) {
   const k = tier - 1;
+  const mats = {};
+  for (let i = 0; i < HOME_GIFT.mats[k]; i++) {
+    const m = rollGiftMat(ch, rng);
+    if (addHomeMat(ch, m, 1)) mats[m] = (mats[m] || 0) + 1;
+  }
   const fertilizer = addFertilizer(ch, HOME_GIFT.fertilizer[k]);
   const seeds = {};
   for (let i = 0; i < HOME_GIFT.seeds[k]; i++) {
@@ -470,7 +487,7 @@ export function giftHome(ch, tier, rng) {
     recipe = rollRecipe(ch, null, rng);
     recipeGold = gainRecipe(ch, recipe).gold;
   }
-  return { fertilizer, seeds, recipe, recipeGold };
+  return { mats, fertilizer, seeds, recipe, recipeGold };
 }
 
 /**

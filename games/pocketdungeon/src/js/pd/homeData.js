@@ -329,10 +329,11 @@ export const CROP_KEYS = Object.keys(CROPS);
 export const START_SEEDS = { apple: 2 };
 
 /**
- * 獎勵禮包（等級 1～5）額外開出的家園物品：fertilizer 為肥料數量；seeds 為種子數量；recipeChance 為開出一本一般家具製作書的機率。
+ * 獎勵禮包（等級 1～5）額外開出的家園物品：fertilizer 為肥料數量；seeds 為種子數量；recipeChance 為開出一本一般家具製作書的機率；
+ * mats 為家園材料數量（種類從角色已解鎖地城的材料與布料中隨機）。
  * 肥料只能從其他學習遊戲的禮包取得，延續「靠學習換獎勵」的設計。
  */
-export const HOME_GIFT = { fertilizer: [1, 1, 2, 2, 3], seeds: [1, 2, 2, 3, 3], recipeChance: [0.1, 0.15, 0.2, 0.3, 0.4] };
+export const HOME_GIFT = { fertilizer: [1, 1, 2, 2, 3], seeds: [1, 2, 2, 3, 3], recipeChance: [0.1, 0.15, 0.2, 0.3, 0.4], mats: [2, 3, 4, 5, 6] };
 
 /**
  * 土地等級：house 為房子室內大小（寬、高，不含牆）；yard 為庭院高度（與室內同寬，最下面一排是田地）；plots 為庭院田地數；animals 為可以養的動物數；price 為擴建金幣；mats 為擴建材料；

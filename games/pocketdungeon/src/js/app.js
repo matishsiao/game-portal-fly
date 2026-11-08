@@ -11,7 +11,7 @@ import * as village from './pd/village.js';
 import * as skills from './pd/skills.js';
 import * as home from './pd/home.js';
 import {
-  HOME_ITEMS, HOME_ITEM_KEYS, HOME_MATS, HOME_RARITY, FURNITURE_CATS, DECOR_CATS, CROPS, CROP_KEYS, LAND, GOODS, GOOD_KEYS, MEALS, MEAL_KEYS, BREWS, ANIMALS, RANCH, LINKS, DIARY, DYE_KEYS, HOME_CHEST, SHELF_SLOTS,
+  HOME_ITEMS, HOME_ITEM_KEYS, HOME_MATS, HOME_RARITY, FURNITURE_CATS, DECOR_CATS, CROPS, CROP_KEYS, LAND, GOODS, GOOD_KEYS, MEALS, MEAL_KEYS, BREWS, ANIMALS, RANCH, LINKS, DIARY, DYE_KEYS, HOME_CHEST, SHELF_SLOTS, HOME_GIFT,
 } from './pd/homeData.js';
 import { homeArt, iconArt, cropArt, toDataUrl } from './pd/homeArt.js';
 import { HouseView } from './houseView.js';
@@ -1978,14 +1978,14 @@ async function openBagCell(ch, key) {
     const act = await openModal({
       title: `${GIFT.names[k]} ×${n}`,
       html: `<div class="gift-head"><span class="inv-cell stack static gift-cell tier${tier}"><img src="${itemDataUrl('gift')}" alt=""></span><p>來自學習遊戲的第一次過關或第一次全對。開啟可以得到：</p></div>
-        <ul><li>金幣 ${GIFT.gold[k]}G</li><li>入場卷 ${TICKET.gift[k]} 張（${TICKET.names[village.progressTicketTier(ch) - 1]}，依目前進度）</li><li>裝備材料 ${GIFT.mats[k]} 個（等級愈高，高品質材料愈多）</li><li>技能書碎片 ${GIFT.shards[k]} 片（同一本的碎片 ${GIFT.shardNeed} 片合成 1 本技能書）</li>
+        <ul><li>金幣 ${GIFT.gold[k]}G</li><li>入場卷 ${TICKET.gift[k]} 張（${TICKET.names[village.progressTicketTier(ch) - 1]}，依目前進度）</li><li>裝備材料 ${GIFT.mats[k]} 個（等級愈高，高品質材料愈多）</li><li>技能書碎片 ${GIFT.shards[k]} 片（同一本的碎片 ${GIFT.shardNeed} 片合成 1 本技能書）</li><li>家園材料 ${HOME_GIFT.mats[k]} 個（已解鎖地城的材料或布料）、肥料 ${HOME_GIFT.fertilizer[k]} 個、種子 ${HOME_GIFT.seeds[k]} 顆</li>
         <li>機率：回復藥水 ${GIFT.potions[k]} 瓶（${Math.round(GIFT.potionChance[k] * 100)}%）、淨化藥水 ${GIFT.cures[k]} 瓶（${Math.round(GIFT.cureChance[k] * 100)}%）、背包擴充袋（${Math.round(GIFT.pouchChance[k] * 100)}%）</li></ul>
         <p class="muted">藥水超過持有上限（各 ${LIMITS.potionHold} 瓶）或背包已擴充到 ${BAG_EXPAND.max} 格時，改為金幣。</p>`,
       actions: [{ label: '關閉', value: null }, ...(n > 1 ? [{ label: `全部開啟（${n}）`, value: 'all' }] : []), { label: '開啟', value: 'one', className: 'primary' }],
     });
     if (!act) return null;
     // 開啟（可以連續開全部），彙整得到的內容。
-    const total = { gold: 0, mats: {}, shards: {}, potions: 0, cures: 0, pouch: 0, converted: 0, tickets: {}, fertilizer: 0, seeds: {}, recipes: [] };
+    const total = { gold: 0, mats: {}, shards: {}, potions: 0, cures: 0, pouch: 0, converted: 0, tickets: {}, homeMats: {}, fertilizer: 0, seeds: {}, recipes: [] };
     let opened = 0;
     let last = null;
     for (let i = 0; i < (act === 'all' ? n : 1); i++) {
@@ -1997,7 +1997,8 @@ async function openBagCell(ch, key) {
       if (last.tickets.n) total.tickets[last.tickets.tier] = (total.tickets[last.tickets.tier] || 0) + last.tickets.n;
       for (const [m, c] of Object.entries(last.mats)) total.mats[m] = (total.mats[m] || 0) + c;
       for (const [s2, c] of Object.entries(last.shards)) total.shards[s2] = (total.shards[s2] || 0) + c;
-      // 家園：肥料、種子與家具製作書（學過的已自動賣出，金幣算進總額）。
+      // 家園：家園材料、肥料、種子與家具製作書（學過的已自動賣出，金幣算進總額）。
+      for (const [m, c] of Object.entries(last.home.mats)) total.homeMats[m] = (total.homeMats[m] || 0) + c;
       total.fertilizer += last.home.fertilizer;
       for (const [s2, c] of Object.entries(last.home.seeds)) total.seeds[s2] = (total.seeds[s2] || 0) + c;
       if (last.home.recipe) total.recipes.push(last.home.recipe);
@@ -2015,8 +2016,9 @@ async function openBagCell(ch, key) {
       ...Object.entries(total.seeds).map(([s2, c]) => `<span class="loot-chip"><img src="${homeSmallIcon('seed')}" alt="">${CROPS[s2].name}種子 ×${c}</span>`),
       ...total.recipes.map((key) => `<span class="loot-chip r${HOME_ITEMS[key].rarity}"><img src="${homeIconUrl(key)}" alt="">${home.recipeName(key)}</span>`),
     ].join('');
+    const homeMatList = HOME_MATS.filter((m) => total.homeMats[m.key]).map((m) => `<span class="loot-chip"><img src="${homeSmallIcon(m.key)}" alt="">${m.name} ×${total.homeMats[m.key]}</span>`).join('');
     const goldNote = total.converted ? `<small class="muted">（含超過上限換成的 ${total.converted}G）</small>` : '';
-    await openModal({ title: `開啟了 ${opened} 個${GIFT.names[k]}`, html: `<p class="gold-text">金幣 +${total.gold}G ${goldNote}</p>${extras ? `<h3>道具</h3><div class="loot-chips">${extras}</div>` : ''}<h3>裝備材料</h3><div class="loot-chips">${matList}</div><h3>技能書碎片</h3><div class="loot-chips">${shardList}</div>${last.ok ? '' : `<p class="notice-inline">${last.message}，其餘的禮包沒有開啟。</p>`}`, actions: [{ label: '好', value: null, className: 'primary' }] });
+    await openModal({ title: `開啟了 ${opened} 個${GIFT.names[k]}`, html: `<p class="gold-text">金幣 +${total.gold}G ${goldNote}</p>${extras ? `<h3>道具</h3><div class="loot-chips">${extras}</div>` : ''}<h3>裝備材料</h3><div class="loot-chips">${matList}</div><h3>技能書碎片</h3><div class="loot-chips">${shardList}</div>${homeMatList ? `<h3>家園材料</h3><div class="loot-chips">${homeMatList}</div>` : ''}${last.ok ? '' : `<p class="notice-inline">${last.message}，其餘的禮包沒有開啟。</p>`}`, actions: [{ label: '好', value: null, className: 'primary' }] });
     return { r: { ok: true, message: `開啟了 ${opened} 個${GIFT.names[k]}` } };
   }
   if (kind === 'shard') {
