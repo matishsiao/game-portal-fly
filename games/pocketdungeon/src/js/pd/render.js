@@ -1321,7 +1321,9 @@ export class Renderer {
         if (swinging && pose !== 'up' && !hidden) this.weapon(world, art.palette, shoulder.x, shoulder.y);
         g.globalAlpha = 1;
         this.drawPlayerAuras(world);
-        this.statusMarks(world, p.x * T, Math.round(p.y * T) - 24, p.status);
+        const head = Math.round(p.y * T + 5 - img.height);
+        this.statusMarks(world, p.x * T, head - 16, p.status);
+        this.playerBar(world, p, head);
         continue;
       }
       const m = e.m;
@@ -1471,6 +1473,51 @@ export class Renderer {
     g.fillText(name, m.x * T + 0.6, y - 2.4);
     g.fillStyle = healing ? '#a8f0b0' : '#f0e0a0';
     g.fillText(name, m.x * T, y - 3);
+    g.restore();
+  }
+
+  /**
+   * 畫玩家頭上的血條與名牌（跟 Boss 血條同樣的樣式，橫版畫面看不到 HUD 時也能掌握血量）：
+   * 受傷時白色殘影延遲消退，護盾量以藍白色接在血量後面，血量低於 30% 時閃紅。
+   * 會在玩家物件上記錄殘影的位置（hpTrail）。
+   * @param {object} world 探險（取角色名稱、等級與時間）。
+   * @param {object} p 玩家。
+   * @param {number} head 頭頂的 y（像素）。
+   */
+  playerBar(world, p, head) {
+    const g = this.ctx;
+    const w = 26;
+    const x = Math.round(p.x * T - w / 2);
+    const y = head - 4;
+    const max = Math.max(1, p.maxHp);
+    const ratio = Math.max(0, Math.min(1, p.hp / max));
+    p.hpTrail = p.hpTrail === undefined || p.hpTrail < ratio ? ratio : p.hpTrail + (ratio - p.hpTrail) * 0.06;
+    const shield = Math.max(0, Math.min(1 - ratio, (p.shield || 0) / max));
+    const low = ratio < 0.3;
+    g.fillStyle = '#1a1020';
+    g.fillRect(x - 1, y - 1, w + 2, 5);
+    g.fillStyle = '#3a2a40';
+    g.fillRect(x, y, w, 3);
+    g.fillStyle = 'rgba(255,255,255,0.75)';
+    g.fillRect(x, y, Math.round(w * p.hpTrail), 3);
+    g.fillStyle = low ? (Math.floor(world.time * 6) % 2 ? '#ff5a5a' : '#c03a3a') : ratio < 0.6 ? '#e8c04a' : '#5fd068';
+    g.fillRect(x, y, Math.round(w * ratio), 3);
+    if (shield > 0) {
+      g.fillStyle = '#c8e6ff';
+      g.fillRect(x + Math.round(w * ratio), y, Math.max(1, Math.round(w * shield)), 3);
+    }
+    g.fillStyle = 'rgba(255,255,255,0.35)';
+    g.fillRect(x, y, Math.round(w * ratio), 1);
+    const ch = world.ch || {};
+    const name = `${ch.name || ''}${ch.level ? ` Lv.${ch.level}` : ''}`;
+    if (!name) return;
+    g.save();
+    g.font = 'bold 6px system-ui, sans-serif';
+    g.textAlign = 'center';
+    g.fillStyle = '#1a1020';
+    g.fillText(name, p.x * T + 0.6, y - 2.4);
+    g.fillStyle = '#d8f0ff';
+    g.fillText(name, p.x * T, y - 3);
     g.restore();
   }
 
