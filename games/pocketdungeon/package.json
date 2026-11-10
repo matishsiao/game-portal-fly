@@ -18,6 +18,7 @@
     "check:balance": "node scripts/check-balance.mjs",
     "icons": "node scripts/make-icons.mjs",
     "heroes": "node scripts/make-hero-sprites.mjs",
-    "bosses": "node scripts/make-hero-sprites.mjs --bosses"
+    "bosses": "node scripts/make-hero-sprites.mjs --bosses",
+    "monsters": "node scripts/make-hero-sprites.mjs --monsters"
   }
 }

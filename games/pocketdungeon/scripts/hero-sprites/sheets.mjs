@@ -86,3 +86,22 @@ export const BOSS_SHEETS = Object.fromEntries(
   ['treant', 'golem', 'lich', 'bullKing', 'thunderbird', 'necromancer', 'pharaoh', 'kraken', 'steamTitan', 'redDragon', 'demonLord']
     .map((k) => [k, { file: `${k}.png`, auto: { n: 4, y: [20, 640] }, cells: {}, hole: ['treant', 'golem', 'steamTitan'].includes(k) ? 30000 : 1500 }]),
 );
+
+/** 一般怪物的待機圖目標高度（圖像素，密度 2）：小 28、中 34、大 40、巨 46（只有雪怪）。 */
+const MONSTER_H = {
+  slime: 34, magmaSlime: 34, bat: 28, hornet: 28, imp: 28, jelly: 28, drone: 28,
+  skeleton: 34, skelArcher: 34, scarecrow: 34, zombie: 34, mummy: 34, clockSoldier: 34,
+  goblin: 28, lizardman: 34, lavaWorm: 34, sandWorm: 40, fireSpirit: 34, boneMage: 34, drake: 34,
+  iceWolf: 34, wraith: 34, banshee: 34, succubus: 34, crystal: 40, mushroom: 34, vineflower: 34,
+  turretBot: 34, spider: 28, boar: 34, scorpion: 34, bomber: 28, yeti: 46, skyKnight: 40, crab: 40,
+  demonKnight: 40, frostSprite: 28, harpy: 34, siren: 34, gargoyle: 40, wyvern: 40, shade: 34,
+  voidEye: 34, thunderSprite: 28,
+};
+
+/**
+ * 各一般怪物的設計圖與轉換參數（design/monsters/，2172 × 724，版面同 Boss）：
+ * 一列 4 格（待機 A、待機 B、蓄力、出招），面向右；h 為待機圖目標高度，小型怪物減色到 18 色避免雜點。
+ */
+export const MONSTER_SHEETS = Object.fromEntries(
+  Object.entries(MONSTER_H).map(([k, h]) => [k, { file: `${k}.png`, auto: { n: 4, y: [20, 640] }, cells: {}, hole: 1500, h, colors: h <= 28 ? 18 : 22 }]),
+);

@@ -1,27 +1,37 @@
 // 把 design/heroes/ 的角色攻擊動作設計圖轉成遊戲用的 src/js/pd/heroSprites.js；
-// 加 --bosses 時改把 design/bosses/ 的 Boss 動作圖轉成 src/js/pd/bossSprites.js。
-// 用法：node scripts/make-hero-sprites.mjs [--bosses] [--preview 預覽圖.png] [--only 職業或 Boss]
+// 加 --bosses 時改把 design/bosses/ 的 Boss 動作圖轉成 src/js/pd/bossSprites.js；
+// 加 --monsters 時改把 design/monsters/ 的一般怪物動作圖轉成 src/js/pd/monsterSprites.js（缺圖的怪物略過並警告）。
+// 用法：node scripts/make-hero-sprites.mjs [--bosses | --monsters] [--preview 預覽圖.png] [--only 職業、Boss 或怪物]
 // 需要 Chrome 與 puppeteer-core（在瀏覽器畫布中讀取像素）：
 //   npm i --no-save puppeteer-core
 // Chrome 預設為 macOS 的安裝位置，其他環境以環境變數 CHROME_PATH 指定。
 
-import { readFileSync, writeFileSync } from 'node:fs';
-import { SHEETS as HERO_SHEETS, BOSS_SHEETS } from './hero-sprites/sheets.mjs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { SHEETS as HERO_SHEETS, BOSS_SHEETS, MONSTER_SHEETS } from './hero-sprites/sheets.mjs';
+import { MONSTERS } from '../src/js/pd/data.js';
 
 const ROOT = new URL('../', import.meta.url);
 const BOSSES = process.argv.includes('--bosses');
-/** 要轉換的設計圖（角色或 Boss）。 */
-const SHEETS = BOSSES ? BOSS_SHEETS : HERO_SHEETS;
+const MONS = process.argv.includes('--monsters');
 /** 設計圖資料夾。 */
-const DIR = BOSSES ? 'design/bosses' : 'design/heroes';
-/** 待機圖（第 1 個方向的第 1 格）換算後的高度（格）：角色 34，Boss 60（約 2.5 格高）。 */
+const DIR = MONS ? 'design/monsters' : BOSSES ? 'design/bosses' : 'design/heroes';
+/** 要轉換的設計圖（角色、Boss 或一般怪物）；一般怪物只取實際存在的設計圖。 */
+const SHEETS = MONS
+  ? Object.fromEntries(Object.entries(MONSTER_SHEETS).filter(([k, s]) => {
+    const ok = existsSync(new URL(`${DIR}/${s.file}`, ROOT));
+    if (!ok) console.warn(`警告：缺少 ${DIR}/${s.file}，${k} 維持舊圖。`);
+    return ok;
+  }))
+  : BOSSES ? BOSS_SHEETS : HERO_SHEETS;
+/** 待機圖（第 1 個方向的第 1 格）換算後的預設高度（格）：角色 34，Boss 60（約 2.5 格高）；一般怪物以各自的 h 為準。 */
 const TARGET_H = BOSSES ? 60 : 34;
-/** 減色後的顏色數。 */
+/** 預設減色後的顏色數；一般怪物以各自的 colors 為準。 */
 const COLORS = 24;
 const NAMES = {
   warrior: '戰士', archer: '弓箭手', mage: '法師', thief: '盜賊', monk: '武僧', knight: '騎士',
   treant: '古樹守衛', golem: '熔岩魔像', lich: '霜之巫妖', bullKing: '巨角牛王', thunderbird: '雷鳥', necromancer: '死靈法師',
   pharaoh: '法老王', kraken: '深海巨妖', steamTitan: '蒸汽巨像', redDragon: '炎龍', demonLord: '魔王',
+  ...Object.fromEntries(Object.entries(MONSTERS).map(([k, m]) => [k, m.name])),
 };
 
 /**
@@ -93,7 +103,7 @@ async function convertClass(page, cls) {
     await img.decode();
     const cell = window.measureH(img, cells[order[0]][0]) / TARGET_H;
     return { cell, ...window.convertSet(img, order.flatMap((d) => cells[d]), cell, COLORS) };
-  }, src, sheet.cells, order, opts, TARGET_H, COLORS);
+  }, src, sheet.cells, order, opts, sheet.h ?? TARGET_H, sheet.colors ?? COLORS);
   const frames = {};
   let start = 0;
   for (const d of order) {
@@ -169,12 +179,23 @@ export const HERO_SPRITES = {\n`;
 }
 
 /**
- * 產生 bossSprites.js 的內容。
- * @param {Record<string, object>} result 各 Boss 的遊戲用資料。
+ * 產生 bossSprites.js 或 monsterSprites.js 的內容（兩者格式相同：一列 4 格、面向右）。
+ * @param {Record<string, object>} result 各 Boss 或怪物的遊戲用資料。
  * @returns {string} 檔案內容。
  */
 function renderBosses(result) {
-  let js = `// Boss 圖（高密度像素圖，由 design/bosses/ 的原創設計圖轉換而來）：每個字元對應調色盤中的一個顏色，'.' 為透明、'o' 為外框。
+  let js = MONS
+    ? `// 一般怪物圖（高密度像素圖，由 design/monsters/ 的原創設計圖轉換而來）：每個字元對應調色盤中的一個顏色，'.' 為透明、'o' 為外框。
+// 每隻怪物有共用的畫布大小（w × h，腳底在倒數第 foot 列之上），frames 依序為待機 A、待機 B、蓄力、出招（面向右），
+// 每格只存緊貼的像素與它在畫布上的位置（x, y）。沒有列在這裡的怪物沿用 sprites.js 的 MONSTER_ART 舊圖。
+// 由 scripts/make-hero-sprites.mjs --monsters 產生，請修改設計圖或轉換參數後重新產生，不要手動修改。
+
+/**
+ * 各一般怪物的圖。
+ * @type {Record<string, {palette: Record<string, string>, w: number, h: number, foot: number, frames: {x: number, y: number, rows: string[]}[]}>}
+ */
+export const MONSTER_SPRITES = {\n`
+    : `// Boss 圖（高密度像素圖，由 design/bosses/ 的原創設計圖轉換而來）：每個字元對應調色盤中的一個顏色，'.' 為透明、'o' 為外框。
 // 每隻 Boss 有共用的畫布大小（w × h，腳底在倒數第 foot 列之上），frames 依序為待機 A、待機 B、蓄力、出招（面向右），
 // 每格只存緊貼的像素與它在畫布上的位置（x, y）。進化 Boss 的配色由 sprites.js 依此圖轉換。
 // 由 scripts/make-hero-sprites.mjs --bosses 產生，請修改設計圖或轉換參數後重新產生，不要手動修改。
@@ -244,8 +265,8 @@ try {
   if (only) {
     console.log('只轉換單一項目時不寫入檔案（可搭配 --preview 檢查）。');
   } else {
-    const js = BOSSES ? renderBosses(result) : render(result);
-    const out = BOSSES ? 'src/js/pd/bossSprites.js' : 'src/js/pd/heroSprites.js';
+    const js = BOSSES || MONS ? renderBosses(result) : render(result);
+    const out = MONS ? 'src/js/pd/monsterSprites.js' : BOSSES ? 'src/js/pd/bossSprites.js' : 'src/js/pd/heroSprites.js';
     writeFileSync(new URL(out, ROOT), js);
     console.log(`已寫入 ${out}（${Math.round(js.length / 1024)} KB）`);
   }

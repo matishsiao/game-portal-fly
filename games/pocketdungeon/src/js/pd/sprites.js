@@ -1,9 +1,11 @@
 // 像素圖資料（全部原創）：以字元陣列描述，每個字元對應調色盤中的一個顏色，'.' 為透明。
-// 角色有站立與左右腳交替的走路幀；怪物有 2 幀；Boss 以 2 倍大小繪製。
+// 角色有站立與左右腳交替的走路幀；Boss 與有設計圖的一般怪物使用 4 格動作圖（monsterSprites.js），
+// 其他怪物沿用 MONSTER_ART 的 2 幀手寫圖並精緻化。
 
 import { HOME_MATS } from './homeData.js';
 import { HERO_SPRITES } from './heroSprites.js';
 import { BOSS_SPRITES } from './bossSprites.js';
+import { MONSTER_SPRITES } from './monsterSprites.js';
 
 /** 共用顏色。 */
 const O = '#1a1020';
@@ -683,13 +685,39 @@ function bossArt(type, evolved) {
 }
 
 /**
- * 取得怪物或 Boss 圖：Boss 使用動作圖（bossArt）；一般怪物把手寫像素圖精緻化成 2 倍密度（refineMonster）。
+ * 取得一般怪物的動作圖（monsterSprites.js，4 格：待機 A、待機 B、蓄力、出招，面向右）。
+ * 大小已由設計圖轉換時決定，scale 固定為 1；半透明沿用 MONSTER_ART 的 alpha。一般怪物不會進化，沒有進化配色。
+ * @param {string} type 怪物種類。
+ * @returns {{frames: HTMLCanvasElement[], flash: HTMLCanvasElement[], scale: number, alpha: number, density: number, foot: number, poses: boolean}} 圖。
+ */
+function monsterSpriteArt(type) {
+  const key = `ms-${type}`;
+  if (!cache.has(key)) {
+    const b = MONSTER_SPRITES[type];
+    const rows = b.frames.map((f) => place(b, f));
+    cache.set(key, {
+      frames: rows.map((r) => paint(r, b.palette)),
+      flash: rows.map((r) => paint(r, b.palette, '#ffffff')),
+      scale: 1,
+      alpha: MONSTER_ART[type]?.alpha || 1,
+      density: 2,
+      foot: b.foot,
+      poses: true,
+    });
+  }
+  return cache.get(key);
+}
+
+/**
+ * 取得怪物或 Boss 圖：Boss 使用動作圖（bossArt）；有設計圖的一般怪物使用 monsterSpriteArt；
+ * 其他一般怪物把手寫像素圖精緻化成 2 倍密度（refineMonster）。
  * @param {string} type 種類。
  * @param {boolean} [evolved=false] 是否為進化 Boss。
  * @returns {{frames: HTMLCanvasElement[], flash: HTMLCanvasElement[], scale: number, alpha: number}} 圖。
  */
 export function monsterArt(type, evolved = false) {
   if (BOSS_SPRITES[type]) return bossArt(type, evolved);
+  if (MONSTER_SPRITES[type]) return monsterSpriteArt(type);
   const a = MONSTER_ART[type];
   const useEvo = evolved && !!a.evolvedPalette;
   const key = `m-${type}${useEvo ? '-evo' : ''}`;

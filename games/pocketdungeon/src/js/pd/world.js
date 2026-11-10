@@ -1527,7 +1527,9 @@ export class World {
     if (this.telegraphs.length > MAX_ENTITIES) return;
     // 怪物行動中建立的有傷害預警，附帶該怪物的異常狀態攻擊。
     const status = tg.status || (tg.dmg && this.acting ? statusOf(this.acting) : undefined);
-    this.telegraphs.push({ ...tg, status, total: tg.t, delay: tg.delay || 0 });
+    // 記下出招的怪物種類與是否為 Boss（只給畫面依屬性產生特效用，不影響判定）。
+    const src = this.acting ? { src: this.acting.type, boss: !!this.acting.boss } : {};
+    this.telegraphs.push({ ...src, ...tg, status, total: tg.t, delay: tg.delay || 0 });
   }
 
   /**
@@ -1568,8 +1570,8 @@ export class World {
       if (tg.t > 0) continue;
       this.telegraphs.splice(this.telegraphs.indexOf(tg), 1);
       // 普通攻擊（沒有預警）只畫出揮砍；技能畫出整個範圍的爆發。
-      if (tg.hidden) this.effect('slash', tg.x, tg.y, { angle: tg.angle, range: tg.r, arc: tg.arc, enemy: true });
-      else this.effect('blast', tg.x, tg.y, { shape: tg.shape, r: tg.r, angle: tg.angle, len: tg.len, width: tg.width, arc: tg.arc });
+      if (tg.hidden) this.effect('slash', tg.x, tg.y, { angle: tg.angle, range: tg.r, arc: tg.arc, enemy: true, src: tg.src, boss: tg.boss });
+      else this.effect('blast', tg.x, tg.y, { shape: tg.shape, r: tg.r, angle: tg.angle, len: tg.len, width: tg.width, arc: tg.arc, src: tg.src, boss: tg.boss });
       if (tg.dmg && this.inShape(tg, p.x, p.y, p.r)) this.hurtPlayer(tg.dmg, tg.x, tg.y, tg.status);
       if (tg.after === 'land') {
         // 雷鳥俯衝：落在預警位置並現身。
@@ -1764,9 +1766,11 @@ export class World {
    */
   shoot(m, speed, angle, mult, opts = {}) {
     if (this.projectiles.length > MAX_ENTITIES) return;
+    // 一般怪物射出時顯示出招格 0.3 秒（只影響畫面；Boss 的普攻已在 bossBasic 設定）。
+    if (!m.boss) m.strikeUntil = this.time + 0.3;
     this.projectiles.push({
       x: m.x + Math.cos(angle) * m.r, y: m.y + Math.sin(angle) * m.r, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
-      r: opts.r || 0.16, team: 'e', life: opts.life || 4, kind: opts.kind || 'arrow', dmg: this.monsterDamage(m, mult), homing: opts.homing || 0, speed, status: statusOf(m),
+      r: opts.r || 0.16, team: 'e', life: opts.life || 4, kind: opts.kind || 'arrow', dmg: this.monsterDamage(m, mult), homing: opts.homing || 0, speed, status: statusOf(m), boss: !!m.boss,
     });
   }
 
@@ -1808,6 +1812,8 @@ export class World {
       }
       if (done) {
         this.projectiles.splice(this.projectiles.indexOf(pr), 1);
+        // 敵方投射物命中或撞牆：依外觀種類在消失處爆出小型特效（只影響畫面）。
+        if (pr.team === 'e') this.effect('impact', pr.x, pr.y, { look: pr.kind, boss: pr.boss, angle: Math.atan2(pr.vy, pr.vx) });
         if (pr.explode) {
           this.effect('blast', pr.x, pr.y, { shape: 'circle', r: pr.explode, friendly: true, look: pr.look === 'fireball' ? 'meteor' : undefined });
           for (const m of this.monsters.slice()) {
@@ -2000,7 +2006,7 @@ export class World {
    */
   effect(kind, x, y, data = {}) {
     if (this.effects.length > MAX_ENTITIES) this.effects.shift();
-    const life = { text: 0.8, slash: 0.22, hit: 0.18, cast: 0.15, poof: 0.35, blast: 0.3, levelup: 1.2, dust: 0.3 }[kind] || 0.4;
+    const life = { text: 0.8, slash: 0.22, hit: 0.18, cast: 0.15, poof: 0.35, blast: 0.3, levelup: 1.2, dust: 0.3, impact: 0.2 }[kind] || 0.4;
     this.effects.push({ kind, x, y, t: 0, life, ...data });
   }
 
@@ -2731,7 +2737,7 @@ World.prototype.ai = {
       if (blocked || m.t <= 0) {
         m.state = 'attacking';
         m.t = 0.9;
-        this.effect('blast', m.x, m.y, { shape: 'circle', r: 1.2 });
+        this.effect('blast', m.x, m.y, { shape: 'circle', r: 1.2, src: m.type, boss: true });
       }
       return;
     }
@@ -2878,7 +2884,7 @@ World.prototype.ai = {
     if (m.state === 'dash') {
       const blocked = this.moveEntity(m, Math.cos(m.dashAngle) * 11 * dt, Math.sin(m.dashAngle) * 11 * dt);
       if (blocked || m.t <= 0) {
-        this.effect('blast', m.x, m.y, { shape: 'circle', r: 1.2 });
+        this.effect('blast', m.x, m.y, { shape: 'circle', r: 1.2, src: m.type, boss: true });
         if (m.phase2 && m.charges > 0) {
           // 第二階段：再衝一次（重新瞄準，仍有預警）。
           m.charges--;

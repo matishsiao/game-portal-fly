@@ -20,7 +20,58 @@ const LOOK_COLORS = {
 /** 各職業施放技能時的光（RGB）。 */
 const CLASS_FX = { warrior: '120,180,255', archer: '255,220,120', mage: '200,140,255', thief: '190,120,255', monk: '255,170,60', knight: '255,225,130' };
 /** 同時存在的特效粒子上限。 */
-const FX_MAX = 500;
+const FX_MAX = 700;
+/** 地面痕跡（焦痕、冰霜、毒液、裂痕）的上限。 */
+const DECAL_MAX = 40;
+
+/**
+ * 怪物與 Boss 攻擊的屬性外觀：rgb 主色、core 核心亮色、bits 飛散的粒子（ember 餘燼、shard 冰晶、bubble 氣泡、zap 落雷、
+ * wisp 暗影、rock 碎石、drop 水滴、spark 金屬火花、feather 羽毛）、smoke 煙霧色（省略時不冒煙）、decal 地面痕跡色（省略時不留痕跡）。
+ */
+const ELEMENTS = {
+  fire: { rgb: '255,120,40', core: '255,225,130', bits: 'ember', smoke: '70,40,30', decal: '40,20,14' },
+  ice: { rgb: '120,200,255', core: '235,250,255', bits: 'shard', smoke: '200,230,255', decal: '170,215,240' },
+  poison: { rgb: '130,220,80', core: '225,255,170', bits: 'bubble', smoke: '60,110,40', decal: '70,130,40' },
+  thunder: { rgb: '255,230,90', core: '255,255,235', bits: 'zap', decal: '40,36,30' },
+  dark: { rgb: '190,90,240', core: '245,200,255', bits: 'wisp', smoke: '40,12,60', decal: '50,16,70' },
+  earth: { rgb: '230,185,115', core: '255,240,200', bits: 'rock', smoke: '150,125,95', decal: '60,44,30' },
+  water: { rgb: '90,185,255', core: '225,245,255', bits: 'drop', decal: '50,110,160' },
+  steel: { rgb: '255,205,120', core: '255,255,255', bits: 'spark', smoke: '90,90,100', decal: '40,36,40' },
+  wind: { rgb: '215,240,255', core: '255,255,255', bits: 'feather' },
+  blood: { rgb: '255,95,85', core: '255,225,215', bits: 'spark' },
+};
+
+/** 各怪物與 Boss 攻擊的屬性（未列出的為 blood：紅色的一般打擊）。 */
+const ELEMENT_OF = {
+  lavaWorm: 'fire', fireSpirit: 'fire', magmaSlime: 'fire', bomber: 'fire', drake: 'fire', golem: 'fire', redDragon: 'fire',
+  iceWolf: 'ice', wraith: 'ice', crystal: 'ice', yeti: 'ice', frostSprite: 'ice', lich: 'ice',
+  slime: 'poison', mushroom: 'poison', vineflower: 'poison', spider: 'poison', hornet: 'poison', zombie: 'poison', scorpion: 'poison', treant: 'poison',
+  thunderSprite: 'thunder', jelly: 'thunder', skyKnight: 'thunder', thunderbird: 'thunder',
+  shade: 'dark', voidEye: 'dark', banshee: 'dark', boneMage: 'dark', succubus: 'dark', demonKnight: 'dark', imp: 'dark', necromancer: 'dark', demonLord: 'dark',
+  gargoyle: 'earth', mummy: 'earth', sandWorm: 'earth', boar: 'earth', bullKing: 'earth', pharaoh: 'earth', wyvern: 'earth', lizardman: 'earth',
+  siren: 'water', crab: 'water', kraken: 'water',
+  clockSoldier: 'steel', turretBot: 'steel', drone: 'steel', steamTitan: 'steel',
+  harpy: 'wind',
+};
+
+/** 敵方投射物外觀對應的屬性。 */
+const SHOT_ELEMENT = { fire: 'fire', ice: 'ice', seed: 'poison', feather: 'wind', curse: 'dark', sand: 'earth', bubble: 'water', gear: 'steel', dark: 'dark', arrow: 'blood', orb: 'dark' };
+
+/** 一般怪物顯示蓄力特效的狀態（預警、衝刺前、瞄準、施法）。 */
+const MONSTER_WIND = new Set(['windup', 'charge', 'aim', 'cast']);
+/** 一般怪物動作圖顯示蓄力格的狀態（多了鑽地前的 burrow）。 */
+const MONSTER_POSE_WIND = new Set([...MONSTER_WIND, 'burrow']);
+/** 一般怪物動作圖顯示出招格的狀態。 */
+const MONSTER_STRIKE = new Set(['dash', 'dive', 'attacking']);
+
+/**
+ * 取得怪物或 Boss 的攻擊屬性。
+ * @param {string} [type] 怪物種類。
+ * @returns {{rgb: string, core: string, bits: string, smoke?: string, decal?: string}} 屬性外觀。
+ */
+function elementOf(type) {
+  return ELEMENTS[ELEMENT_OF[type] || 'blood'];
+}
 
 /** Boss 顯示蓄力格的狀態（預警、瞄準、施法、出招判定前、回復）。 */
 const BOSS_WIND = new Set(['windup', 'aim', 'cast', 'attacking', 'healing']);
@@ -769,6 +820,10 @@ export class Renderer {
     this.shakeT = 0;
     /** 特效粒子（火花、餘燼、衝擊波、光柱、符文圈），只用於畫面。 */
     this.fx = [];
+    /** 地面痕跡（敵方爆炸留下的焦痕等），畫在角色下方。 */
+    this.decals = [];
+    /** 全畫面閃光（Boss 大招）：顏色與剩餘強度。 */
+    this.screenFlash = { rgb: '255,255,255', a: 0 };
     this.prevSkillAnim = 0;
     this.shakeAmp = 0;
     this.shakeOn = true;
@@ -991,6 +1046,7 @@ export class Renderer {
     g.drawImage(this.floorCache.canvas, 0, 0);
     this.drawDynamicTiles(world);
     this.drawHazards(world);
+    this.drawDecals(dt);
     this.drawTelegraphs(world);
     this.drawStrikes(world);
     this.drawChestsAndPickups(world);
@@ -999,9 +1055,11 @@ export class Renderer {
     this.drawProjectiles(world);
     this.drawEffects(world);
     this.castAura(world);
+    this.chargeFx(world, dt);
     this.drawFx(dt);
     this.drawLighting(world);
     this.drawFog(world);
+    this.drawScreenFlash(dt);
     if (this.frame % 6 === 0) this.drawMinimap(world);
   }
 
@@ -1129,7 +1187,14 @@ export class Renderer {
         continue;
       }
       g.fillStyle = 'rgba(255,50,50,0.16)';
-      g.strokeStyle = 'rgba(255,90,90,0.95)';
+      // 即將判定（最後 20%）時外框閃白，提醒玩家馬上離開。
+      g.strokeStyle = k > 0.8 && Math.floor(world.time * 24) % 2 ? 'rgba(255,255,255,0.95)' : 'rgba(255,90,90,0.95)';
+      if (tg.boss) {
+        // Boss 的預警：外框較粗，並帶攻擊屬性顏色的光暈。
+        g.lineWidth = 1.5;
+        g.shadowColor = `rgba(${elementOf(tg.src).rgb},0.9)`;
+        g.shadowBlur = 3 * this.scale;
+      }
       if (tg.shape === 'circle') {
         g.beginPath();
         g.arc(x, y, tg.r * T, 0, Math.PI * 2);
@@ -1178,6 +1243,7 @@ export class Renderer {
         g.closePath();
         g.fill();
       }
+      g.shadowBlur = 0;
     }
   }
 
@@ -1400,15 +1466,15 @@ export class Renderer {
       }
       const art = monsterArt(m.type, m.evolved);
       const frames = m.hurt > 0 ? art.flash : art.frames;
-      // 有動作圖的 Boss（4 格）：平常在待機 A／B 間交替，預警蓄力時顯示蓄力，出手後 0.3 秒顯示出招。
-      const img = art.poses ? frames[this.bossPose(world, m)] : frames[walkFrame % frames.length];
+      // 有動作圖的 Boss 與一般怪物（4 格）：平常在待機 A／B 間交替，預警蓄力時顯示蓄力，出手後 0.3 秒顯示出招。
+      const img = art.poses ? frames[this.posedFrame(world, m)] : frames[walkFrame % frames.length];
       // 高密度的圖（Boss 動作圖與精緻化的怪物圖）依畫面放大倍率換算，與角色相同。
       const dens = art.density ? this.heroDensity || art.density : 1;
       const scale = art.scale * (m.elite ? 1.25 : 1) * (m.small ? 0.7 : 1) * (m.evolved ? 1.15 : 1);
       const iw = img.width / dens;
       const ih = img.height / dens;
-      // 圖的腳底以下留給特效的列，往下移讓腳踩在原本的位置；Boss 再把腳對齊影子中心（shadow 的 y + r × 0.6）。
-      const footY = art.density ? (art.foot * scale) / dens / T + (m.boss ? (m.r * T * 0.9 * 0.6 - 5 * Math.min(scale, 1.5)) / T : 0) : 0;
+      // 圖的腳底以下留給特效的列，往下移讓腳踩在原本的位置；動作圖（Boss 與一般怪物）再把腳對齊影子中心（shadow 的 y + r × 0.6）。
+      const footY = art.density ? (art.foot * scale) / dens / T + (art.poses ? (m.r * T * 0.9 * 0.6 - 5 * Math.min(scale, 1.5)) / T : 0) : 0;
       const bob = art.frames.length === 1 ? (walkFrame ? 1 : 0) : 0;
       this.shadow(m.x, m.y, m.r * T * 0.9);
       if (m.elite) {
@@ -1505,20 +1571,23 @@ export class Renderer {
   }
 
   /**
-   * 選擇 Boss 動作圖的格子（0 待機 A、1 待機 B、2 蓄力、3 出招）：預警與施法中（windup、aim、cast、attacking、healing、
-   * 或普攻預警 windUntil 未到）為蓄力；從蓄力狀態離開、或剛射出投射物（strikeUntil）後 0.3 秒為出招；其他時候每 0.5 秒交替待機。
-   * 會在 Boss 物件上記錄上一格的狀態（poseWind）與出招結束時間（strikeUntil）。
+   * 選擇動作圖的格子（0 待機 A、1 待機 B、2 蓄力、3 出招），Boss 與有動作圖的一般怪物共用：
+   * - Boss：預警與施法中（windup、aim、cast、attacking、healing，或普攻預警 windUntil 未到）為蓄力，待機每 0.5 秒交替；
+   * - 一般怪物：windup、charge、aim、cast、burrow（或 windUntil 未到）為蓄力，衝刺與俯衝（dash、dive、attacking）為出招，待機每 0.4 秒交替；
+   * - 從蓄力狀態離開、或剛射出投射物（strikeUntil）後 0.3 秒為出招。
+   * 會在怪物物件上記錄上一格的狀態（poseWind）與出招結束時間（strikeUntil），只影響畫面。
    * @param {object} world 探險（取時間）。
-   * @param {object} m Boss（會被修改）。
+   * @param {object} m Boss 或怪物（會被修改）。
    * @returns {number} 格子索引。
    */
-  bossPose(world, m) {
-    const wind = BOSS_WIND.has(m.state) || (m.windUntil ?? 0) > world.time;
+  posedFrame(world, m) {
+    const wind = (m.boss ? BOSS_WIND.has(m.state) : MONSTER_POSE_WIND.has(m.state)) || (m.windUntil ?? 0) > world.time;
     if (m.poseWind && !wind) m.strikeUntil = Math.max(m.strikeUntil ?? 0, world.time + 0.3);
     m.poseWind = wind;
     if ((m.strikeUntil ?? 0) > world.time) return 3;
     if (wind) return 2;
-    return Math.floor(world.time * 2) % 2;
+    if (!m.boss && MONSTER_STRIKE.has(m.state)) return 3;
+    return Math.floor(world.time * (m.boss ? 2 : 2.5)) % 2;
   }
 
   /**
@@ -1779,6 +1848,20 @@ export class Renderer {
         g.restore();
         continue;
       }
+      if (pr.team === 'e') {
+        // 敵方投射物：沿路灑下屬性顏色的光點；Boss 的投射物外圍另有脈動的光環。
+        const el = ELEMENTS[SHOT_ELEMENT[pr.kind] || 'blood'];
+        if (Math.random() < (pr.boss ? 0.8 : 0.45)) {
+          this.emit({ kind: 'ember', x: x + (Math.random() - 0.5) * 3, y: y + (Math.random() - 0.5) * 3, vx: -pr.vx * 1.5 + (Math.random() - 0.5) * 10, vy: -pr.vy * 1.5 + (Math.random() - 0.5) * 10, life: 0.25 + Math.random() * 0.2, rgb: Math.random() < 0.6 ? el.rgb : el.core, size: pr.boss && Math.random() < 0.5 ? 2 : 1 });
+        }
+        if (pr.boss) {
+          g.strokeStyle = `rgba(${el.core},${0.45 + 0.3 * Math.sin(this.frame * 0.5)})`;
+          g.lineWidth = 1;
+          g.beginPath();
+          g.arc(x, y, pr.r * T * 2.4, 0, Math.PI * 2);
+          g.stroke();
+        }
+      }
       const colors = { orb: ['200,168,255', '#c8a8ff'], fire: ['255,120,40', '#ff8a3a'], ice: ['122,200,255', '#9ad8ff'], seed: ['140,200,90', '#8ac85a'], feather: ['240,240,250', '#e8e8f4'], curse: ['160,90,210', '#a05ad2'], sand: ['220,190,110', '#e0c070'], bubble: ['120,200,255', '#a8e4ff'], gear: ['200,200,215', '#c8c8d8'], dark: ['210,60,100', '#d8406a'] }[pr.look === 'fireball' ? 'fire' : pr.kind] || ['255,255,255', '#fff'];
       const r = pr.r * T;
       // 拖尾：沿飛行反方向的幾個淡色圓點。
@@ -1846,6 +1929,11 @@ export class Renderer {
    * @param {object} e 效果。
    */
   spawnFx(world, e) {
+    // 怪物與 Boss 的攻擊（普攻揮砍、招式爆發、投射物命中）另外依屬性產生特效。
+    if ((e.kind === 'slash' && e.enemy) || (e.kind === 'blast' && !e.friendly) || e.kind === 'impact') {
+      this.enemyFx(e);
+      return;
+    }
     const x = e.x * T;
     const y = e.y * T;
     if (e.kind === 'blast') {
@@ -1889,6 +1977,279 @@ export class Renderer {
   }
 
   /**
+   * 怪物與 Boss 攻擊的特效：依攻擊屬性（elementOf，投射物依 SHOT_ELEMENT）決定顏色與飛散的粒子。
+   * 揮砍沿刀光外緣灑出火花；直線為光束；環狀沿圓周爆開；扇形為掃過的弧光；圓形有閃光、衝擊波、粒子與地面痕跡。
+   * Boss 的粒子數量約 1.8 倍，並加上第二層衝擊波、光柱、畫面震動，大範圍招式另有全畫面閃光。
+   * @param {object} e 效果（slash 普攻揮砍、blast 招式爆發、impact 投射物命中；src 為怪物種類、boss 是否為 Boss）。
+   */
+  enemyFx(e) {
+    const x = e.x * T;
+    const y = e.y * T;
+    const boss = !!e.boss;
+    const el = e.kind === 'impact' ? ELEMENTS[SHOT_ELEMENT[e.look] || 'blood'] : elementOf(e.src);
+    const k = boss ? 1.8 : 1;
+    if (e.kind === 'impact') {
+      this.emit({ kind: 'flash', x, y: y - 3, life: 0.16, size: boss ? 12 : 8, rgb: el.rgb });
+      this.emit({ kind: 'ring', x, y: y - 3, life: 0.25, r0: 1, r1: boss ? 12 : 8, rgb: el.core, size: 1.5 });
+      this.bits(el, x, y - 3, Math.round(5 * k), 50 * k, (e.angle ?? 0) + Math.PI, 1.2);
+      return;
+    }
+    if (e.kind === 'slash') {
+      const r = (e.range || 1.5) * T + 2;
+      const arc = e.arc || 2;
+      const n = boss ? 8 : 4;
+      for (let i = 0; i <= n; i++) {
+        const a = e.angle - arc / 2 + (arc * i) / n;
+        this.burst(x + Math.cos(a) * r, y - 3 + Math.sin(a) * r, el.rgb, boss ? 3 : 2, 60 * k, a, 0.5);
+      }
+      if (boss) {
+        // Boss 的重擊：再疊一層較寬的弧光，刀尖處爆出衝擊波、碎屑與地面痕跡。
+        this.emit({ kind: 'crescent', x, y: y - 3, life: 0.3, r0: r * 0.45, r1: r * 1.25, angle: e.angle, arc: arc * 1.1, rgb: el.rgb, size: 4 });
+        const tx = x + Math.cos(e.angle) * r * 0.85;
+        const ty = y + Math.sin(e.angle) * r * 0.85;
+        this.emit({ kind: 'ring', x: tx, y: ty, life: 0.35, r0: 2, r1: 18, rgb: el.core, size: 2 });
+        this.bits(el, tx, ty, 10, 70, e.angle, 0.8);
+        this.decal(tx, ty, 10, el, 2);
+        this.shake(2, 0.15);
+      }
+      return;
+    }
+    const r = (e.r || 1) * T;
+    if (e.shape === 'line') {
+      // 光束：沿直線的發光帶，兩側灑出粒子。
+      const len = (e.len || 3) * T;
+      const w = (e.width || 1) * T;
+      this.emit({ kind: 'beam', x, y, life: boss ? 0.42 : 0.28, len, angle: e.angle, size: w, rgb: el.rgb, core: el.core });
+      for (let d = 0; d <= len; d += boss ? 8 : 12) {
+        const side = e.angle + (Math.random() < 0.5 ? 1 : -1) * Math.PI / 2;
+        this.bits(el, x + Math.cos(e.angle) * d, y + Math.sin(e.angle) * d, boss ? 2 : 1, 40 * k, side, 0.6);
+      }
+      if (boss) {
+        for (let d = 8; d <= len; d += 18) this.decal(x + Math.cos(e.angle) * d, y + Math.sin(e.angle) * d, w * 0.6, el, 2.2);
+        this.shake(3, 0.2);
+      }
+      return;
+    }
+    if (e.shape === 'ring') {
+      // 環狀震波：外圈衝擊波，沿圓周往外爆開。
+      const n = Math.max(8, Math.round((r / 5) * (boss ? 1.5 : 1)));
+      this.emit({ kind: 'ring', x, y, life: 0.35, r0: r * 0.85, r1: r * 1.1, rgb: el.rgb, size: boss ? 4 : 3 });
+      for (let i = 0; i < n; i++) {
+        const a = (i / n) * Math.PI * 2;
+        this.bits(el, x + Math.cos(a) * r, y + Math.sin(a) * r, 1, 50 * k, a, 0.4);
+      }
+      if (boss) this.shake(2, 0.15);
+      return;
+    }
+    if (e.shape === 'arc' && e.arc) {
+      // 扇形：從中心掃過的弧光，弧邊往外灑出粒子。
+      this.emit({ kind: 'crescent', x, y, life: 0.3, r0: r * 0.25, r1: r, angle: e.angle, arc: e.arc, rgb: el.rgb, size: boss ? 4 : 2.5 });
+      for (let i = 0; i <= 8; i++) {
+        const a = e.angle - e.arc / 2 + (e.arc * i) / 8;
+        this.bits(el, x + Math.cos(a) * r * 0.85, y + Math.sin(a) * r * 0.85, boss ? 2 : 1, 60 * k, a, 0.5);
+      }
+      if (boss) this.shake(3, 0.2);
+      return;
+    }
+    // 圓形爆發。
+    this.emit({ kind: 'flash', x, y, life: 0.22, size: r * 1.2, rgb: el.rgb });
+    this.emit({ kind: 'ring', x, y, life: 0.35, r0: r * 0.3, r1: r * 1.15, rgb: el.rgb, size: 3 });
+    if (boss) {
+      this.emit({ kind: 'ring', x, y, t: -0.08, life: 0.5, r0: r * 0.1, r1: r * 1.5, rgb: el.core, size: 2 });
+      this.emit({ kind: 'pillar', x, y, life: 0.5, size: Math.min(24, r * 0.8), rgb: el.rgb });
+    }
+    this.bits(el, x, y, Math.min(boss ? 40 : 22, Math.round((8 + r / 2) * k)), 40 + r * 2);
+    this.decal(x, y, r * 0.8, el, boss ? 2.5 : 1.6);
+    if (boss) {
+      this.shake(Math.min(5, 2 + r / T), 0.25);
+      if (r >= 2.5 * T) this.flashScreen(el.rgb, 0.14);
+    }
+  }
+
+  /**
+   * 依屬性灑出粒子：餘燼、冰晶、氣泡、落雷、暗影、碎石、水滴、金屬火花或羽毛，有煙霧色的屬性再冒出幾團煙。
+   * @param {{rgb: string, core: string, bits: string, smoke?: string}} el 屬性外觀。
+   * @param {number} x 中心 x（像素）。
+   * @param {number} y 中心 y（像素）。
+   * @param {number} n 數量。
+   * @param {number} speed 速度（像素／秒）。
+   * @param {number} [dir] 指定時只往這個方向 ±spread 噴出。
+   * @param {number} [spread=Math.PI] 噴出角度的一半。
+   */
+  bits(el, x, y, n, speed, dir, spread = Math.PI) {
+    /** 隨機的噴出方向。 */
+    const ang = () => (dir ?? 0) + (Math.random() * 2 - 1) * spread;
+    /** 隨機的速度。 */
+    const vel = () => speed * (0.4 + Math.random() * 0.8);
+    for (let i = 0; i < n; i++) {
+      const a = ang();
+      const v = vel();
+      const vx = Math.cos(a) * v;
+      const vy = Math.sin(a) * v;
+      switch (el.bits) {
+        case 'ember':
+          this.emit({ kind: 'spark', x, y, vx, vy, life: 0.25 + Math.random() * 0.3, rgb: el.core, gravity: 40 });
+          this.emit({ kind: 'ember', x: x + (Math.random() - 0.5) * 8, y, vx: vx * 0.3, vy: -20 - Math.random() * 30, life: 0.6 + Math.random() * 0.5, rgb: el.rgb, size: Math.random() < 0.4 ? 2 : 1 });
+          break;
+        case 'shard':
+          this.emit({ kind: 'shard', x, y, vx, vy: vy - 40, life: 0.45 + Math.random() * 0.3, rgb: Math.random() < 0.5 ? el.rgb : el.core, gravity: 160, rot: Math.random() * 6, spin: (Math.random() - 0.5) * 20 });
+          break;
+        case 'bubble':
+          this.emit({ kind: 'bubble', x: x + vx * 0.15, y: y + vy * 0.1, vx: vx * 0.25, vy: -15 - Math.random() * 25, life: 0.6 + Math.random() * 0.5, rgb: Math.random() < 0.7 ? el.rgb : el.core, size: 1 + Math.random() * 1.8 });
+          break;
+        case 'zap':
+          // 數量少（沿線灑出）時只偶爾落雷，避免一整排落雷讓畫面過曝。
+          if (i % 4 === 0 && (n >= 4 || Math.random() < 0.2)) this.emit({ kind: 'zap', x: x + vx * 0.25, y: y + vy * 0.2, life: 0.22, rgb: el.rgb, size: 26 + Math.random() * 14 });
+          this.emit({ kind: 'spark', x, y, vx: vx * 1.4, vy: vy * 1.4, life: 0.2 + Math.random() * 0.2, rgb: el.core, gravity: 0 });
+          break;
+        case 'wisp':
+          this.emit({ kind: 'wisp', x, y, cx: x, cy: y, ang: a, rad: 2, dr: v * 0.5, da: (Math.random() < 0.5 ? -1 : 1) * (4 + Math.random() * 3), life: 0.5 + Math.random() * 0.3, rgb: Math.random() < 0.6 ? el.rgb : el.core, size: 1.5 + Math.random() });
+          break;
+        case 'rock':
+          this.emit({ kind: 'rock', x, y, vx: vx * 0.8, vy: -50 - Math.random() * 70, life: 0.5 + Math.random() * 0.3, rgb: Math.random() < 0.5 ? '120,95,70' : '170,140,105', gravity: 320, size: Math.random() < 0.4 ? 2 : 1, add: false });
+          this.emit({ kind: 'spark', x, y, vx, vy, life: 0.2 + Math.random() * 0.2, rgb: el.core, gravity: 60 });
+          break;
+        case 'drop':
+          this.emit({ kind: 'drop', x, y, vx: vx * 0.8, vy: -40 - Math.random() * 60, life: 0.45 + Math.random() * 0.3, rgb: Math.random() < 0.6 ? el.rgb : el.core, gravity: 260 });
+          break;
+        case 'feather':
+          this.emit({ kind: 'feather', x, y, vx: vx * 0.6, vy: vy * 0.4 - 10, life: 0.8 + Math.random() * 0.5, rgb: el.core, gravity: 25, rot: Math.random() * 6, spin: (Math.random() - 0.5) * 8 });
+          break;
+        default:
+          this.emit({ kind: 'spark', x, y, vx, vy, life: 0.25 + Math.random() * 0.3, rgb: i % 2 ? el.rgb : el.core, gravity: 60 });
+      }
+    }
+    // 煙霧只在數量較多的爆發時出現（光束、環狀沿線的零星粒子不冒煙，避免畫面混濁）。
+    if (el.smoke && n >= 6) {
+      for (let i = 0; i < Math.floor(n / 6); i++) {
+        this.emit({ kind: 'smoke', x: x + (Math.random() - 0.5) * 10, y: y + (Math.random() - 0.5) * 6, vx: (Math.random() - 0.5) * 12, vy: -8 - Math.random() * 12, life: 0.6 + Math.random() * 0.4, rgb: el.smoke, size: 3 + Math.random() * 3, add: false });
+      }
+    }
+  }
+
+  /**
+   * 在地上留下痕跡（焦痕、冰霜、毒液等，依屬性的 decal 顏色），逐漸淡出；超過上限時丟掉最舊的。
+   * @param {number} x 中心 x（像素）。
+   * @param {number} y 中心 y（像素）。
+   * @param {number} r 半徑（像素）。
+   * @param {{decal?: string}} el 屬性外觀（沒有 decal 時不留痕跡）。
+   * @param {number} life 持續秒數。
+   */
+  decal(x, y, r, el, life) {
+    if (!el.decal) return;
+    if (this.decals.length >= DECAL_MAX) this.decals.shift();
+    this.decals.push({ x, y, r: Math.max(4, r), rgb: el.decal, t: 0, life });
+  }
+
+  /**
+   * 更新並畫出地面痕跡（畫在角色下方，一般混色）：壓扁的橢圓，中心較深、邊緣漸淡。
+   * @param {number} dt 秒。
+   */
+  drawDecals(dt) {
+    if (!this.decals.length) return;
+    const g = this.ctx;
+    const step = Math.min(dt || 0, 0.05);
+    this.decals = this.decals.filter((d) => {
+      d.t += step;
+      if (d.t >= d.life) return false;
+      const a = 0.5 * (1 - d.t / d.life);
+      const grad = g.createRadialGradient(d.x, d.y, 0, d.x, d.y, d.r);
+      grad.addColorStop(0, `rgba(${d.rgb},${a})`);
+      grad.addColorStop(0.6, `rgba(${d.rgb},${a * 0.6})`);
+      grad.addColorStop(1, `rgba(${d.rgb},0)`);
+      g.fillStyle = grad;
+      g.beginPath();
+      g.ellipse(d.x, d.y, d.r, d.r * 0.6, 0, 0, Math.PI * 2);
+      g.fill();
+      return true;
+    });
+  }
+
+  /**
+   * 怪物蓄力時的集氣特效：屬性顏色的光點從四周往身上聚集，身上有脈動的光暈；
+   * Boss 的光點更多、光暈更大，腳下另有旋轉的屬性符文圈。
+   * @param {object} world 探險。
+   * @param {number} dt 秒。
+   */
+  chargeFx(world, dt) {
+    const g = this.ctx;
+    const step = Math.min(dt || 0, 0.05);
+    for (const m of world.monsters) {
+      if (m.invisible || m.hp <= 0) continue;
+      const wind = m.boss ? (BOSS_WIND.has(m.state) && m.state !== 'healing') || (m.windUntil ?? 0) > world.time : MONSTER_WIND.has(m.state);
+      if (!wind) continue;
+      const el = elementOf(m.type);
+      const boss = !!m.boss;
+      const x = m.x * T;
+      const y = m.y * T - (boss ? m.r * T * 1.2 : 6);
+      // 往中心聚集的光點：從半徑 d 處出發，在 life 秒內抵達中心。
+      const count = Math.floor((boss ? 45 : 16) * step + Math.random());
+      for (let i = 0; i < count; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const d = boss ? 24 + Math.random() * 18 : 10 + Math.random() * 8;
+        const life = 0.3 + Math.random() * 0.15;
+        this.emit({ kind: 'spark', x: x + Math.cos(a) * d, y: y + Math.sin(a) * d * 0.8, vx: (-Math.cos(a) * d) / life, vy: (-Math.sin(a) * d * 0.8) / life, life, rgb: Math.random() < 0.6 ? el.rgb : el.core });
+      }
+      const pulse = 0.5 + 0.5 * Math.sin(world.time * (boss ? 14 : 18));
+      g.save();
+      g.globalCompositeOperation = 'lighter';
+      const gr = boss ? m.r * T * 1.4 : 9;
+      const glow = g.createRadialGradient(x, y, 0, x, y, gr);
+      glow.addColorStop(0, `rgba(${el.core},${0.35 + 0.2 * pulse})`);
+      glow.addColorStop(0.5, `rgba(${el.rgb},${0.18 + 0.12 * pulse})`);
+      glow.addColorStop(1, `rgba(${el.rgb},0)`);
+      g.fillStyle = glow;
+      g.beginPath();
+      g.arc(x, y, gr, 0, Math.PI * 2);
+      g.fill();
+      if (boss) {
+        // 腳下的符文圈：內外兩圈與旋轉的刻度。
+        const fx = m.x * T;
+        const fy = m.y * T + m.r * T * 0.5;
+        const rr = m.r * T * (1.3 + 0.1 * pulse);
+        g.strokeStyle = `rgba(${el.rgb},${0.55 + 0.3 * pulse})`;
+        g.lineWidth = 1;
+        for (const k of [1, 0.72]) {
+          g.beginPath();
+          g.ellipse(fx, fy, rr * k, rr * k * 0.42, 0, 0, Math.PI * 2);
+          g.stroke();
+        }
+        g.fillStyle = `rgba(${el.core},${0.6 + 0.4 * pulse})`;
+        for (let n = 0; n < 12; n++) {
+          const a = world.time * 2.5 + (n * Math.PI) / 6;
+          g.fillRect(fx + Math.cos(a) * rr * 0.86 - 0.5, fy + Math.sin(a) * rr * 0.86 * 0.42 - 0.5, 1.5, 1.5);
+        }
+      }
+      g.restore();
+    }
+  }
+
+  /**
+   * 觸發全畫面閃光（Boss 大招）。強度上限 0.2，避免刺眼。
+   * @param {string} rgb 顏色。
+   * @param {number} a 強度。
+   */
+  flashScreen(rgb, a) {
+    this.screenFlash = { rgb, a: Math.min(0.2, Math.max(this.screenFlash.a, a)) };
+  }
+
+  /**
+   * 畫全畫面閃光並衰減。
+   * @param {number} dt 秒。
+   */
+  drawScreenFlash(dt) {
+    const f = this.screenFlash;
+    if (f.a <= 0) return;
+    const g = this.ctx;
+    g.save();
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.fillStyle = `rgba(${f.rgb},${f.a})`;
+    g.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    g.restore();
+    f.a = Math.max(0, f.a - Math.min(dt || 0, 0.05) * 0.9);
+  }
+
+  /**
    * 施放技能的瞬間（skillAnim 剛被設定）：腳下展開職業顏色的符文圈，並升起光柱與光點。
    * @param {object} world 探險。
    */
@@ -1916,6 +2277,11 @@ export class Renderer {
     g.save();
     g.globalCompositeOperation = 'lighter';
     this.fx = this.fx.filter((p) => {
+      // t 為負的粒子是延遲出現的（例如 Boss 的第二層衝擊波）。
+      if (p.t < 0) {
+        p.t += step;
+        return true;
+      }
       p.t += step;
       if (p.t >= p.life) return false;
       p.vy += p.gravity * step;
@@ -1923,6 +2289,8 @@ export class Renderer {
       p.y += p.vy * step;
       const k = p.t / p.life;
       const a = 1 - k;
+      // 煙霧與碎石用一般混色（暗色在加亮混色下看不見），其他用加亮混色。
+      g.globalCompositeOperation = p.add === false ? 'source-over' : 'lighter';
       if (p.kind === 'spark') {
         // 火花：沿速度方向的短線，愈快愈長。
         const sp = Math.hypot(p.vx, p.vy) || 1;
@@ -1980,6 +2348,112 @@ export class Renderer {
           const ang = p.t * 4 + (n * Math.PI) / 4;
           g.fillRect(p.x + Math.cos(ang) * r * 0.85 - 0.5, p.y + Math.sin(ang) * r * 0.85 * 0.45 - 0.5, 1, 1);
         }
+      } else if (p.kind === 'shard' || p.kind === 'feather') {
+        // 冰晶：旋轉的短亮線；羽毛：左右搖擺、慢慢飄落的短線。
+        p.rot += p.spin * step;
+        if (p.kind === 'feather') p.vx *= 0.96;
+        const len = p.kind === 'shard' ? 2 : 1.6;
+        const c = Math.cos(p.rot) * len;
+        const s2 = Math.sin(p.rot) * len;
+        g.strokeStyle = `rgba(${p.rgb},${a})`;
+        g.lineWidth = 1;
+        g.beginPath();
+        g.moveTo(p.x - c, p.y - s2);
+        g.lineTo(p.x + c, p.y + s2);
+        g.stroke();
+      } else if (p.kind === 'bubble') {
+        // 氣泡：左右晃動往上浮的小圓圈，最後破掉（放大淡出）。
+        const bx = p.x + Math.sin(p.t * 9 + p.size * 3) * 1.5;
+        const r = p.size * (k > 0.85 ? 1 + (k - 0.85) * 6 : 1);
+        g.strokeStyle = `rgba(${p.rgb},${a})`;
+        g.lineWidth = 0.75;
+        g.beginPath();
+        g.arc(bx, p.y, r, 0, Math.PI * 2);
+        g.stroke();
+        g.fillStyle = `rgba(255,255,255,${0.7 * a})`;
+        g.fillRect(bx - r * 0.5, p.y - r * 0.5, 0.75, 0.75);
+      } else if (p.kind === 'zap') {
+        // 落雷：從上方劈到地面的鋸齒光（每 0.05 秒重新產生鋸齒，看起來在閃動）。
+        if (!p.pts || Math.floor(p.t / 0.05) !== p.seg) {
+          p.seg = Math.floor(p.t / 0.05);
+          p.pts = [];
+          for (let n = 0; n <= 5; n++) p.pts.push([p.x + (n === 0 || n === 5 ? 0 : (Math.random() - 0.5) * 7), p.y - p.size + (p.size * n) / 5]);
+        }
+        for (const [w, al, rgb] of [[3, 0.45, p.rgb], [1, 1, '255,255,255']]) {
+          g.strokeStyle = `rgba(${rgb},${al * a})`;
+          g.lineWidth = w;
+          g.beginPath();
+          p.pts.forEach(([px, py], n) => (n ? g.lineTo(px, py) : g.moveTo(px, py)));
+          g.stroke();
+        }
+        const grad = g.createRadialGradient(p.x, p.y, 0, p.x, p.y, 8);
+        grad.addColorStop(0, `rgba(255,255,255,${0.8 * a})`);
+        grad.addColorStop(1, `rgba(${p.rgb},0)`);
+        g.fillStyle = grad;
+        g.fillRect(p.x - 8, p.y - 8, 16, 16);
+      } else if (p.kind === 'wisp') {
+        // 暗影：繞著中心旋轉往外擴散的光點。
+        p.ang += p.da * step;
+        p.rad += p.dr * step;
+        p.x = p.cx + Math.cos(p.ang) * p.rad;
+        p.y = p.cy + Math.sin(p.ang) * p.rad * 0.6;
+        g.fillStyle = `rgba(${p.rgb},${a})`;
+        g.beginPath();
+        g.arc(p.x, p.y, p.size * (1 - k * 0.5), 0, Math.PI * 2);
+        g.fill();
+      } else if (p.kind === 'rock') {
+        // 碎石：往上拋起再落下的小方塊，帶深色外框。
+        g.fillStyle = `rgba(26,16,32,${a})`;
+        g.fillRect(Math.round(p.x) - 0.5, Math.round(p.y) - 0.5, p.size + 1, p.size + 1);
+        g.fillStyle = `rgba(${p.rgb},${a})`;
+        g.fillRect(Math.round(p.x), Math.round(p.y), p.size, p.size);
+      } else if (p.kind === 'drop') {
+        // 水滴：沿速度方向拉長的亮點。
+        const sp = Math.hypot(p.vx, p.vy) || 1;
+        g.strokeStyle = `rgba(${p.rgb},${a})`;
+        g.lineWidth = 1.2;
+        g.beginPath();
+        g.moveTo(p.x, p.y);
+        g.lineTo(p.x - (p.vx / sp) * 2.5, p.y - (p.vy / sp) * 2.5);
+        g.stroke();
+      } else if (p.kind === 'smoke') {
+        // 煙霧：慢慢變大、變淡的圓團。
+        const r = p.size * (1 + k * 1.5);
+        g.fillStyle = `rgba(${p.rgb},${0.35 * a})`;
+        g.beginPath();
+        g.arc(p.x, p.y, r, 0, Math.PI * 2);
+        g.fill();
+      } else if (p.kind === 'beam') {
+        // 光束：沿直線快速伸出的光帶（外層屬性色、內層白色核心），寬度逐漸收窄。
+        const len = p.len * Math.min(1, k * 6);
+        const w = p.size * (1 - k * 0.6);
+        g.save();
+        g.translate(p.x, p.y);
+        g.rotate(p.angle);
+        const grad = g.createLinearGradient(0, -w, 0, w);
+        grad.addColorStop(0, `rgba(${p.rgb},0)`);
+        grad.addColorStop(0.5, `rgba(${p.rgb},${0.75 * a})`);
+        grad.addColorStop(1, `rgba(${p.rgb},0)`);
+        g.fillStyle = grad;
+        g.fillRect(0, -w, len, w * 2);
+        g.fillStyle = `rgba(${p.core},${a})`;
+        g.fillRect(0, -w * 0.18, len, w * 0.36);
+        g.restore();
+      } else if (p.kind === 'crescent') {
+        // 弧光：從一側掃到另一側的發光弧帶，之後淡出。
+        const start = p.angle - p.arc / 2;
+        const end = start + p.arc * Math.min(1, k * 3);
+        const fade = k < 0.35 ? 1 : 1 - (k - 0.35) / 0.65;
+        const grad = g.createRadialGradient(p.x, p.y, p.r0, p.x, p.y, p.r1);
+        grad.addColorStop(0, `rgba(${p.rgb},0)`);
+        grad.addColorStop(0.75, `rgba(${p.rgb},${0.5 * fade})`);
+        grad.addColorStop(1, `rgba(255,255,255,${0.85 * fade})`);
+        g.fillStyle = grad;
+        g.beginPath();
+        g.arc(p.x, p.y, p.r1, start, end);
+        g.arc(p.x, p.y, p.r0, end, start, true);
+        g.closePath();
+        g.fill();
       }
       return true;
     });
@@ -2051,11 +2525,13 @@ export class Renderer {
         const start = e.angle - (dir * arc) / 2;
         const end = start + dir * arc * Math.min(1, k * 2.5);
         const outer = e.range * T + 2;
-        const inner = outer * 0.5;
+        // Boss 的揮砍弧帶較寬。
+        const inner = outer * (e.boss ? 0.32 : 0.5);
         const fade = k < 0.4 ? 1 : 1 - (k - 0.4) / 0.6;
         const grad = g.createRadialGradient(x, y - 3, inner, x, y - 3, outer);
-        // 怪物的普通攻擊是紅色的揮砍；玩家依職業配色：戰士藍色、盜賊紫色、武僧橘色掌風、騎士金色，其他為白色。
-        const [mid, edge, rim] = e.enemy ? ['255,120,110', '255,200,190', '255,90,80'] : SLASH_COLORS[e.look] || SLASH_COLORS.default;
+        // 怪物的普通攻擊依攻擊屬性配色（一般打擊為紅色）；玩家依職業配色：戰士藍色、盜賊紫色、武僧橘色掌風、騎士金色，其他為白色。
+        const ene = e.enemy ? elementOf(e.src) : null;
+        const [mid, edge, rim] = ene ? [ene.rgb, ene.core, ene.rgb] : SLASH_COLORS[e.look] || SLASH_COLORS.default;
         grad.addColorStop(0, 'rgba(255,255,255,0)');
         grad.addColorStop(0.7, `rgba(${mid},${0.45 * fade})`);
         grad.addColorStop(1, `rgba(${edge},${0.95 * fade})`);
@@ -2112,8 +2588,8 @@ export class Renderer {
         g.arc(x, y, r * (0.4 + 0.7 * k), 0, Math.PI * 2);
         g.stroke();
       } else if (e.kind === 'blast') {
-        // 範圍底色淡一點，邊緣以加亮混色描出發光的外框（衝擊波、火花另外由 spawnFx 產生）。
-        const rgb = e.friendly ? LOOK_COLORS[e.look] || '200,168,255' : '255,140,60';
+        // 範圍底色淡一點，邊緣以加亮混色描出發光的外框（衝擊波、火花另外由 spawnFx 產生）；敵方依攻擊屬性配色。
+        const rgb = e.friendly ? LOOK_COLORS[e.look] || '200,168,255' : elementOf(e.src).rgb;
         g.fillStyle = `rgba(${rgb},${0.4 * (1 - k)})`;
         if (e.shape === 'ring') {
           g.beginPath();
@@ -2243,7 +2719,19 @@ export class Renderer {
       glows.push({ x: pt.x * T, y: pt.y * T, r: 2.5 * T, c: '170,130,255', a: 0.22 });
     }
     for (const pr of world.projectiles) if (pr.kind !== 'arrow') add(pr.x * T, pr.y * T, 1.4 * T, 0.8);
-    for (const e of world.effects) if (e.kind === 'blast') add(e.x * T, e.y * T, ((e.r || 1) + 1) * T, 0.9 * (1 - e.t / e.life));
+    for (const e of world.effects) {
+      if (e.kind === 'blast') {
+        add(e.x * T, e.y * T, ((e.r || 1) + 1) * T, 0.9 * (1 - e.t / e.life));
+        // 敵方爆發：依攻擊屬性的彩色光暈（Boss 較亮）。
+        if (!e.friendly) glows.push({ x: e.x * T, y: e.y * T, r: ((e.r || 1) + 1.5) * T, c: elementOf(e.src).rgb, a: (e.boss ? 0.4 : 0.25) * (1 - e.t / e.life) });
+      } else if (e.kind === 'impact') add(e.x * T, e.y * T, 1.6 * T, 0.8 * (1 - e.t / e.life));
+    }
+    for (const m of world.monsters) {
+      // 蓄力中的怪物身上發光，照亮周圍。
+      if (m.invisible || !(m.boss ? BOSS_WIND.has(m.state) && m.state !== 'healing' : MONSTER_WIND.has(m.state))) continue;
+      add(m.x * T, m.y * T, (m.boss ? 3 : 1.6) * T, 0.7);
+      glows.push({ x: m.x * T, y: m.y * T - 4, r: (m.boss ? 2.6 : 1.2) * T, c: elementOf(m.type).rgb, a: m.boss ? 0.3 : 0.18 });
+    }
     // 光照層：整片暗色，再以 destination-out 挖出光源。
     l.globalCompositeOperation = 'source-over';
     l.clearRect(0, 0, w, h);
