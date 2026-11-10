@@ -1,7 +1,8 @@
 // 圖資料的 PNG 封裝（執行期）：轉換產生的圖（角色、Boss、怪物、裝飾物、道具、家園、地城圖塊）把像素存在同名的 PNG 圖集裡，
 // 模組只保留調色盤、大小與每張圖在圖集上的位置（{ $r: [x, y, w, h] }）；圖集每像素存調色盤編號（8 位元灰階：0 透明、n 為調色盤第 n 個鍵）。載入時把 PNG 還原成原本的 rows（字元陣列），
 // 其他程式照舊使用 rows 與 palette。PNG 是無損格式，還原後與原本的資料完全相同。
-// 瀏覽器中以 createImageBitmap 非同步解碼（app 啟動前要 await spritesReady()）；Node（測試與轉換工具）中以 zlib 同步解碼。
+// 瀏覽器中以 DecompressionStream 自行解碼（不經過瀏覽器的影像解碼與色彩管理，像素值保證精確；app 啟動前要 await spritesReady()）；
+// Node（測試與轉換工具）中以 zlib 同步解碼。
 
 /** 尚未完成的解碼工作。 */
 const pending = [];
@@ -38,6 +39,25 @@ function restore(target, meta, img) {
   };
   walk(meta, null);
   Object.assign(target, meta);
+}
+
+/**
+ * 取出 PNG 所有 IDAT 區塊串接後的 zlib 資料。
+ * @param {Uint8Array} buf PNG 檔內容。
+ * @returns {Uint8Array} zlib 資料。
+ */
+function idatOf(buf) {
+  const dv = new DataView(buf.buffer, buf.byteOffset, buf.byteLength);
+  const parts = [];
+  for (let p = 8; p < buf.length;) {
+    const len = dv.getUint32(p);
+    if (buf[p + 4] === 73 && buf[p + 5] === 68 && buf[p + 6] === 65 && buf[p + 7] === 84) parts.push(buf.subarray(p + 8, p + 8 + len));
+    p += len + 12;
+  }
+  const out = new Uint8Array(parts.reduce((n, b) => n + b.length, 0));
+  let o = 0;
+  for (const b of parts) { out.set(b, o); o += b.length; }
+  return out;
 }
 
 /**
@@ -102,14 +122,13 @@ export function unpack(target, meta, url) {
     return;
   }
   pending.push((async () => {
-    const blob = await (await fetch(url)).blob();
-    const bmp = await createImageBitmap(blob, { colorSpaceConversion: 'none', premultiplyAlpha: 'none' });
-    const c = document.createElement('canvas');
-    c.width = bmp.width;
-    c.height = bmp.height;
-    const g = c.getContext('2d', { willReadFrequently: true });
-    g.drawImage(bmp, 0, 0);
-    restore(target, meta, { w: c.width, h: c.height, ch: 4, data: g.getImageData(0, 0, c.width, c.height).data });
+    const buf = new Uint8Array(await (await fetch(url)).arrayBuffer());
+    // 自己解 PNG（DecompressionStream 解壓），不經過瀏覽器的影像解碼：iOS Safari 會對灰階 PNG 做色彩管理，
+    // 像素值偏差 1 就會對到錯的調色盤顏色（畫面出現雜點）。
+    const zlib = idatOf(buf);
+    const ds = new DecompressionStream('deflate');
+    const raw = new Uint8Array(await new Response(new Blob([zlib]).stream().pipeThrough(ds)).arrayBuffer());
+    restore(target, meta, decodePng(buf, () => raw));
   })());
 }
 
