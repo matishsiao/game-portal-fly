@@ -75,3 +75,14 @@ export const SHEETS = {
     },
   },
 };
+
+/**
+ * 各 Boss 的設計圖與轉換參數（欄位同 SHEETS）：設計圖（design/bosses/，2172 × 724）一列 4 格（待機 A、待機 B、蓄力、出招），
+ * auto 表示依最空的欄自動切格（y 範圍 [上緣, 下緣]，排除下方的編號文字）；Boss 只有面向右，遊戲中左右翻轉。
+ * 標題與說明文字在格子上方，轉換時只取每格最大的連通區塊，不會被抓進去。
+ * 古樹、魔像、蒸汽巨像的手臂與身體之間圍出大片白底，白洞門檻放大；法老王的白袍是設計的一部分，維持預設。
+ */
+export const BOSS_SHEETS = Object.fromEntries(
+  ['treant', 'golem', 'lich', 'bullKing', 'thunderbird', 'necromancer', 'pharaoh', 'kraken', 'steamTitan', 'redDragon', 'demonLord']
+    .map((k) => [k, { file: `${k}.png`, auto: { n: 4, y: [20, 640] }, cells: {}, hole: ['treant', 'golem', 'steamTitan'].includes(k) ? 30000 : 1500 }]),
+);

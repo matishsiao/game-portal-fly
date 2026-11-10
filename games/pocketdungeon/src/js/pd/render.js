@@ -11,6 +11,19 @@ const T = 16;
 const ATTACK_TIME = 0.24;
 /** 地城中角色圖的目標顯示密度（每個世界像素約 1.5 個圖像素）；實際值依放大倍率取能整除的值（Renderer.heroDensity）。 */
 const HERO_DENSITY = 1.5;
+/** 技能與爆炸的顏色（RGB），依效果樣式（look）區分；沒有樣式的友方爆炸為紫色、敵方為橘色。 */
+const LOOK_COLORS = {
+  nova: '150,210,255', spin: '255,255,255', slam: '210,170,110', rain: '240,224,176', beam: '255,240,170', meteor: '255,150,60',
+  trap: '232,184,74', starfall: '255,230,140', hypnosis: '220,150,255', miasma: '120,200,80', thunder: '210,235,255', freeze: '170,200,255',
+  chi: '255,200,120', smoke: '190,190,205', shadow: '150,100,200',
+};
+/** 各職業施放技能時的光（RGB）。 */
+const CLASS_FX = { warrior: '120,180,255', archer: '255,220,120', mage: '200,140,255', thief: '190,120,255', monk: '255,170,60', knight: '255,225,130' };
+/** 同時存在的特效粒子上限。 */
+const FX_MAX = 500;
+
+/** Boss 顯示蓄力格的狀態（預警、瞄準、施法、出招判定前、回復）。 */
+const BOSS_WIND = new Set(['windup', 'aim', 'cast', 'attacking', 'healing']);
 
 /** 玩家揮砍特效的顏色（中段、外緣、刀鋒線），依職業或攻擊樣式（look）區分。 */
 const SLASH_COLORS = {
@@ -754,6 +767,9 @@ export class Renderer {
     this.viewW = 240;
     this.viewH = 240;
     this.shakeT = 0;
+    /** 特效粒子（火花、餘燼、衝擊波、光柱、符文圈），只用於畫面。 */
+    this.fx = [];
+    this.prevSkillAnim = 0;
     this.shakeAmp = 0;
     this.shakeOn = true;
     this.frame = 0;
@@ -982,6 +998,8 @@ export class Renderer {
     this.drawEntities(world);
     this.drawProjectiles(world);
     this.drawEffects(world);
+    this.castAura(world);
+    this.drawFx(dt);
     this.drawLighting(world);
     this.drawFog(world);
     if (this.frame % 6 === 0) this.drawMinimap(world);
@@ -1382,8 +1400,15 @@ export class Renderer {
       }
       const art = monsterArt(m.type, m.evolved);
       const frames = m.hurt > 0 ? art.flash : art.frames;
-      const img = frames[walkFrame % frames.length];
+      // 有動作圖的 Boss（4 格）：平常在待機 A／B 間交替，預警蓄力時顯示蓄力，出手後 0.3 秒顯示出招。
+      const img = art.poses ? frames[this.bossPose(world, m)] : frames[walkFrame % frames.length];
+      // 高密度的圖（Boss 動作圖與精緻化的怪物圖）依畫面放大倍率換算，與角色相同。
+      const dens = art.density ? this.heroDensity || art.density : 1;
       const scale = art.scale * (m.elite ? 1.25 : 1) * (m.small ? 0.7 : 1) * (m.evolved ? 1.15 : 1);
+      const iw = img.width / dens;
+      const ih = img.height / dens;
+      // 圖的腳底以下留給特效的列，往下移讓腳踩在原本的位置；Boss 再把腳對齊影子中心（shadow 的 y + r × 0.6）。
+      const footY = art.density ? (art.foot * scale) / dens / T + (m.boss ? (m.r * T * 0.9 * 0.6 - 5 * Math.min(scale, 1.5)) / T : 0) : 0;
       const bob = art.frames.length === 1 ? (walkFrame ? 1 : 0) : 0;
       this.shadow(m.x, m.y, m.r * T * 0.9);
       if (m.elite) {
@@ -1434,24 +1459,24 @@ export class Renderer {
       if (m.evolved) {
         // 進化 Boss 身上的外光：身體後方的紅金色光暈，加上沿著輪廓發光。
         const pulse = 0.5 + 0.5 * Math.sin(world.time * 4);
-        const cy = m.y * T + 5 * Math.min(scale, 1.5) - (img.height * scale) / 2;
-        const glow = g.createRadialGradient(m.x * T, cy, 0, m.x * T, cy, img.width * scale * 0.9);
+        const cy = m.y * T + 5 * Math.min(scale, 1.5) - (ih * scale) / 2;
+        const glow = g.createRadialGradient(m.x * T, cy, 0, m.x * T, cy, iw * scale * 0.9);
         glow.addColorStop(0, `rgba(255,170,60,${0.35 + 0.15 * pulse})`);
         glow.addColorStop(1, 'rgba(255,90,40,0)');
         g.fillStyle = glow;
         g.beginPath();
-        g.arc(m.x * T, cy, img.width * scale * 0.9, 0, Math.PI * 2);
+        g.arc(m.x * T, cy, iw * scale * 0.9, 0, Math.PI * 2);
         g.fill();
         g.shadowColor = `rgba(255,${150 + Math.round(70 * pulse)},70,0.95)`;
         g.shadowBlur = 6 * this.scale;
       }
       // 蓄力中的怪物上下抖動，配合地面預警。
       const shakeX = m.state === 'windup' || m.state === 'charge' || m.state === 'aim' || m.state === 'cast' ? (walkFrame ? 0.5 : -0.5) : 0;
-      this.sprite(img, m.x + shakeX / T, m.y, world.player.x < m.x, scale, dormant ? 0 : bob);
+      this.sprite(img, m.x + shakeX / T, m.y + footY, world.player.x < m.x, scale, dormant ? 0 : bob, 1, dens);
       g.globalAlpha = 1;
       g.filter = 'none';
       g.shadowBlur = 0;
-      const top = Math.round(m.y * T - (img.height * scale) / 2 - 10 - m.r * T * 0.3);
+      const top = Math.round(m.y * T - (ih * scale) / 2 - 10 - m.r * T * 0.3);
       if (m.status) this.statusMarks(world, m.x * T, top - 4, m.status);
       if (m.stun > 0) {
         // 暈眩：頭上旋轉的星星。
@@ -1469,14 +1494,31 @@ export class Renderer {
       if (!m.boss && (m.hp < m.maxHp || m.elite)) {
         const w = Math.max(10, Math.round(m.r * T * 2));
         const x = Math.round(m.x * T - w / 2);
-        const y = Math.round(m.y * T - (img.height * scale) / 2 - 6 - m.r * T * 0.3);
+        const y = Math.round(m.y * T - (ih * scale) / 2 - 6 - m.r * T * 0.3);
         g.fillStyle = '#1a1020';
         g.fillRect(x - 1, y - 1, w + 2, 4);
         g.fillStyle = m.elite ? '#e8b84a' : '#e04a5a';
         g.fillRect(x, y, Math.max(0, Math.round((w * m.hp) / m.maxHp)), 2);
       }
-      if (m.boss) this.bossBar(world, m, Math.round(m.y * T + 5 * Math.min(scale, 1.5) - img.height * scale));
+      if (m.boss) this.bossBar(world, m, Math.round(m.y * T + 5 * Math.min(scale, 1.5) - ih * scale));
     }
+  }
+
+  /**
+   * 選擇 Boss 動作圖的格子（0 待機 A、1 待機 B、2 蓄力、3 出招）：預警與施法中（windup、aim、cast、attacking、healing、
+   * 或普攻預警 windUntil 未到）為蓄力；從蓄力狀態離開、或剛射出投射物（strikeUntil）後 0.3 秒為出招；其他時候每 0.5 秒交替待機。
+   * 會在 Boss 物件上記錄上一格的狀態（poseWind）與出招結束時間（strikeUntil）。
+   * @param {object} world 探險（取時間）。
+   * @param {object} m Boss（會被修改）。
+   * @returns {number} 格子索引。
+   */
+  bossPose(world, m) {
+    const wind = BOSS_WIND.has(m.state) || (m.windUntil ?? 0) > world.time;
+    if (m.poseWind && !wind) m.strikeUntil = Math.max(m.strikeUntil ?? 0, world.time + 0.3);
+    m.poseWind = wind;
+    if ((m.strikeUntil ?? 0) > world.time) return 3;
+    if (wind) return 2;
+    return Math.floor(world.time * 2) % 2;
   }
 
   /**
@@ -1767,6 +1809,184 @@ export class Renderer {
 
 
   /**
+   * 加入一個特效粒子（超過上限時丟掉最舊的）。
+   * @param {object} p 粒子：kind（spark 火花、ember 餘燼、ring 衝擊波、flash 閃光、pillar 光柱、rune 符文圈）、
+   *   x、y（像素）、vx、vy（像素／秒）、life（秒）、size、rgb、gravity（像素／秒²）、r0／r1（環的起訖半徑）。
+   */
+  emit(p) {
+    if (this.fx.length >= FX_MAX) this.fx.shift();
+    this.fx.push({ t: 0, vx: 0, vy: 0, gravity: 0, size: 1, ...p });
+  }
+
+  /**
+   * 從一點向外噴出火花與餘燼。
+   * @param {number} x 中心 x（像素）。
+   * @param {number} y 中心 y（像素）。
+   * @param {string} rgb 顏色。
+   * @param {number} n 火花數量。
+   * @param {number} speed 速度（像素／秒）。
+   * @param {number} [dir] 指定時只往這個方向 ±spread 噴出。
+   * @param {number} [spread=Math.PI] 噴出角度的一半。
+   */
+  burst(x, y, rgb, n, speed, dir, spread = Math.PI) {
+    for (let i = 0; i < n; i++) {
+      const a = (dir ?? 0) + (Math.random() * 2 - 1) * spread;
+      const v = speed * (0.4 + Math.random() * 0.8);
+      this.emit({ kind: 'spark', x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 0.25 + Math.random() * 0.3, rgb, gravity: 60 });
+    }
+    for (let i = 0; i < Math.ceil(n / 3); i++) {
+      this.emit({ kind: 'ember', x: x + (Math.random() - 0.5) * 8, y: y + (Math.random() - 0.5) * 6, vx: (Math.random() - 0.5) * 20, vy: -15 - Math.random() * 25, life: 0.5 + Math.random() * 0.5, rgb, size: 1 + (Math.random() < 0.3 ? 1 : 0) });
+    }
+  }
+
+  /**
+   * 依畫面效果產生特效粒子：技能與爆炸有閃光、衝擊波、火花與餘燼（直線沿線、扇形沿弧分布）；
+   * 命中有火花，技能的斬擊沿刀光邊緣灑出火花，連鎖閃電在每個命中點爆出火花，升級有金色光柱。
+   * @param {object} world 探險（取職業）。
+   * @param {object} e 效果。
+   */
+  spawnFx(world, e) {
+    const x = e.x * T;
+    const y = e.y * T;
+    if (e.kind === 'blast') {
+      const rgb = e.friendly ? LOOK_COLORS[e.look] || '200,168,255' : '255,140,60';
+      const r = (e.r || 1) * T;
+      if (e.shape === 'line') {
+        const len = (e.len || 3) * T;
+        for (let d = 0; d <= len; d += 6) this.burst(x + Math.cos(e.angle) * d, y + Math.sin(e.angle) * d, rgb, 2, 50);
+        this.emit({ kind: 'flash', x: x + Math.cos(e.angle) * len * 0.5, y: y + Math.sin(e.angle) * len * 0.5, life: 0.18, size: (e.width || 1) * T * 1.4, rgb });
+        return;
+      }
+      if (e.shape === 'arc' && e.arc) {
+        for (let i = 0; i <= 6; i++) {
+          const a = e.angle - e.arc / 2 + (e.arc * i) / 6;
+          this.burst(x + Math.cos(a) * r * 0.8, y + Math.sin(a) * r * 0.8, rgb, 2, 60, a, 0.6);
+        }
+        return;
+      }
+      this.emit({ kind: 'flash', x, y, life: 0.2, size: r * 1.1, rgb });
+      this.emit({ kind: 'ring', x, y, life: 0.35, r0: r * 0.3, r1: r * 1.15, rgb, size: 3 });
+      if (e.friendly && r >= 2 * T) this.emit({ kind: 'ring', x, y, life: 0.5, r0: r * 0.1, r1: r * 0.8, rgb: '255,255,255', size: 1.5 });
+      this.burst(x, y, rgb, Math.min(28, Math.round(8 + r / 2)), 40 + r * 2.2);
+    } else if (e.kind === 'hit') {
+      this.emit({ kind: 'flash', x, y, life: 0.12, size: 7, rgb: '255,250,220' });
+      this.burst(x, y, '255,236,170', 5, 70, e.angle, 0.9);
+    } else if (e.kind === 'slash' && !e.basic && !e.enemy) {
+      const rgb = CLASS_FX[world.ch.cls] || '255,255,255';
+      const r = (e.range || 1.5) * T + 2;
+      for (let i = 0; i <= 5; i++) {
+        const a = e.angle - (e.arc || 2) / 2 + ((e.arc || 2) * i) / 5;
+        this.burst(x + Math.cos(a) * r, y - 3 + Math.sin(a) * r, rgb, 2, 50, a, 0.5);
+      }
+    } else if (e.kind === 'bolt') {
+      for (const pt of e.points || []) this.burst(pt.x * T, pt.y * T - 4, '210,235,255', 5, 80);
+    } else if (e.kind === 'cast' && e.look === 'orb') {
+      this.burst(x, y, '200,140,255', 5, 40, e.angle, 0.7);
+    } else if (e.kind === 'levelup') {
+      this.emit({ kind: 'pillar', x, y, life: 0.9, size: 12, rgb: '255,220,120' });
+      this.burst(x, y, '255,220,120', 14, 50, -Math.PI / 2, 1.1);
+    }
+  }
+
+  /**
+   * 施放技能的瞬間（skillAnim 剛被設定）：腳下展開職業顏色的符文圈，並升起光柱與光點。
+   * @param {object} world 探險。
+   */
+  castAura(world) {
+    const p = world.player;
+    const now = p.skillAnim > 0 ? p.skillAnim : 0;
+    if (now > this.prevSkillAnim + 0.05) {
+      const rgb = CLASS_FX[world.ch.cls] || '255,255,255';
+      const x = p.x * T;
+      const y = p.y * T + 3;
+      this.emit({ kind: 'rune', x, y, life: 0.6, size: 11, rgb });
+      this.emit({ kind: 'pillar', x, y, life: 0.45, size: 9, rgb });
+      this.burst(x, y - 4, rgb, 10, 45, -Math.PI / 2, 1.2);
+    }
+    this.prevSkillAnim = now;
+  }
+
+  /**
+   * 更新並畫出特效粒子（以加亮混色畫出發光感）。
+   * @param {number} dt 秒。
+   */
+  drawFx(dt) {
+    const g = this.ctx;
+    const step = Math.min(dt || 0, 0.05);
+    g.save();
+    g.globalCompositeOperation = 'lighter';
+    this.fx = this.fx.filter((p) => {
+      p.t += step;
+      if (p.t >= p.life) return false;
+      p.vy += p.gravity * step;
+      p.x += p.vx * step;
+      p.y += p.vy * step;
+      const k = p.t / p.life;
+      const a = 1 - k;
+      if (p.kind === 'spark') {
+        // 火花：沿速度方向的短線，愈快愈長。
+        const sp = Math.hypot(p.vx, p.vy) || 1;
+        const len = Math.min(6, sp * 0.04 + 1);
+        g.strokeStyle = `rgba(${p.rgb},${a})`;
+        g.lineWidth = 1;
+        g.beginPath();
+        g.moveTo(p.x, p.y);
+        g.lineTo(p.x - (p.vx / sp) * len, p.y - (p.vy / sp) * len);
+        g.stroke();
+        g.fillStyle = `rgba(255,255,255,${a})`;
+        g.fillRect(p.x - 0.5, p.y - 0.5, 1, 1);
+      } else if (p.kind === 'ember') {
+        g.fillStyle = `rgba(${p.rgb},${a * (0.6 + 0.4 * Math.sin(p.t * 30))})`;
+        g.fillRect(Math.round(p.x), Math.round(p.y), p.size, p.size);
+      } else if (p.kind === 'ring') {
+        // 衝擊波：快速擴散、逐漸變細的光環。
+        const ease = 1 - (1 - k) ** 3;
+        g.strokeStyle = `rgba(${p.rgb},${0.9 * a})`;
+        g.lineWidth = p.size * a + 0.5;
+        g.beginPath();
+        g.arc(p.x, p.y, p.r0 + (p.r1 - p.r0) * ease, 0, Math.PI * 2);
+        g.stroke();
+      } else if (p.kind === 'flash') {
+        const grad = g.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
+        grad.addColorStop(0, `rgba(255,255,255,${0.9 * a})`);
+        grad.addColorStop(0.35, `rgba(${p.rgb},${0.6 * a})`);
+        grad.addColorStop(1, `rgba(${p.rgb},0)`);
+        g.fillStyle = grad;
+        g.beginPath();
+        g.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        g.fill();
+      } else if (p.kind === 'pillar') {
+        // 光柱：從腳下往上升起、上端漸淡的光。
+        const h = 36 * Math.min(1, k * 4);
+        const grad = g.createLinearGradient(p.x, p.y, p.x, p.y - h);
+        grad.addColorStop(0, `rgba(${p.rgb},${0.7 * a})`);
+        grad.addColorStop(1, `rgba(${p.rgb},0)`);
+        g.fillStyle = grad;
+        g.fillRect(p.x - p.size / 2, p.y - h, p.size, h);
+        g.fillStyle = `rgba(255,255,255,${0.5 * a})`;
+        g.fillRect(p.x - 1, p.y - h, 2, h);
+      } else if (p.kind === 'rune') {
+        // 符文圈：腳下壓扁的雙圈與旋轉的刻度。
+        const r = p.size * (0.6 + 0.4 * Math.min(1, k * 4));
+        g.strokeStyle = `rgba(${p.rgb},${0.9 * a})`;
+        g.lineWidth = 1;
+        for (const rr of [r, r * 0.7]) {
+          g.beginPath();
+          g.ellipse(p.x, p.y, rr, rr * 0.45, 0, 0, Math.PI * 2);
+          g.stroke();
+        }
+        g.fillStyle = `rgba(255,255,255,${a})`;
+        for (let n = 0; n < 8; n++) {
+          const ang = p.t * 4 + (n * Math.PI) / 4;
+          g.fillRect(p.x + Math.cos(ang) * r * 0.85 - 0.5, p.y + Math.sin(ang) * r * 0.85 * 0.45 - 0.5, 1, 1);
+        }
+      }
+      return true;
+    });
+    g.restore();
+  }
+
+  /**
    * 畫紫色魔法陣：內外兩圈、旋轉的六芒星與外圈刻度（法師出手用）。
    * @param {number} x 中心 x（像素）。
    * @param {number} y 中心 y（像素）。
@@ -1814,6 +2034,11 @@ export class Renderer {
     // 有動作圖的職業，普攻的刀光與魔法陣已經畫在動作圖裡，不再另外畫。
     const framed = !!heroArt(world.ch.cls).dirs.side.attack;
     for (const e of world.effects) {
+      // 第一次看到的效果：產生對應的特效粒子。
+      if (!e.fxDone) {
+        e.fxDone = true;
+        this.spawnFx(world, e);
+      }
       const k = e.t / e.life;
       const x = e.x * T;
       const y = e.y * T;
@@ -1887,12 +2112,9 @@ export class Renderer {
         g.arc(x, y, r * (0.4 + 0.7 * k), 0, Math.PI * 2);
         g.stroke();
       } else if (e.kind === 'blast') {
-        const looks = {
-          nova: '150,210,255', spin: '255,255,255', slam: '210,170,110', rain: '240,224,176', beam: '255,240,170', meteor: '255,150,60',
-          trap: '232,184,74', starfall: '255,230,140', hypnosis: '220,150,255', miasma: '120,200,80', thunder: '210,235,255', freeze: '170,200,255',
-          chi: '255,200,120', smoke: '190,190,205', shadow: '150,100,200',
-        };
-        g.fillStyle = e.friendly ? `rgba(${looks[e.look] || '200,168,255'},${0.6 * (1 - k)})` : `rgba(255,140,60,${0.55 * (1 - k)})`;
+        // 範圍底色淡一點，邊緣以加亮混色描出發光的外框（衝擊波、火花另外由 spawnFx 產生）。
+        const rgb = e.friendly ? LOOK_COLORS[e.look] || '200,168,255' : '255,140,60';
+        g.fillStyle = `rgba(${rgb},${0.4 * (1 - k)})`;
         if (e.shape === 'ring') {
           g.beginPath();
           g.arc(x, y, e.r * T, 0, Math.PI * 2);
@@ -1912,6 +2134,13 @@ export class Renderer {
           g.closePath();
           g.fill();
         }
+        // 發光外框：沿用剛才的路徑，以加亮混色描邊。
+        g.save();
+        g.globalCompositeOperation = 'lighter';
+        g.strokeStyle = `rgba(${rgb},${0.9 * (1 - k)})`;
+        g.lineWidth = 1.5 * (1 - k) + 0.5;
+        g.stroke();
+        g.restore();
       } else if (e.kind === 'poof' || e.kind === 'dust') {
         g.fillStyle = e.color || (e.kind === 'dust' ? 'rgba(220,210,200,0.6)' : 'rgba(255,255,255,0.8)');
         const r = (e.r || 0.3) * T * (0.5 + k);

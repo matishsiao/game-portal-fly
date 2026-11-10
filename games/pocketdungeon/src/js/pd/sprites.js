@@ -3,6 +3,7 @@
 
 import { HOME_MATS } from './homeData.js';
 import { HERO_SPRITES } from './heroSprites.js';
+import { BOSS_SPRITES } from './bossSprites.js';
 
 /** 共用顏色。 */
 const O = '#1a1020';
@@ -554,22 +555,155 @@ export function heroArt(cls) {
 }
 
 /**
- * 取得怪物或 Boss 圖；進化 Boss 使用專屬的進化配色（evolvedPalette）。
+ * 把手寫的怪物像素圖精緻化成 2 倍密度（與角色相同的細緻度），回傳每個像素的顏色：
+ * 1. Scale2x：解析度加倍並把斜邊的階梯補平，輪廓變圓滑；
+ * 2. 外框變細：原圖輪廓上的外框在加倍後是 2 像素粗，把內側那一半換成相鄰的身體顏色（眼睛、分隔線等內部線條保留）；
+ * 3. 光影：左上靠近外框或透明處的像素提亮、右下的壓暗，與角色同一個光源方向。
+ * @param {string[]} rows 原圖的像素列。
+ * @param {Record<string, string>} palette 調色盤。
+ * @returns {(string | null)[][]} 2 倍大小的顏色（null 為透明）。
+ */
+function refineMonster(rows, palette) {
+  const h = rows.length;
+  const w = Math.max(...rows.map((r) => r.length));
+  /** 原圖 (x, y) 的顏色（透明與超出範圍為 null）。 */
+  const src = (x, y) => {
+    const ch = rows[y]?.[x];
+    return ch && ch !== '.' && ch !== ' ' && palette[ch] ? palette[ch] : null;
+  };
+  const W = w * 2;
+  const H = h * 2;
+  const out = Array.from({ length: H }, () => new Array(W).fill(null));
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const p = src(x, y);
+      const a = src(x, y - 1);
+      const b = src(x + 1, y);
+      const c = src(x - 1, y);
+      const d = src(x, y + 1);
+      out[y * 2][x * 2] = c === a && c !== d && a !== b ? a : p;
+      out[y * 2][x * 2 + 1] = a === b && a !== c && b !== d ? b : p;
+      out[y * 2 + 1][x * 2] = d === c && d !== b && c !== a ? c : p;
+      out[y * 2 + 1][x * 2 + 1] = b === d && b !== a && d !== c ? d : p;
+    }
+  }
+  const N4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+  /** 原圖 (x, y) 是否為輪廓上的外框（外框色且旁邊是透明）。 */
+  const contour = (x, y) => src(x, y) === O && N4.some(([dx, dy]) => src(x + dx, y + dy) === null);
+  // 外框變細：輪廓外框的內側像素（不碰到透明）換成相鄰的身體顏色。
+  const thin = out.map((r) => r.slice());
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      if (out[y][x] !== O || !contour(x >> 1, y >> 1)) continue;
+      if (N4.some(([dx, dy]) => (out[y + dy]?.[x + dx] ?? null) === null)) continue;
+      const body = N4.map(([dx, dy]) => out[y + dy]?.[x + dx]).find((v) => v && v !== O);
+      if (body) thin[y][x] = body;
+    }
+  }
+  // 光影：上方或左方是外框／透明的像素提亮，下方或右方是的壓暗（兩者都是時維持原色）。
+  /** 是否為邊界（外框或透明）。 */
+  const edge = (x, y) => {
+    const v = thin[y]?.[x] ?? null;
+    return v === null || v === O;
+  };
+  const shaded = thin.map((r) => r.slice());
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const v = thin[y][x];
+      if (!v || v === O) continue;
+      const lit = edge(x, y - 1) || edge(x - 1, y);
+      const dark = edge(x, y + 1) || edge(x + 1, y);
+      if (lit && !dark) shaded[y][x] = mixHex(v, '#ffffff', 0.28);
+      else if (dark && !lit) shaded[y][x] = mixHex(v, '#1a1030', 0.3);
+    }
+  }
+  return shaded;
+}
+
+/**
+ * 依顏色陣列繪製到新的畫布。
+ * @param {(string | null)[][]} grid 顏色（null 為透明）。
+ * @param {string} [tint] 指定時所有非透明像素都用這個顏色（受傷閃爍用）。
+ * @returns {HTMLCanvasElement} 畫布。
+ */
+function paintGrid(grid, tint) {
+  const c = makeCanvas(grid[0].length, grid.length);
+  const g = c.getContext('2d');
+  grid.forEach((row, y) => row.forEach((v, x) => {
+    if (!v) return;
+    g.fillStyle = tint || v;
+    g.fillRect(x, y, 1, 1);
+  }));
+  return c;
+}
+
+/**
+ * 進化 Boss 的配色：依亮度對應到「暗紅 → 赤紅 → 金」的漸層，再與原色混合（保留六成原色的辨識度）。
+ * @param {string} hex 原色（#rrggbb）。
+ * @returns {string} 進化色。
+ */
+function evolveColor(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  const c = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  const l = (0.3 * c[0] + 0.59 * c[1] + 0.11 * c[2]) / 255;
+  const stops = [[0, [40, 6, 16]], [0.45, [190, 40, 40]], [0.8, [255, 170, 60]], [1, [255, 240, 190]]];
+  let k = 1;
+  while (k < stops.length - 1 && l > stops[k][0]) k++;
+  const [l0, a] = stops[k - 1];
+  const [l1, b] = stops[k];
+  const t = Math.max(0, Math.min(1, (l - l0) / (l1 - l0)));
+  const out = a.map((v, i) => Math.round((v + (b[i] - v) * t) * 0.6 + c[i] * 0.4));
+  return '#' + out.map((v) => v.toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * 取得 Boss 的動作圖（bossSprites.js，4 格：待機 A、待機 B、蓄力、出招，面向右）；進化 Boss 依 evolveColor 換色（外框不變）。
+ * 圖是高密度（density 2，繪製時依畫面放大倍率換算），腳底以下有 foot 列（特效用）。
+ * @param {string} type Boss 種類。
+ * @param {boolean} evolved 是否為進化 Boss。
+ * @returns {{frames: HTMLCanvasElement[], flash: HTMLCanvasElement[], scale: number, alpha: number, density: number, foot: number, poses: boolean}} 圖（poses 表示 4 格動作圖）。
+ */
+function bossArt(type, evolved) {
+  const key = `boss-${type}${evolved ? '-evo' : ''}`;
+  if (!cache.has(key)) {
+    const b = BOSS_SPRITES[type];
+    const palette = evolved ? Object.fromEntries(Object.entries(b.palette).map(([k, v]) => [k, k === 'o' ? v : evolveColor(v)])) : b.palette;
+    const rows = b.frames.map((f) => place(b, f));
+    cache.set(key, {
+      frames: rows.map((r) => paint(r, palette)),
+      flash: rows.map((r) => paint(r, palette, '#ffffff')),
+      scale: 1,
+      alpha: 1,
+      density: 2,
+      foot: b.foot,
+      poses: true,
+    });
+  }
+  return cache.get(key);
+}
+
+/**
+ * 取得怪物或 Boss 圖：Boss 使用動作圖（bossArt）；一般怪物把手寫像素圖精緻化成 2 倍密度（refineMonster）。
  * @param {string} type 種類。
  * @param {boolean} [evolved=false] 是否為進化 Boss。
  * @returns {{frames: HTMLCanvasElement[], flash: HTMLCanvasElement[], scale: number, alpha: number}} 圖。
  */
 export function monsterArt(type, evolved = false) {
+  if (BOSS_SPRITES[type]) return bossArt(type, evolved);
   const a = MONSTER_ART[type];
   const useEvo = evolved && !!a.evolvedPalette;
   const key = `m-${type}${useEvo ? '-evo' : ''}`;
   if (!cache.has(key)) {
     const palette = useEvo ? a.evolvedPalette : a.palette;
+    // 一般怪物以 refineMonster 精緻化成 2 倍密度（繪製時依畫面放大倍率換算，與角色相同）。
+    const grids = a.frames.map((r) => refineMonster(r, palette));
     cache.set(key, {
-      frames: a.frames.map((r) => paint(r, palette)),
-      flash: a.frames.map((r) => paint(r, palette, '#ffffff')),
+      frames: grids.map((gr) => paintGrid(gr)),
+      flash: grids.map((gr) => paintGrid(gr, '#ffffff')),
       scale: a.scale || 1,
       alpha: a.alpha || 1,
+      density: 2,
+      foot: 0,
     });
   }
   return cache.get(key);
@@ -726,8 +860,11 @@ export function heroDataUrl(cls, scale = 4) {
  * @returns {string} data URL。
  */
 export function monsterDataUrl(type, scale = 3, evolved = false) {
-  const src = monsterArt(type, evolved).frames[0];
-  const c = makeCanvas(src.width * scale, src.height * scale);
+  const art = monsterArt(type, evolved);
+  const src = art.frames[0];
+  // 高密度的 Boss 圖：實際放大倍率為 scale 的一半（至少 1 倍）。
+  const k = art.density ? Math.max(1, Math.round(scale / art.density)) : scale;
+  const c = makeCanvas(src.width * k, src.height * k);
   const g = c.getContext('2d');
   g.imageSmoothingEnabled = false;
   g.drawImage(src, 0, 0, c.width, c.height);

@@ -17,6 +17,7 @@
     "check:dungeons": "node scripts/check-dungeons.mjs",
     "check:balance": "node scripts/check-balance.mjs",
     "icons": "node scripts/make-icons.mjs",
-    "heroes": "node scripts/make-hero-sprites.mjs"
+    "heroes": "node scripts/make-hero-sprites.mjs",
+    "bosses": "node scripts/make-hero-sprites.mjs --bosses"
   }
 }

@@ -1682,10 +1682,13 @@ export class World {
     if (m.basicT > 0 || m.intangible || (m.state !== 'move' && m.state !== 'idle')) return;
     m.basicT = (m.enraged ? 0.9 : 1.2) * (m.evolved ? EVOLVE.cd : 1);
     if (d < m.r + 1.9) {
+      // 動作圖：預警期間顯示蓄力（windUntil），之後自動切到出招。
+      m.windUntil = this.time + 0.35;
       this.telegraph({ shape: 'arc', x: m.x, y: m.y, r: m.r + 1.5, angle: m.facing, arc: (110 * Math.PI) / 180, t: 0.35, dmg: this.monsterDamage(m, 0.45), hidden: true });
     } else {
       const kind = { treant: 'seed', golem: 'fire', lich: 'ice', bullKing: 'seed', thunderbird: 'feather', necromancer: 'curse', pharaoh: 'sand', kraken: 'bubble', steamTitan: 'gear', redDragon: 'fire', demonLord: 'dark' }[m.ai] || 'fire';
       this.shoot(m, 6.5, m.facing, 0.45, { kind, r: 0.2, life: 3 });
+      m.strikeUntil = this.time + 0.3;
       // 遠距離射擊的間隔較長（約 1.7 秒），保持距離的 Boss 不會一直連射。
       m.basicT *= 1.4;
     }

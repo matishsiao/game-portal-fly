@@ -20,6 +20,7 @@
 | `npm run icons` | 重新產生 `src/icons/` 圖示 |
 | `node scripts/gen-home-links.mjs` | 從自然探險與社會科學題庫重新產生家園學科連動的知識卡清單（`src/js/pd/homeLinks.js`；題庫變動時執行，測試會檢查是否一致） |
 | `npm run heroes` | 把 `design/heroes/` 的角色攻擊動作設計圖轉成 `src/js/pd/heroSprites.js`（去白底、換算像素格、減成 24 色）；`--preview 檔名.png` 另外輸出預覽圖、`--only 職業` 只轉換一個職業檢查（不寫檔）。需要 Chrome 與 puppeteer-core（先執行 `npm i --no-save puppeteer-core`；非 macOS 以 `CHROME_PATH` 指定 Chrome）。格子位置與各職業的轉換參數在 `scripts/hero-sprites/sheets.mjs` |
+| `npm run bosses` | 同上，把 `design/bosses/` 的 Boss 動作圖（一列 4 格：待機 A、待機 B、蓄力、出招，依空白欄自動切格）轉成 `src/js/pd/bossSprites.js` |
 
 ## 專案結構
 
@@ -39,6 +40,7 @@ src/
   js/pd/render.js       畫面繪製：地圖、角色、預警、效果、戰爭迷霧、小地圖
   js/pd/sprites.js      原創像素圖資料與角色圖（方向、走路循環、攻擊動畫）
   js/pd/heroSprites.js  職業角色圖（由 npm run heroes 從 design/heroes/ 轉換產生）
+  js/pd/bossSprites.js  Boss 圖（由 npm run bosses 從 design/bosses/ 轉換產生）
   js/pd/homeData.js     家園資料：材料、家具與裝飾、作物、牧場、料理、土地、學科連動、觀察日記
   js/pd/home.js         家園規則（純邏輯）：存檔修復、配方與製作、擺放、擴建、種植、牧場、藥草台、寶箱、染色、市集
   js/pd/homeArt.js, homeDraw.js, homeArt/  家園美術（每格 32 像素，以部件繪製）
@@ -46,6 +48,7 @@ src/
   dev/home-gallery.html 家園審圖頁（不放進正式版）
 scripts/                build、serve、check-dungeons、check-balance、make-icons、gen-home-links、make-hero-sprites（hero-sprites/ 為轉換用的格子定義與瀏覽器端函式）
 design/heroes/          職業角色的攻擊動作設計圖（4 方向，每方向 6～8 格；原創，轉換來源）
+design/bosses/          Boss 的動作設計圖（4 格；原創，轉換來源）
 tests/                  node:test 單元測試
 ```
 

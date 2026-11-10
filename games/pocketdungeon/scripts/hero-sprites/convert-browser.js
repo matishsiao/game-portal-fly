@@ -220,3 +220,43 @@ window.measureH = function (img, b) {
   const box = bbox(fg, px.w, px.h);
   return box.y1 - box.y0 + 1;
 };
+
+/**
+ * 自動切格：在原圖的 y0～y1 範圍內，把一列 n 個角色依「最空的欄」切開（每個切點在等分位置左右 200 像素內，
+ * 取不透明像素最少、且連續最長的那一段的中間）。用於格子寬度不固定、角色可能超出等分線的設計圖（Boss）。
+ * @param {HTMLImageElement} img 原圖。
+ * @param {number} n 格數。
+ * @param {number} y0 上緣。
+ * @param {number} y1 下緣。
+ * @returns {{x:number,y:number,w:number,h:number}[]} 各格。
+ */
+window.autoCells = function (img, n, y0, y1) {
+  const W = img.width;
+  const px = grab(img, 0, y0, W, y1 - y0);
+  const col = new Array(W).fill(0);
+  for (let y = 0; y < px.h; y++) for (let x = 0; x < W; x++) {
+    const i = (y * W + x) * 4;
+    const r = px.d[i], g = px.d[i + 1], b = px.d[i + 2];
+    const mn = Math.min(r, g, b), mx = Math.max(r, g, b);
+    if (!(mn > 222 && mx - mn < 30)) col[x]++;
+  }
+  const cuts = [0];
+  for (let k = 1; k < n; k++) {
+    const c = Math.round((W * k) / n);
+    const lo = Math.max(1, c - 200), hi = Math.min(W - 2, c + 200);
+    const least = Math.min(...col.slice(lo, hi));
+    // 在最少的欄中找最長的連續段，取中間。
+    let best = c, bestLen = -1, start = -1;
+    for (let x = lo; x <= hi + 1; x++) {
+      const ok = x <= hi && col[x] <= least;
+      if (ok && start < 0) start = x;
+      if (!ok && start >= 0) {
+        if (x - start > bestLen) { bestLen = x - start; best = Math.round((start + x - 1) / 2); }
+        start = -1;
+      }
+    }
+    cuts.push(best);
+  }
+  cuts.push(W);
+  return cuts.slice(0, n).map((x, i) => ({ x, y: y0, w: cuts[i + 1] - x, h: y1 - y0 }));
+};
