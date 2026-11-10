@@ -934,6 +934,7 @@ function dungeonTile(key) {
  * @param {number} j 格子 y。
  * @param {{left: string, right: string, mid: boolean, rise: number}} opt 同 drawWallFace。
  * @param {string} theme 區域色調名稱。
+ * @returns {{x: number, y: number}[]} 兩端石柱的柱頂中心（轉角放火盆用）。
  */
 function drawWallFaceTex(g, i, j, opt, theme) {
   const x = i * T;
@@ -961,11 +962,13 @@ function drawWallFaceTex(g, i, j, opt, theme) {
     const rest = h - 8;
     g.drawImage(pillar, 0, 56 - rest * 2, 24, rest * 2, px, y0 + 8, 12, rest);
   };
+  const tops = [];
   if (pillar) {
-    if (opt.left !== 'face') drawP(x - 1);
-    if (opt.right !== 'face') drawP(x + T - 11);
+    if (opt.left !== 'face') { drawP(x - 1); tops.push({ x: x + 5, y: top - 4 }); }
+    if (opt.right !== 'face') { drawP(x + T - 11); tops.push({ x: x + T - 5, y: top - 4 }); }
     if (opt.mid) drawP(x + 2);
   }
+  return tops;
 }
 
 /**
@@ -985,6 +988,27 @@ function drawFrontLip(g, i, j, theme) {
   g.fillRect(x, y, T, 0.5);
   g.fillStyle = 'rgba(0,0,0,0.55)';
   g.fillRect(x, y + 6.5, T, 0.5);
+}
+
+/**
+ * 畫一個放火的小鐵盆（柱頂或石階旁）：深色盆身、亮邊與燒紅的炭（火焰每幀另外畫）。
+ * @param {CanvasRenderingContext2D} g 畫布（已依 FLOOR_DENSITY 縮放）。
+ * @param {number} cx 中心 x（世界像素）。
+ * @param {number} y 盆口 y（世界像素）。
+ */
+function drawFireBowl(g, cx, y) {
+  g.fillStyle = 'rgba(0,0,0,0.4)';
+  g.fillRect(cx - 3, y + 2.5, 6, 1);
+  g.fillStyle = '#1a1020';
+  g.fillRect(cx - 3.5, y - 0.5, 7, 3);
+  g.fillStyle = '#4a4650';
+  g.fillRect(cx - 3, y, 6, 2);
+  g.fillStyle = '#7a7684';
+  g.fillRect(cx - 3, y, 6, 0.5);
+  g.fillStyle = '#ff6a2a';
+  g.fillRect(cx - 2, y - 0.5, 4, 0.5);
+  g.fillStyle = '#ffd070';
+  g.fillRect(cx - 1, y - 0.5, 1.5, 0.5);
 }
 
 /** 拱門畫在角色上方的部分（從頂端算起佔整張圖的比例）：拱頂、拱心石與拉起的鐵柵門。 */
@@ -1654,6 +1678,8 @@ export class Renderer {
     const torchArt = propArt('torch');
     const stairsArt = propArt('stairs', ramps.stone);
     const torches = [];
+    /** 柱頂與石階旁的火盆火焰（世界像素；s 為大小倍率）。 */
+    const flames = [];
     /** 已放置火把、掛旗或大型擺設的牆面格子。 */
     const decor = [];
     /** 牆邊的大型擺設（整層畫完後再畫）。 */
@@ -1694,6 +1720,33 @@ export class Renderer {
     g.scale(FLOOR_DENSITY, FLOOR_DENSITY);
     g.fillStyle = th.bg;
     g.fillRect(0, 0, c.width, c.height);
+    // 火把的位置：每一段連續的牆面先找出所有石柱（兩端與長牆中間每 5 格一根），火把放在每兩根相鄰石柱的正中央
+    // （可以落在兩格之間），石柱間距太短（不到 2.5 格）的不放，像真的地下城一樣整齊排列。
+    /** 各列牆面的火把中心 x（世界像素）。 */
+    const torchPlan = new Map();
+    if (!hedge && themeName !== 'sky') {
+      for (let j = 0; j < f.h; j++) {
+        for (let i = 0; i < f.w; i++) {
+          if (!isFace(i, j) || isFace(i - 1, j)) continue;
+          let e = i;
+          while (isFace(e + 1, j)) e++;
+          const cols = [i * T + 5];
+          for (let k = i + 2; k <= e - 2; k++) if (k % 5 === 0 && isFace(k - 2, j) && isFace(k + 2, j)) cols.push(k * T + 8);
+          cols.push(e * T + T - 5);
+          const xs = [];
+          for (let k = 1; k < cols.length; k++) if (cols[k] - cols[k - 1] >= 2.5 * T) xs.push((cols[k] + cols[k - 1]) / 2);
+          if (xs.length) torchPlan.set(j, [...(torchPlan.get(j) || []), ...xs]);
+          i = e;
+        }
+      }
+    }
+    /**
+     * 這一格的中心是否靠近同一列的火把（擺設與掛飾要避開）。
+     * @param {number} i 格子 x。
+     * @param {number} j 格子 y。
+     * @returns {boolean} 距離火把不到 1.25 格時為 true。
+     */
+    const nearTorch = (i, j) => (torchPlan.get(j) || []).some((tx) => Math.abs(tx - (i * T + 8)) < 1.25 * T);
     for (let j = 0; j < f.h; j++) {
       for (let i = 0; i < f.w; i++) {
         const t = f.tiles[j * f.w + i];
@@ -1712,33 +1765,39 @@ export class Renderer {
             // 長牆中間每隔 5 格立一根圓柱（兩側都要是牆面，不和兩端的圓柱擠在一起）。
             const mid = !hedge && wideFace && isFace(i - 2, j) && isFace(i + 2, j) && i % 5 === 0;
             const faceOpt = { left: endKind(-1), right: endKind(1), mid, rise: j > 0 && solid(i, j - 1) ? 8 : 0 };
-            if (tex) drawWallFaceTex(g, i, j, faceOpt, tex);
+            if (tex) {
+              // 轉角石柱：約一半的柱頂放一盆火（天空之城與沉沒神殿不放）。
+              for (const t of drawWallFaceTex(g, i, j, faceOpt, tex)) {
+                if (themeName !== 'sky' && themeName !== 'sea' && hash(Math.round(t.x), j + 311) < 0.55 && !flames.some((fl) => Math.abs(fl.x - t.x) < 8 && Math.abs(fl.y - t.y) < 8)) {
+                  drawFireBowl(g, t.x, t.y);
+                  flames.push({ x: t.x, y: t.y - 1, s: 0.8 });
+                }
+              }
+            }
             else drawWallFace(g, i, j, pal, hedge, faceOpt, fx);
-            // 牆面點綴：間隔放置火把（另外每幀畫火焰與光暈）或掛旗；兩側都要是牆面、且不是圓柱的位置才放。
+            // 牆面點綴：固定間距的火把（另外每幀畫火焰與光暈）、掛旗、掛飾與大型擺設；兩側都要是牆面、且不是圓柱的位置才放，彼此至少間隔 2 格。
             const r = hash(i + 101, j + 57);
-            // 火把、掛旗與擺設彼此至少間隔 2 格。
-            const spaced = !decor.some((d) => d.j === j && Math.abs(d.i - i) < 2);
-            if (!hedge && wideFace && !mid && spaced && r < 0.22) {
-              torches.push({ i, j });
-              decor.push({ i, j });
-            } else if (wideFace && !mid && spaced && r >= 0.22 && r < 0.58) {
+            // 牆面的規律：長牆每 5 格一根石柱（i % 5 = 0），火把固定在兩根石柱的正中間（i % 5 = 2），
+            // 其他掛飾與擺設只放在火把與石柱之間（i % 5 = 4，短牆沒有中間石柱時也可放在 0），整面牆排列整齊。
+            const spaced = !decor.some((d) => d.j === j && Math.abs(d.i - i) < 2) && !nearTorch(i, j);
+            if (wideFace && !mid && spaced && r < 0.45) {
               // 大型擺設：依區域挑種類；石像先在牆面挖出壁龕。
               const list = PROPS[themeName] || PROPS.default;
               const kind = list[Math.floor(hash(i + 7, j + 311) * list.length)];
               if (kind === 'statue') drawNiche(g, x, j * T - (j > 0 && solid(i, j - 1) ? 8 : 0), (j + 1) * T, pal);
               props.push({ kind, i, j });
               decor.push({ i, j });
-            } else if (!hedge && wideFace && !mid && spaced && r > 0.9) {
+            } else if (!hedge && wideFace && !mid && spaced && r > 0.88) {
               // 掛旗：有設計圖時布面染成區域的點綴色。
               if (bannerArt) blitProp(g, bannerArt, x + 8, y + 3);
               else drawBanner(g, x, y, th, pal);
               decor.push({ i, j });
-            } else if (!hedge && wideFace && !mid && spaced && r >= 0.86 && r < 0.9 && PROP_SPRITES.ironGate) {
+            } else if (!hedge && wideFace && !mid && spaced && r >= 0.82 && r < 0.88 && PROP_SPRITES.ironGate) {
               // 封閉的鐵柵門（嵌在牆裡的裝飾，不能通行）。
               const art = propArt('ironGate', ramps.stone);
               blitProp(g, art, x + 8, (j + 1) * T - art.h / 2);
               decor.push({ i, j });
-            } else if (wideFace && !mid && spaced && r >= 0.62 && r < 0.86) {
+            } else if (wideFace && !mid && spaced && r >= 0.45 && r < 0.82) {
               // 牆上的掛飾：武器架、圓盾或鐵鏈（有設計圖時）。
               const kinds = ['weaponRack', 'wallShield', 'chains'].filter((k) => PROP_SPRITES[k]);
               if (kinds.length) {
@@ -1747,16 +1806,20 @@ export class Renderer {
                 decor.push({ i, j });
               }
             }
-            if (torches.length && torches[torches.length - 1].i === i && torches[torches.length - 1].j === j && torchArt) {
-              // 火把座（火焰每幀另外畫在托盤上方）。
-              blitProp(g, torchArt, x + 8, y + 6);
-            } else if (torches.length && torches[torches.length - 1].i === i && torches[torches.length - 1].j === j) {
-              g.fillStyle = '#3a2a1a';
-              g.fillRect(x + 7, y + 8, 2, 5);
-              g.fillStyle = '#8a8a92';
-              g.fillRect(x + 6, y + 7, 4, 2);
-              g.fillStyle = '#5a5a62';
-              g.fillRect(x + 6, y + 12, 4, 1);
+            // 火把座：這一格包含火把中心時畫上（火焰每幀另外畫在托盤上方）。
+            for (const tx of torchPlan.get(j) || []) {
+              if (tx < i * T || tx >= (i + 1) * T) continue;
+              if (torchArt) blitProp(g, torchArt, tx, y + 6);
+              else {
+                g.fillStyle = '#3a2a1a';
+                g.fillRect(tx - 1, y + 8, 2, 5);
+                g.fillStyle = '#8a8a92';
+                g.fillRect(tx - 2, y + 7, 4, 2);
+                g.fillStyle = '#5a5a62';
+                g.fillRect(tx - 2, y + 12, 4, 1);
+              }
+              torches.push({ i: tx / T - 0.5, j, px: tx });
+              decor.push({ i, j });
             }
           } else if (near(i, j)) {
             drawWallTop(g, i, j, pal, {
@@ -1828,8 +1891,8 @@ export class Renderer {
     if (!tex) grainPass(g, c.width, c.height);
     const braziers = this.placeRoomDecor(g, world, ramps, solid, themeName);
     for (const prop of props) drawProp(g, prop, pal, ramps);
-    const arches = hedge ? [] : this.drawDoorways(g, world, ramps, solid);
-    this.floorCache = { canvas: c, floor: f, torches: themeName === 'sky' ? [] : torches, props, braziers, arches };
+    const arches = hedge ? [] : this.drawDoorways(g, world, ramps, solid, { torches, flames, torchArt, isFace, noFire: themeName === 'sky' || themeName === 'sea' });
+    this.floorCache = { canvas: c, floor: f, torches: themeName === 'sky' ? [] : torches, props, braziers, arches, flames };
   }
 
   /**
@@ -1860,9 +1923,11 @@ export class Renderer {
    * @param {object} world 探險。
    * @param {{stone: string[], rock: string[], cloth: string[]}} ramps 上色色階。
    * @param {(i: number, j: number) => boolean} solid 是否為牆。
+   * @param {{torches: object[], flames: object[], torchArt: object, isFace: (i: number, j: number) => boolean, noFire: boolean}} lights
+   *   火把與火盆清單（會被加入：拱門兩旁牆上的火把、南側石階兩旁的火盆）、火把座圖、是否為牆面、是否不放火。
    * @returns {{art: object, cx: number, y: number}[]} 拱門的位置（拱頂每幀畫在角色上方）。
    */
-  drawDoorways(g, world, ramps, solid) {
+  drawDoorways(g, world, ramps, solid, lights) {
     const f = world.floor;
     const steps = propArt('steps', ramps.stone);
     const arch = propArt('archway', ramps.stone);
@@ -1885,10 +1950,25 @@ export class Renderer {
           if (done.has(key) || j < 1 || j >= f.h - 1 || !plain(i, j) || !plain(i + 1, j) || !solid(i - 1, j) || !solid(i + 2, j) || solid(i, out) || solid(i + 1, out)) continue;
           done.add(key);
           if (steps) drawWideSteps(g, steps.frames[0], i * T, j * T, north);
+          if (!north && !lights.noFire) {
+            // 南側石階兩旁的牆緣上各立一盆火，像守著出口。
+            for (const fx of [(i - 1) * T + 8, (i + 2) * T + 8]) {
+              drawFireBowl(g, fx, j * T + 6);
+              lights.flames.push({ x: fx, y: j * T + 5, s: 1 });
+            }
+          }
           // 拱門約 3 格高：門口上方兩格的兩側都要是牆（真的有一段走廊），拱門才不會畫到另一個房間的地板上。
           const tall = [1, 2].every((d) => solid(i - 1, j - d) && solid(i + 2, j - d));
           if (north && arch && tall) {
             blitProp(g, arch, (i + 1) * T, (j + 1) * T - arch.h / 2);
+            // 拱門兩旁的牆面掛火把。
+            if (!lights.noFire && lights.torchArt) {
+              for (const ti of [i - 2, i + 3]) {
+                if (!lights.isFace(ti, j) || lights.torches.some((t) => t.j === j && Math.abs(t.i - ti) < 3)) continue;
+                blitProp(g, lights.torchArt, ti * T + 8, j * T + 6);
+                lights.torches.push({ i: ti, j, px: ti * T + 8 });
+              }
+            }
             // 拱頂另外記下來，每幀畫在角色上方（角色從拱門下穿過）。
             arches.push({ art: arch, cx: (i + 1) * T, y: (j + 1) * T - arch.h / 2 });
           }
@@ -1949,6 +2029,33 @@ export class Renderer {
         groundShadow(g, cx, bottom, Math.min(14, art.w / 2));
         blitProp(g, art, cx, bottom - art.h / 2);
         if (kind === 'brazier') braziers.push({ x: cx, y: bottom - art.h / 2 + 2 });
+      }
+    }
+    // 沿牆的小擺設：每個房間在貼著牆的地板上再放 2～4 個（蠟燭、陶罐、麻布袋、頭骨堆、木桶），避開角落與門口。
+    const edgeKinds = ['candles', 'urns', 'sacks', 'skulls', 'barrel'].filter((k) => PROP_SPRITES[k]);
+    for (const [n, room] of f.rooms.entries()) {
+      if (!edgeKinds.length) break;
+      const spots = [];
+      for (let i = room.x + 1; i < room.x + room.w - 1; i++) {
+        if (solid(i, room.y - 1)) spots.push([i, room.y]);
+        if (solid(i, room.y + room.h)) spots.push([i, room.y + room.h - 1]);
+      }
+      for (let j = room.y + 1; j < room.y + room.h - 1; j++) {
+        if (solid(room.x - 1, j)) spots.push([room.x, j]);
+        if (solid(room.x + room.w, j)) spots.push([room.x + room.w - 1, j]);
+      }
+      const want = 2 + Math.floor(hash(n + 401, room.y) * 3);
+      let placed = 0;
+      for (let k = 0; k < spots.length && placed < want; k++) {
+        const [i, j] = spots[Math.floor(hash(n * 13 + k, room.x + k * 7) * spots.length)];
+        if (!free(i, j) || busy.has(`${i},${j}`)) continue;
+        busy.add(`${i},${j}`);
+        const art = propArt(edgeKinds[Math.floor(hash(i + 91, j + 37) * edgeKinds.length)], ramps.stone);
+        const cx = i * T + 8 + (solid(i - 1, j) ? -2 : solid(i + 1, j) ? 2 : 0);
+        const bottom = (j + 1) * T - (solid(i, j + 1) ? 2 : 4);
+        groundShadow(g, cx, bottom, Math.min(14, art.w / 2));
+        blitProp(g, art, cx, bottom - art.h / 2);
+        placed++;
       }
     }
     return braziers;
@@ -2029,8 +2136,8 @@ export class Renderer {
     const f = world.floor;
     const v = this.visible();
     for (const tc of this.floorCache.torches) {
-      if (tc.i < v.i0 || tc.i > v.i1 || tc.j < v.j0 || tc.j > v.j1) continue;
-      const x = tc.i * T;
+      if (tc.i < v.i0 - 1 || tc.i > v.i1 || tc.j < v.j0 || tc.j > v.j1) continue;
+      const x = (tc.px ?? tc.i * T + 8) - 8;
       const y = tc.j * T;
       // 光暈由光影（drawLighting）負責，這裡只畫閃爍的火焰。
       const flick = Math.floor(world.time * 8 + tc.i * 3) % 3;
@@ -2040,6 +2147,17 @@ export class Renderer {
       g.fillRect(x + 7 - (flick === 2 ? 1 : 0), y + 3, 2, 3);
       g.fillStyle = '#fff2b0';
       g.fillRect(x + 7, y + 5, 1 + (flick === 0 ? 1 : 0), 1);
+    }
+    for (const b of this.floorCache.flames || []) {
+      // 柱頂與石階旁的火焰：比火盆小一點的三層火舌。
+      const fl = Math.floor(world.time * 9 + b.x * 0.7) % 3;
+      const k = b.s || 1;
+      g.fillStyle = '#e8541c';
+      g.fillRect(b.x - 2 * k, b.y - 3 * k - (fl === 1 ? 1 : 0), 4 * k, 3 * k + (fl === 1 ? 1 : 0));
+      g.fillStyle = '#ffb030';
+      g.fillRect(b.x - 1 * k + (fl === 2 ? 0.5 : 0), b.y - 4.5 * k, 2 * k, 4 * k);
+      g.fillStyle = '#fff2b0';
+      g.fillRect(b.x - 0.5, b.y - 2 * k, 1, 1.5 * k);
     }
     for (const b of this.floorCache.braziers || []) {
       // 火盆的火焰：三層閃爍的火舌。
@@ -3682,7 +3800,7 @@ export class Renderer {
     add(p.x * T, p.y * T - 4, 4.2 * T);
     for (const tc of this.floorCache.torches) {
       const flick = Math.sin(t * 9 + tc.i * 1.7) * 0.06 + Math.sin(t * 23 + tc.j) * 0.03;
-      const x = tc.i * T + 8;
+      const x = tc.px ?? tc.i * T + 8;
       const y = tc.j * T + 10;
       add(x, y + 6, 4 * T * (1 + flick), 1);
       // 暖光往下照在地板上（中心在火把下方），避免把牆後的黑色區域染成橘色；火把本身周圍再加一圈小而亮的光暈。
@@ -3693,6 +3811,12 @@ export class Renderer {
       const flick = Math.sin(t * 8 + b.x) * 0.07;
       add(b.x, b.y, 3.6 * T * (1 + flick), 1);
       glows.push({ x: b.x, y: b.y + 4, r: 2.6 * T * (1 + flick), c: '255,140,50', a: 0.38 });
+    }
+    for (const b of this.floorCache.flames || []) {
+      const flick = Math.sin(t * 9 + b.x * 0.3) * 0.07;
+      add(b.x, b.y + 4, 3 * T * (b.s || 1) * (1 + flick), 0.95);
+      glows.push({ x: b.x, y: b.y + 8, r: 2.2 * T * (b.s || 1) * (1 + flick), c: '255,140,50', a: 0.32 });
+      glows.push({ x: b.x, y: b.y - 2, r: 0.8 * T * (1 + flick), c: '255,190,90', a: 0.45 });
     }
     for (const c of world.chests) if (!c.opened) add(c.x * T, c.y * T, 1.6 * T, 0.7);
     const st = world.floor.stairs;
