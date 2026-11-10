@@ -374,7 +374,7 @@ function renderHome() {
  * @returns {string} 文字。
  */
 function classBlurb(cls) {
-  return { warrior: '近戰・耐打・扇形揮砍', archer: '遠程・靈活・直線射箭', mage: '遠程・範圍・爆炸法球', thief: '近戰・快攻・爆擊與毒', monk: '近戰・三連擊・自我回復' }[cls];
+  return { warrior: '近戰・耐打・扇形揮砍', archer: '遠程・靈活・直線射箭', mage: '遠程・範圍・爆炸法球', thief: '近戰・快攻・爆擊與毒', monk: '近戰・三連擊・自我回復', knight: '近戰・坦克・護盾與長槍' }[cls];
 }
 
 /**
@@ -1867,12 +1867,12 @@ function bagPanel(ch) {
 }
 
 /**
- * 裝備的格子圖示：武器依類型（劍、斧、弓弩、法杖、匕首、拳套），其他依部位。
+ * 裝備的格子圖示：武器依類型（劍與騎士劍、斧、弓弩、法杖、匕首、拳套、長槍），其他依部位。
  * @param {object} item 裝備。
  * @returns {string} 圖示名稱（ITEM_ART 的鍵）。
  */
 function itemIconName(item) {
-  if (item.slot === 'weapon') return { 劍: 'sword', 斧: 'axe', 弓: 'bow', 弩: 'bow', 法杖: 'staff', 魔杖: 'staff', 匕首: 'dagger', 雙匕: 'daggers', 拳套: 'fist' }[item.type] || 'sword';
+  if (item.slot === 'weapon') return { 劍: 'sword', 斧: 'axe', 弓: 'bow', 弩: 'bow', 法杖: 'staff', 魔杖: 'staff', 匕首: 'dagger', 雙匕: 'daggers', 拳套: 'fist', 騎士劍: 'sword', 長槍: 'spear' }[item.type] || 'sword';
   return SLOT_ICONS[item.slot];
 }
 

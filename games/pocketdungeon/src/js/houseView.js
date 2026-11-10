@@ -900,10 +900,11 @@ export class HouseView {
     const art = heroArt(this.ch.cls);
     const cycle = [1, 0, 2, 0];
     const f = p.walk > 0 ? art.frames[cycle[Math.floor(p.walk * 8) % 4]] : art.frames[0];
-    const w = f.width * 2;
-    const hh = f.height * 2;
+    const w = (f.width * 2) / art.density;
+    const hh = (f.height * 2) / art.density;
     const x = Math.round(p.x * HT + (HT - w) / 2);
-    const y = Math.round(Y(p.y + 1) - hh - 2);
+    // 角色圖腳底以下留有特效用的列，往下移回讓腳踩在地上。
+    const y = Math.round(Y(p.y + 1) - hh - 2 + (art.foot * 2) / art.density);
     const g = this.g;
     g.globalAlpha = 0.3;
     ellipse(g, p.x * HT + HT / 2, Y(p.y + 1) - 3, 10, 3, '#000000');

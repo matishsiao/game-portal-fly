@@ -294,6 +294,7 @@ button:focus-visible {
 .char-card[data-cls="mage"] { --c: #5b3a8f; }
 .char-card[data-cls="thief"] { --c: #4a4a5c; }
 .char-card[data-cls="monk"] { --c: #e8862a; }
+.char-card[data-cls="knight"] { --c: #3a5a9a; }
 
 .char-card.empty {
   border: 2px dashed var(--line);
@@ -2918,6 +2919,7 @@ button:focus-visible {
 .hero-banner[data-cls="mage"] { --c: #5b3a8f; }
 .hero-banner[data-cls="thief"] { --c: #4a4a5c; }
 .hero-banner[data-cls="monk"] { --c: #c0701e; }
+.hero-banner[data-cls="knight"] { --c: #3a5a9a; }
 
 .hero-sprite {
   width: 96px;

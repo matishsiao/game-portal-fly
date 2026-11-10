@@ -68,6 +68,16 @@ export const SKILLS = {
   ironShirt: { cls: 'monk', name: '鐵布衫', short: '鐵布', rebirth: 2, cd: 20, kind: 'guard', dur: 6, pct: 0.4, per: 0.05, text: '{dur} 秒內受到的傷害減少 {pct}' },
   chiWave: { cls: 'monk', name: '氣功波', short: '氣波', rebirth: 3, cd: 14, mult: 4.5, kind: 'snipe', len: 10, look: 'chi', text: '蓄力 0.4 秒後打出貫穿 {len} 格的氣功波（{mult}）' },
   nirvana: { cls: 'monk', name: '涅槃', short: '涅槃', rebirth: 3, cd: 45, kind: 'heal', pct: 0.6, per: 0.05, cleanse: true, text: '立即回復最大 HP 的 {pct}，並解除身上的異常狀態' },
+  holySlash: { cls: 'knight', name: '聖光斬', short: '聖斬', unlock: 1, cd: 6, mult: 1.7, kind: 'bash', r: 2, text: '朝前方 {r} 格扇形揮出聖光斬（{mult}）' },
+  knightCharge: { cls: 'knight', name: '騎士衝鋒', short: '衝鋒', unlock: 5, cd: 9, mult: 1.4, kind: 'charge', dist: 5, text: '舉盾向前衝刺 {dist} 格，衝刺中無敵並撞傷路上的敵人（{mult}）' },
+  aegis: { cls: 'knight', name: '神聖護盾', short: '護盾', unlock: 12, cd: 20, kind: 'barrier', dur: 8, pct: 0.35, per: 0.05, text: '{dur} 秒內獲得最大 HP {pct} 的護盾' },
+  judgment: { cls: 'knight', name: '審判', short: '審判', unlock: 20, cd: 14, mult: 2.3, kind: 'slam', r: 2.8, stun: 1.2, text: '以劍擊地降下審判，{r} 格內（{mult}）並定身 {stun} 秒' },
+  holdTheLine: { cls: 'knight', name: '堅守', short: '堅守', rebirth: 1, cd: 22, kind: 'guard', dur: 6, pct: 0.45, per: 0.05, text: '{dur} 秒內受到的傷害減少 {pct}' },
+  lanceThrust: { cls: 'knight', name: '貫槍', short: '貫槍', rebirth: 1, cd: 10, mult: 2.4, kind: 'fissure', len: 5, status: ['stun', 0.3], text: '向前刺出 {len} 格的貫穿槍擊（{mult}），{status}' },
+  layOnHands: { cls: 'knight', name: '聖療', short: '聖療', rebirth: 2, cd: 26, kind: 'regen', dur: 8, pct: 0.035, per: 0.01, text: '{dur} 秒內每秒回復最大 HP 的 {pct}' },
+  shieldStorm: { cls: 'knight', name: '盾牌風暴', short: '盾暴', rebirth: 2, cd: 15, mult: 0.7, kind: 'storm', r: 2, ticks: 8, text: '舉盾旋轉 {ticks} 次，每次攻擊周圍 {r} 格（{mult}），可以邊轉邊移動' },
+  divineLance: { cls: 'knight', name: '神聖之槍', short: '神槍', rebirth: 3, cd: 14, mult: 4.2, kind: 'snipe', len: 10, text: '蓄力 0.4 秒後擲出貫穿 {len} 格的光之槍（{mult}）' },
+  paladinOath: { cls: 'knight', name: '聖騎誓約', short: '誓約', rebirth: 3, cd: 40, kind: 'buff', dur: 10, pct: 0.45, per: 0.05, cleanse: true, text: '{dur} 秒內攻擊與防禦提升 {pct}，並解除身上的異常狀態' },
 };
 
 /**
@@ -126,6 +136,16 @@ const BOOK_SKILLS = {
   lionRoar: { cls: 'monk', rarity: 2, name: '獅子吼', short: '獅吼', cd: 16, mult: 1.2, kind: 'slam', r: 3, stun: 1.5, text: '一聲獅吼，{r} 格內（{mult}）並定身 {stun} 秒' },
   heavenShield: { cls: 'monk', rarity: 1, name: '天罡護盾', short: '天罡', cd: 24, kind: 'barrier', dur: 6, pct: 0.35, per: 0.05, text: '{dur} 秒內獲得最大 HP {pct} 的護盾' },
   dragonKick: { cls: 'monk', rarity: 3, name: '飛龍踢', short: '龍踢', cd: 9, mult: 2.2, kind: 'charge', dist: 5, text: '向前飛踢 {dist} 格，無敵並撞傷路上的敵人（{mult}）' },
+  shieldSlam: { cls: 'knight', rarity: 0, name: '盾牌重擊', short: '盾擊', cd: 8, mult: 2, kind: 'bash', r: 1.8, status: ['stun', 0.6], text: '用盾牌猛擊前方 {r} 格（{mult}），{status}' },
+  spearSweep: { cls: 'knight', rarity: 0, name: '橫掃槍', short: '橫掃', cd: 7, mult: 1.6, kind: 'spin', r: 2.2, text: '長槍橫掃周圍 {r} 格內所有敵人（{mult}）' },
+  steadfast: { cls: 'knight', rarity: 0, name: '不屈', short: '不屈', cd: 24, kind: 'guard', dur: 6, pct: 0.4, per: 0.05, text: '{dur} 秒內受到的傷害減少 {pct}' },
+  prayer: { cls: 'knight', rarity: 0, name: '祈禱', short: '祈禱', cd: 14, kind: 'heal', pct: 0.2, per: 0.05, text: '立即回復最大 HP 的 {pct}' },
+  holyWave: { cls: 'knight', rarity: 1, name: '聖光波', short: '聖波', cd: 12, mult: 1.8, kind: 'nova', r: 2.6, slow: 0, text: '聖光向外擴散，{r} 格內（{mult}）' },
+  lanceRush: { cls: 'knight', rarity: 1, name: '突刺衝鋒', short: '突刺', cd: 10, mult: 2, kind: 'charge', dist: 6, text: '持槍向前突刺 {dist} 格，無敵並撞傷路上的敵人（{mult}）' },
+  guardianWall: { cls: 'knight', rarity: 1, name: '守護之壁', short: '守護', cd: 26, kind: 'barrier', dur: 8, pct: 0.4, per: 0.05, text: '{dur} 秒內獲得最大 HP {pct} 的護盾' },
+  crusade: { cls: 'knight', rarity: 2, name: '聖戰', short: '聖戰', cd: 22, kind: 'buff', dur: 8, pct: 0.35, per: 0.05, text: '{dur} 秒內攻擊與防禦提升 {pct}' },
+  heavenPierce: { cls: 'knight', rarity: 2, name: '天穿', short: '天穿', cd: 12, mult: 2.8, kind: 'fissure', len: 7, status: ['stun', 0.4], text: '向前刺出 {len} 格的天穿衝擊（{mult}），{status}' },
+  sanctuary: { cls: 'knight', rarity: 3, name: '聖域', short: '聖域', cd: 18, mult: 2.8, kind: 'slam', r: 3.6, stun: 1.5, text: '展開聖域，{r} 格內（{mult}）並定身 {stun} 秒' },
   firstAid: { cls: 'all', rarity: 0, name: '急救', short: '急救', cd: 18, kind: 'heal', pct: 0.15, per: 0.03, text: '立即回復最大 HP 的 {pct}' },
   sprint: { cls: 'all', rarity: 0, name: '衝刺', short: '衝刺', cd: 20, kind: 'haste', dur: 4, pct: 0.5, per: 0.05, text: '{dur} 秒內移動速度提升 {pct}，攻擊間隔縮短 30%' },
   ironGuard: { cls: 'all', rarity: 1, name: '鐵壁術', short: '鐵壁', cd: 22, kind: 'guard', dur: 4, pct: 0.35, per: 0.05, text: '{dur} 秒內受到的傷害減少 {pct}' },
@@ -393,6 +413,11 @@ export const PASSIVES = {
   innerPeace: { cls: 'monk', name: '內功', rebirth: 1, per: { healBoost: 6 }, text: '回復技能的效果 +{healBoost}%' },
   diamondBody: { cls: 'monk', name: '金剛不壞', rebirth: 2, per: { dmgReduce: 3 }, text: '受到的傷害 −{dmgReduce}%' },
   vitality: { cls: 'monk', name: '氣血', rebirth: 3, per: { regen: 0.3 }, text: '每秒回復最大 HP 的 {regen}%' },
+  fortitude: { cls: 'knight', name: '堅毅', unlock: 8, per: { hpPct: 5 }, text: '最大 HP +{hpPct}%' },
+  bulwark: { cls: 'knight', name: '壁壘', unlock: 16, per: { shieldDefPct: 7 }, text: '裝備副手（盾牌）時防禦 +{shieldDefPct}%' },
+  holyArmor: { cls: 'knight', name: '聖甲', rebirth: 1, per: { dmgReduce: 3 }, text: '受到的傷害 −{dmgReduce}%' },
+  faith: { cls: 'knight', name: '信念', rebirth: 2, per: { statusResist: 10 }, text: '受到的異常狀態時間 −{statusResist}%' },
+  devotion: { cls: 'knight', name: '奉獻', rebirth: 3, per: { regen: 0.3 }, text: '每秒回復最大 HP 的 {regen}%' },
 };
 
 /**

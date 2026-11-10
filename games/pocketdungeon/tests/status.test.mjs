@@ -447,8 +447,11 @@ test('每個轉職技能都能施放並產生效果', () => {
     rejuvenate: (w) => w.player.regenT > 0,
     ironShirt: (w) => w.player.guardT > 0,
     nirvana: (w) => w.player.hp >= w.player.maxHp * 0.85,
+    holdTheLine: (w) => w.player.guardT > 0,
+    layOnHands: (w) => w.player.regenT > 0,
+    paladinOath: (w) => w.player.buffT > 0,
   };
-  for (const cls of ['warrior', 'archer', 'mage', 'thief', 'monk']) {
+  for (const cls of ['warrior', 'archer', 'mage', 'thief', 'monk', 'knight']) {
     for (const id of sk.classSkills(cls).filter((k) => sk.SKILLS[k].rebirth)) {
       const ch = hero(cls, 1, 3);
       ch.skills.slots = [id, null, null, null];
@@ -751,10 +754,10 @@ test('武僧：拳套（雙手）、三連擊（第三擊範圍重擊，停手 1
   assert.equal(w.player.hp, 10 + Math.round(w.player.maxHp * 0.25));
 });
 
-test('技能書：每個職業 10 種＋通用 15 種；非適合職業強度 30%、通用 100%；學會後可裝備與升級', () => {
+test('技能書：每個職業 10 種（6 個職業）＋通用 15 種；非適合職業強度 30%、通用 100%；學會後可裝備與升級', () => {
   const ids = sk.bookSkillIds();
-  assert.equal(ids.length, 65);
-  for (const cls of ['warrior', 'archer', 'mage', 'thief', 'monk', 'all']) assert.equal(ids.filter((id) => sk.SKILLS[id].cls === cls).length, cls === 'all' ? 15 : 10, cls);
+  assert.equal(ids.length, 75);
+  for (const cls of ['warrior', 'archer', 'mage', 'thief', 'monk', 'knight', 'all']) assert.equal(ids.filter((id) => sk.SKILLS[id].cls === cls).length, cls === 'all' ? 15 : 10, cls);
   assert.equal(sk.classSkills('warrior').length, 10, '職業技能不含技能書');
   const ch = hero('mage', 10);
   ch.skillBooks = {};
@@ -801,7 +804,7 @@ test('技能書只有 Boss 會掉（一般 30%、進化必掉）', () => {
 
 test('技能書稀有度：每職業普通 4、精良 3、稀有 2、傳說 1，通用 6／5／3／1；賣價依稀有度；掉落依權重', () => {
   const ids = sk.bookSkillIds();
-  for (const cls of ['warrior', 'archer', 'mage', 'thief', 'monk', 'all']) {
+  for (const cls of ['warrior', 'archer', 'mage', 'thief', 'monk', 'knight', 'all']) {
     const counts = [0, 0, 0, 0];
     for (const id of ids.filter((k) => sk.SKILLS[k].cls === cls)) counts[sk.SKILLS[id].rarity]++;
     assert.deepEqual(counts, cls === 'all' ? [6, 5, 3, 1] : [4, 3, 2, 1], cls);

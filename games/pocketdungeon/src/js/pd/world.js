@@ -875,7 +875,8 @@ export class World {
     const atk = CLASSES[this.ch.cls].attack;
     // 疾風步：攻擊間隔縮短 30%。
     p.atkCd = p.interval * (p.hasteT > 0 ? 0.7 : 1);
-    p.attackAnim = 0.18;
+    // 出手動畫 0.24 秒（6 格，約 25 FPS），只影響畫面，傷害在出手當下就判定。
+    p.attackAnim = 0.24;
     this.aim(atk.kind === 'arc' || atk.kind === 'combo' ? 2.6 : 7);
     const ang = Math.atan2(p.facing.y, p.facing.x);
     // 致命毒刃：普通攻擊必定中毒。
@@ -898,7 +899,8 @@ export class World {
       }
     }
     if (atk.kind === 'arc' || atk.kind === 'combo') {
-      this.effect('slash', p.x, p.y, { angle: ang, range: atk.range, arc: (atk.angle * Math.PI) / 180, look: atk.kind === 'combo' ? 'fist' : this.ch.cls });
+      // basic：普通攻擊的刀光（有動作圖的職業由動作圖表現，繪製時略過）。
+      this.effect('slash', p.x, p.y, { angle: ang, range: atk.range, arc: (atk.angle * Math.PI) / 180, look: atk.kind === 'combo' ? 'fist' : this.ch.cls, basic: true });
       for (const m of this.monsters.slice()) {
         if (m.intangible) continue;
         const d = dist(p.x, p.y, m.x, m.y);
@@ -907,7 +909,8 @@ export class World {
         }
       }
     } else {
-      this.effect('cast', p.x + p.facing.x * 0.5, p.y + p.facing.y * 0.5 - 0.2, { angle: ang, look: atk.kind });
+      // 法球出手的魔法陣停留久一點（0.3 秒），弓箭的閃光維持 0.15 秒。
+      this.effect('cast', p.x + p.facing.x * 0.5, p.y + p.facing.y * 0.5 - 0.2, { angle: ang, look: atk.kind, ...(atk.kind === 'orb' ? { life: 0.3 } : {}) });
       this.playerShot(Math.atan2(p.facing.y, p.facing.x), atk.kind, atk.mult, { explode: atk.kind === 'orb' ? atk.radius * (1 + p.pb.orbRadius / 100) : 0, range: atk.range, speed: atk.speed, status: p.attackStatus });
     }
   }

@@ -7,6 +7,40 @@ import { heroArt, monsterArt, itemArt } from './sprites.js';
 
 /** 一格的像素數。 */
 const T = 16;
+/** 普通攻擊的出手動畫長度（秒，與 World.playerAttack 設定的 attackAnim 相同）。 */
+const ATTACK_TIME = 0.24;
+
+/** 玩家揮砍特效的顏色（中段、外緣、刀鋒線），依職業或攻擊樣式（look）區分。 */
+const SLASH_COLORS = {
+  warrior: ['90,160,255', '200,230,255', '150,210,255'],
+  thief: ['170,90,255', '230,200,255', '200,140,255'],
+  fist: ['255,150,50', '255,230,150', '255,200,90'],
+  knight: ['230,200,90', '255,245,200', '255,225,130'],
+  default: ['200,225,255', '255,255,255', '255,236,170'],
+};
+
+/**
+ * 出手 6 階段（進度上限、前衝像素、垂直伸縮、前傾弧度），對應動作圖的 6 格攻擊序列；
+ * 沒有動作圖的職業以前衝、伸縮與前傾表現。
+ */
+const ATTACK_POSES = [
+  [0.12, -1, 0.92, -0.1], // 1 蓄力準備：後退、壓低、後仰
+  [0.25, 0, 1, 0], // 2 起手揮動
+  [0.42, 2, 1.05, 0.1], // 3 揮砍中：前衝、前傾
+  [0.62, 3, 1.08, 0.15], // 4 主要打擊：衝最遠
+  [0.82, 1.5, 0.95, 0.05], // 5 收招：往回收、稍微壓低
+  [1, 0.5, 1, 0], // 6 回到平衡
+];
+
+/**
+ * 依出手進度取得目前是第幾個階段（0～5）；每個階段是固定的一格，像像素動畫一樣逐格切換。
+ * @param {number} k 出手進度（0～1）。
+ * @returns {number} 階段索引。
+ */
+function attackPhase(k) {
+  const i = ATTACK_POSES.findIndex((ph) => k < ph[0]);
+  return i < 0 ? ATTACK_POSES.length - 1 : i;
+}
 
 /** 各區域的地圖色調：地板兩色、地板斑點（草原為小花）、牆頂、牆面、牆面暗線、地圖外背景。 */
 const THEMES = {
@@ -725,7 +759,7 @@ export class Renderer {
   }
 
   /**
-   * 依畫布的 CSS 大小調整解析度與整數放大倍率（畫面短邊約 11 格）。
+   * 依畫布的 CSS 大小調整解析度與整數放大倍率（畫面短邊約 11 格；夠大時取偶數，配合 2 倍密度的角色圖）。
    * @returns {void}
    */
   resize() {
@@ -736,7 +770,8 @@ export class Renderer {
     this.canvas.width = w;
     this.canvas.height = h;
     const target = Math.min(w / (11 * T), h / (11 * T));
-    this.scale = Math.max(1, Math.round(target));
+    // 角色圖是 2 倍密度，放大倍率取偶數，半格的像素才會落在整數的螢幕像素上。
+    this.scale = target >= 3 ? Math.max(2, Math.round(target / 2) * 2) : Math.max(1, Math.round(target));
     this.viewW = w / this.scale;
     this.viewH = h / this.scale;
   }
@@ -1284,21 +1319,27 @@ export class Renderer {
       if (e.p) {
         const art = heroArt(world.ch.cls);
         const blink = p.invuln > 0 && p.hurt > -0.3 && Math.floor(world.time * 16) % 2 === 0;
-        // 走路循環：抬左腳 → 站立 → 抬右腳 → 站立。
-        const step = [1, 0, 2, 0][Math.floor(world.time * 8) % 4];
-        // 攻擊或施放技能時依方向切到出手姿勢：側面（左右翻轉）、朝下（正面）、朝上（背影）。
-        const acting = p.attackAnim > 0 || p.skillAnim > 0;
+        // 依面向選方向：正面（朝下）、背面（朝上）、側面（面向左時翻轉）。
         const vertical = Math.abs(p.facing.y) > Math.abs(p.facing.x) * 1.2;
-        const pose = !acting ? null : vertical ? (p.facing.y > 0 ? 'down' : 'up') : 'side';
-        // 普攻時改用拿掉右手臂的幀，手臂另外從肩膀畫出、與武器一起揮動。
-        const swinging = p.attackAnim > 0;
-        const frame = swinging ? (pose === 'up' ? 7 : 6) : { side: 3, down: 4, up: 5 }[pose] ?? (p.moving ? step : 0);
-        const img = (p.hurt > 0.15 ? art.flash : art.frames)[frame];
-        const flip = p.facing.x < 0;
-        const lunge = acting ? 2 : 0;
+        const dir = vertical ? (p.facing.y > 0 ? 'down' : 'up') : 'side';
+        const set = (p.hurt > 0.15 ? art.flash : art.dirs)[dir];
+        const flip = dir === 'side' && p.facing.x < 0;
+        // 攻擊或施放技能：有動作圖時逐格播放該方向的 6～8 格（準備 → 起手 → 揮擊 → 命中 → 收招 → 回到待機），
+        // 沒有動作圖時以前衝、伸縮與前傾表現 6 個階段。
+        const acting = p.attackAnim > 0 || p.skillAnim > 0;
+        const ak = acting ? 1 - Math.max(p.attackAnim / ATTACK_TIME, p.skillAnim / 0.25) : 1;
+        const phase = acting ? attackPhase(ak) : -1;
+        const animated = acting && set.attack;
+        const ph = acting && !animated ? ATTACK_POSES[phase] : null;
+        // 走路循環 4 格（踏步 → 上浮 → 換腳 → 上浮），每秒 8 格。
+        const step = Math.floor(world.time * 8) % 4;
+        // 動作圖依格數平均分配出手時間（6 格或 8 格）。
+        const frameIdx = animated ? Math.min(set.attack.length - 1, Math.floor(ak * set.attack.length)) : 0;
+        const img = animated ? set.attack[frameIdx] : p.moving ? set.walk[step] : set.stand;
+        const lunge = ph ? ph[1] : 0;
         const px = p.x * T + p.facing.x * lunge;
         const py = p.y * T + p.facing.y * lunge;
-        const bob = !p.moving && Math.floor(world.time * 2) % 2 ? 1 : 0;
+        const bob = !p.moving && !acting && Math.floor(world.time * 2) % 2 ? 1 : 0;
         this.shadow(p.x, p.y, 5);
         if (p.buffT > 0) {
           // 戰吼中：腳下金色光環。
@@ -1309,19 +1350,15 @@ export class Renderer {
           g.stroke();
         }
         if (p.dodgeT > 0) g.globalAlpha = 0.55;
-        // 出手的彈性：前段蓄力（變矮變寬），後段伸展（變高變窄）。
-        const ak = acting ? 1 - Math.max(p.attackAnim / 0.18, p.skillAnim / 0.25) : 1;
-        const sy = acting ? (ak < 0.35 ? 0.9 : 1.06) : 1;
-        // 右肩的位置（圖的第 12.5 欄、第 10 列，隨垂直伸縮與上下浮動移動）：手臂與武器以此為支點。
-        const shoulder = { x: px + (flip ? -4 : 4), y: py + 5 - 10 * sy + bob };
+        const sy = ph ? ph[2] : 1;
+        // 左右出手時身體朝面向前傾（往上、往下出手時不傾斜）。
+        const tilt = ph && dir === 'side' ? ph[3] * (flip ? -1 : 1) : 0;
         const hidden = blink && p.dodgeT <= 0;
-        // 朝上攻擊時手臂與武器在身體後面，其他方向在前面。
-        if (swinging && pose === 'up' && !hidden) this.weapon(world, art.palette, shoulder.x, shoulder.y);
-        if (!hidden) this.sprite(img, px / T, py / T, flip, 1, bob, sy);
-        if (swinging && pose !== 'up' && !hidden) this.weapon(world, art.palette, shoulder.x, shoulder.y);
+        // 角色圖腳底以下留有特效用的列，往下移讓腳踩在原本的位置。
+        if (!hidden) this.sprite(img, px / T, py / T + art.foot / art.density / T, flip, 1, bob, sy, art.density, tilt);
         g.globalAlpha = 1;
         this.drawPlayerAuras(world);
-        const head = Math.round(p.y * T + 5 - img.height);
+        const head = Math.round(p.y * T + 5 - art.standH / art.density);
         this.statusMarks(world, p.x * T, head - 16, p.status);
         this.playerBar(world, p, head);
         continue;
@@ -1626,13 +1663,21 @@ export class Renderer {
    * @param {number} scale 放大倍率。
    * @param {number} bob 上下偏移（像素）。
    * @param {number} [sy=1] 垂直伸縮（攻擊時的彈性，寬度反向調整以維持份量）。
+   * @param {number} [density=1] 圖的像素密度（角色圖為 2：每 2 個圖像素佔世界的 1 像素）。
+   * @param {number} [tilt=0] 以腳底為支點的傾斜角度（弧度，正值往右傾）。
    */
-  sprite(img, x, y, flip, scale, bob, sy = 1) {
+  sprite(img, x, y, flip, scale, bob, sy = 1, density = 1, tilt = 0) {
     const g = this.ctx;
-    const w = img.width * scale * (2 - sy);
-    const h = img.height * scale * sy;
+    const w = (img.width / density) * scale * (2 - sy);
+    const h = (img.height / density) * scale * sy;
     const px = Math.round(x * T - w / 2);
     const py = Math.round(y * T + 5 * Math.min(scale, 1.5) - h) + bob;
+    if (tilt) {
+      g.save();
+      g.translate(px + w / 2, py + h);
+      g.rotate(tilt);
+      g.translate(-(px + w / 2), -(py + h));
+    }
     if (flip) {
       g.save();
       g.translate(px + w, py);
@@ -1642,138 +1687,8 @@ export class Renderer {
     } else {
       g.drawImage(img, px, py, w, h);
     }
+    if (tilt) g.restore();
   }
-
-  /**
-   * 攻擊時從肩膀畫出手臂與武器（戰士的劍、盜賊的匕首、武僧的拳套、弓箭手的弓、法師的法杖）：
-   * 手臂、武器與握住武器的手在同一個旋轉座標下繪製，整組一起揮出，武器不會和手臂分開。
-   * @param {object} world 探險。
-   * @param {Record<string, string>} pal 角色調色盤（取袖子與皮膚的顏色）。
-   * @param {number} sx 肩膀位置 x（像素）。
-   * @param {number} sy 肩膀位置 y（像素）。
-   */
-  weapon(world, pal, sx, sy) {
-    const g = this.ctx;
-    const p = world.player;
-    const cls = world.ch.cls;
-    const O = '#1a1020';
-    const k = Math.min(1, 1 - p.attackAnim / 0.18);
-    const ease = 1 - (1 - k) ** 3;
-    const thrust = Math.sin(Math.PI * k);
-    const a = Math.atan2(p.facing.y, p.facing.x);
-    const s = swingDir(a);
-    // 戰士從頭頂後方劈到身前下方（約 165°）；盜賊的匕首在身前快速橫劃（約 100°）；其他職業朝面向伸出。
-    const sweep = { warrior: [-1.9, 1.0], thief: [-0.9, 0.85] }[cls];
-    const angle = sweep ? a + s * (sweep[0] + (sweep[1] - sweep[0]) * ease) : a;
-    // 手臂很短（約 2～3 像素，手幾乎貼著肩膀）；拳與法杖出手時稍微伸長再收回。
-    const L = { thief: 2.5 + 0.5 * thrust, monk: 2 + 1.5 * thrust, mage: 2.5 + 0.5 * thrust }[cls] ?? 2.5;
-    const skin = pal.s;
-    const sleeve = { warrior: pal.m, mage: pal.P, monk: pal.Y }[cls] || skin;
-    g.save();
-    g.translate(Math.round(sx), Math.round(sy));
-    g.rotate(angle);
-    // 手臂：短而粗的 Q 版手臂，深色輪廓包住袖子。
-    g.fillStyle = O;
-    g.fillRect(-2, -2, L + 2, 4);
-    g.fillStyle = sleeve;
-    g.fillRect(-1, -1, L, 2);
-    g.fillStyle = 'rgba(255,255,255,0.25)';
-    g.fillRect(-1, -1, L, 1);
-    if (cls === 'warrior') {
-      // 劍（全長約 12 像素，約角色身高的六成）：劍柄握在手裡，護手、劍身朝外。
-      g.fillStyle = O;
-      g.fillRect(L - 1, -1.5, 3, 3);
-      g.fillRect(L + 3, -2, 10, 4);
-      g.fillRect(L + 1.5, -3, 3, 6);
-      g.fillStyle = '#d8dee8';
-      g.fillRect(L + 4, -1, 8, 2);
-      g.fillStyle = '#ffffff';
-      g.fillRect(L + 4, -1, 8, 1);
-      g.fillStyle = '#e8b84a';
-      g.fillRect(L + 2.5, -2, 1, 4);
-      g.fillStyle = '#6b4226';
-      g.fillRect(L - 1, -0.5, 3, 1);
-    } else if (cls === 'thief') {
-      // 匕首：短刃（約 5 像素）隨手臂劃過。
-      g.fillStyle = O;
-      g.fillRect(L + 1, -2, 7, 4);
-      g.fillStyle = '#e8eef5';
-      g.fillRect(L + 3, -1, 4, 2);
-      g.fillStyle = '#ffffff';
-      g.fillRect(L + 3, -1, 4, 1);
-      g.fillStyle = '#c0c6d0';
-      g.fillRect(L + 2, -2, 1, 4);
-    } else if (cls === 'monk') {
-      // 拳套就是手（比頭小一些）：第三擊拳頭較大。
-      const big = p.combo === 3 ? 1.3 : 1;
-      g.fillStyle = O;
-      g.fillRect(L - 1, -2.5 * big, 5 * big, 5 * big);
-      g.fillStyle = '#e8862a';
-      g.fillRect(L, -1.5 * big, 3 * big, 3 * big);
-      g.fillStyle = '#ffd08a';
-      g.fillRect(L + 2 * big, -1.5 * big, 1 * big, 1 * big);
-    } else if (cls === 'archer') {
-      // 弓：手握弓臂中央，前半段拉弓（弦往後），放箭後弦彈回。
-      const pull = k < 0.4 ? 2 : 0;
-      const R = 5.5;
-      const cx = L + 1 - R;
-      g.strokeStyle = O;
-      g.lineWidth = 3;
-      g.beginPath();
-      g.arc(cx, 0, R, -1.15, 1.15);
-      g.stroke();
-      g.strokeStyle = '#b07a3e';
-      g.lineWidth = 1.5;
-      g.beginPath();
-      g.arc(cx, 0, R, -1.15, 1.15);
-      g.stroke();
-      g.strokeStyle = '#f0e6d0';
-      g.lineWidth = 0.7;
-      g.beginPath();
-      g.moveTo(cx + Math.cos(-1.15) * R, Math.sin(-1.15) * R);
-      g.lineTo(cx + Math.cos(-1.15) * R - pull, 0);
-      g.lineTo(cx + Math.cos(1.15) * R, Math.sin(1.15) * R);
-      g.stroke();
-      if (pull) {
-        // 拉弓時箭搭在弦上：箭尾貼著弦，箭頭越過弓臂。
-        const tail = cx + Math.cos(1.15) * R - pull;
-        g.fillStyle = O;
-        g.fillRect(tail, -1, L + 6 - tail, 2);
-        g.fillStyle = '#c89a5a';
-        g.fillRect(tail, -0.5, L + 5 - tail, 1);
-        g.fillStyle = '#e8eef5';
-        g.fillRect(L + 4, -1, 2, 2);
-      }
-    } else {
-      // 法杖：握住杖身中段往前舉（全長約 11 像素），杖頭寶石發光。
-      g.fillStyle = O;
-      g.fillRect(L - 3, -1.5, 11, 3);
-      g.fillStyle = '#8a5a2a';
-      g.fillRect(L - 2, -0.5, 9, 1);
-      const glow = g.createRadialGradient(L + 9, 0, 0, L + 9, 0, 5);
-      glow.addColorStop(0, 'rgba(230,210,255,0.95)');
-      glow.addColorStop(1, 'rgba(154,122,208,0)');
-      g.fillStyle = glow;
-      g.fillRect(L + 4, -5, 10, 10);
-      g.fillStyle = O;
-      g.fillRect(L + 7, -2, 4, 4);
-      g.fillStyle = '#c8a8ff';
-      g.fillRect(L + 8, -1, 2, 2);
-      g.fillStyle = '#ffffff';
-      g.fillRect(L + 8, -1, 1, 1);
-    }
-    if (cls !== 'monk') {
-      // 握住武器的手畫在最上層，手指包住握柄。
-      g.fillStyle = O;
-      g.fillRect(L - 1, -2, 4, 4);
-      g.fillStyle = skin;
-      g.fillRect(L, -1, 2, 2);
-      g.fillStyle = pal.S || skin;
-      g.fillRect(L, 0.5, 2, 0.5);
-    }
-    g.restore();
-  }
-
 
   /**
    * 畫投射物：箭、法球、火球、冰彈。
@@ -1846,15 +1761,57 @@ export class Renderer {
 
 
   /**
+   * 畫紫色魔法陣：內外兩圈、旋轉的六芒星與外圈刻度（法師出手用）。
+   * @param {number} x 中心 x（像素）。
+   * @param {number} y 中心 y（像素）。
+   * @param {number} r 半徑（像素）。
+   * @param {number} spin 旋轉角度（弧度）。
+   * @param {number} alpha 不透明度。
+   */
+  magicCircle(x, y, r, spin, alpha) {
+    const g = this.ctx;
+    g.save();
+    g.strokeStyle = `rgba(200,150,255,${0.9 * alpha})`;
+    g.lineWidth = 0.75;
+    g.beginPath();
+    g.arc(x, y, r, 0, Math.PI * 2);
+    g.stroke();
+    g.beginPath();
+    g.arc(x, y, r * 0.62, 0, Math.PI * 2);
+    g.stroke();
+    // 兩個交錯的三角形組成六芒星。
+    for (const off of [0, Math.PI / 3]) {
+      g.beginPath();
+      for (let n = 0; n <= 3; n++) {
+        const a = spin + off + (n * Math.PI * 2) / 3;
+        const px = x + Math.cos(a) * r * 0.62;
+        const py = y + Math.sin(a) * r * 0.62;
+        if (n === 0) g.moveTo(px, py);
+        else g.lineTo(px, py);
+      }
+      g.stroke();
+    }
+    g.fillStyle = `rgba(235,215,255,${alpha})`;
+    for (let n = 0; n < 8; n++) {
+      const a = -spin + (n * Math.PI) / 4;
+      g.fillRect(x + Math.cos(a) * r - 0.5, y + Math.sin(a) * r - 0.5, 1, 1);
+    }
+    g.restore();
+  }
+
+  /**
    * 畫效果：斬擊、爆炸、消失的煙霧、升級、傷害數字。
    * @param {object} world 探險。
    */
   drawEffects(world) {
     const g = this.ctx;
+    // 有動作圖的職業，普攻的刀光與魔法陣已經畫在動作圖裡，不再另外畫。
+    const framed = !!heroArt(world.ch.cls).dirs.side.attack;
     for (const e of world.effects) {
       const k = e.t / e.life;
       const x = e.x * T;
       const y = e.y * T;
+      if (e.kind === 'slash' && framed && e.basic) continue;
       if (e.kind === 'slash') {
         // 新月形刀光：快速掃過 120°，之後逐漸淡出。
         // 玩家的刀光與武器同向掃過（見 swingDir）；怪物的揮砍一律順時針。
@@ -1866,8 +1823,8 @@ export class Renderer {
         const inner = outer * 0.5;
         const fade = k < 0.4 ? 1 : 1 - (k - 0.4) / 0.6;
         const grad = g.createRadialGradient(x, y - 3, inner, x, y - 3, outer);
-        // 怪物的普通攻擊是紅色的揮砍，與玩家的白色刀光區分。
-        const [mid, edge] = e.enemy ? ['255,120,110', '255,200,190'] : ['200,225,255', '255,255,255'];
+        // 怪物的普通攻擊是紅色的揮砍；玩家依職業配色：戰士藍色、盜賊紫色、武僧橘色掌風、騎士金色，其他為白色。
+        const [mid, edge, rim] = e.enemy ? ['255,120,110', '255,200,190', '255,90,80'] : SLASH_COLORS[e.look] || SLASH_COLORS.default;
         grad.addColorStop(0, 'rgba(255,255,255,0)');
         grad.addColorStop(0.7, `rgba(${mid},${0.45 * fade})`);
         grad.addColorStop(1, `rgba(${edge},${0.95 * fade})`);
@@ -1877,7 +1834,7 @@ export class Renderer {
         g.arc(x, y - 3, inner, end, start, dir > 0);
         g.closePath();
         g.fill();
-        g.strokeStyle = e.enemy ? `rgba(255,90,80,${0.9 * fade})` : `rgba(255,236,170,${0.9 * fade})`;
+        g.strokeStyle = `rgba(${rim},${0.9 * fade})`;
         g.lineWidth = 1;
         g.beginPath();
         g.arc(x, y - 3, outer, start, end, dir < 0);
@@ -1900,8 +1857,9 @@ export class Renderer {
         g.arc(x, y, 3 * (1 - k), 0, Math.PI * 2);
         g.fill();
       } else if (e.kind === 'cast') {
-        // 出手的閃光：弓箭是白色、法球是紫色。
-        const c = e.look === 'orb' ? '200,168,255' : '255,250,230';
+        // 出手的閃光：弓箭是金色、法球是紫色；法球另外在手前方展開旋轉的魔法陣。
+        const c = e.look === 'orb' ? '200,168,255' : '255,226,140';
+        if (e.look === 'orb' && !framed) this.magicCircle(x + Math.cos(e.angle) * 6, y + Math.sin(e.angle) * 6, 7 * (0.6 + 0.4 * Math.min(1, k * 3)), world.time * 4, 1 - k);
         g.strokeStyle = `rgba(${c},${1 - k})`;
         g.lineWidth = 1.2;
         g.beginPath();

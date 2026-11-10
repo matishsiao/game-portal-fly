@@ -2,247 +2,10 @@
 // 角色有站立與左右腳交替的走路幀；怪物有 2 幀；Boss 以 2 倍大小繪製。
 
 import { HOME_MATS } from './homeData.js';
+import { HERO_SPRITES } from './heroSprites.js';
 
 /** 共用顏色。 */
 const O = '#1a1020';
-
-/**
- * 職業圖（16 × 20）：上半身與頭部共用，下半身有站立、抬左腳、抬右腳三種姿勢；走路時依 抬左腳 → 站立 → 抬右腳 → 站立 循環。
- * 法師穿長袍，下半身以袍擺與露出的鞋子表現。
- * @type {Record<string, {palette: Record<string, string>, top: string[]}>}
- */
-const BODY = {
-  warrior: {
-    palette: { o: O, H: '#b8c0cc', h: '#eef2f8', d: '#7a8496', s: '#f2c9a0', S: '#c8946a', e: O, R: '#b23a48', r: '#7e2232', a: '#e8b84a', m: '#8a92a2', K: '#5a3a22', P: '#4a3a5a', p: '#33283f', B: '#5a3a22', b: '#8a5a34' },
-    top: [
-      '................',
-      '....oooooooo....',
-      '...ohhHHHHHdo...',
-      '...ohHHHHHHdo...',
-      '...oddddddddo...',
-      '...osesssesSo...',
-      '...osssssssSo...',
-      '....oSSSSSSo....',
-      '..ohHoRRRRoHdo..',
-      '..oddoRRRRoddo..',
-      '..omoRRaaRRomo..',
-      '..omorRRRRromo..',
-      '..osoKKaKKKoso..',
-      '...oorrrrrroo...',
-    ],
-  },
-  archer: {
-    palette: { o: O, G: '#3f8f4a', g: '#7cc46a', n: '#2a5e33', s: '#f2c9a0', S: '#c8946a', e: O, T: '#8a5a2a', t: '#b07a3e', K: '#4a2a14', a: '#e8b84a', P: '#3a4a2a', p: '#2a3420', B: '#5a3a22', b: '#8a5a34' },
-    top: [
-      '................',
-      '.....oooooo.....',
-      '....ogGGGGGo....',
-      '...ogGGGGGGno...',
-      '...oGGsssssno...',
-      '...oGsessesno...',
-      '...oGssssSSno...',
-      '....onSSSSno....',
-      '...oGGTTTTGGo...',
-      '..ognTTKTTTngo..',
-      '..osoTTTKTToso..',
-      '..osotTTTKToso..',
-      '..osoKKaKKKoso..',
-      '...ooTTTTTToo...',
-    ],
-  },
-  mage: {
-    palette: { o: O, P: '#5b3a8f', p: '#8a6ac8', q: '#3a2462', a: '#e8b84a', s: '#f2c9a0', S: '#c8946a', e: O, B: '#3a2a1a', b: '#5a4030' },
-    top: [
-      '.......oo.......',
-      '......oPPo......',
-      '.....oPpPqo.....',
-      '.....oPPPqo.....',
-      '....oaaaaaao....',
-      '..ooPPPPPPPPoo..',
-      '...oosesseSoo...',
-      '....osssSSo.....',
-      '...oPPPaaPPPo...',
-      '..opPPPaPPPPqo..',
-      '..osoPPaPPPoso..',
-      '..ooPPPaPPPqoo..',
-      '...oPPPaPPPqo...',
-      '...opPPaPPPqo...',
-      '..opPPPaPPPPqo..',
-      '..oPPPPaPPPPqo..',
-    ],
-  },
-};
-
-// 盜賊：以弓箭手的上半身為基礎，深色兜帽、面罩與紅色圍巾。
-BODY.thief = {
-  palette: { o: O, G: '#4a4a5c', g: '#6e6e86', n: '#2c2c3a', s: '#f2c9a0', S: '#c8946a', e: O, m: '#1e1e28', R: '#a8283a', T: '#3a3a4c', t: '#56566e', K: '#2a1a14', a: '#c0c6d0', P: '#2a2a36', p: '#1a1a24', B: '#3a2a1e', b: '#5a4030' },
-  top: BODY.archer.top.map((row, i) => ({ 6: '...oGsmmmmmno...', 7: '....onRRRRno....' })[i] || row),
-};
-
-// 武僧：光頭、橘色武道服、念珠與黑腰帶。
-BODY.monk = {
-  palette: { o: O, s: '#f2c9a0', S: '#c8946a', e: O, Y: '#e8862a', y: '#a85a14', W: '#f0e6c8', a: '#7a3a1a', K: '#2a1a14', P: '#c0701e', p: '#8a4a14', B: '#5a3a22', b: '#8a5a34' },
-  top: [
-    '................',
-    '.....oooooo.....',
-    '....osssssso....',
-    '...osssssssSo...',
-    '...osssssssSo...',
-    '...osessesSSo...',
-    '...ossssssSSo...',
-    '....oSSSSSSo....',
-    '...oYYWWWWYYo...',
-    '..oyYYaWWaYYyo..',
-    '..osoYYaaYYoso..',
-    '..osoyYYYYyoso..',
-    '..osoKKKKKKoso..',
-    '...ooyyyyyyoo...',
-  ],
-};
-
-/** 側面出手：只替換上半身的幾列（列索引 → 新內容），手臂朝右伸出；面向左時整張翻轉。 */
-const ATTACK_ROWS = {
-  warrior: {
-    9: '..oddoRRRRoddoo.',
-    10: '..omoRRaaRRmmmso',
-    11: '..omorRRRRroooo.',
-    12: '..osoKKaKKKo....',
-  },
-  archer: {
-    9: '..ognTTKTTTnooo.',
-    10: '..osoTTTKTTssso.',
-    11: '..osotTTTKToooo.',
-    12: '..osoKKaKKKo....',
-  },
-  mage: {
-    10: '..osoPPaPPPpsso.',
-    11: '..ooPPPaPPPqooo.',
-  },
-};
-
-/** 朝下出手（正面，雙手握在胸前）。 */
-const ATTACK_DOWN = {
-  warrior: {
-    10: '...omRRaaRRmo...',
-    11: '...omrRRRRrmo...',
-    12: '...oKKssssKKo...',
-  },
-  archer: {
-    10: '...osTTTKTTso...',
-    11: '...ootTTTKToo...',
-    12: '...oKKssssKKo...',
-  },
-  mage: {
-    10: '...ooPPaPPPoo...',
-    11: '...oPPssssPqo...',
-  },
-};
-
-/** 朝上出手（背影，雙手舉起）。 */
-const ATTACK_UP = {
-  warrior: {
-    5: '...oHHHHHHHdo...',
-    6: '...odHHHHHHdo...',
-    7: '....oddddddo....',
-    8: '.sohHoRRRRoHdos.',
-    10: '...oRRRRRRRRo...',
-    11: '...orRRRRRRro...',
-    12: '...oKKKKKKKKo...',
-  },
-  archer: {
-    4: '...oGGGGGGGno...',
-    5: '...oGGGGGGGno...',
-    6: '...oGGGGGGnno...',
-    7: '....onnnnnno....',
-    8: '.sooGGTTTTGGoos.',
-    10: '...oTTTKTTTTo...',
-    11: '...otTTTTKTTo...',
-    12: '...oKKKKKKKKo...',
-  },
-  mage: {
-    6: '...ooqqqqqqoo...',
-    7: '....oqqqqqo.....',
-    8: '...oPPPPPPPPo...',
-    9: '.sopPPPPPPPPqos.',
-    10: '..ooPPPPPPPPoo..',
-    11: '..ooPPPPPPPqoo..',
-    12: '...oPPPPPPPqo...',
-    13: '...opPPPPPPqo...',
-    14: '..opPPPPPPPPqo..',
-    15: '..oPPPPPPPPPqo..',
-  },
-};
-
-// 盜賊的出手姿勢與弓箭手相同（同一個上半身骨架）；武僧另外畫出拳的手臂。
-ATTACK_ROWS.thief = ATTACK_ROWS.archer;
-ATTACK_DOWN.thief = ATTACK_DOWN.archer;
-ATTACK_UP.thief = ATTACK_UP.archer;
-ATTACK_ROWS.monk = {
-  9: '..oyYYaWWaYyooo.',
-  10: '..osoYYaaYYssso.',
-  11: '..osoyYYYYyoooo.',
-  12: '..osoKKKKKKo....',
-};
-ATTACK_DOWN.monk = {
-  10: '...osYYaaYYso...',
-  11: '...ooyYYYYyoo...',
-  12: '...oKKssssKKo...',
-};
-ATTACK_UP.monk = {
-  6: '...oSSSSSSSSo...',
-  7: '....oSSSSSSo....',
-  8: '.sooYYWWWWYYoos.',
-  10: '...oYYYaaYYYo...',
-  11: '...oyYYYYYYyo...',
-  12: '...oKKKKKKKKo...',
-};
-
-/** 一般職業的下半身（褲子與靴子）：站立、抬左腳、抬右腳。 */
-const LEGS = {
-  stand: [
-    '...oPPPPPPPPo...',
-    '...oPPpooPPpo...',
-    '...oPPpooPPpo...',
-    '...obBBoobBBo...',
-    '...oBBBooBBBo...',
-    '...oooo..oooo...',
-  ],
-  left: [
-    '...oPPPPPPPPo...',
-    '...oPPpooPPpo...',
-    '...obBBooPPpo...',
-    '...oBBBoobBBo...',
-    '...ooooooBBBo...',
-    '........ooooo...',
-  ],
-  right: [
-    '...oPPPPPPPPo...',
-    '...oPPpooPPpo...',
-    '...oPPpoobBBo...',
-    '...obBBooBBBo...',
-    '...oBBBoooooo...',
-    '...ooooo........',
-  ],
-};
-
-/** 法師的下半身（袍擺與鞋子）：站立、左腳在前、右腳在前。 */
-const ROBE = {
-  stand: [
-    '..oqqqqqqqqqqo..',
-    '...oBBo..oBBo...',
-    '...oooo..oooo...',
-  ],
-  left: [
-    '.oqqqqqqqqqqo...',
-    '..oBBo...oBo....',
-    '..oooo...ooo....',
-  ],
-  right: [
-    '...oqqqqqqqqqqo.',
-    '....oBo...oBBo..',
-    '....ooo...oooo..',
-  ],
-};
 
 /**
  * 怪物與 Boss 圖：palette 調色盤、evolvedPalette 進化 Boss 的配色（只有 Boss 有）、frames 兩幀（第二幀省略時與第一幀相同，繪製時以上下浮動表現）。
@@ -695,45 +458,96 @@ function makeCanvas(w, h) {
 const cache = new Map();
 
 /**
- * 拿掉上半身右側（第 12～13 欄）的手臂，身體邊緣補上輪廓線；普攻時由繪製端另外畫出可旋轉的手臂。
- * @param {string[]} top 上半身各列。
- * @returns {string[]} 去掉右手臂後的各列。
+ * 由待機圖產生 4 格走路循環（參考走路動作圖：踏步 → 身體上浮 → 換腳踏步 → 身體上浮）。
+ * 正面與背面：腳部（腳底以上 6 列）以中線分左右，輪流抬起 2 格；側面：前腳往前、後腳往後各跨 1 格，下一步前後交換。
+ * 踏步之間的格子把腳部以上的身體往上移 1 格，表現走路時身體的起伏。
+ * @param {string[]} rows 待機圖（已貼在共用畫布上）。
+ * @param {number} foot 腳底以下的列數。
+ * @param {'down' | 'up' | 'side'} dir 方向。
+ * @returns {string[][]} 4 格走路幀。
  */
-function withoutArm(top) {
-  return top.map((row, i) => {
-    const c = row.split('');
-    if (i >= 10 && i <= 12) {
-      c[12] = c[11] === 'o' ? '.' : 'o';
-      c[13] = '.';
-    } else if (i === 13 && c[11] === 'o' && c[12] === 'o') {
-      c[12] = '.';
-    }
-    return c.join('');
+function walkCycle(rows, foot, dir) {
+  const H = rows.length - foot;
+  const W = rows[0].length;
+  const legTop = H - 6;
+  const mid = W / 2;
+  /** 取 (x, y) 的像素（超出範圍為透明）。 */
+  const at = (x, y) => (y >= 0 && y < rows.length && x >= 0 && x < W ? rows[y][x] : '.');
+  /** 依每個像素的來源位置建立一格。 */
+  const build = (src) => rows.map((r, y) => [...r].map((c, x) => src(x, y)).join(''));
+  /** 身體上浮：腳部以上整體往上移 1 格（腳部不動，腿看起來伸長）。 */
+  const bob = build((x, y) => (y < legTop ? at(x, y + 1) : at(x, y)));
+  if (dir === 'side') {
+    /** 跨步：畫面右半（前腳）往 front 方向移、左半（後腳）往反方向移；後腳先畫，前腳蓋在上面。 */
+    const stride = (front) => build((x, y) => {
+      if (y < legTop || y >= H) return at(x, y);
+      const fromFront = at(x - front, y);
+      if (fromFront !== '.' && x - front >= mid) return fromFront;
+      const fromBack = at(x + front, y);
+      return fromBack !== '.' && x + front < mid ? fromBack : '.';
+    });
+    return [stride(1), bob, stride(-1), bob];
+  }
+  /** 抬腳：腳部中線一側的像素往上移 2 格。 */
+  const lift = (left) => build((x, y) => {
+    if (y < legTop || y >= H || (x < mid) !== left) return at(x, y);
+    return y + 2 < H ? at(x, y + 2) : '.';
   });
+  return [lift(true), bob, lift(false), bob];
 }
 
 /**
- * 取得角色圖（含受傷閃白的版本）：frames 依序為站立、抬左腳、抬右腳、側面出手、朝下出手、朝上出手（技能用），
- * 以及普攻用的無右手臂正面／背影；palette 供繪製手臂時取色。
+ * 把一格（緊貼的像素與位置）貼到職業的共用畫布上。
+ * @param {{w: number, h: number}} h 職業圖資料。
+ * @param {{x: number, y: number, rows: string[]}} f 一格。
+ * @returns {string[]} 共用畫布大小的各列。
+ */
+function place(h, f) {
+  const out = Array.from({ length: h.h }, () => '.'.repeat(h.w).split(''));
+  f.rows.forEach((r, y) => [...r].forEach((c, x) => {
+    if (c !== '.' && out[f.y + y] && f.x + x >= 0 && f.x + x < h.w) out[f.y + y][f.x + x] = c;
+  }));
+  return out.map((r) => r.join(''));
+}
+
+/**
+ * 取得角色圖（含受傷閃白的版本）。
+ * dirs 依方向（down 正面、up 背面、side 面向右，面向左時翻轉）提供待機、走路 4 格（踏步、上浮、換腳、上浮）與攻擊 6～8 格；
+ * 沒有動作圖的職業 attack 為 null（攻擊時以程式變形表現）。frames 是側面的待機與兩個跨步幀（家園用），
+ * portrait 是緊貼的正面待機圖（介面頭像用）。圖是 2 倍密度（density 2），腳底以下有 foot 列（特效用）。
  * @param {string} cls 職業。
- * @returns {{palette: Record<string, string>, frames: HTMLCanvasElement[], flash: HTMLCanvasElement[], scale: number, alpha: number}} 圖。
+ * @returns {{palette: Record<string, string>, dirs: Record<string, {stand: HTMLCanvasElement, walk: HTMLCanvasElement[], attack: HTMLCanvasElement[] | null}>, flash: Record<string, {stand: HTMLCanvasElement, walk: HTMLCanvasElement[], attack: HTMLCanvasElement[] | null}>, frames: HTMLCanvasElement[], portrait: HTMLCanvasElement, scale: number, alpha: number, density: number, foot: number, standH: number}} 圖。
  */
 export function heroArt(cls) {
   const key = `hero-${cls}`;
   if (!cache.has(key)) {
-    const b = BODY[cls];
-    const legs = cls === 'mage' ? ROBE : LEGS;
-    const frames = ['stand', 'left', 'right'].map((k) => b.top.concat(legs[k]));
-    for (const pose of [ATTACK_ROWS, ATTACK_DOWN, ATTACK_UP]) frames.push(b.top.map((row, i) => pose[cls][i] || row).concat(legs.stand));
-    // 普攻用的兩幀（6：側面／正面，7：背影）：拿掉右手臂，改由繪製端從肩膀畫出手臂與武器一起揮動。
-    frames.push(withoutArm(b.top).concat(legs.stand));
-    frames.push(b.top.map((row, i) => (ATTACK_UP[cls][i] || row).replace(/^(.{14})s/, '$1.')).concat(legs.stand));
+    const h = HERO_SPRITES[cls];
+    /** 依調色盤（或閃白色）建立各方向的圖。 */
+    const build = (tint) => {
+      const dirs = {};
+      for (const [d, list] of Object.entries(h.frames)) {
+        const stand = place(h, list[0]);
+        dirs[d] = {
+          stand: paint(stand, h.palette, tint),
+          walk: walkCycle(stand, h.foot, d).map((r) => paint(r, h.palette, tint)),
+          attack: list.length > 1 ? list.map((f) => paint(place(h, f), h.palette, tint)) : null,
+        };
+      }
+      return dirs;
+    };
+    const dirs = build();
+    const down = h.frames.down[0];
     cache.set(key, {
-      palette: b.palette,
-      frames: frames.map((r) => paint(r, b.palette)),
-      flash: frames.map((r) => paint(r, b.palette, '#ffffff')),
+      palette: h.palette,
+      dirs,
+      flash: build('#ffffff'),
+      frames: [dirs.side.stand, dirs.side.walk[0], dirs.side.walk[2]],
+      portrait: paint(down.rows, h.palette),
       scale: 1,
       alpha: 1,
+      density: 2,
+      foot: h.foot,
+      standH: h.h - h.foot - down.y,
     });
   }
   return cache.get(key);
@@ -803,6 +617,8 @@ export const ITEM_ART = {
   dagger: { palette: { o: O, S: '#e8eef5', D: '#9aa3b5', G: '#e8b84a', B: '#4a2a1a' }, rows: ['........', '.....oo.', '....oSo.', '...oSDo.', '.oGSDo..', '..oGo...', '.oBo....', '.oo.....'] },
   daggers: { palette: { o: O, S: '#e8eef5', D: '#9aa3b5', G: '#e8b84a', B: '#4a2a1a' }, rows: ['oo....oo', 'oSo..oSo', '.oSooSo.', '..oDDo..', '.oGooGo.', 'oBo..oBo', 'oo....oo', '........'] },
   fist: { palette: { o: O, Y: '#e8862a', y: '#a85a14', W: '#f0e6c8' }, rows: ['.oooooo.', 'oYoYoYYo', 'oYoYoYYo', 'oYYYYYYo', 'oyYYYYyo', '.oWWWWo.', '.oyyyyo.', '..oooo..'] },
+  // 長槍：右上的鋼製槍頭與紅色槍纓，斜向左下的木製槍桿。
+  spear: { palette: { o: O, S: '#e8eef5', D: '#9aa3b5', R: '#c0303a', W: '#8a5a34', w: '#b07a3e' }, rows: ['.....ooo', '....oSSo', '....oSDo', '...oRoo.', '..owRo..', '.owwo...', 'owwo....', 'oo......'] },
     bow: { palette: { o: O, W: '#a06a3a', S: '#e8e8e8' }, rows: ['..ooo...', '.oWWoS..', 'oWo..S..', 'oW...S..', 'oWo..S..', '.oWWoS..', '..ooo...'] },
   staff: { palette: { o: O, W: '#8a5a2a', G: '#c8a8ff', L: '#ffffff' }, rows: ['.....oo.', '....oGLo', '....oGGo', '...oWoo.', '..oWo...', '.oWo....', 'oWo.....', 'oo......'] },
   axe: { palette: { o: O, S: '#c0c6d0', D: '#7a808e', W: '#8a5a2a' }, rows: ['..oooo..', '.oSSSDo.', 'oSSSoWo.', 'oSDoWo..', '.ooWo...', '..oWo...', '.oWo....', '.oo.....'] },
@@ -886,14 +702,16 @@ export function itemDataUrl(name, scale = 4) {
 }
 
 /**
- * 以 data URL 取得角色圖（介面中的 <img> 用）。
+ * 以 data URL 取得角色圖（介面中的 <img> 用）；角色圖是 2 倍密度，實際放大倍率為 scale 的一半（至少 1 倍）。
  * @param {string} cls 職業。
- * @param {number} [scale=4] 放大倍率。
+ * @param {number} [scale=4] 相當於 16 像素一格的放大倍率。
  * @returns {string} data URL。
  */
 export function heroDataUrl(cls, scale = 4) {
-  const src = heroArt(cls).frames[0];
-  const c = makeCanvas(src.width * scale, src.height * scale);
+  const art = heroArt(cls);
+  const src = art.portrait;
+  const k = Math.max(1, Math.round(scale / art.density));
+  const c = makeCanvas(src.width * k, src.height * k);
   const g = c.getContext('2d');
   g.imageSmoothingEnabled = false;
   g.drawImage(src, 0, 0, c.width, c.height);
