@@ -4,13 +4,15 @@
 import { AREAS, RARITIES, STATUS } from './data.js';
 import { WALL, STAIRS, SPIKES, walkable } from './dungeon.js';
 import { heroArt, monsterArt, itemArt } from './sprites.js';
+import { PROP_SPRITES } from './propSprites.js';
+import { DUNGEON_TILES } from './dungeonTiles.js';
 
 /** 一格的像素數。 */
 const T = 16;
 /** 普通攻擊的出手動畫長度（秒，與 World.playerAttack 設定的 attackAnim 相同）。 */
 const ATTACK_TIME = 0.24;
-/** 地城中角色圖的目標顯示密度（每個世界像素約 1.5 個圖像素）；實際值依放大倍率取能整除的值（Renderer.heroDensity）。 */
-const HERO_DENSITY = 1.5;
+/** 地城中角色圖的目標顯示密度（每個世界像素約 2 個圖像素，角色約 1 格高）；實際值依放大倍率取能整除的值（Renderer.heroDensity）。 */
+const HERO_DENSITY = 2;
 /** 技能與爆炸的顏色（RGB），依效果樣式（look）區分；沒有樣式的友方爆炸為紫色、敵方為橘色。 */
 const LOOK_COLORS = {
   nova: '150,210,255', spin: '255,255,255', slam: '210,170,110', rain: '240,224,176', beam: '255,240,170', meteor: '255,150,60',
@@ -128,7 +130,7 @@ const THEMES = {
  * 各色調的環境暗度（光照層的黑色不透明度）：戶外的草原、天空、沙漠較亮，地下的遺跡、墓地、深淵較暗。
  * 火把、角色、寶箱、傳送門與發光的招式會在暗處照出亮區。
  */
-const AMBIENT = { grass: 0.16, sky: 0.06, desert: 0.22, sea: 0.4, moss: 0.5, lava: 0.42, ice: 0.42, necro: 0.6, clock: 0.5, dragon: 0.5, demon: 0.58, abyss: 0.62 };
+const AMBIENT = { grass: 0.16, sky: 0.08, desert: 0.3, sea: 0.52, moss: 0.62, lava: 0.55, ice: 0.54, necro: 0.7, clock: 0.62, dragon: 0.6, demon: 0.68, abyss: 0.72 };
 
 /**
  * 以格子座標計算固定的雜湊值（地板花紋用）。
@@ -212,8 +214,9 @@ function wallPalette(th) {
  * @param {object} pal 牆壁色盤。
  * @param {boolean} hedge 是否為樹籬。
  * @param {{left: string, right: string, mid: boolean, rise: number}} opt 左右鄰格（'face' 牆面相連、'top' 接到牆頂、'void' 地圖外）、是否在中間立圓柱、往上加高的像素。
+ * @param {object} [fx] 區域點綴（見 THEME_FX）。
  */
-function drawWallFace(g, i, j, pal, hedge, opt) {
+function drawWallFace(g, i, j, pal, hedge, opt, fx = {}) {
   const x = i * T;
   const top = j * T - opt.rise;
   const bottom = (j + 1) * T;
@@ -232,6 +235,16 @@ function drawWallFace(g, i, j, pal, hedge, opt) {
       g.fillStyle = k % 3 ? pal.brickHi : pal.brickLo;
       g.fillRect(x + Math.floor(r * 15), top + 4 + Math.floor(hash(k, i + j) * (bottom - top - 5)), 2, 1);
     }
+    // 細緻的葉片：亮色葉面與下方的暗色葉影（0.5 像素）。
+    for (let k = 0; k < 34; k++) {
+      const lx = x + hash(i * 17 + k, j * 23 + 5) * 15;
+      const ly = top + 4.5 + hash(i * 3 - k, j * 41 + k) * (bottom - top - 6);
+      g.fillStyle = pal.brickLo;
+      dot(g, lx, ly + FINE, 1, FINE);
+      g.fillStyle = k % 4 ? mix(pal.brick[0], pal.brickHi, 0.6) : pal.brickHi;
+      dot(g, lx, ly, k % 2 ? 1 : FINE, FINE);
+    }
+    wallLipDetail(g, x, top, pal, fx, i, j);
     g.fillStyle = pal.mortar;
     g.fillRect(x, bottom - 1, T, 1);
     return;
@@ -248,7 +261,8 @@ function drawWallFace(g, i, j, pal, hedge, opt) {
       const x0 = Math.max(gx, start);
       const x1 = Math.min(x + T, end);
       const r = hash(Math.floor((gx + off) / 10), gr);
-      g.fillStyle = pal.brick[Math.floor(r * 3)];
+      const base = pal.brick[Math.floor(r * 3)];
+      g.fillStyle = base;
       g.fillRect(x0, by, x1 - x0, 5);
       // 上緣與左緣高光、下緣陰影，讓每塊磚有凸起感。
       g.fillStyle = pal.brickHi;
@@ -268,12 +282,14 @@ function drawWallFace(g, i, j, pal, hedge, opt) {
         g.fillRect(start + 4, by + 2, 2, 1);
         g.fillRect(start + 6, by + 1, 1, 1);
       }
+      brickDetail(g, x0, x1, by, start, end, base, pal, fx, Math.floor((gx + off) / 10) * 131 + gr);
       gx = x1;
     }
   }
   // 牆腳陰影。
   g.fillStyle = pal.outline;
   g.fillRect(x, bottom - 1, T, 1);
+  wallLipDetail(g, x, top, pal, fx, i, j);
   // 圓柱：牆面接到牆頂（轉角）或地圖外的端點各立一根，長牆中間每隔幾格也立一根。
   // 圓柱比牆頂高出 4 像素，像參考圖的石柱一樣凸出牆面。
   if (opt.left !== 'face') drawPillar(g, x - 1, top - 4, bottom, pal);
@@ -350,8 +366,9 @@ function drawPillar(g, x, top, bottom, pal) {
  * @param {number} j 格子 y。
  * @param {object} th 區域色調。
  * @param {object} fp 地板色盤。
+ * @param {object} [fx] 區域點綴（見 THEME_FX，在 2 倍密度的畫布上以 0.5 像素加上細節）。
  */
-function drawFloorStones(g, i, j, th, fp) {
+function drawFloorStones(g, i, j, th, fp, fx = {}) {
   const x = i * T;
   const y = j * T;
   g.fillStyle = fp.mortar;
@@ -366,7 +383,8 @@ function drawFloorStones(g, i, j, th, fp) {
       const sx = x + cx * 8 + (joinLeft ? 0 : 1);
       const sy = y + cy * 8 + 1;
       const w = 7 + (joinLeft ? 1 : 0);
-      g.fillStyle = fp.stone[Math.floor(r * fp.stone.length)];
+      const base = fp.stone[Math.floor(r * fp.stone.length)];
+      g.fillStyle = base;
       g.fillRect(sx, sy, w, 7);
       g.fillStyle = fp.hi;
       g.fillRect(sx, sy, Math.min(w, 4), 1);
@@ -378,6 +396,7 @@ function drawFloorStones(g, i, j, th, fp) {
         g.fillRect(sx + 2, sy + 3, 2, 1);
         g.fillRect(sx + 4, sy + 2, 1, 1);
       }
+      stoneDetail(g, sx, sy, w, 7, base, fp, fx, gi, gj);
     }
   }
 }
@@ -389,12 +408,14 @@ function drawFloorStones(g, i, j, th, fp) {
  * @param {number} j 格子 y。
  * @param {object} pal 牆壁色盤。
  * @param {{up: boolean, down: boolean, left: boolean, right: boolean}} edge 各方向是否要畫外框。
+ * @param {HTMLCanvasElement} [tex] 設計圖的牆頂圖塊（有時取代程式繪製的石板，外框照畫）。
  */
-function drawWallTop(g, i, j, pal, edge) {
+function drawWallTop(g, i, j, pal, edge, tex) {
   const x = i * T;
   const y = j * T;
+  if (tex) g.drawImage(tex, x, y, T, T);
   // 平整的石板：每片 16×8，隔排錯開半片；接縫只比石面稍暗，看起來是平面而不是磚牆。
-  for (let row = 0; row < 2; row++) {
+  for (let row = 0; row < (tex ? 0 : 2); row++) {
     const by = y + row * 8;
     const gr = j * 2 + row;
     const off = gr % 2 ? 8 : 0;
@@ -403,8 +424,10 @@ function drawWallTop(g, i, j, pal, edge) {
       const end = start + 16;
       const x0 = Math.max(gx, start);
       const x1 = Math.min(x + T, end);
-      g.fillStyle = pal.top[Math.floor(hash(Math.floor((gx + off) / 16) + 7, gr) * 3)];
+      const base = pal.top[Math.floor(hash(Math.floor((gx + off) / 16) + 7, gr) * 3)];
+      g.fillStyle = base;
       g.fillRect(x0, by, x1 - x0, 8);
+      slabDetail(g, x0, x1, by, pal, base, Math.floor((gx + off) / 16) * 97 + gr * 13 + i);
       g.fillStyle = pal.seam;
       g.fillRect(x0, by + 7, x1 - x0, 1);
       if (end - 1 < x1) g.fillRect(end - 1, by, 1, 8);
@@ -741,15 +764,407 @@ function drawSkulls(g, x, y) {
   drawRows(g, x + 4, y - 1, skull, colors);
 }
 
+/** 地城牆頂圖塊的壓暗比例（0～1）。 */
+const TOP_DARKEN = 0.3;
+
+/** 地城圖塊（dungeonTiles.js）畫好的畫布快取。 */
+const tileCanvasCache = new Map();
+
+/**
+ * 圖塊的平均色（RGB）。
+ * @param {{palette: Record<string, string>, rows: string[]}} s 圖塊。
+ * @returns {number[]} 平均 RGB。
+ */
+function tileMean(s) {
+  const sum = [0, 0, 0];
+  let n = 0;
+  for (const row of s.rows) for (const ch of row) {
+    const v = s.palette[ch];
+    if (!v) continue;
+    const k = parseInt(v.slice(1), 16);
+    sum[0] += (k >> 16) & 255; sum[1] += (k >> 8) & 255; sum[2] += k & 255; n++;
+  }
+  return sum.map((v) => v / Math.max(1, n));
+}
+
+/**
+ * 把圖塊的調色盤整體平移，讓平均色等於基準圖塊的平均色。
+ * @param {{palette: Record<string, string>, rows: string[]}} s 圖塊。
+ * @param {{palette: Record<string, string>, rows: string[]}} base 基準圖塊。
+ * @returns {Record<string, string>} 調整後的調色盤。
+ */
+function matchMean(s, base) {
+  const a = tileMean(s);
+  const b = tileMean(base);
+  const out = {};
+  for (const [k, v] of Object.entries(s.palette)) {
+    const n = parseInt(v.slice(1), 16);
+    const c = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((x, i) => Math.max(0, Math.min(255, Math.round(x + b[i] - a[i]))));
+    out[k] = '#' + c.map((x) => x.toString(16).padStart(2, '0')).join('');
+  }
+  return out;
+}
+
+/**
+ * 去掉像素圖中孤立的雜點：周圍 8 格中沒有任何同色的像素，改成周圍最多的顏色（邊緣以環繞方式取鄰格，圖塊拼接處一致）。
+ * @param {string[]} rows 像素列。
+ * @returns {string[]} 處理後的像素列。
+ */
+function despeckle(rows) {
+  const h = rows.length;
+  const w = rows[0].length;
+  return rows.map((row, y) => {
+    let out = '';
+    for (let x = 0; x < w; x++) {
+      const ch = row[x];
+      const count = {};
+      let same = 0;
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+        if (!dx && !dy) continue;
+        const c = rows[(y + dy + h) % h][(x + dx + w) % w];
+        count[c] = (count[c] || 0) + 1;
+        if (c === ch) same++;
+      }
+      if (same >= 1) { out += ch; continue; }
+      out += Object.entries(count).sort((a, b) => b[1] - a[1])[0][0];
+    }
+    return out;
+  });
+}
+
+/** 地板灰縫往石面平均色靠攏的比例（0～1），越大網格越淡。 */
+const GROUT_SOFTEN = 0.6;
+
+/**
+ * 把地板圖塊中明顯比平均暗的顏色（灰縫、深色邊）往平均色靠攏，讓圖塊之間的網格變淡、地面看起來更連續。
+ * @param {{rows: string[]}} s 圖塊。
+ * @param {Record<string, string>} pal 目前的調色盤。
+ * @returns {Record<string, string>} 調整後的調色盤。
+ */
+function softenGrout(s, pal) {
+  const mean = tileMean({ palette: pal, rows: s.rows });
+  const lum = (c) => 0.3 * c[0] + 0.59 * c[1] + 0.11 * c[2];
+  const ml = lum(mean);
+  const hex = '#' + mean.map((v) => Math.round(v).toString(16).padStart(2, '0')).join('');
+  const out = {};
+  for (const [k, v] of Object.entries(pal)) {
+    const n = parseInt(v.slice(1), 16);
+    const l = lum([(n >> 16) & 255, (n >> 8) & 255, n & 255]);
+    out[k] = l < ml * 0.75 ? mix(v, hex, GROUT_SOFTEN) : v;
+  }
+  return out;
+}
+
+/**
+ * 產生整層地板的大範圍明暗起伏（世界像素大小的畫布）：以每 3 格一個的隨機明暗點做平滑內插放大，
+ * 亮處為淡白、暗處為淡黑，貼在地板上讓地面有連續的光影、不再一格一格。
+ * @param {number} w 地圖寬（格）。
+ * @param {number} h 地圖高（格）。
+ * @returns {HTMLCanvasElement} 明暗層畫布（w × T 寬、h × T 高）。
+ */
+function floorShadeLayer(w, h) {
+  const S = 3;
+  const cw = Math.ceil(w / S) + 2;
+  const chh = Math.ceil(h / S) + 2;
+  const small = document.createElement('canvas');
+  small.width = cw;
+  small.height = chh;
+  const sg = small.getContext('2d');
+  for (let y = 0; y < chh; y++) {
+    for (let x = 0; x < cw; x++) {
+      const v = hash(x * 13 + 401, y * 7 + 233) - 0.5;
+      sg.fillStyle = v > 0 ? `rgba(255,245,225,${(v * 0.2).toFixed(3)})` : `rgba(0,0,0,${(-v * 0.36).toFixed(3)})`;
+      sg.fillRect(x, y, 1, 1);
+    }
+  }
+  const big = document.createElement('canvas');
+  big.width = w * T;
+  big.height = h * T;
+  const bg = big.getContext('2d');
+  bg.imageSmoothingEnabled = true;
+  bg.imageSmoothingQuality = 'high';
+  // 小畫布每個點對應 S 格，往左上偏移半格讓內插的中心落在格子中間。
+  bg.drawImage(small, -S * T * 0.5, -S * T * 0.5, cw * S * T, chh * S * T);
+  return big;
+}
+
+/**
+ * 取得地城圖塊的畫布（由 design/dungeon/ 的設計圖轉換，密度 2）：地板與牆頂 32 × 32、牆面段 32 × 48、石柱 24 × 56。
+ * 地板與牆頂的其他變化對齊第 1 種的平均色；牆緣對齊同區域牆面的平均色；牆頂與牆緣另外壓暗（TOP_DARKEN），與地板區分。
+ * @param {string} key 圖塊代碼（例如 'moss.floor@2'）。
+ * @returns {HTMLCanvasElement | null} 畫布；沒有這個圖塊時為 null。
+ */
+function dungeonTile(key) {
+  if (tileCanvasCache.has(key)) return tileCanvasCache.get(key);
+  const s = DUNGEON_TILES[key];
+  let c = null;
+  if (s) {
+    // 地板與牆頂的其他變化：整體顏色往第 1 種的平均色靠攏，相鄰格子才不會明暗不一、像棋盤格。
+    const m = /^(.+\.(?:floor|top))@([1-9])$/.exec(key);
+    let pal = m && DUNGEON_TILES[`${m[1]}@0`] ? matchMean(s, DUNGEON_TILES[`${m[1]}@0`]) : s.palette;
+    // 牆頂整體壓暗、降低彩度，和可以行走的地板明顯區分（石材區域的牆頂與地板花紋相近）。
+    if (key.includes('.floor@')) pal = softenGrout(s, pal);
+    // 牆緣：平均色對齊同區域的牆面（設計圖的牆緣偏淺），再一起壓暗。
+    const rim = /^(.+)\.rim@\d$/.exec(key);
+    if (rim && DUNGEON_TILES[`${rim[1]}.face@0`]) pal = matchMean({ palette: pal, rows: s.rows }, DUNGEON_TILES[`${rim[1]}.face@0`]);
+    if (key.includes('.top@') || rim) pal = Object.fromEntries(Object.entries(pal).map(([k, v]) => [k, shade(mix(v, '#3a3640', 0.25), -TOP_DARKEN)]));
+    c = document.createElement('canvas');
+    c.width = s.w;
+    c.height = s.h;
+    const g = c.getContext('2d');
+    // 地板：去掉孤立的雜點，石面更平滑。
+    const rows = key.includes('.floor@') ? despeckle(s.rows) : s.rows;
+    rows.forEach((row, y) => {
+      for (let x = 0; x < row.length; x++) {
+        if (row[x] === '.' || !pal[row[x]]) continue;
+        g.fillStyle = pal[row[x]];
+        g.fillRect(x, y, 1, 1);
+      }
+    });
+  }
+  tileCanvasCache.set(key, c);
+  return c;
+}
+
+/**
+ * 以設計圖圖塊畫牆面：3 種牆面段依位置挑一種；往上加高時畫整段（含石唇），沒有加高時只畫石唇與下方 12 像素的牆面。
+ * 兩端與長牆中間的石柱改用設計圖的石柱（柱頭固定，柱身依牆高從下方截取），並在牆面投下陰影。
+ * @param {CanvasRenderingContext2D} g 畫布（已依 FLOOR_DENSITY 縮放）。
+ * @param {number} i 格子 x。
+ * @param {number} j 格子 y。
+ * @param {{left: string, right: string, mid: boolean, rise: number}} opt 同 drawWallFace。
+ * @param {string} theme 區域色調名稱。
+ */
+function drawWallFaceTex(g, i, j, opt, theme) {
+  const x = i * T;
+  const top = j * T - opt.rise;
+  const bottom = (j + 1) * T;
+  const face = dungeonTile(`${theme}.face@${Math.floor(hash(i + 31, j + 17) * 3)}`);
+  if (opt.rise >= 8) g.drawImage(face, 0, 0, 32, 48, x, top, T, 24);
+  else {
+    g.drawImage(face, 0, 0, 32, 8, x, top, T, 4);
+    g.drawImage(face, 0, 24, 32, 24, x, top + 4, T, bottom - top - 4);
+  }
+  const pillar = dungeonTile(`${theme}.pillar`);
+  /**
+   * 畫一根石柱（寬 12 世界像素）。
+   * @param {number} px 左緣 x。
+   */
+  const drawP = (px) => {
+    const y0 = top - 4;
+    const h = bottom - y0;
+    g.fillStyle = 'rgba(0,0,0,0.3)';
+    g.fillRect(px - 1, y0 + 5, 1, h - 6);
+    g.fillStyle = 'rgba(0,0,0,0.45)';
+    g.fillRect(px + 12, y0 + 5, 2, h - 6);
+    g.drawImage(pillar, 0, 0, 24, 16, px, y0, 12, 8);
+    const rest = h - 8;
+    g.drawImage(pillar, 0, 56 - rest * 2, 24, rest * 2, px, y0 + 8, 12, rest);
+  };
+  if (pillar) {
+    if (opt.left !== 'face') drawP(x - 1);
+    if (opt.right !== 'face') drawP(x + T - 11);
+    if (opt.mid) drawP(x + 2);
+  }
+}
+
+/**
+ * 畫南側外牆的矮牆正面：取牆面段最下方 14 列（世界 7 像素）貼在牆緣圖塊的下半部，上緣一道亮邊、下緣一道深色陰影。
+ * @param {CanvasRenderingContext2D} g 畫布（已依 FLOOR_DENSITY 縮放）。
+ * @param {number} i 格子 x。
+ * @param {number} j 格子 y。
+ * @param {string} theme 區域色調名稱。
+ */
+function drawFrontLip(g, i, j, theme) {
+  const face = dungeonTile(`${theme}.face@${Math.floor(hash(i + 31, j + 17) * 3)}`);
+  if (!face) return;
+  const x = i * T;
+  const y = (j + 1) * T - 7;
+  g.drawImage(face, 0, 48 - 14, 32, 14, x, y, T, 7);
+  g.fillStyle = 'rgba(255,240,210,0.18)';
+  g.fillRect(x, y, T, 0.5);
+  g.fillStyle = 'rgba(0,0,0,0.55)';
+  g.fillRect(x, y + 6.5, T, 0.5);
+}
+
+/** 拱門畫在角色上方的部分（從頂端算起佔整張圖的比例）：拱頂、拱心石與拉起的鐵柵門。 */
+const ARCH_FRONT = 0.42;
+
+/**
+ * 畫 2 格寬的石階：原圖（1 格寬）的左右兩側保留石邊，中段重複拼接，只有最外側有石邊；
+ * 往下的石階（南側出口）上下翻轉，並越往下越暗，表現往下延伸的深度。
+ * @param {CanvasRenderingContext2D} g 畫布（已依 FLOOR_DENSITY 縮放）。
+ * @param {HTMLCanvasElement} src 石階圖（32 × 32，密度 2）。
+ * @param {number} x 左上角 x（世界像素）。
+ * @param {number} y 左上角 y（世界像素）。
+ * @param {boolean} up 往上的石階（北側入口）為 true，往下（南側出口）為 false。
+ */
+function drawWideSteps(g, src, x, y, up) {
+  const side = 9;
+  const mid = src.width - side * 2;
+  const W = T * 2 * 2;
+  g.save();
+  if (!up) { g.translate(0, y * 2 + T); g.scale(1, -1); }
+  /**
+   * 把原圖的一段（畫布像素）貼到石階的某個位置（畫布像素，從左算起）。
+   * @param {number} sx 原圖起點。
+   * @param {number} sw 寬度。
+   * @param {number} dx 目標起點。
+   */
+  const put = (sx, sw, dx) => g.drawImage(src, sx, 0, sw, src.height, x + dx / 2, y, sw / 2, T);
+  put(0, side, 0);
+  for (let dx = side; dx < W - side; dx += mid) put(side, Math.min(mid, W - side - dx), dx);
+  put(src.width - side, side, W - side);
+  g.restore();
+  if (!up) {
+    const grad = g.createLinearGradient(0, y, 0, y + T);
+    grad.addColorStop(0, 'rgba(0,0,0,0)');
+    grad.addColorStop(1, 'rgba(0,0,0,0.55)');
+    g.fillStyle = grad;
+    g.fillRect(x, y, T * 2, T);
+  }
+  // 石階兩側的陰影，像嵌進牆裡。
+  g.fillStyle = 'rgba(0,0,0,0.35)';
+  g.fillRect(x, y, 1, T);
+  g.fillRect(x + T * 2 - 1, y, 1, T);
+}
+
+/**
+ * 畫升起的地刺：鐵板中央一排 4 根細長的銀色矛頭尖刺（圓形底座、中段略粗、頂端尖銳），
+ * 左亮右暗並有高光，伸出鐵板約半格，底部在鐵板上投下小陰影。以 0.5 世界像素繪製（畫面放大後仍細緻）。
+ * @param {CanvasRenderingContext2D} g 畫布（世界座標）。
+ * @param {number} x 格子左上角 x。
+ * @param {number} y 格子左上角 y。
+ */
+function drawSpikeBlades(g, x, y) {
+  const base = y + 9;
+  for (const dx of [4, 6.5, 9, 11.5]) {
+    const cx = x + dx + 0.5;
+    // 陰影與圓形底座。
+    g.fillStyle = 'rgba(0,0,0,0.45)';
+    g.fillRect(cx - 0.5, base, 2.5, 1);
+    g.fillStyle = '#2a2a32';
+    g.fillRect(cx - 1, base - 0.5, 2.5, 1);
+    g.fillStyle = '#6a6e7a';
+    g.fillRect(cx - 0.5, base - 1, 1.5, 0.5);
+    // 尖刺：由下往上，寬度 1.5 → 1 → 0.5，左半亮、右半暗。
+    const segs = [[base - 4, 4, 1.5], [base - 9, 5, 1], [base - 12, 3, 0.5]];
+    for (const [top, h, w] of segs) {
+      g.fillStyle = '#1a1020';
+      g.fillRect(cx - w / 2 - 0.5 + 0.25, top, w + 1, h);
+      g.fillStyle = '#9aa0ac';
+      g.fillRect(cx - w / 2 + 0.25, top, w, h);
+      g.fillStyle = '#e8ecf2';
+      g.fillRect(cx - w / 2 + 0.25, top, Math.max(0.5, w / 2), h);
+    }
+    g.fillStyle = '#ffffff';
+    g.fillRect(cx, base - 12, 0.5, 0.5);
+  }
+}
+
+/** 裝飾物圖的快取（依種類與上色色階）。 */
+const propCache = new Map();
+
+/**
+ * 取得地圖裝飾物的圖（propSprites.js，密度 2）：灰階圖的低彩度顏色依亮度對應到 ramp 色階（先把這張圖的亮度範圍拉滿），
+ * 有彩度的部分（例如掛旗的金色橫桿）維持原色。
+ * @param {string} key 裝飾物種類。
+ * @param {string[]} [ramp] 由暗到亮的色階（只用於灰階圖）。
+ * @returns {{frames: HTMLCanvasElement[], w: number, h: number} | null} 圖；沒有這種圖時為 null。
+ */
+function propArt(key, ramp) {
+  const sp = PROP_SPRITES[key];
+  if (!sp) return null;
+  const ck = `${key}|${sp.gray && ramp ? ramp.join(',') : ''}`;
+  if (propCache.has(ck)) return propCache.get(ck);
+  /**
+   * 色碼轉 RGB。
+   * @param {string} hex `#rrggbb`。
+   * @returns {number[]} RGB。
+   */
+  const rgb = (hex) => [1, 3, 5].map((k) => parseInt(hex.slice(k, k + 2), 16));
+  const colors = { ...sp.palette };
+  if (sp.gray && ramp) {
+    const grays = Object.entries(sp.palette).filter(([k, v]) => k !== 'o' && (Math.max(...rgb(v)) - Math.min(...rgb(v))) < 28);
+    const lum = (v) => { const c = rgb(v); return 0.3 * c[0] + 0.59 * c[1] + 0.11 * c[2]; };
+    const ls = grays.map(([, v]) => lum(v));
+    const lo = Math.min(...ls);
+    const hi = Math.max(...ls);
+    for (const [k, v] of grays) {
+      const t = hi > lo ? (lum(v) - lo) / (hi - lo) : 0.5;
+      const f = t * (ramp.length - 1);
+      const n = Math.min(ramp.length - 2, Math.floor(f));
+      colors[k] = mix(ramp[n], ramp[n + 1], f - n);
+    }
+  }
+  const frames = sp.frames.map((fr) => {
+    const c = document.createElement('canvas');
+    c.width = sp.w;
+    c.height = sp.h;
+    const g = c.getContext('2d');
+    fr.rows.forEach((row, y) => {
+      for (let x = 0; x < row.length; x++) {
+        if (row[x] === '.') continue;
+        g.fillStyle = colors[row[x]];
+        g.fillRect(fr.x + x, fr.y + y, 1, 1);
+      }
+    });
+    return c;
+  });
+  const art = { frames, w: sp.w, h: sp.h };
+  propCache.set(ck, art);
+  return art;
+}
+
+/**
+ * 以世界座標畫一張裝飾物圖（圖為密度 2，世界大小為圖的一半）。
+ * @param {CanvasRenderingContext2D} g 畫布。
+ * @param {{frames: HTMLCanvasElement[], w: number, h: number}} art 裝飾物圖。
+ * @param {number} cx 水平中心（世界像素）。
+ * @param {number} y 上緣（世界像素）。
+ * @param {number} [frame=0] 第幾格。
+ */
+function blitProp(g, art, cx, y, frame = 0) {
+  g.drawImage(art.frames[frame], Math.round((cx - art.w / 4) * 2) / 2, Math.round(y * 2) / 2, art.w / 2, art.h / 2);
+}
+
+/**
+ * 依區域產生裝飾物的上色色階：stone 石材（取圓柱的石色，暗到亮）、cloth 掛旗布面（取區域點綴色）。
+ * @param {object} th 區域色調。
+ * @param {object} pal 牆壁色盤。
+ * @returns {{stone: string[], rock: string[], cloth: string[]}} 色階（rock 為大石與碎石用、少了最亮一階的石色）。
+ */
+function propRamps(th, pal) {
+  return {
+    stone: [pal.outline, pal.pillar[4], pal.pillar[3], pal.pillar[2], pal.pillar[1], pal.pillar[0], shade(pal.pillar[0], 0.3)],
+    // 大石與碎石：不用最亮的一階，亮面才不會糊成一片。
+    rock: [pal.outline, pal.pillar[4], pal.pillar[3], pal.pillar[2], pal.pillar[1], pal.pillar[0]],
+    cloth: [shade(th.speck, -0.65), shade(th.speck, -0.35), th.speck, shade(th.speck, 0.3)],
+  };
+}
+
 /**
  * 畫牆邊的大型擺設（在整層地圖畫完後畫，才能稍微壓到下方的地板）。
  * @param {CanvasRenderingContext2D} g 畫布。
  * @param {{kind: string, i: number, j: number}} prop 擺設。
  * @param {object} pal 牆壁色盤。
+ * @param {{stone: string[], cloth: string[]}} [ramps] 裝飾物的上色色階（有設計圖時使用 propSprites.js 的圖）。
  */
-function drawProp(g, prop, pal) {
+function drawProp(g, prop, pal, ramps) {
   const x = prop.i * T;
   const base = (prop.j + 1) * T + 2;
+  // 有設計圖的擺設：腳底對齊 base（戰利品掛在牆上），石像與大石依區域石色上色。
+  const art = ramps && propArt(prop.kind, prop.kind === 'boulder' ? ramps.rock : ramps.stone);
+  if (art) {
+    const h = art.h / 2;
+    if (prop.kind === 'trophy') {
+      blitProp(g, art, x + 8, prop.j * T - 6);
+      return;
+    }
+    if (prop.kind !== 'statue') groundShadow(g, x + 8, base, Math.min(16, art.w / 2 + 1));
+    blitProp(g, art, x + 8, base - h - (prop.kind === 'statue' ? 1 : 0));
+    return;
+  }
   if (prop.kind === 'barrel') {
     groundShadow(g, x + 8, base, 13);
     drawBarrel(g, x + 2, base - 14);
@@ -777,10 +1192,17 @@ function drawProp(g, prop, pal) {
  * @param {number} y 格子左上角 y（像素）。
  * @param {number} r 0～1 的雜湊值（決定種類與位置）。
  * @param {object} fp 地板色盤。
+ * @param {{stone: string[], cloth: string[]}} [ramps] 裝飾物的上色色階（有設計圖時使用 propSprites.js 的圖）。
  */
-function drawFloorLitter(g, x, y, r, fp) {
+function drawFloorLitter(g, x, y, r, fp, ramps) {
   const ox = x + 3 + Math.floor(r * 70) % 7;
   const oy = y + 4 + Math.floor(r * 130) % 6;
+  // 有設計圖時：骨頭或依區域石色上色的碎石。
+  const art = ramps && propArt(r < 0.5 ? 'bone' : 'rubble', ramps.rock);
+  if (art) {
+    blitProp(g, art, ox + 3, oy - 1);
+    return;
+  }
   if (r < 0.5) {
     // 骨頭：中間細、兩端圓的白骨。
     g.fillStyle = '#1a1020';
@@ -800,6 +1222,347 @@ function drawFloorLitter(g, x, y, r, fp) {
       g.fillRect(ox + dx, oy + dy, w, 1);
     }
   }
+}
+
+/** 地圖離屏畫布的密度（每個世界像素 2 × 2 個畫布像素）：細節以 0.5 像素繪製，畫質接近角色圖。 */
+const FLOOR_DENSITY = 2;
+/** 細節的最小單位（世界像素）。 */
+const FINE = 1 / FLOOR_DENSITY;
+
+/**
+ * 各區域的地圖點綴：seam 石縫裡的苔蘚、drip 牆唇垂下的苔蘚、glow 石縫與磚縫的發光（熔岩、魔力）、frost 冰霜、
+ * icicle 牆唇的冰柱、sand 積沙、vein 大理石紋、rivet 鉚釘、wet 積水反光。
+ */
+const THEME_FX = {
+  moss: { seam: '#5f7f3a', drip: '#56763a' },
+  grass: { seam: '#4a7a2e' },
+  ice: { frost: '#d8eefa', icicle: '#bfe4f8' },
+  lava: { glow: '255,120,40' },
+  dragon: { glow: '255,100,40' },
+  demon: { glow: '255,50,90' },
+  abyss: { glow: '170,110,255' },
+  sea: { seam: '#2f7f70', drip: '#3a8f7c', wet: true },
+  necro: { seam: '#5e4c70' },
+  desert: { sand: '#e4cc94' },
+  sky: { vein: '#ffffff' },
+  clock: { rivet: '#d0a858' },
+};
+
+/**
+ * 畫一個細節像素（0.5 世界像素，座標對齊 0.5）。
+ * @param {CanvasRenderingContext2D} g 畫布（已依 FLOOR_DENSITY 縮放）。
+ * @param {number} x 左上角 x（世界像素）。
+ * @param {number} y 左上角 y（世界像素）。
+ * @param {number} [w=FINE] 寬度。
+ * @param {number} [h=FINE] 高度。
+ */
+function dot(g, x, y, w = FINE, h = FINE) {
+  g.fillRect(Math.round(x * FLOOR_DENSITY) / FLOOR_DENSITY, Math.round(y * FLOOR_DENSITY) / FLOOR_DENSITY, w, h);
+}
+
+/**
+ * 地板石塊的細節：圓角、延伸的高光與雙層陰影、細小斑點、細裂痕，以及依區域加上的石縫苔蘚、發光縫、冰霜、積沙、
+ * 大理石紋、鉚釘或積水反光。
+ * @param {CanvasRenderingContext2D} g 畫布。
+ * @param {number} sx 石塊左上角 x。
+ * @param {number} sy 石塊左上角 y。
+ * @param {number} w 石塊寬度。
+ * @param {number} h 石塊高度。
+ * @param {string} base 石塊顏色。
+ * @param {object} fp 地板色盤。
+ * @param {object} fx 區域點綴。
+ * @param {number} gi 石塊的全域 x 索引（雜湊用）。
+ * @param {number} gj 石塊的全域 y 索引（雜湊用）。
+ */
+function stoneDetail(g, sx, sy, w, h, base, fp, fx, gi, gj) {
+  const r = (k) => hash(gi * 7 + k * 13, gj * 11 - k * 5);
+  // 圓角。
+  g.fillStyle = fp.mortar;
+  dot(g, sx, sy); dot(g, sx + w - FINE, sy); dot(g, sx, sy + h - FINE); dot(g, sx + w - FINE, sy + h - FINE);
+  // 高光往右漸淡、左緣高光往下漸淡；下緣多一層更深的陰影。
+  g.fillStyle = mix(base, fp.hi, 0.5);
+  dot(g, sx + Math.min(w, 4), sy, Math.min(2, Math.max(0, w - 4.5)), FINE);
+  dot(g, sx + FINE, sy + 1, Math.min(w, 3) - FINE, FINE);
+  dot(g, sx, sy + 3, FINE, 1.5);
+  g.fillStyle = mix(fp.lo, fp.mortar, 0.5);
+  dot(g, sx + FINE, sy + h - FINE, w - 1, FINE);
+  dot(g, sx + w - FINE, sy + 1, FINE, h - 1.5);
+  // 細小斑點（石材的雜質與磨損）。
+  for (let k = 0; k < 4; k++) {
+    g.fillStyle = k % 2 ? mix(base, fp.lo, 0.7) : mix(base, fp.hi, 0.6);
+    dot(g, sx + 1 + r(k) * (w - 2), sy + 1.5 + r(k + 9) * (h - 3));
+  }
+  // 細裂痕：由一點往右蜿蜒的 0.5 像素暗線，下方帶一點亮邊。
+  if (r(20) > 0.9) {
+    let cx = sx + 1 + r(21) * 2;
+    let cy = sy + 2 + r(22) * 3;
+    for (let k = 0; k < 6 && cx < sx + w - 1; k++) {
+      g.fillStyle = mix(base, fp.mortar, 0.6);
+      dot(g, cx, cy);
+      g.fillStyle = mix(base, fp.hi, 0.4);
+      dot(g, cx, cy + FINE);
+      cx += FINE;
+      cy += r(30 + k) < 0.33 ? -FINE : r(30 + k) > 0.66 ? FINE : 0;
+    }
+  }
+  if (fx.seam && r(40) < 0.45) {
+    // 石縫裡的苔蘚：沿下緣灰縫的幾個細點，少數往石面爬上一點。
+    g.fillStyle = fx.seam;
+    const mx = sx + r(41) * (w - 2);
+    dot(g, mx, sy + h, 1.5, FINE);
+    dot(g, mx + FINE, sy + h - FINE, FINE, FINE);
+    g.fillStyle = shade(fx.seam, 0.25);
+    dot(g, mx + 1, sy + h - FINE);
+  }
+  if (fx.glow && r(50) < 0.12) {
+    // 發光縫：灰縫裡一段亮色細線與外圍淡光。
+    const gx = sx + r(51) * (w - 3);
+    g.fillStyle = `rgba(${fx.glow},0.35)`;
+    dot(g, gx - FINE, sy + h - FINE, 3, 1.5);
+    g.fillStyle = `rgb(${fx.glow})`;
+    dot(g, gx, sy + h, 2, FINE);
+    g.fillStyle = 'rgba(255,240,200,0.9)';
+    dot(g, gx + FINE, sy + h);
+  }
+  if (fx.frost) {
+    // 冰霜：石面上緣的白色細點與一小片霜。
+    g.fillStyle = fx.frost;
+    if (r(60) < 0.25) dot(g, sx + 1 + r(61) * (w - 3), sy + FINE, 1, FINE);
+    if (r(62) < 0.12) { g.globalAlpha = 0.5; dot(g, sx + 1 + r(63) * (w - 4), sy + 2 + r(64) * 2, 2, 1); g.globalAlpha = 1; }
+  }
+  if (fx.sand && r(70) < 0.4) {
+    // 積沙：石塊角落的沙堆（亮色細點組成的斜坡）。
+    g.fillStyle = fx.sand;
+    const left = r(71) < 0.5;
+    for (let k = 0; k < 3; k++) dot(g, left ? sx + FINE : sx + w - 1.5 - k * FINE, sy + h - 1 - k * FINE, left ? 1.5 - k * FINE : 1 + k * FINE, FINE);
+  }
+  if (fx.vein && r(80) < 0.35) {
+    // 大理石紋：斜向的淡白細線。
+    g.fillStyle = 'rgba(255,255,255,0.55)';
+    const vx = sx + 1 + r(81) * (w - 4);
+    for (let k = 0; k < 5; k++) dot(g, vx + k * FINE, sy + 1.5 + k * FINE * (r(82) < 0.5 ? 1 : 1.5));
+  }
+  if (fx.rivet && r(90) < 0.3) {
+    // 鉚釘：石塊（金屬板）四角的亮點與暗點。
+    for (const [ox, oy] of [[1, 1], [w - 1.5, 1], [1, h - 1.5], [w - 1.5, h - 1.5]]) {
+      g.fillStyle = fx.rivet;
+      dot(g, sx + ox, sy + oy);
+      g.fillStyle = fp.mortar;
+      dot(g, sx + ox + FINE, sy + oy + FINE);
+    }
+  }
+  if (fx.wet && r(100) < 0.18) {
+    // 積水：一小灘較亮的水面與一道反光。
+    g.fillStyle = 'rgba(140,220,230,0.25)';
+    const wx = sx + 1 + r(101) * (w - 4);
+    dot(g, wx, sy + 3, 3, 1.5);
+    g.fillStyle = 'rgba(220,255,255,0.7)';
+    dot(g, wx + FINE, sy + 3, 1, FINE);
+  }
+}
+
+/**
+ * 畫草地地板（草原）：底色上有深淺不一的草叢斑塊，再撒上 0.5 像素的草葉（深色根部、亮色葉尖）。
+ * @param {CanvasRenderingContext2D} g 畫布。
+ * @param {number} i 格子 x。
+ * @param {number} j 格子 y。
+ * @param {object} th 區域色調。
+ */
+function drawGrassFloor(g, i, j, th) {
+  const x = i * T;
+  const y = j * T;
+  g.fillStyle = th.floor[0];
+  g.fillRect(x, y, T, T);
+  /**
+   * 平滑的雜訊（以 8 像素為一格做雙線性內插），讓草色斑塊連成不規則的大片。
+   * @param {number} wx 世界 x（像素）。
+   * @param {number} wy 世界 y（像素）。
+   * @returns {number} 0～1。
+   */
+  const smooth = (wx, wy) => {
+    const gx = wx / 8, gy = wy / 8;
+    const x0 = Math.floor(gx), y0 = Math.floor(gy);
+    const fx = gx - x0, fy = gy - y0;
+    const v = (a, b) => hash(a + 900, b + 300);
+    const top = v(x0, y0) * (1 - fx) + v(x0 + 1, y0) * fx;
+    const bot = v(x0, y0 + 1) * (1 - fx) + v(x0 + 1, y0 + 1) * fx;
+    return top * (1 - fy) + bot * fy;
+  };
+  // 斑塊：以 1 像素為單位，依平滑雜訊決定較亮或較暗的草色。
+  const hi = th.floor[1];
+  const hi2 = shade(th.floor[1], 0.07);
+  const lo = shade(th.floor[0], -0.07);
+  for (let by = 0; by < T; by++) {
+    for (let bx = 0; bx < T; bx++) {
+      const v = smooth(x + bx, y + by) + (hash(x + bx, y + by) - 0.5) * 0.12;
+      if (v > 0.66) g.fillStyle = hi2;
+      else if (v > 0.5) g.fillStyle = hi;
+      else if (v < 0.3) g.fillStyle = lo;
+      else continue;
+      g.fillRect(x + bx, y + by, 1, 1);
+    }
+  }
+  // 草葉：1.5 像素高、0.5 像素寬，深色根部、亮色葉尖，少數兩片成 V 字形。
+  const dark = shade(th.floor[0], -0.28);
+  const light = shade(th.floor[1], 0.28);
+  for (let k = 0; k < 26; k++) {
+    const bx = x + hash(i * 31 + k, j * 7 + 3) * 15.5;
+    const by = y + hash(i * 5 - k, j * 29 + k) * 14.5;
+    const lean = hash(i + k * 3, j - k) < 0.5 ? -FINE : FINE;
+    g.fillStyle = dark;
+    dot(g, bx, by + 1);
+    g.fillStyle = mix(th.floor[1], light, 0.4);
+    dot(g, bx, by + FINE);
+    g.fillStyle = light;
+    dot(g, bx + lean, by);
+    if (k % 3 === 0) {
+      g.fillStyle = mix(th.floor[1], light, 0.4);
+      dot(g, bx - lean, by + FINE);
+    }
+  }
+}
+
+/**
+ * 牆面磚塊的細節：圓角、高光下的半階亮面、細小斑點，以及依區域加上的苔蘚或發光裂縫。
+ * @param {CanvasRenderingContext2D} g 畫布。
+ * @param {number} x0 這一格中磚塊的左緣。
+ * @param {number} x1 這一格中磚塊的右緣（不含）。
+ * @param {number} by 磚塊上緣 y。
+ * @param {number} start 磚塊（整塊）左緣。
+ * @param {number} end 磚塊（整塊）右緣（不含）。
+ * @param {string} base 磚塊顏色。
+ * @param {object} pal 牆壁色盤。
+ * @param {object} fx 區域點綴。
+ * @param {number} seed 雜湊種子。
+ */
+function brickDetail(g, x0, x1, by, start, end, base, pal, fx, seed) {
+  const r = (k) => hash(seed * 3 + k * 17, seed - k * 7);
+  /**
+   * 只在這一格範圍內畫細節像素。
+   * @param {number} x x。
+   * @param {number} y y。
+   * @param {number} [w=FINE] 寬度。
+   * @param {number} [h=FINE] 高度。
+   */
+  const clip = (x, y, w = FINE, h = FINE) => {
+    const a = Math.max(x, x0);
+    const b = Math.min(x + w, x1);
+    if (b > a) dot(g, a, y, b - a, h);
+  };
+  g.fillStyle = pal.mortar;
+  clip(start + 1, by); clip(end - 1.5, by); clip(start + 1, by + 4.5); clip(end - 1.5, by + 4.5);
+  g.fillStyle = mix(base, pal.brickHi, 0.45);
+  clip(start + 2, by + 1, end - start - 4, FINE);
+  g.fillStyle = mix(base, pal.brickLo, 0.5);
+  clip(start + 1.5, by + 3.5, end - start - 3.5, FINE);
+  for (let k = 0; k < 3; k++) {
+    g.fillStyle = k ? mix(base, pal.brickLo, 0.75) : mix(base, pal.brickHi, 0.7);
+    clip(start + 2 + r(k) * (end - start - 4), by + 1.5 + r(k + 5) * 2);
+  }
+  if (fx.seam && r(10) < 0.3) {
+    // 磚縫垂下的苔蘚。
+    g.fillStyle = fx.seam;
+    const mx = start + 2 + r(11) * (end - start - 5);
+    clip(mx, by + 4.5, 2, FINE);
+    clip(mx + FINE, by + 5, 1, FINE);
+    g.fillStyle = shade(fx.seam, 0.2);
+    clip(mx, by + 4.5);
+  }
+  if (fx.glow && r(20) < 0.1) {
+    // 磚面的發光裂縫（熔岩、魔力從牆裡透出來）。
+    const cx = start + 3 + r(21) * (end - start - 6);
+    g.fillStyle = `rgba(${fx.glow},0.3)`;
+    clip(cx - FINE, by + 1, 2, 3);
+    g.fillStyle = `rgb(${fx.glow})`;
+    clip(cx, by + 1.5); clip(cx + FINE, by + 2); clip(cx, by + 2.5); clip(cx + FINE, by + 3);
+  }
+  if (fx.frost && r(30) < 0.4) {
+    g.fillStyle = fx.frost;
+    clip(start + 2 + r(31) * (end - start - 5), by, 1.5, FINE);
+  }
+}
+
+/**
+ * 牆唇的細節：石唇上的細小高光與缺口，依區域加上垂下的苔蘚或冰柱。
+ * @param {CanvasRenderingContext2D} g 畫布。
+ * @param {number} x 格子左上角 x。
+ * @param {number} top 牆面上緣 y。
+ * @param {object} pal 牆壁色盤。
+ * @param {object} fx 區域點綴。
+ * @param {number} i 格子 x（雜湊用）。
+ * @param {number} j 格子 y（雜湊用）。
+ */
+function wallLipDetail(g, x, top, pal, fx, i, j) {
+  g.fillStyle = mix(pal.top[0], pal.topHi, 0.5);
+  dot(g, x, top + 1, T, FINE);
+  g.fillStyle = mix(pal.top[0], pal.outline, 0.5);
+  dot(g, x, top + 2.5, T, FINE);
+  for (let k = 0; k < 3; k++) {
+    g.fillStyle = pal.topLo;
+    dot(g, x + hash(i * 13 + k, j + 77) * 15, top + 1.5 + (k % 2) * FINE);
+  }
+  const hang = fx.icicle || fx.drip;
+  if (!hang) return;
+  for (let k = 0; k < 3; k++) {
+    if (hash(i * 7 + k, j * 3 + 41) > 0.55) continue;
+    const hx = x + 1 + hash(i * 9 - k, j + k * 5) * 13;
+    const len = 1.5 + hash(i + k, j * 13) * 3;
+    // 由上往下變細：上段 1 像素寬、下段 0.5 像素，尖端較亮。
+    g.fillStyle = hang;
+    dot(g, hx, top + 4, 1, Math.min(1.5, len));
+    dot(g, hx + (fx.icicle ? FINE / 2 : 0), top + 4, FINE, len);
+    g.fillStyle = fx.icicle ? '#ffffff' : shade(hang, 0.25);
+    dot(g, hx, top + 4, FINE, FINE);
+    if (fx.icicle) dot(g, hx + FINE / 2, top + 4 + len - FINE);
+  }
+}
+
+/**
+ * 牆頂石板的細節：每片石板上緣的半階亮面、細小斑點與缺角。
+ * @param {CanvasRenderingContext2D} g 畫布。
+ * @param {number} x0 石板在這一格的左緣。
+ * @param {number} x1 石板在這一格的右緣（不含）。
+ * @param {number} by 石板上緣 y。
+ * @param {object} pal 牆壁色盤。
+ * @param {string} base 石板顏色。
+ * @param {number} seed 雜湊種子。
+ */
+function slabDetail(g, x0, x1, by, pal, base, seed) {
+  g.fillStyle = mix(base, pal.topHi, 0.6);
+  dot(g, x0, by, x1 - x0 - (x1 % 16 === 0 ? 1 : 0), FINE);
+  g.fillStyle = mix(base, pal.seam, 0.5);
+  dot(g, x0, by + 6.5, x1 - x0, FINE);
+  for (let k = 0; k < 3; k++) {
+    const v = hash(seed + k * 31, seed * 3 - k);
+    g.fillStyle = k ? mix(base, pal.topLo, 0.5) : mix(base, pal.topHi, 0.8);
+    dot(g, x0 + v * Math.max(0, x1 - x0 - 1), by + 1.5 + hash(seed - k, k + 9) * 4.5);
+  }
+}
+
+/**
+ * 地圖的石材顆粒：對整張離屏畫布做極輕微的明暗雜訊（細顆粒加上 2 × 2 的斑駁），讓大片色塊有材質感。
+ * 雜訊依像素座標固定，每次產生的地圖都一樣。
+ * @param {CanvasRenderingContext2D} g 畫布。
+ * @param {number} w 畫布寬度（畫布像素）。
+ * @param {number} h 畫布高度（畫布像素）。
+ */
+function grainPass(g, w, h) {
+  const img = g.getImageData(0, 0, w, h);
+  const d = img.data;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      let n = Math.imul(x * 374761393 + y * 668265263, 1274126177) >>> 0;
+      n = ((n ^ (n >>> 15)) & 0xff) / 255;
+      let b = Math.imul((x >> 1) * 2246822519 + (y >> 1) * 3266489917, 668265263) >>> 0;
+      b = ((b ^ (b >>> 13)) & 0xff) / 255;
+      const k = 1 + (n - 0.5) * 0.06 + (b - 0.5) * 0.07;
+      const i = (y * w + x) * 4;
+      d[i] = Math.min(255, d[i] * k);
+      d[i + 1] = Math.min(255, d[i + 1] * k);
+      d[i + 2] = Math.min(255, d[i + 2] * k);
+    }
+  }
+  g.putImageData(img, 0, 0);
 }
 
 /** 地城畫面的繪製器。 */
@@ -832,7 +1595,7 @@ export class Renderer {
   }
 
   /**
-   * 依畫布的 CSS 大小調整解析度與整數放大倍率（畫面短邊約 11 格），並決定角色圖的顯示密度（heroDensity）。
+   * 依畫布的 CSS 大小調整解析度與整數放大倍率（畫面短邊約 13 格），並決定角色圖的顯示密度（heroDensity）。
    * @returns {void}
    */
   resize() {
@@ -842,7 +1605,8 @@ export class Renderer {
     const h = Math.max(1, Math.round(rect.height * dpr));
     this.canvas.width = w;
     this.canvas.height = h;
-    const target = Math.min(w / (11 * T), h / (11 * T));
+    // 畫面短邊約 13 格（角色約 1 格高，視野比以前寬一點，地圖看起來更開闊）。
+    const target = Math.min(w / (13 * T), h / (13 * T));
     this.scale = Math.max(1, Math.round(target));
     // 角色圖約以 1.5 倍密度顯示（比 16 格的世界大一點），並讓每個圖像素佔整數個螢幕像素：
     // 例如放大 6 倍時每個圖像素 4 個螢幕像素（密度 1.5）、7 倍時 5 個（密度 1.4）。畫面太小時直接用 1.5。
@@ -864,7 +1628,8 @@ export class Renderer {
   }
 
   /**
-   * 預先把整層地圖畫到離屏畫布（地圖不變，每幀只需貼上）。
+   * 預先把整層地圖畫到離屏畫布（地圖不變，每幀只需貼上）。畫布為 2 倍密度（FLOOR_DENSITY），
+   * 地板、牆面、牆頂與草地另外以 0.5 像素加上細節與區域點綴，最後加上石材顆粒，再畫擺設。
    * @param {object} world 探險。
    */
   buildFloor(world) {
@@ -879,6 +1644,15 @@ export class Renderer {
       mortar: shade(th.floor[0], -0.38),
     };
     const hedge = themeName === 'grass';
+    const fx = THEME_FX[themeName] || {};
+    // 有設計圖圖塊的區域：地板、牆面、牆頂與石柱改用 dungeonTiles.js（legacyTiles 為轉換工具取參考圖用）。
+    const tex = !this.legacyTiles && DUNGEON_TILES[`${themeName}.floor@0`] ? themeName : null;
+    // 地板的大範圍明暗起伏（只用於有設計圖圖塊的區域）。
+    const shadeLayer = tex && !hedge ? floorShadeLayer(f.w, f.h) : null;
+    const ramps = propRamps(th, pal);
+    const bannerArt = propArt('banner', ramps.cloth);
+    const torchArt = propArt('torch');
+    const stairsArt = propArt('stairs', ramps.stone);
     const torches = [];
     /** 已放置火把、掛旗或大型擺設的牆面格子。 */
     const decor = [];
@@ -912,10 +1686,12 @@ export class Renderer {
      * @returns {boolean} 畫出牆頂時為 true。
      */
     const isSolidTop = (i, j) => solid(i, j) && !isFace(i, j) && near(i, j);
+    // 離屏畫布以 2 倍密度繪製：沿用世界像素座標（縮放 2 倍），細節再以 0.5 像素補上。
     const c = document.createElement('canvas');
-    c.width = f.w * T;
-    c.height = f.h * T;
+    c.width = f.w * T * FLOOR_DENSITY;
+    c.height = f.h * T * FLOOR_DENSITY;
     const g = c.getContext('2d');
+    g.scale(FLOOR_DENSITY, FLOOR_DENSITY);
     g.fillStyle = th.bg;
     g.fillRect(0, 0, c.width, c.height);
     for (let j = 0; j < f.h; j++) {
@@ -935,15 +1711,17 @@ export class Renderer {
             const wideFace = isFace(i - 1, j) && isFace(i + 1, j);
             // 長牆中間每隔 5 格立一根圓柱（兩側都要是牆面，不和兩端的圓柱擠在一起）。
             const mid = !hedge && wideFace && isFace(i - 2, j) && isFace(i + 2, j) && i % 5 === 0;
-            drawWallFace(g, i, j, pal, hedge, { left: endKind(-1), right: endKind(1), mid, rise: j > 0 && solid(i, j - 1) ? 8 : 0 });
+            const faceOpt = { left: endKind(-1), right: endKind(1), mid, rise: j > 0 && solid(i, j - 1) ? 8 : 0 };
+            if (tex) drawWallFaceTex(g, i, j, faceOpt, tex);
+            else drawWallFace(g, i, j, pal, hedge, faceOpt, fx);
             // 牆面點綴：間隔放置火把（另外每幀畫火焰與光暈）或掛旗；兩側都要是牆面、且不是圓柱的位置才放。
             const r = hash(i + 101, j + 57);
             // 火把、掛旗與擺設彼此至少間隔 2 格。
             const spaced = !decor.some((d) => d.j === j && Math.abs(d.i - i) < 2);
-            if (!hedge && wideFace && !mid && spaced && r < 0.16) {
+            if (!hedge && wideFace && !mid && spaced && r < 0.22) {
               torches.push({ i, j });
               decor.push({ i, j });
-            } else if (wideFace && !mid && spaced && r >= 0.16 && r < 0.55) {
+            } else if (wideFace && !mid && spaced && r >= 0.22 && r < 0.58) {
               // 大型擺設：依區域挑種類；石像先在牆面挖出壁龕。
               const list = PROPS[themeName] || PROPS.default;
               const kind = list[Math.floor(hash(i + 7, j + 311) * list.length)];
@@ -951,10 +1729,28 @@ export class Renderer {
               props.push({ kind, i, j });
               decor.push({ i, j });
             } else if (!hedge && wideFace && !mid && spaced && r > 0.9) {
-              drawBanner(g, x, y, th, pal);
+              // 掛旗：有設計圖時布面染成區域的點綴色。
+              if (bannerArt) blitProp(g, bannerArt, x + 8, y + 3);
+              else drawBanner(g, x, y, th, pal);
               decor.push({ i, j });
+            } else if (!hedge && wideFace && !mid && spaced && r >= 0.86 && r < 0.9 && PROP_SPRITES.ironGate) {
+              // 封閉的鐵柵門（嵌在牆裡的裝飾，不能通行）。
+              const art = propArt('ironGate', ramps.stone);
+              blitProp(g, art, x + 8, (j + 1) * T - art.h / 2);
+              decor.push({ i, j });
+            } else if (wideFace && !mid && spaced && r >= 0.62 && r < 0.86) {
+              // 牆上的掛飾：武器架、圓盾或鐵鏈（有設計圖時）。
+              const kinds = ['weaponRack', 'wallShield', 'chains'].filter((k) => PROP_SPRITES[k]);
+              if (kinds.length) {
+                const art = propArt(kinds[Math.floor(hash(i + 51, j + 7) * kinds.length)]);
+                blitProp(g, art, x + 8, y + 9 - art.h / 4);
+                decor.push({ i, j });
+              }
             }
-            if (torches.length && torches[torches.length - 1].i === i && torches[torches.length - 1].j === j) {
+            if (torches.length && torches[torches.length - 1].i === i && torches[torches.length - 1].j === j && torchArt) {
+              // 火把座（火焰每幀另外畫在托盤上方）。
+              blitProp(g, torchArt, x + 8, y + 6);
+            } else if (torches.length && torches[torches.length - 1].i === i && torches[torches.length - 1].j === j) {
               g.fillStyle = '#3a2a1a';
               g.fillRect(x + 7, y + 8, 2, 5);
               g.fillStyle = '#8a8a92';
@@ -968,24 +1764,45 @@ export class Renderer {
               down: !isSolidTop(i, j + 1) && !isFace(i, j + 1),
               left: !isSolidTop(i - 1, j) && !isFace(i - 1, j),
               right: !isSolidTop(i + 1, j) && !isFace(i + 1, j),
-            });
+            }, tex ? dungeonTile(`${tex}.rim@${hash(i + 3, j + 9) < 0.5 ? 0 : 1}`) || dungeonTile(`${tex}.top@${hash(i + 3, j + 9) < 0.5 ? 0 : 1}`) : null);
+            // 南側外牆（上方是地板、下方是地圖外）：牆緣下方補一段矮牆正面，牆看起來有厚度。
+            if (tex && !solid(i, j - 1) && !isSolidTop(i, j + 1) && !isFace(i, j + 1)) drawFrontLip(g, i, j, tex);
           }
           continue;
         }
-        if (hedge) {
-          g.fillStyle = th.floor[(i + j) % 2];
-          g.fillRect(x, y, T, T);
+        if (tex && !hedge) {
+          g.drawImage(dungeonTile(`${tex}.floor@${Math.floor(hash(i + 7, j + 3) * 4)}`), x, y, T, T);
+          g.drawImage(shadeLayer, x, y, T, T, x, y, T, T);
+        } else if (hedge) {
+          // 草原的地面維持程式繪製（不規則的草色斑塊跨格相連，圖塊拼接會出現棋盤格）。
+          drawGrassFloor(g, i, j, th);
         } else {
-          drawFloorStones(g, i, j, th, fpal);
+          drawFloorStones(g, i, j, th, fpal, fx);
         }
         const r = hash(i, j);
         g.fillStyle = th.speck;
-        if (r < 0.35) g.fillRect(x + Math.floor(r * 40) % 13 + 1, y + Math.floor(r * 97) % 13 + 1, 2, 1);
-        if (r > 0.8) g.fillRect(x + Math.floor(r * 53) % 12 + 2, y + Math.floor(r * 71) % 12 + 2, 1, 2);
+        if (tex && !hedge) {
+          // 設計圖圖塊已有自己的點綴，不另外畫斑點。
+        } else if (hedge) {
+          // 草原的小花：四片花瓣（0.5 像素）圍著花心，下方一點葉影。
+          for (const [fx0, fy0, on] of [[Math.floor(r * 40) % 13 + 1, Math.floor(r * 97) % 13 + 1, r < 0.35], [Math.floor(r * 53) % 12 + 2, Math.floor(r * 71) % 12 + 2, r > 0.8]]) {
+            if (!on) continue;
+            g.fillStyle = shade(th.floor[0], -0.3);
+            dot(g, x + fx0, y + fy0 + 1.5, 1.5, FINE);
+            g.fillStyle = r < 0.15 ? '#ffffff' : th.speck;
+            dot(g, x + fx0 + FINE, y + fy0); dot(g, x + fx0, y + fy0 + FINE); dot(g, x + fx0 + 1, y + fy0 + FINE); dot(g, x + fx0 + FINE, y + fy0 + 1);
+            g.fillStyle = '#e07a3a';
+            dot(g, x + fx0 + FINE, y + fy0 + FINE);
+          }
+        } else if (r < 0.35) g.fillRect(x + Math.floor(r * 40) % 13 + 1, y + Math.floor(r * 97) % 13 + 1, 2, 1);
+        if (!tex && !hedge && r > 0.8) g.fillRect(x + Math.floor(r * 53) % 12 + 2, y + Math.floor(r * 71) % 12 + 2, 1, 2);
         // 少數地板有骨頭或碎石（樓梯與陷阱除外，只是裝飾，不影響行走）。
         const lr = hash(i + 503, j + 71);
-        if (!hedge && t !== STAIRS && t !== SPIKES && lr < 0.035) drawFloorLitter(g, x, y, lr / 0.035, fpal);
-        if (t === STAIRS) {
+        if (!hedge && t !== STAIRS && t !== SPIKES && lr < 0.035) drawFloorLitter(g, x, y, lr / 0.035, fpal, ramps);
+        if (t === STAIRS && stairsArt) {
+          // 樓梯：依區域石色上色的石階入口，剛好填滿一格。
+          blitProp(g, stairsArt, x + 8, y);
+        } else if (t === STAIRS) {
           g.fillStyle = '#0b0710';
           g.fillRect(x + 1, y + 1, T - 2, T - 2);
           g.fillStyle = th.top;
@@ -1007,8 +1824,129 @@ export class Renderer {
         if (solid(i + 1, j)) g.fillRect(x + T - 1, y, 1, T);
       }
     }
-    for (const prop of props) drawProp(g, prop, pal);
-    this.floorCache = { canvas: c, floor: f, torches: themeName === 'sky' ? [] : torches, props };
+    // 擺設之前先加上石材顆粒（擺設維持乾淨的像素圖）。
+    if (!tex) grainPass(g, c.width, c.height);
+    const braziers = this.placeRoomDecor(g, world, ramps, solid, themeName);
+    for (const prop of props) drawProp(g, prop, pal, ramps);
+    const arches = hedge ? [] : this.drawDoorways(g, world, ramps, solid);
+    this.floorCache = { canvas: c, floor: f, torches: themeName === 'sky' ? [] : torches, props, braziers, arches };
+  }
+
+  /**
+   * 畫拱門的前景層：拱頂（上方 ARCH_FRONT 比例）畫在角色與怪物上方，角色走進門口時從拱門下穿過。
+   * 只畫在畫面範圍內的拱門。
+   */
+  drawArchFronts() {
+    const list = this.floorCache.arches || [];
+    if (!list.length) return;
+    const g = this.ctx;
+    const { x: cx, y: cy } = this.cam;
+    for (const a of list) {
+      const w = a.art.w / 2;
+      const h = (a.art.h * ARCH_FRONT) / 2;
+      const x = Math.round((a.cx - w / 2) * 2) / 2;
+      if (x + w < cx || x > cx + this.viewW || a.y + h < cy || a.y > cy + this.viewH) continue;
+      g.drawImage(a.art.frames[0], 0, 0, a.art.w, Math.round(a.art.h * ARCH_FRONT), x, a.y, w, Math.round(a.art.h * ARCH_FRONT) / 2);
+    }
+  }
+
+  /**
+   * 房間出入口（有設計圖時）：走廊從房間上方的牆穿進來的地方（走廊與門口都是 2 格寬），門口畫往上的石階與嵌在牆裡的 3 格寬石拱門（門洞 2 格、兩側是打開的木門）；
+   * 走廊從房間下方的牆穿出去的地方，畫往下的石階。用石階表現房間與走廊的高低落差，只是畫面效果，不影響行走。
+   * @param {CanvasRenderingContext2D} g 地圖離屏畫布。
+   * @param {object} world 探險。
+   * @param {{stone: string[], rock: string[], cloth: string[]}} ramps 上色色階。
+   * @param {(i: number, j: number) => boolean} solid 是否為牆。
+   * @returns {{art: object, cx: number, y: number}[]} 拱門的位置（拱頂每幀畫在角色上方）。
+   */
+  drawDoorways(g, world, ramps, solid) {
+    const f = world.floor;
+    const steps = propArt('steps', ramps.stone);
+    const arch = propArt('archway', ramps.stone);
+    const arches = [];
+    if (!steps && !arch) return arches;
+    const done = new Set();
+    /**
+     * 這一格是不是一般地板（不是牆、樓梯或地刺）。
+     * @param {number} i 格子 x。
+     * @param {number} j 格子 y。
+     * @returns {boolean} 一般地板時為 true。
+     */
+    const plain = (i, j) => !solid(i, j) && f.tiles[j * f.w + i] === 1;
+    for (const r of f.rooms) {
+      for (let i = r.x; i < r.x + r.w - 1; i++) {
+        for (const [j, north] of [[r.y - 1, true], [r.y + r.h, false]]) {
+          const out = north ? j - 1 : j + 1;
+          const key = `${i},${j}`;
+          // 門口：牆上 2 格寬的缺口（走廊寬 2 格；兩側是牆、外側接著走廊）。
+          if (done.has(key) || j < 1 || j >= f.h - 1 || !plain(i, j) || !plain(i + 1, j) || !solid(i - 1, j) || !solid(i + 2, j) || solid(i, out) || solid(i + 1, out)) continue;
+          done.add(key);
+          if (steps) drawWideSteps(g, steps.frames[0], i * T, j * T, north);
+          if (north && arch) {
+            blitProp(g, arch, (i + 1) * T, (j + 1) * T - arch.h / 2);
+            // 拱頂另外記下來，每幀畫在角色上方（角色從拱門下穿過）。
+            arches.push({ art: arch, cx: (i + 1) * T, y: (j + 1) * T - arch.h / 2 });
+          }
+        }
+      }
+    }
+    return arches;
+  }
+
+  /**
+   * 房間的擺設（有設計圖時）：房間中央偶爾鋪地毯；房間四個角落依位置放蜘蛛網（只在上方兩角）、火盆、陶罐、麻布袋、蠟燭或斷柱。
+   * 只是裝飾，不影響行走（樓梯、地刺、寶箱與起點附近不放）。
+   * @param {CanvasRenderingContext2D} g 地圖離屏畫布。
+   * @param {object} world 探險。
+   * @param {{stone: string[], rock: string[], cloth: string[]}} ramps 上色色階。
+   * @param {(i: number, j: number) => boolean} solid 是否為牆。
+   * @param {string} theme 區域色調名稱。
+   * @returns {{x: number, y: number}[]} 火盆的位置（世界像素，火焰與光每幀另外畫）。
+   */
+  placeRoomDecor(g, world, ramps, solid, theme) {
+    const f = world.floor;
+    const braziers = [];
+    const busy = new Set([f.stairs, f.start, ...world.chests.map((c) => ({ x: Math.floor(c.x), y: Math.floor(c.y) }))].filter(Boolean).map((p) => `${Math.floor(p.x)},${Math.floor(p.y)}`));
+    /**
+     * 這一格能不能放擺設（地板、不是樓梯地刺、附近沒有寶箱與起點）。
+     * @param {number} i 格子 x。
+     * @param {number} j 格子 y。
+     * @returns {boolean} 可以放時為 true。
+     */
+    const free = (i, j) => !solid(i, j) && f.tiles[j * f.w + i] === 1 && !busy.has(`${i},${j}`);
+    for (const [n, room] of f.rooms.entries()) {
+      // 地毯：房間夠大時，約三分之一的房間在中央鋪一張。
+      const rug = propArt('rug');
+      if (rug && room.w >= 5 && room.h >= 4 && hash(n + 77, room.x) < 0.35 && free(room.cx, room.cy) && free(room.cx + 1, room.cy)) {
+        blitProp(g, rug, (room.cx + 1) * T, room.cy * T + 8 - rug.h / 4);
+      }
+      const corners = [[room.x, room.y, 'tl'], [room.x + room.w - 1, room.y, 'tr'], [room.x, room.y + room.h - 1, 'bl'], [room.x + room.w - 1, room.y + room.h - 1, 'br']];
+      for (const [i, j, c] of corners) {
+        if (!free(i, j)) continue;
+        const v = hash(i * 7 + n, j * 3 + 11);
+        if ((c === 'tl' || c === 'tr') && v < 0.35 && PROP_SPRITES.cobweb) {
+          // 蜘蛛網：貼在上方角落（右上角左右翻轉）。
+          const art = propArt('cobweb', ramps.stone);
+          const w = art.w / 2;
+          const h = art.h / 2;
+          g.save();
+          if (c === 'tr') { g.translate((i + 1) * T, 0); g.scale(-1, 1); g.drawImage(art.frames[0], 0, j * T, w, h); } else g.drawImage(art.frames[0], i * T, j * T, w, h);
+          g.restore();
+          continue;
+        }
+        if (v > 0.7) continue;
+        const kinds = ['brazier', 'urns', 'sacks', 'candles', 'pillarStump'].filter((k) => PROP_SPRITES[k] && !(k === 'brazier' && theme === 'sea'));
+        if (!kinds.length) continue;
+        const kind = kinds[Math.floor(hash(i + 5, j * 9 + n) * kinds.length)];
+        const art = propArt(kind, ramps.stone);
+        const cx = i * T + 8 + (c.endsWith('l') ? -1 : 1);
+        const bottom = (j + 1) * T - 1;
+        groundShadow(g, cx, bottom, Math.min(14, art.w / 2));
+        blitProp(g, art, cx, bottom - art.h / 2);
+        if (kind === 'brazier') braziers.push({ x: cx, y: bottom - art.h / 2 + 2 });
+      }
+    }
+    return braziers;
   }
 
   /**
@@ -1043,7 +1981,7 @@ export class Renderer {
     this.cam = { x: cx, y: cy };
     g.setTransform(this.scale, 0, 0, this.scale, -cx * this.scale, -cy * this.scale);
 
-    g.drawImage(this.floorCache.canvas, 0, 0);
+    g.drawImage(this.floorCache.canvas, 0, 0, f.w * T, f.h * T);
     this.drawDynamicTiles(world);
     this.drawHazards(world);
     this.drawDecals(dt);
@@ -1052,6 +1990,7 @@ export class Renderer {
     this.drawChestsAndPickups(world);
     this.drawPortal(world);
     this.drawEntities(world);
+    this.drawArchFronts();
     this.drawProjectiles(world);
     this.drawEffects(world);
     this.castAura(world);
@@ -1097,13 +2036,30 @@ export class Renderer {
       g.fillStyle = '#fff2b0';
       g.fillRect(x + 7, y + 5, 1 + (flick === 0 ? 1 : 0), 1);
     }
+    for (const b of this.floorCache.braziers || []) {
+      // 火盆的火焰：三層閃爍的火舌。
+      const fl = Math.floor(world.time * 9 + b.x) % 3;
+      g.fillStyle = '#e8541c';
+      g.fillRect(b.x - 3, b.y - 4 - (fl === 1 ? 1 : 0), 6, 4 + (fl === 1 ? 1 : 0));
+      g.fillStyle = '#ffb030';
+      g.fillRect(b.x - 2 + (fl === 2 ? 1 : 0), b.y - 6, 3, 5);
+      g.fillStyle = '#fff2b0';
+      g.fillRect(b.x - 1, b.y - 3, 2, 2);
+    }
     const up = world.spikesUp();
     for (let j = Math.max(0, v.j0); j < Math.min(f.h, v.j1); j++) {
       for (let i = Math.max(0, v.i0); i < Math.min(f.w, v.i1); i++) {
         if (f.tiles[j * f.w + i] !== SPIKES) continue;
         const x = i * T;
         const y = j * T;
-        drawSpikeTrap(g, x, y, up);
+        // 地刺：有設計圖時用收起／升起兩格，否則用手寫的像素圖。
+        const art = propArt('spikes');
+        // 以收起的鐵板為底（底部對齊格子下緣），升起時在 4 個孔位畫出往上伸出格子的長尖刺。
+        if (art) {
+          blitProp(g, art, x + 8, y + T + 1 - art.h / 2, 0);
+          if (up) drawSpikeBlades(g, x, y);
+        }
+        else drawSpikeTrap(g, x, y, up);
       }
     }
   }
@@ -1318,6 +2274,20 @@ export class Renderer {
   drawChestsAndPickups(world) {
     const g = this.ctx;
     for (const c of world.chests) {
+      // 寶箱：有設計圖時用關閉／打開兩格（密度 2，世界大小為一半），否則用道具圖。
+      const art = propArt('chest');
+      if (art) {
+        const bx = Math.round(c.x * T);
+        const by = Math.round(c.y * T + art.h / 4);
+        groundShadow(g, bx, by, art.w / 2 - 2);
+        blitProp(g, art, bx, by - art.h / 2, c.opened ? 1 : 0);
+        if (!c.opened && Math.floor(world.time * 3 + c.x * 7) % 6 === 0) {
+          g.fillStyle = '#fff6c8';
+          g.fillRect(bx + art.w / 4 - 2, by - art.h / 2 - 2, 1, 5);
+          g.fillRect(bx + art.w / 4 - 4, by - art.h / 2, 5, 1);
+        }
+        continue;
+      }
       const img = itemArt(c.opened ? 'chestOpen' : 'chest');
       const x = Math.round(c.x * T - img.width / 2);
       const y = Math.round(c.y * T - img.height / 2);
@@ -1335,24 +2305,27 @@ export class Renderer {
       const bob = Math.round(Math.sin(world.time * 5 + it.x) * 1);
       const name = it.kind === 'gem' ? `gem-${it.gem.split('-')[0]}` : it.kind === 'mat' ? it.mat : it.kind === 'homeMat' ? `hm-${it.mat}` : { gold: 'coin', potion: 'potion', cure: 'cure', bagExpand: 'pouch', book: 'book', skillBook: 'skillbook', recipe: 'blueprint', seed: 'seedBag', meat: 'meat' }[it.kind] || 'bag';
       const img = itemArt(name);
-      const x = Math.round(it.x * T - img.width / 2);
-      const y = Math.round(it.y * T - img.height / 2) + bob;
+      // 高密度的道具圖（density）以實際大小（世界像素）繪製。
+      const iw = img.width / (img.density || 1);
+      const ih = img.height / (img.density || 1);
+      const x = Math.round(it.x * T - iw / 2);
+      const y = Math.round(it.y * T - ih / 2) + bob;
       if (it.kind === 'item') {
         // 裝備：以稀有度顏色的光柱標示。
         g.fillStyle = RARITIES[it.item.rarity].color;
         g.globalAlpha = 0.35;
-        g.fillRect(x + 1, y - 8, img.width - 2, 8);
+        g.fillRect(x + 1, y - 8, iw - 2, 8);
         g.globalAlpha = 1;
       } else if (it.kind === 'gem') {
         // 寶石：一閃一閃的白色十字光。
         const tw = Math.floor(world.time * 4 + it.x * 3) % 4 === 0;
         if (tw) {
           g.fillStyle = '#ffffff';
-          g.fillRect(x + img.width - 2, y - 3, 1, 5);
-          g.fillRect(x + img.width - 4, y - 1, 5, 1);
+          g.fillRect(x + iw - 2, y - 3, 1, 5);
+          g.fillRect(x + iw - 4, y - 1, 5, 1);
         }
       }
-      g.drawImage(img, x, y);
+      g.drawImage(img, x, y, iw, ih);
     }
   }
 
@@ -2706,9 +3679,15 @@ export class Renderer {
       const flick = Math.sin(t * 9 + tc.i * 1.7) * 0.06 + Math.sin(t * 23 + tc.j) * 0.03;
       const x = tc.i * T + 8;
       const y = tc.j * T + 10;
-      add(x, y + 6, 3.5 * T * (1 + flick), 0.95);
-      // 暖光往下照在地板上（中心在火把下方），避免把牆後的黑色區域染成橘色。
-      glows.push({ x, y: y + 14, r: 2.6 * T * (1 + flick), c: '255,140,50', a: 0.26 });
+      add(x, y + 6, 4 * T * (1 + flick), 1);
+      // 暖光往下照在地板上（中心在火把下方），避免把牆後的黑色區域染成橘色；火把本身周圍再加一圈小而亮的光暈。
+      glows.push({ x, y: y + 14, r: 3.2 * T * (1 + flick), c: '255,140,50', a: 0.4 });
+      glows.push({ x, y: y - 4, r: 1.1 * T * (1 + flick), c: '255,190,90', a: 0.45 });
+    }
+    for (const b of this.floorCache.braziers || []) {
+      const flick = Math.sin(t * 8 + b.x) * 0.07;
+      add(b.x, b.y, 3.6 * T * (1 + flick), 1);
+      glows.push({ x: b.x, y: b.y + 4, r: 2.6 * T * (1 + flick), c: '255,140,50', a: 0.38 });
     }
     for (const c of world.chests) if (!c.opened) add(c.x * T, c.y * T, 1.6 * T, 0.7);
     const st = world.floor.stairs;

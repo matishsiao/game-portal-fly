@@ -16,6 +16,7 @@ import {
 import { homeArt, iconArt, cropArt, toDataUrl } from './pd/homeArt.js';
 import { HouseView } from './houseView.js';
 import { pendingTips, tipText } from './pd/tips.js';
+import { spritesReady } from './pd/spritePack.js';
 import { ICONS, PASSIVE_ICONS, fillIcons, skillIcon } from './icons.js';
 
 /** 固定時間步（秒）。 */
@@ -4175,6 +4176,8 @@ async function init() {
   const play = trackPlay('pocketdungeon');
   guardFreeze({ onLock: play.flush, onUnlock: play.resume });
   applyTheme();
+  // 圖資料（PNG 圖集）解碼完成後才能畫角色、怪物與道具圖。
+  await spritesReady();
   buildHeroDeco();
   fillIcons(document);
   bindEvents();

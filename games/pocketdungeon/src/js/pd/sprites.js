@@ -6,6 +6,8 @@ import { HOME_MATS } from './homeData.js';
 import { HERO_SPRITES } from './heroSprites.js';
 import { BOSS_SPRITES } from './bossSprites.js';
 import { MONSTER_SPRITES } from './monsterSprites.js';
+import { ITEM_SPRITES } from './itemSprites.js';
+import { ICON_SPRITES } from './homeArt/iconSprites.js';
 
 /** 共用顏色。 */
 const O = '#1a1020';
@@ -842,10 +844,73 @@ function gemArt() {
  * @param {string} name 名稱。
  * @returns {HTMLCanvasElement} 畫布。
  */
-export function itemArt(name) {
+export function itemArtLegacy(name) {
   const key = `i-${name}`;
   if (!cache.has(key)) cache.set(key, paint(ITEM_ART[name].rows, ITEM_ART[name].palette));
   return cache.get(key);
+}
+
+/** 入場卷各等級的顏色（基底、亮面），與 ticketArt 相同。 */
+const TICKET_COLORS = [['#c07a3a', '#f0b070'], ['#9aa3b5', '#e8eef5'], ['#d8a020', '#ffe080'], ['#7ac8d8', '#e0fbff'], ['#b070f0', '#f0d0ff']];
+
+/**
+ * 把灰階圖的低彩度顏色依亮度換成指定色階（入場卷依等級上色用）。
+ * @param {Record<string, string>} palette 調色盤。
+ * @param {string[]} stops 由暗到亮的色階。
+ * @returns {Record<string, string>} 換色後的調色盤。
+ */
+function tintGray(palette, stops) {
+  /**
+   * 色碼轉 RGB。
+   * @param {string} h `#rrggbb`。
+   * @returns {number[]} RGB。
+   */
+  const rgb = (h) => [1, 3, 5].map((k) => parseInt(h.slice(k, k + 2), 16));
+  /**
+   * 混合兩個色碼。
+   * @param {string} a 色碼。
+   * @param {string} b 色碼。
+   * @param {number} t 0～1。
+   * @returns {string} 色碼。
+   */
+  const mixHex = (a, b, t) => '#' + rgb(a).map((v, i) => Math.round(v + (rgb(b)[i] - v) * t).toString(16).padStart(2, '0')).join('');
+  const out = { ...palette };
+  const grays = Object.entries(palette).filter(([k, v]) => k !== 'o' && Math.max(...rgb(v)) - Math.min(...rgb(v)) < 30);
+  const lum = (v) => { const c = rgb(v); return 0.3 * c[0] + 0.59 * c[1] + 0.11 * c[2]; };
+  const ls = grays.map(([, v]) => lum(v));
+  const lo = Math.min(...ls), hi = Math.max(...ls);
+  for (const [k, v] of grays) {
+    const f = (hi > lo ? (lum(v) - lo) / (hi - lo) : 0.5) * (stops.length - 1);
+    const n = Math.min(stops.length - 2, Math.floor(f));
+    out[k] = mixHex(stops[n], stops[n + 1], f - n);
+  }
+  return out;
+}
+
+/**
+ * 取得道具圖（地城掉落物與介面圖示）：有設計圖的道具使用 itemSprites.js 的 2 倍密度圖（畫布帶 density = 2），
+ * 入場卷以灰階圖依等級上色；家園材料（hm-*）使用家園圖示並縮到原本的大小（density 依原圖寬度換算）；其他沿用手寫圖。
+ * 使用時以 width / density 為實際大小（世界像素）。
+ * @param {string} name 名稱。
+ * @returns {HTMLCanvasElement} 畫布（可能帶 density 屬性）。
+ */
+export function itemArt(name) {
+  const key = `is-${name}`;
+  if (cache.has(key)) return cache.get(key);
+  const tier = /^ticket(\d)$/.exec(name);
+  const sp = ITEM_SPRITES[tier ? 'ticket1' : name];
+  let c = null;
+  if (sp) {
+    const pal = tier ? tintGray(sp.palette, ['#2a1a10', ...TICKET_COLORS[Number(tier[1]) - 1], '#ffffff']) : sp.palette;
+    c = paint(sp.rows, pal);
+    c.density = 2;
+  } else if (name.startsWith('hm-') && ICON_SPRITES[name.slice(3)]) {
+    const s = ICON_SPRITES[name.slice(3)];
+    c = paint(s.rows, s.palette);
+    c.density = s.w / itemArtLegacy(name).width;
+  } else c = itemArtLegacy(name);
+  cache.set(key, c);
+  return c;
 }
 
 /**
@@ -856,7 +921,9 @@ export function itemArt(name) {
  */
 export function itemDataUrl(name, scale = 4) {
   const src = itemArt(name);
-  const c = makeCanvas(src.width * scale, src.height * scale);
+  // 高密度的圖：放大倍率換算成相同的顯示大小（至少 1 倍）。
+  const k = Math.max(1, Math.round(scale / (src.density || 1)));
+  const c = makeCanvas(src.width * k, src.height * k);
   const g = c.getContext('2d');
   g.imageSmoothingEnabled = false;
   g.drawImage(src, 0, 0, c.width, c.height);

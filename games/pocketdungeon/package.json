@@ -19,6 +19,7 @@
     "icons": "node scripts/make-icons.mjs",
     "heroes": "node scripts/make-hero-sprites.mjs",
     "bosses": "node scripts/make-hero-sprites.mjs --bosses",
-    "monsters": "node scripts/make-hero-sprites.mjs --monsters"
+    "monsters": "node scripts/make-hero-sprites.mjs --monsters",
+    "props": "node scripts/make-hero-sprites.mjs --props"
   }
 }

@@ -13,6 +13,29 @@ import { ART as themeBoss } from './homeArt/themeBoss.js';
 import { TILES as moreTiles, CROPS as moreCrops, ART as rugs } from './homeArt/tilesCrops.js';
 import { ART as ranchFestival } from './homeArt/ranchFestival.js';
 import { CROPS as farmCrops, ICONS as farmIcons } from './homeArt/farmIcons.js';
+import { FURNITURE_SPRITES } from './homeArt/furnitureSprites.js';
+import { ICON_SPRITES } from './homeArt/iconSprites.js';
+import { CROP_SPRITES } from './homeArt/cropSprites.js';
+import { TILE_SPRITES } from './homeArt/tileSprites.js';
+
+/**
+ * 把設計圖轉換的像素圖畫到新畫布（'.' 透明）。
+ * @param {{palette: Record<string, string>, w: number, h: number, rows: string[]}} s 像素圖。
+ * @returns {HTMLCanvasElement} 畫布。
+ */
+function paintSprite(s) {
+  const c = makeCanvas(s.w, s.h);
+  const g = c.getContext('2d');
+  s.rows.forEach((row, y) => {
+    for (let x = 0; x < row.length; x++) {
+      const ch = row[x];
+      if (ch === '.' || !s.palette[ch]) continue;
+      g.fillStyle = s.palette[ch];
+      g.fillRect(x, y, 1, 1);
+    }
+  });
+  return c;
+}
 
 export { HT, mix, ramp };
 
@@ -770,6 +793,23 @@ Object.assign(ICON_ART, farmIcons);
  * @returns {HTMLCanvasElement | null} 畫布。
  */
 export function homeArt(key, frame = 0) {
+  // 沒有動態幀、且有設計圖的物件：使用 furnitureSprites.js 的圖（畫布大小與原本相同）。
+  const sp = FURNITURE_SPRITES[key];
+  if (sp && homeFrames(key) === 1) {
+    const id = `hs-${key}`;
+    if (!cache.has(id)) cache.set(id, paintSprite(sp));
+    return cache.get(id);
+  }
+  return homeArtLegacy(key, frame);
+}
+
+/**
+ * 取得家具或裝飾的程式繪製圖（沒有設計圖的物件與轉換工具使用）。
+ * @param {string} key 代碼（HOME_ART 中沒有的回傳 null）。
+ * @param {number} [frame=0] 動態幀。
+ * @returns {HTMLCanvasElement | null} 畫布。
+ */
+export function homeArtLegacy(key, frame = 0) {
   const a = HOME_ART[key];
   if (!a) return null;
   const f = frame % (a.frames || 1);
@@ -882,6 +922,25 @@ export function homeFrames(key) {
  * @returns {HTMLCanvasElement | null} 畫布（地板 32 × 32、牆面 32 × 48）。
  */
 export function tileArt(key, i = 0, j = 0) {
+  // 有設計圖的樣式：依位置在 2 種變化間選一種（固定雜湊，相鄰格不會整齊重複）。
+  const v = (Math.imul(i * 73856093 ^ j * 19349663, 2654435761) >>> 0) % 7 < 4 ? 0 : 1;
+  const sp = TILE_SPRITES[`${key}@${v}`] || TILE_SPRITES[`${key}@0`];
+  if (sp) {
+    const id = `ts-${key}-${sp === TILE_SPRITES[`${key}@0`] ? 0 : 1}`;
+    if (!cache.has(id)) cache.set(id, paintSprite(sp));
+    return cache.get(id);
+  }
+  return tileArtLegacy(key, i, j);
+}
+
+/**
+ * 取得地板或牆面樣式的程式繪製圖（轉換工具使用）。
+ * @param {string} key 樣式代碼。
+ * @param {number} i 格子 x。
+ * @param {number} j 格子 y。
+ * @returns {HTMLCanvasElement | null} 畫布。
+ */
+export function tileArtLegacy(key, i = 0, j = 0) {
   const draw = TILE_ART[key];
   if (!draw) return null;
   const id = `t-${key}-${i % 4}-${j % 4}`;
@@ -901,6 +960,22 @@ export function tileArt(key, i = 0, j = 0) {
  * @returns {HTMLCanvasElement | null} 畫布（32 × 40）。
  */
 export function cropArt(key, stage) {
+  const sp = CROP_SPRITES[`${key}@${stage}`];
+  if (sp) {
+    const id = `cs-${key}-${stage}`;
+    if (!cache.has(id)) cache.set(id, paintSprite(sp));
+    return cache.get(id);
+  }
+  return cropArtLegacy(key, stage);
+}
+
+/**
+ * 取得作物的程式繪製圖（轉換工具使用）。
+ * @param {string} key 作物代碼。
+ * @param {number} stage 階段 0～2。
+ * @returns {HTMLCanvasElement | null} 畫布。
+ */
+export function cropArtLegacy(key, stage) {
   const draw = CROP_ART[key];
   if (!draw) return null;
   const id = `c-${key}-${stage}`;
@@ -918,6 +993,21 @@ export function cropArt(key, stage) {
  * @returns {HTMLCanvasElement | null} 畫布。
  */
 export function iconArt(key) {
+  const sp = ICON_SPRITES[key];
+  if (sp) {
+    const id = `is-${key}`;
+    if (!cache.has(id)) cache.set(id, paintSprite(sp));
+    return cache.get(id);
+  }
+  return iconArtLegacy(key);
+}
+
+/**
+ * 取得圖示的程式繪製圖（轉換工具使用）。
+ * @param {string} key 材料代碼或圖示代碼。
+ * @returns {HTMLCanvasElement | null} 畫布。
+ */
+export function iconArtLegacy(key) {
   const draw = MAT_ART[key] || ICON_ART[key];
   if (!draw) return null;
   const id = `i-${key}`;

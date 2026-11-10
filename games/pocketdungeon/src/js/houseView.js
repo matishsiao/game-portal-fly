@@ -846,8 +846,9 @@ export class HouseView {
     p.show.forEach((item, k) => {
       const art = this.hooks.itemArt && this.hooks.itemArt(item);
       if (!art) return;
-      const w = art.width * 2;
-      const hh = art.height * 2;
+      // 高密度的道具圖（density）換算成相同的顯示大小。
+      const w = (art.width * 2) / (art.density || 1);
+      const hh = (art.height * 2) / (art.density || 1);
       const cx = r.x * HT + (r.w * HT * (k + 1)) / (p.show.length + 1);
       g.drawImage(art, Math.round(cx - w / 2), Math.round(top + 14 - hh / 2), w, hh);
     });

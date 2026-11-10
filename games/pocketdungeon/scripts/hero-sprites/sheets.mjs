@@ -105,3 +105,21 @@ const MONSTER_H = {
 export const MONSTER_SHEETS = Object.fromEntries(
   Object.entries(MONSTER_H).map(([k, h]) => [k, { file: `${k}.png`, auto: { n: 4, y: [20, 640] }, cells: {}, hole: 1500, h, colors: h <= 28 ? 18 : 22 }]),
 );
+
+/**
+ * 地圖裝飾物的設計圖與轉換參數（design/props/，白底、一列 n 格、每格一個狀態）：
+ * h 為目標高度、w 為目標寬度（圖像素，密度 2，與地圖離屏畫布相同；有 w 時以寬度換算，用於要填滿一格的樓梯與地刺）；
+ * gray 表示灰階圖（遊戲中依區域石色上色），灰邊不清除。背景已校正為純白，只把純白當背景、不清白洞；
+ * 背景校正不乾淨的圖以 bg 指定白底判定 [最低亮度, 最大彩度]。
+ */
+export const PROP_SHEETS = Object.fromEntries(Object.entries({
+  barrel: { h: 28 }, crates: { h: 36 }, boulder: { h: 26, gray: true }, statue: { h: 46, gray: true },
+  trophy: { h: 30 }, skulls: { h: 22 }, banner: { h: 22, gray: true }, torch: { h: 20 }, bone: { h: 7 },
+  rubble: { h: 12, gray: true }, stairs: { w: 32, gray: true }, spikes: { w: 32, n: 2, bg: [236, 12] }, chest: { h: 22, n: 2, H: 887 },
+  weaponRack: { h: 26 }, wallShield: { h: 18 }, chains: { h: 18 }, cobweb: { h: 16, gray: true }, brazier: { h: 20 },
+  urns: { h: 18 }, sacks: { h: 16 }, rug: { w: 44 }, pillarStump: { h: 22, gray: true }, candles: { h: 16 },
+  archway: { w: 96, gray: true, bg: [236, 12] }, steps: { w: 32, gray: true, H: 1254 }, ironGate: { w: 28, gray: true, H: 1536 },
+}).map(([k, o]) => [k, {
+  file: `${k}.png`, auto: { n: o.n || 1, y: [0, o.H || 99999] }, cells: {}, hole: 0, bg: o.bg || [254, 3], edge: o.gray ? 0 : 1,
+  h: o.h, w: o.w, gray: !!o.gray, colors: o.gray ? 10 : 16,
+}]));

@@ -1,22 +1,25 @@
 // 把 design/heroes/ 的角色攻擊動作設計圖轉成遊戲用的 src/js/pd/heroSprites.js；
 // 加 --bosses 時改把 design/bosses/ 的 Boss 動作圖轉成 src/js/pd/bossSprites.js；
 // 加 --monsters 時改把 design/monsters/ 的一般怪物動作圖轉成 src/js/pd/monsterSprites.js（缺圖的怪物略過並警告）。
-// 用法：node scripts/make-hero-sprites.mjs [--bosses | --monsters] [--preview 預覽圖.png] [--only 職業、Boss 或怪物]
+// 加 --props 時改把 design/props/ 的地圖裝飾物設計圖轉成 src/js/pd/propSprites.js。
+// 用法：node scripts/make-hero-sprites.mjs [--bosses | --monsters | --props] [--preview 預覽圖.png] [--only 職業、Boss 或怪物]
 // 需要 Chrome 與 puppeteer-core（在瀏覽器畫布中讀取像素）：
 //   npm i --no-save puppeteer-core
 // Chrome 預設為 macOS 的安裝位置，其他環境以環境變數 CHROME_PATH 指定。
 
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { SHEETS as HERO_SHEETS, BOSS_SHEETS, MONSTER_SHEETS } from './hero-sprites/sheets.mjs';
+import { SHEETS as HERO_SHEETS, BOSS_SHEETS, MONSTER_SHEETS, PROP_SHEETS } from './hero-sprites/sheets.mjs';
 import { MONSTERS } from '../src/js/pd/data.js';
+import { packFile } from './sprite-pack.mjs';
 
 const ROOT = new URL('../', import.meta.url);
 const BOSSES = process.argv.includes('--bosses');
 const MONS = process.argv.includes('--monsters');
+const PROPS = process.argv.includes('--props');
 /** 設計圖資料夾。 */
-const DIR = MONS ? 'design/monsters' : BOSSES ? 'design/bosses' : 'design/heroes';
+const DIR = PROPS ? 'design/props' : MONS ? 'design/monsters' : BOSSES ? 'design/bosses' : 'design/heroes';
 /** 要轉換的設計圖（角色、Boss 或一般怪物）；一般怪物只取實際存在的設計圖。 */
-const SHEETS = MONS
+const SHEETS = PROPS ? PROP_SHEETS : MONS
   ? Object.fromEntries(Object.entries(MONSTER_SHEETS).filter(([k, s]) => {
     const ok = existsSync(new URL(`${DIR}/${s.file}`, ROOT));
     if (!ok) console.warn(`警告：缺少 ${DIR}/${s.file}，${k} 維持舊圖。`);
@@ -32,6 +35,9 @@ const NAMES = {
   treant: '古樹守衛', golem: '熔岩魔像', lich: '霜之巫妖', bullKing: '巨角牛王', thunderbird: '雷鳥', necromancer: '死靈法師',
   pharaoh: '法老王', kraken: '深海巨妖', steamTitan: '蒸汽巨像', redDragon: '炎龍', demonLord: '魔王',
   ...Object.fromEntries(Object.entries(MONSTERS).map(([k, m]) => [k, m.name])),
+  barrel: '木桶', crates: '木箱', boulder: '大石', statue: '石像', trophy: '戰利品', skulls: '頭骨堆', banner: '掛旗', torch: '火把座',
+  bone: '骨頭', rubble: '碎石', stairs: '樓梯', spikes: '地刺', chest: '寶箱',
+  weaponRack: '武器架', wallShield: '牆上圓盾', chains: '鐵鏈', cobweb: '蜘蛛網', brazier: '火盆', urns: '陶罐', sacks: '麻布袋', rug: '地毯', pillarStump: '斷柱', candles: '蠟燭', archway: '石拱門', steps: '石階', ironGate: '鐵柵門',
 };
 
 /**
@@ -87,7 +93,8 @@ async function convertClass(page, cls) {
         const img = new Image();
         img.src = src;
         await img.decode();
-        return window.autoCells(img, a.n, a.y[0], a.y[1]);
+        // 下緣不超過圖片實際高度（超出的部分是透明，會被誤判成前景）。
+        return window.autoCells(img, a.n, a.y[0], Math.min(a.y[1], img.height));
       }, src, sheet.auto),
     };
   }
@@ -101,9 +108,10 @@ async function convertClass(page, cls) {
     const img = new Image();
     img.src = src;
     await img.decode();
-    const cell = window.measureH(img, cells[order[0]][0]) / TARGET_H;
+    // 有目標寬度（opts.w）時以寬度換算像素格，否則以高度。
+    const cell = opts.w ? window.measureW(img, cells[order[0]][0]) / opts.w : window.measureH(img, cells[order[0]][0]) / TARGET_H;
     return { cell, ...window.convertSet(img, order.flatMap((d) => cells[d]), cell, COLORS) };
-  }, src, sheet.cells, order, opts, sheet.h ?? TARGET_H, sheet.colors ?? COLORS);
+  }, src, sheet.cells, order, { ...opts, w: sheet.w }, sheet.h ?? TARGET_H, sheet.colors ?? COLORS);
   const frames = {};
   let start = 0;
   for (const d of order) {
@@ -184,7 +192,18 @@ export const HERO_SPRITES = {\n`;
  * @returns {string} 檔案內容。
  */
 function renderBosses(result) {
-  let js = MONS
+  let js = PROPS
+    ? `// 地圖裝飾物圖（高密度像素圖，由 design/props/ 的原創設計圖轉換而來，密度 2，與地圖離屏畫布相同）：每個字元對應調色盤中的一個顏色，'.' 為透明、'o' 為外框。
+// 每種裝飾物有共用的畫布大小（w × h），frames 為各狀態（寶箱：關閉、打開；地刺：收起、升起），每格只存緊貼的像素與位置（x, y）。
+// gray 為灰階圖，render.js 依區域的石色上色。
+// 由 scripts/make-hero-sprites.mjs --props 產生，請修改設計圖或轉換參數後重新產生，不要手動修改。
+
+/**
+ * 各地圖裝飾物的圖。
+ * @type {Record<string, {palette: Record<string, string>, w: number, h: number, foot: number, gray: boolean, frames: {x: number, y: number, rows: string[]}[]}>}
+ */
+export const PROP_SPRITES = {\n`
+    : MONS
     ? `// 一般怪物圖（高密度像素圖，由 design/monsters/ 的原創設計圖轉換而來）：每個字元對應調色盤中的一個顏色，'.' 為透明、'o' 為外框。
 // 每隻怪物有共用的畫布大小（w × h，腳底在倒數第 foot 列之上），frames 依序為待機 A、待機 B、蓄力、出招（面向右），
 // 每格只存緊貼的像素與它在畫布上的位置（x, y）。沒有列在這裡的怪物沿用 sprites.js 的 MONSTER_ART 舊圖。
@@ -208,7 +227,7 @@ export const BOSS_SPRITES = {\n`;
   for (const k of Object.keys(SHEETS)) {
     const s = result[k];
     const pal = JSON.stringify(s.palette).replace(/"([a-zA-Z])":/g, '$1: ').replace(/,/g, ', ').replace(/"/g, "'");
-    js += `  // ${NAMES[k]}（畫布 ${s.w} × ${s.h}）\n  ${k}: {\n    palette: ${pal},\n    w: ${s.w},\n    h: ${s.h},\n    foot: ${s.foot},\n    frames: [\n`;
+    js += `  // ${NAMES[k]}（畫布 ${s.w} × ${s.h}）\n  ${k}: {\n    palette: ${pal},\n    w: ${s.w},\n    h: ${s.h},\n    foot: ${s.foot},\n${PROPS ? `    gray: ${SHEETS[k].gray},\n` : ''}    frames: [\n`;
     for (const f of s.frames.side) js += `      { x: ${f.x}, y: ${f.y}, rows: [\n${f.rows.map((r) => `        '${r}',`).join('\n')}\n      ] },\n`;
     js += `    ],\n  },\n`;
   }
@@ -265,9 +284,11 @@ try {
   if (only) {
     console.log('只轉換單一項目時不寫入檔案（可搭配 --preview 檢查）。');
   } else {
-    const js = BOSSES || MONS ? renderBosses(result) : render(result);
-    const out = MONS ? 'src/js/pd/monsterSprites.js' : BOSSES ? 'src/js/pd/bossSprites.js' : 'src/js/pd/heroSprites.js';
+    const js = BOSSES || MONS || PROPS ? renderBosses(result) : render(result);
+    const out = PROPS ? 'src/js/pd/propSprites.js' : MONS ? 'src/js/pd/monsterSprites.js' : BOSSES ? 'src/js/pd/bossSprites.js' : 'src/js/pd/heroSprites.js';
     writeFileSync(new URL(out, ROOT), js);
+    // 封裝成 PNG 圖集（模組只留描述）。
+    await packFile(new URL(out, ROOT).pathname);
     console.log(`已寫入 ${out}（${Math.round(js.length / 1024)} KB）`);
   }
   if (arg('preview')) await preview(page, result, arg('preview'));

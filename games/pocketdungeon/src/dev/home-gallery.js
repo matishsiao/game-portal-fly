@@ -1,6 +1,7 @@
 // 家園審圖頁：列出已完成美術的物件（含所有動態幀）、地板牆面、作物各階段、圖示，以及一間示範房間。
 
 import { HOME_ART, TILE_ART, CROP_ART, MAT_ART, ICON_ART, homeArt, homeFrames, tileArt, cropArt, iconArt, HT } from '../js/pd/homeArt.js';
+import { spritesReady } from '../js/pd/spritePack.js';
 import { HOME_ITEMS, HOME_ITEM_KEYS, HOME_MATS, CROPS, CROP_KEYS, FURNITURE_CATS, DECOR_CATS, GOODS, GOOD_KEYS, MEALS, MEAL_KEYS } from '../js/pd/homeData.js';
 
 const out = document.getElementById('out');
@@ -139,4 +140,5 @@ function render() {
 }
 
 scaleSel.addEventListener('change', render);
-render();
+// 圖資料（PNG 圖集）解碼完成後再繪製。
+spritesReady().then(render);
