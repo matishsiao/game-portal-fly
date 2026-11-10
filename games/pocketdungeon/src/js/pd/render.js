@@ -1833,7 +1833,8 @@ export class Renderer {
   }
 
   /**
-   * 畫拱門的前景層：拱頂（上方 ARCH_FRONT 比例）畫在角色與怪物上方，角色走進門口時從拱門下穿過。
+   * 畫拱門的前景層：門洞正上方 2 格寬的拱頂（上方 ARCH_FRONT 比例）畫在角色與怪物上方，角色走進門口時從拱門下穿過；
+   * 兩側石柱不畫在前景，走在拱門旁邊的角色不會被蓋住。
    * 只畫在畫面範圍內的拱門。
    */
   drawArchFronts() {
@@ -1842,11 +1843,13 @@ export class Renderer {
     const g = this.ctx;
     const { x: cx, y: cy } = this.cam;
     for (const a of list) {
-      const w = a.art.w / 2;
-      const h = (a.art.h * ARCH_FRONT) / 2;
-      const x = Math.round((a.cx - w / 2) * 2) / 2;
-      if (x + w < cx || x > cx + this.viewW || a.y + h < cy || a.y > cy + this.viewH) continue;
-      g.drawImage(a.art.frames[0], 0, 0, a.art.w, Math.round(a.art.h * ARCH_FRONT), x, a.y, w, Math.round(a.art.h * ARCH_FRONT) / 2);
+      // 只取門洞正上方 2 格寬的拱頂（兩側石柱不蓋住旁邊的角色）。
+      const sw = T * 2 * 2;
+      const sx = Math.round((a.art.w - sw) / 2);
+      const sh = Math.round(a.art.h * ARCH_FRONT);
+      const x = a.cx - T;
+      if (x + T * 2 < cx || x > cx + this.viewW || a.y + sh / 2 < cy || a.y > cy + this.viewH) continue;
+      g.drawImage(a.art.frames[0], sx, 0, sw, sh, x, a.y, T * 2, sh / 2);
     }
   }
 
@@ -1882,7 +1885,9 @@ export class Renderer {
           if (done.has(key) || j < 1 || j >= f.h - 1 || !plain(i, j) || !plain(i + 1, j) || !solid(i - 1, j) || !solid(i + 2, j) || solid(i, out) || solid(i + 1, out)) continue;
           done.add(key);
           if (steps) drawWideSteps(g, steps.frames[0], i * T, j * T, north);
-          if (north && arch) {
+          // 拱門約 3 格高：門口上方兩格的兩側都要是牆（真的有一段走廊），拱門才不會畫到另一個房間的地板上。
+          const tall = [1, 2].every((d) => solid(i - 1, j - d) && solid(i + 2, j - d));
+          if (north && arch && tall) {
             blitProp(g, arch, (i + 1) * T, (j + 1) * T - arch.h / 2);
             // 拱頂另外記下來，每幀畫在角色上方（角色從拱門下穿過）。
             arches.push({ art: arch, cx: (i + 1) * T, y: (j + 1) * T - arch.h / 2 });
