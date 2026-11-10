@@ -11,8 +11,8 @@ import { DUNGEON_TILES } from './dungeonTiles.js';
 const T = 16;
 /** 普通攻擊的出手動畫長度（秒，與 World.playerAttack 設定的 attackAnim 相同）。 */
 const ATTACK_TIME = 0.24;
-/** 地城中角色圖的目標顯示密度（每個世界像素約 2 個圖像素，角色約 1 格高）；實際值依放大倍率取能整除的值（Renderer.heroDensity）。 */
-const HERO_DENSITY = 2;
+/** 地城中角色圖的目標顯示密度（每個世界像素約 1.45 個圖像素，角色約 1.4 格高）；實際值依放大倍率取能整除的值（Renderer.heroDensity）。 */
+const HERO_DENSITY = 1.45;
 /** 技能與爆炸的顏色（RGB），依效果樣式（look）區分；沒有樣式的友方爆炸為紫色、敵方為橘色。 */
 const LOOK_COLORS = {
   nova: '150,210,255', spin: '255,255,255', slam: '210,170,110', rain: '240,224,176', beam: '255,240,170', meteor: '255,150,60',
@@ -1086,6 +1086,16 @@ function drawSpikeBlades(g, x, y) {
   }
 }
 
+/**
+ * 各裝飾物的顯示倍率（配合約 1.4 格高的角色，擺設放大才看得出是什麼）；
+ * 要對齊格子的樓梯、石階、拱門、地刺與嵌在牆裡的鐵柵門維持 1 倍，地毯稍微放大。
+ */
+const PROP_SCALE = { stairs: 1, steps: 1, archway: 1, spikes: 1, ironGate: 1, rug: 1.15, torch: 1.3, cobweb: 1.3 };
+/** 沒有列在 PROP_SCALE 的裝飾物的顯示倍率。 */
+const PROP_SCALE_DEFAULT = 1.4;
+/** 地上掉落物的顯示倍率。 */
+const PICKUP_SCALE = 1.4;
+
 /** 裝飾物圖的快取（依種類與上色色階）。 */
 const propCache = new Map();
 
@@ -1135,7 +1145,7 @@ function propArt(key, ramp) {
     });
     return c;
   });
-  const art = { frames, w: sp.w, h: sp.h };
+  const art = { frames, w: sp.w, h: sp.h, scale: PROP_SCALE[key] ?? PROP_SCALE_DEFAULT };
   propCache.set(ck, art);
   return art;
 }
@@ -1147,9 +1157,15 @@ function propArt(key, ramp) {
  * @param {number} cx 水平中心（世界像素）。
  * @param {number} y 上緣（世界像素）。
  * @param {number} [frame=0] 第幾格。
+ * 依 art.scale 放大，底邊位置不變。
  */
 function blitProp(g, art, cx, y, frame = 0) {
-  g.drawImage(art.frames[frame], Math.round((cx - art.w / 4) * 2) / 2, Math.round(y * 2) / 2, art.w / 2, art.h / 2);
+  // 依種類放大（PROP_SCALE），以原本的底邊為基準往上長、水平置中。
+  const k = art.scale || 1;
+  const w = (art.w / 2) * k;
+  const h = (art.h / 2) * k;
+  const top = y + art.h / 2 - h;
+  g.drawImage(art.frames[frame], Math.round((cx - w / 2) * 2) / 2, Math.round(top * 2) / 2, w, h);
 }
 
 /**
@@ -1185,7 +1201,7 @@ function drawProp(g, prop, pal, ramps) {
       blitProp(g, art, x + 8, prop.j * T - 6);
       return;
     }
-    if (prop.kind !== 'statue') groundShadow(g, x + 8, base, Math.min(16, art.w / 2 + 1));
+    if (prop.kind !== 'statue') groundShadow(g, x + 8, base, Math.min(20, (art.w / 2) * art.scale + 1));
     blitProp(g, art, x + 8, base - h - (prop.kind === 'statue' ? 1 : 0));
     return;
   }
@@ -2012,8 +2028,8 @@ export class Renderer {
         if ((c === 'tl' || c === 'tr') && v < 0.35 && PROP_SPRITES.cobweb) {
           // 蜘蛛網：貼在上方角落（右上角左右翻轉）。
           const art = propArt('cobweb', ramps.stone);
-          const w = art.w / 2;
-          const h = art.h / 2;
+          const w = (art.w / 2) * art.scale;
+          const h = (art.h / 2) * art.scale;
           g.save();
           if (c === 'tr') { g.translate((i + 1) * T, 0); g.scale(-1, 1); g.drawImage(art.frames[0], 0, j * T, w, h); } else g.drawImage(art.frames[0], i * T, j * T, w, h);
           g.restore();
@@ -2026,7 +2042,7 @@ export class Renderer {
         const art = propArt(kind, ramps.stone);
         const cx = i * T + 8 + (c.endsWith('l') ? -1 : 1);
         const bottom = (j + 1) * T - 1;
-        groundShadow(g, cx, bottom, Math.min(14, art.w / 2));
+        groundShadow(g, cx, bottom, Math.min(18, (art.w / 2) * art.scale));
         blitProp(g, art, cx, bottom - art.h / 2);
         if (kind === 'brazier') braziers.push({ x: cx, y: bottom - art.h / 2 + 2 });
       }
@@ -2053,7 +2069,7 @@ export class Renderer {
         const art = propArt(edgeKinds[Math.floor(hash(i + 91, j + 37) * edgeKinds.length)], ramps.stone);
         const cx = i * T + 8 + (solid(i - 1, j) ? -2 : solid(i + 1, j) ? 2 : 0);
         const bottom = (j + 1) * T - (solid(i, j + 1) ? 2 : 4);
-        groundShadow(g, cx, bottom, Math.min(14, art.w / 2));
+        groundShadow(g, cx, bottom, Math.min(18, (art.w / 2) * art.scale));
         blitProp(g, art, cx, bottom - art.h / 2);
         placed++;
       }
@@ -2402,12 +2418,14 @@ export class Renderer {
       if (art) {
         const bx = Math.round(c.x * T);
         const by = Math.round(c.y * T + art.h / 4);
-        groundShadow(g, bx, by, art.w / 2 - 2);
+        const hw = (art.w / 4) * art.scale;
+        const top = by - (art.h / 2) * art.scale;
+        groundShadow(g, bx, by, hw * 2 - 2);
         blitProp(g, art, bx, by - art.h / 2, c.opened ? 1 : 0);
         if (!c.opened && Math.floor(world.time * 3 + c.x * 7) % 6 === 0) {
           g.fillStyle = '#fff6c8';
-          g.fillRect(bx + art.w / 4 - 2, by - art.h / 2 - 2, 1, 5);
-          g.fillRect(bx + art.w / 4 - 4, by - art.h / 2, 5, 1);
+          g.fillRect(bx + hw - 2, top - 2, 1, 5);
+          g.fillRect(bx + hw - 4, top, 5, 1);
         }
         continue;
       }
@@ -2429,8 +2447,8 @@ export class Renderer {
       const name = it.kind === 'gem' ? `gem-${it.gem.split('-')[0]}` : it.kind === 'mat' ? it.mat : it.kind === 'homeMat' ? `hm-${it.mat}` : { gold: 'coin', potion: 'potion', cure: 'cure', bagExpand: 'pouch', book: 'book', skillBook: 'skillbook', recipe: 'blueprint', seed: 'seedBag', meat: 'meat' }[it.kind] || 'bag';
       const img = itemArt(name);
       // 高密度的道具圖（density）以實際大小（世界像素）繪製。
-      const iw = img.width / (img.density || 1);
-      const ih = img.height / (img.density || 1);
+      const iw = (img.width / (img.density || 1)) * PICKUP_SCALE;
+      const ih = (img.height / (img.density || 1)) * PICKUP_SCALE;
       const x = Math.round(it.x * T - iw / 2);
       const y = Math.round(it.y * T - ih / 2) + bob;
       if (it.kind === 'item') {
