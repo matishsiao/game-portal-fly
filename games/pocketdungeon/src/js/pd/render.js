@@ -9,6 +9,8 @@ import { heroArt, monsterArt, itemArt } from './sprites.js';
 const T = 16;
 /** 普通攻擊的出手動畫長度（秒，與 World.playerAttack 設定的 attackAnim 相同）。 */
 const ATTACK_TIME = 0.24;
+/** 地城中角色圖的目標顯示密度（每個世界像素約 1.5 個圖像素）；實際值依放大倍率取能整除的值（Renderer.heroDensity）。 */
+const HERO_DENSITY = 1.5;
 
 /** 玩家揮砍特效的顏色（中段、外緣、刀鋒線），依職業或攻擊樣式（look）區分。 */
 const SLASH_COLORS = {
@@ -759,7 +761,7 @@ export class Renderer {
   }
 
   /**
-   * 依畫布的 CSS 大小調整解析度與整數放大倍率（畫面短邊約 11 格；夠大時取偶數，配合 2 倍密度的角色圖）。
+   * 依畫布的 CSS 大小調整解析度與整數放大倍率（畫面短邊約 11 格），並決定角色圖的顯示密度（heroDensity）。
    * @returns {void}
    */
   resize() {
@@ -770,8 +772,11 @@ export class Renderer {
     this.canvas.width = w;
     this.canvas.height = h;
     const target = Math.min(w / (11 * T), h / (11 * T));
-    // 角色圖是 2 倍密度，放大倍率取偶數，半格的像素才會落在整數的螢幕像素上。
-    this.scale = target >= 3 ? Math.max(2, Math.round(target / 2) * 2) : Math.max(1, Math.round(target));
+    this.scale = Math.max(1, Math.round(target));
+    // 角色圖約以 1.5 倍密度顯示（比 16 格的世界大一點），並讓每個圖像素佔整數個螢幕像素：
+    // 例如放大 6 倍時每個圖像素 4 個螢幕像素（密度 1.5）、7 倍時 5 個（密度 1.4）。畫面太小時直接用 1.5。
+    const artPx = Math.round(this.scale / HERO_DENSITY);
+    this.heroDensity = artPx >= 1 && this.scale >= 2 ? this.scale / artPx : HERO_DENSITY;
     this.viewW = w / this.scale;
     this.viewH = h / this.scale;
   }
@@ -1355,10 +1360,11 @@ export class Renderer {
         const tilt = ph && dir === 'side' ? ph[3] * (flip ? -1 : 1) : 0;
         const hidden = blink && p.dodgeT <= 0;
         // 角色圖腳底以下留有特效用的列，往下移讓腳踩在原本的位置。
-        if (!hidden) this.sprite(img, px / T, py / T + art.foot / art.density / T, flip, 1, bob, sy, art.density, tilt);
+        const dens = this.heroDensity || art.density;
+        if (!hidden) this.sprite(img, px / T, py / T + art.foot / dens / T, flip, 1, bob, sy, dens, tilt);
         g.globalAlpha = 1;
         this.drawPlayerAuras(world);
-        const head = Math.round(p.y * T + 5 - art.standH / art.density);
+        const head = Math.round(p.y * T + 5 - art.standH / dens);
         this.statusMarks(world, p.x * T, head - 16, p.status);
         this.playerBar(world, p, head);
         continue;
