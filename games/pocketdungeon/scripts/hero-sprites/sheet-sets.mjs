@@ -47,12 +47,24 @@ const FURN_BIG = ['woodBed', 'bunkBed', 'redCarpet', 'princessBed', 'gazebo', 'b
 const HOME_TILES = ['woodFloor', 'stoneTile', 'redBrick', 'marble', 'tatami', 'shellTile', 'starFloor', 'woodWall', 'stoneWall', 'floralPaper', 'stripePaper',
   'brickWall', 'oceanPaper', 'gearPaper', 'castleWall', 'starPaper', 'sandstoneWall'];
 
+/** 庭院造景（第二版，密度 2，參考城鎮廣場風格：深色外框、石材與植物細節豐富）。 */
+const YARD_1 = ['pineTree', 'roundBush', 'lupineBed', 'streetLamp', 'stoneLantern', 'birdbath', 'well', 'mailbox'];
+const YARD_2 = ['flowerBed', 'stonePath', 'woodFence', 'whiteFence', 'mushroomLamp', 'scarecrowDecor', 'doghouse', 'bench'];
+const YARD_3 = ['picnicTable', 'flowerArch', 'woodBridge', 'stonePlanter'];
+const YARD_4 = ['fountain', 'gazebo'];
+
+/** 地城外圍地形的石塊：一整格的大石塊與半格的小石塊，各 4 種高度（頂面往上抬 0、6、12、18 世界像素）。 */
+const TERRAIN_HEIGHTS = [0, 6, 12, 18];
+
 /** 地城的 12 種區域色調。 */
 export const DUNGEON_THEMES = ['moss', 'lava', 'ice', 'grass', 'sky', 'necro', 'desert', 'sea', 'clock', 'dragon', 'demon', 'abyss'];
 
 /**
  * 各批次：dir 設計圖資料夾、out 輸出檔、name 匯出名稱、source 目前圖片的來源、density 新圖密度（相對於目前的圖）、
- * colors 減色數、sheets 各張設計圖（file 檔名、keys 依序的物件代碼、cols 參考圖每列幾個）。
+ * colors 減色數、sheets 各張設計圖（file 檔名、keys 依序的物件代碼、cols 參考圖每列幾個）、
+ * sizes 還沒有圖的新物件的畫布大小（目前圖片的單位，整張畫布都是可用範圍）、source 為 none 時全部物件都用 sizes；
+ * 每張設計圖可另外指定 exact（剛好填滿畫布）與 colors（減色數），覆蓋批次的設定；
+ * maxHole 被物件包住的白色區塊小於這個面積（設計圖像素）時當成背景（長椅椅背與椅面之間、柵欄縫隙、涼亭柱子之間）。
  */
 export const SETS = {
   drops: {
@@ -78,6 +90,31 @@ export const SETS = {
   homeTiles: {
     dir: 'design/home', out: 'src/js/pd/homeArt/tileSprites.js', name: 'TILE_SPRITES', source: 'tile', density: 1, colors: 14, exact: true,
     sheets: chunk(HOME_TILES, 3).map((ks, i) => ({ file: `tiles-${i + 1}.png`, keys: ks.flatMap((k) => [`${k}@0`, `${k}@1`]), cols: 2 })),
+  },
+  yard: {
+    dir: 'design/home', out: 'src/js/pd/homeArt/yardSprites.js', name: 'YARD_SPRITES', source: 'furniture', density: 2, colors: 24, maxHole: 1e9,
+    sizes: { pineTree: [32, 76], roundBush: [32, 34], lupineBed: [32, 46], stonePlanter: [64, 44] },
+    sheets: [
+      { file: 'yard-1.png', keys: YARD_1, cols: 4 },
+      { file: 'yard-2.png', keys: YARD_2, cols: 4 },
+      { file: 'yard-3.png', keys: YARD_3, cols: 2 },
+      { file: 'yard-4.png', keys: YARD_4, cols: 2 },
+    ],
+  },
+  terrain: {
+    dir: 'design/dungeon', out: 'src/js/pd/terrainSprites.js', name: 'TERRAIN_SPRITES', source: 'none', density: 2, colors: 12, maxHole: 1e9,
+    sizes: {
+      ...Object.fromEntries(TERRAIN_HEIGHTS.flatMap((hh, n) => [[`big@${n}`, [16, 16 + hh]], [`bigB@${n}`, [16, 16 + hh]], [`small@${n}`, [8, 8 + hh]]])),
+      'tree@0': [22, 24], 'tree@1': [22, 24], 'pine@0': [18, 28], 'pine@1': [18, 28], 'cloud@0': [30, 16], 'cloud@1': [30, 16],
+      lava: [64, 64], water: [64, 64], iceWater: [64, 64], void: [64, 64],
+    },
+    sheets: [
+      // 灰階石塊（遊戲中依區域石色上色）：第 1、2 列大石塊兩種變化，第 3 列小石塊。
+      { file: 'terrain-blocks.png', keys: [0, 1, 2, 3].flatMap((n) => [`big@${n}`]).concat([0, 1, 2, 3].map((n) => `bigB@${n}`), [0, 1, 2, 3].map((n) => `small@${n}`)), cols: 4, colors: 10, exact: true },
+      { file: 'terrain-nature.png', keys: ['tree@0', 'tree@1', 'pine@0', 'pine@1', 'cloud@0', 'cloud@1'], cols: 2, colors: 18 },
+      // 液體：每張一個方形的無縫紋理（白色留邊），轉換時剛好填滿 64 × 64 世界像素。
+      ...['lava', 'water', 'iceWater', 'void'].map((k) => ({ file: `terrain-${k}.png`, keys: [k], cols: 1, exact: true, colors: 20 })),
+    ],
   },
   dungeonTiles: {
     dir: 'design/dungeon', out: 'src/js/pd/dungeonTiles.js', name: 'DUNGEON_TILES', source: 'dungeon', density: 1, colors: 14, exact: true,

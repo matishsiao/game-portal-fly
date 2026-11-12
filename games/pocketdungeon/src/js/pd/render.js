@@ -6,6 +6,7 @@ import { WALL, STAIRS, SPIKES, walkable } from './dungeon.js';
 import { heroArt, monsterArt, itemArt } from './sprites.js';
 import { PROP_SPRITES } from './propSprites.js';
 import { DUNGEON_TILES } from './dungeonTiles.js';
+import { drawTerrain } from './terrain.js';
 
 /** 一格的像素數。 */
 const T = 16;
@@ -1903,12 +1904,14 @@ export class Renderer {
         if (solid(i + 1, j)) g.fillRect(x + T - 1, y, 1, T);
       }
     }
+    // 牆緣以外的實心區域：高低堆疊的石塊與熔岩、海水等外圍地形（液體另有每幀疊加的自發光層）。
+    const terrain = drawTerrain(g, { w: f.w, h: f.h, solid, theme: themeName, th, pal, density: FLOOR_DENSITY });
     // 擺設之前先加上石材顆粒（擺設維持乾淨的像素圖）。
     if (!tex) grainPass(g, c.width, c.height);
     const braziers = this.placeRoomDecor(g, world, ramps, solid, themeName);
     for (const prop of props) drawProp(g, prop, pal, ramps);
     const arches = hedge ? [] : this.drawDoorways(g, world, ramps, solid, { torches, flames, torchArt, isFace, noFire: themeName === 'sky' || themeName === 'sea' });
-    this.floorCache = { canvas: c, floor: f, torches: themeName === 'sky' ? [] : torches, props, braziers, arches, flames };
+    this.floorCache = { canvas: c, floor: f, torches: themeName === 'sky' ? [] : torches, props, braziers, arches, flames, terrain };
   }
 
   /**
@@ -2125,9 +2128,31 @@ export class Renderer {
     this.chargeFx(world, dt);
     this.drawFx(dt);
     this.drawLighting(world);
+    this.drawEmissive();
     this.drawFog(world);
     this.drawScreenFlash(dt);
     if (this.frame % 6 === 0) this.drawMinimap(world);
+  }
+
+  /**
+   * 外圍地形的自發光層（熔岩、虛空、水面）：光照層之後再疊一次畫面範圍內的部分，液體在暗處仍然看得清楚。
+   * 熔岩的亮度隨時間緩慢起伏。
+   */
+  drawEmissive() {
+    const tr = this.floorCache.terrain;
+    if (!tr || !tr.emissive) return;
+    const g = this.ctx;
+    const src = tr.emissive;
+    const D = src.width / (this.floorCache.floor.w * T);
+    const x0 = Math.max(0, this.cam.x);
+    const y0 = Math.max(0, this.cam.y);
+    const x1 = Math.min(src.width / D, this.cam.x + this.viewW);
+    const y1 = Math.min(src.height / D, this.cam.y + this.viewH);
+    if (x1 <= x0 || y1 <= y0) return;
+    g.save();
+    g.globalAlpha = tr.glowAlpha * (0.88 + Math.sin(performance.now() / 700) * 0.12);
+    g.drawImage(src, x0 * D, y0 * D, (x1 - x0) * D, (y1 - y0) * D, x0, y0, x1 - x0, y1 - y0);
+    g.restore();
   }
 
   /**
@@ -2558,7 +2583,8 @@ export class Renderer {
         const tilt = ph && dir === 'side' ? ph[3] * (flip ? -1 : 1) : 0;
         const hidden = blink && p.dodgeT <= 0;
         // 角色圖腳底以下留有特效用的列，往下移讓腳踩在原本的位置。
-        const dens = this.heroDensity || art.density;
+        // 高解析度的角色圖（密度 4）依比例再提高密度，顯示大小不變。
+        const dens = (this.heroDensity || 2) * (art.density / 2);
         if (!hidden) this.sprite(img, px / T, py / T + art.foot / dens / T, flip, 1, bob, sy, dens, tilt);
         g.globalAlpha = 1;
         this.drawPlayerAuras(world);
@@ -2582,8 +2608,9 @@ export class Renderer {
       const frames = m.hurt > 0 ? art.flash : art.frames;
       // 有動作圖的 Boss 與一般怪物（4 格）：平常在待機 A／B 間交替，預警蓄力時顯示蓄力，出手後 0.3 秒顯示出招。
       const img = art.poses ? frames[this.posedFrame(world, m)] : frames[walkFrame % frames.length];
-      // 高密度的圖（Boss 動作圖與精緻化的怪物圖）依畫面放大倍率換算，與角色相同。
-      const dens = art.density ? this.heroDensity || art.density : 1;
+      // 高密度的圖（Boss 動作圖與精緻化的怪物圖）依畫面放大倍率換算，與角色相同；
+      // 解析度更高的圖（一般怪物動作圖密度 4）依比例再提高密度，顯示大小不變。
+      const dens = art.density ? (this.heroDensity || 2) * (art.density / 2) : 1;
       const scale = art.scale * (m.elite ? 1.25 : 1) * (m.small ? 0.7 : 1) * (m.evolved ? 1.15 : 1);
       const iw = img.width / dens;
       const ih = img.height / dens;
@@ -3835,6 +3862,15 @@ export class Renderer {
       add(b.x, b.y + 4, 3 * T * (b.s || 1) * (1 + flick), 0.95);
       glows.push({ x: b.x, y: b.y + 8, r: 2.2 * T * (b.s || 1) * (1 + flick), c: '255,140,50', a: 0.32 });
       glows.push({ x: b.x, y: b.y - 2, r: 0.8 * T * (1 + flick), c: '255,190,90', a: 0.45 });
+    }
+    // 外圍的熔岩與虛空照亮周圍的石塊（水面只微亮）。
+    const tr = this.floorCache.terrain;
+    if (tr && tr.glowAlpha >= 0.5) {
+      const rgb = AREAS[world.area].theme === 'abyss' ? '170,110,255' : '255,120,40';
+      for (const gp of tr.glows) {
+        add(gp.x, gp.y, 2.4 * T, 0.75);
+        glows.push({ x: gp.x, y: gp.y, r: 2 * T, c: rgb, a: 0.22 });
+      }
     }
     for (const c of world.chests) if (!c.opened) add(c.x * T, c.y * T, 1.6 * T, 0.7);
     const st = world.floor.stairs;

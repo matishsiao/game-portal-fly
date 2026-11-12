@@ -31,12 +31,13 @@ const URL_BASE = arg('url') || 'http://localhost:5191';
 
 /**
  * 在瀏覽器中取得目前的圖（給參考圖與量範圍用）：回傳每個代碼的 data URL、畫布大小與不透明範圍。
- * 在頁面中執行，source 決定來源：item 道具、icon 家園圖示、crop 作物、furniture 家具、tile 家園地板牆面、dungeon 地城圖塊。
+ * 在頁面中執行，source 決定來源：item 道具、icon 家園圖示、crop 作物、furniture 家具、tile 家園地板牆面、dungeon 地城圖塊、none 全部是新物件（依 sizes）。
  * @param {string} source 來源。
  * @param {string[]} keys 代碼。
+ * @param {Record<string, [number, number]>} [sizes] 還沒有圖的新物件的畫布大小（畫成虛線框當參考，整張畫布都是可用範圍）。
  * @returns {Promise<Record<string, {url: string, w: number, h: number, box: {x0:number,y0:number,x1:number,y1:number}}>>} 目前的圖。
  */
-async function currentArt(source, keys) {
+async function currentArt(source, keys, sizes = {}) {
   /**
    * 量出畫布的不透明範圍。
    * @param {HTMLCanvasElement} c 畫布。
@@ -124,6 +125,20 @@ async function currentArt(source, keys) {
     if (source === 'crop') c = (home.cropArtLegacy || home.cropArt)(key, Number(v));
     if (source === 'furniture') c = (home.homeArtLegacy || home.homeArt)(key);
     if (source === 'tile') c = (home.tileArtLegacy || home.tileArt)(key, Number(v), Number(v));
+    if (source === 'none') c = null;
+    const size = sizes[k] || sizes[key];
+    if (!c && size) {
+      // 新物件：畫一個灰色虛線框表示可用範圍，範圍取整張畫布。
+      c = document.createElement('canvas');
+      [c.width, c.height] = size;
+      const g = c.getContext('2d');
+      g.fillStyle = '#d8d8d8'; g.fillRect(0, 0, c.width, c.height);
+      g.fillStyle = '#888888';
+      for (let x = 0; x < c.width; x += 4) { g.fillRect(x, 0, 2, 1); g.fillRect(x, c.height - 1, 2, 1); }
+      for (let y = 0; y < c.height; y += 4) { g.fillRect(0, y, 1, 2); g.fillRect(c.width - 1, y, 1, 2); }
+      out[k] = { url: c.toDataURL(), w: c.width, h: c.height, box: { x0: 0, y0: 0, x1: c.width - 1, y1: c.height - 1 } };
+      continue;
+    }
     put(k, c);
   }
   return out;
@@ -141,7 +156,7 @@ try {
   await page.evaluate(() => { document.body.innerHTML = ''; });
   await page.addScriptTag({ content: readFileSync(new URL('scripts/hero-sprites/convert-browser.js', ROOT), 'utf8') });
   const allKeys = SET.sheets.flatMap((s) => s.keys);
-  const cur = await page.evaluate(`(${currentArt.toString()})(${JSON.stringify(SET.source)}, ${JSON.stringify(allKeys)})`);
+  const cur = await page.evaluate(`(${currentArt.toString()})(${JSON.stringify(SET.source)}, ${JSON.stringify(allKeys)}, ${JSON.stringify(SET.sizes || {})})`);
 
   if (arg('refs')) {
     // 參考圖：每張設計圖一張，目前的圖整數倍放大後依列排好，物件之間留大片白色空隙。
@@ -178,17 +193,18 @@ try {
         const D = SET.density;
         const kind = k.includes('.') ? k.split('.')[1].split('@')[0] : '';
         if (kind === 'pillar') return { tw: 24, th: 56, mode: 'contain', align: 'bottom', k: SET.colors };
-        if (SET.exact) return { tw: c.w * D, th: c.h * D, mode: 'exact', k: SET.colors, outline: false };
+        const colors = sheet.colors ?? SET.colors;
+        if (sheet.exact ?? SET.exact) return { tw: c.w * D, th: c.h * D, mode: 'exact', k: colors, outline: false };
         // 等比例縮進目前圖片的不透明範圍，水平置中、貼齊底部，再放回原畫布的位置。
-        return { tw: (c.box.x1 - c.box.x0 + 1) * D, th: (c.box.y1 - c.box.y0 + 1) * D, mode: 'contain', align: 'bottom', k: SET.colors, place: { x: c.box.x0 * D, y: c.box.y0 * D, w: c.w * D, h: c.h * D } };
+        return { tw: (c.box.x1 - c.box.x0 + 1) * D, th: (c.box.y1 - c.box.y0 + 1) * D, mode: 'contain', align: 'bottom', k: colors, place: { x: c.box.x0 * D, y: c.box.y0 * D, w: c.w * D, h: c.h * D } };
       });
-      const r = await page.evaluate(async (src, targets) => {
-        window.BG_MIN = 250; window.BG_SAT = 6; window.MAX_HOLE = 0; window.EDGE_PASSES = 0;
+      const r = await page.evaluate(async (src, targets, maxHole) => {
+        window.BG_MIN = 250; window.BG_SAT = 6; window.MAX_HOLE = maxHole; window.EDGE_PASSES = 0;
         const img = new Image(); img.src = src; await img.decode();
         const boxes = window.autoBlobs(img);
         if (boxes.length !== targets.length) return { error: `找到 ${boxes.length} 個物件，應為 ${targets.length} 個` };
         return { items: boxes.map((b, i) => window.convertFit(img, b, targets[i])) };
-      }, src, targets);
+      }, src, targets, SET.maxHole || 0);
       if (r.error) { console.error(`${sheet.file}：${r.error}`); ok = false; continue; }
       r.items.forEach((it, i) => {
         const t = targets[i];
