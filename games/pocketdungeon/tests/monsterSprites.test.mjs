@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { MONSTER_SPRITES } from '../src/js/pd/monsterSprites.js';
 import { MONSTERS } from '../src/js/pd/data.js';
-import { MONSTER_SHEETS } from '../scripts/hero-sprites/sheets.mjs';
+import { MONSTER_SHEETS, MONSTER_RES } from '../scripts/hero-sprites/sheets.mjs';
 
 const entries = Object.entries(MONSTER_SPRITES);
 
@@ -29,11 +29,11 @@ test('每隻 4 格，每格列長一致且字元都在調色盤裡', () => {
   }
 });
 
-// 待機圖高度依尺寸級別（小 28、中 34、大 40、巨 46）。
-test('待機圖高度約等於尺寸級別的目標高度（±4）', () => {
+// 待機圖高度依尺寸級別（顯示高度小 28、中 34、大 40、巨 46，乘上解析度倍率）。
+test('待機圖高度約等於尺寸級別的目標高度（±4 × 解析度倍率）', () => {
   for (const [k, s] of entries) {
     const h = s.frames[0].rows.length;
     const target = MONSTER_SHEETS[k].h;
-    assert.ok(Math.abs(h - target) <= 4, `${k} 高度 ${h}，目標 ${target}`);
+    assert.ok(Math.abs(h - target) <= 4 * MONSTER_RES, `${k} 高度 ${h}，目標 ${target}`);
   }
 });

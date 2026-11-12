@@ -87,7 +87,13 @@ export const BOSS_SHEETS = Object.fromEntries(
     .map((k) => [k, { file: `${k}.png`, auto: { n: 4, y: [20, 640] }, cells: {}, hole: ['treant', 'golem', 'steamTitan'].includes(k) ? 30000 : 1500 }]),
 );
 
-/** 一般怪物的待機圖目標高度（圖像素，密度 2）：小 28、中 34、大 40、巨 46（只有雪怪）。 */
+/** 一般怪物與 Boss 動作圖的解析度倍率：以 2 倍解析度轉換（密度 4），顯示大小不變、細節加倍（遊戲中 src/js/pd/sprites.js 的 MONSTER_RES 要相同）。 */
+export const MONSTER_RES = 2;
+
+/** 角色動作圖的解析度倍率：以 2 倍解析度轉換（密度 4），顯示大小不變、細節加倍（遊戲中 src/js/pd/sprites.js 的 HERO_RES 要相同）。 */
+export const HERO_RES = 2;
+
+/** 一般怪物的待機圖顯示高度（密度 2 的圖像素，實際轉換高度再乘 MONSTER_RES）：小 28、中 34、大 40、巨 46（只有雪怪）。 */
 const MONSTER_H = {
   slime: 34, magmaSlime: 34, bat: 28, hornet: 28, imp: 28, jelly: 28, drone: 28,
   skeleton: 34, skelArcher: 34, scarecrow: 34, zombie: 34, mummy: 34, clockSoldier: 34,
@@ -100,10 +106,10 @@ const MONSTER_H = {
 
 /**
  * 各一般怪物的設計圖與轉換參數（design/monsters/，2172 × 724，版面同 Boss）：
- * 一列 4 格（待機 A、待機 B、蓄力、出招），面向右；h 為待機圖目標高度，小型怪物減色到 18 色避免雜點。
+ * 一列 4 格（待機 A、待機 B、蓄力、出招），面向右；h 為待機圖目標高度（顯示高度 × MONSTER_RES），2 倍解析度下保留較多顏色（小型 24、其他 28 色）。
  */
 export const MONSTER_SHEETS = Object.fromEntries(
-  Object.entries(MONSTER_H).map(([k, h]) => [k, { file: `${k}.png`, auto: { n: 4, y: [20, 640] }, cells: {}, hole: 1500, h, colors: h <= 28 ? 18 : 22 }]),
+  Object.entries(MONSTER_H).map(([k, h]) => [k, { file: `${k}.png`, auto: { n: 4, y: [20, 640] }, cells: {}, hole: 1500, h: h * MONSTER_RES, colors: h <= 28 ? 24 : 28 }]),
 );
 
 /**

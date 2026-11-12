@@ -9,6 +9,12 @@ import { MONSTER_SPRITES } from './monsterSprites.js';
 import { ITEM_SPRITES } from './itemSprites.js';
 import { ICON_SPRITES } from './homeArt/iconSprites.js';
 
+/** 一般怪物與 Boss 動作圖（monsterSprites.js、bossSprites.js）的解析度倍率（與 scripts/hero-sprites/sheets.mjs 的 MONSTER_RES 相同）。 */
+export const MONSTER_RES = 2;
+
+/** 角色動作圖（heroSprites.js）的解析度倍率（與 scripts/hero-sprites/sheets.mjs 的 HERO_RES 相同）。 */
+export const HERO_RES = 2;
+
 /** 共用顏色。 */
 const O = '#1a1020';
 
@@ -465,23 +471,24 @@ const cache = new Map();
 /**
  * 由待機圖產生 4 格走路循環（參考走路動作圖：踏步 → 身體上浮 → 換腳踏步 → 身體上浮）。
  * 正面與背面：腳部（腳底以上 6 列）以中線分左右，輪流抬起 2 格；側面：前腳往前、後腳往後各跨 1 格，下一步前後交換。
- * 踏步之間的格子把腳部以上的身體往上移 1 格，表現走路時身體的起伏。
+ * 踏步之間的格子把腳部以上的身體往上移 1 格，表現走路時身體的起伏。以上格數都乘上解析度倍率 k。
  * @param {string[]} rows 待機圖（已貼在共用畫布上）。
  * @param {number} foot 腳底以下的列數。
  * @param {'down' | 'up' | 'side'} dir 方向。
+ * @param {number} [k=1] 解析度倍率（2 倍解析度的圖為 2）。
  * @returns {string[][]} 4 格走路幀。
  */
-function walkCycle(rows, foot, dir) {
+function walkCycle(rows, foot, dir, k = 1) {
   const H = rows.length - foot;
   const W = rows[0].length;
-  const legTop = H - 6;
+  const legTop = H - 6 * k;
   const mid = W / 2;
   /** 取 (x, y) 的像素（超出範圍為透明）。 */
   const at = (x, y) => (y >= 0 && y < rows.length && x >= 0 && x < W ? rows[y][x] : '.');
   /** 依每個像素的來源位置建立一格。 */
   const build = (src) => rows.map((r, y) => [...r].map((c, x) => src(x, y)).join(''));
-  /** 身體上浮：腳部以上整體往上移 1 格（腳部不動，腿看起來伸長）。 */
-  const bob = build((x, y) => (y < legTop ? at(x, y + 1) : at(x, y)));
+  /** 身體上浮：腳部以上整體往上移 1 格（乘解析度倍率；腳部不動，腿看起來伸長）。 */
+  const bob = build((x, y) => (y < legTop ? at(x, y + k) : at(x, y)));
   if (dir === 'side') {
     /** 跨步：畫面右半（前腳）往 front 方向移、左半（後腳）往反方向移；後腳先畫，前腳蓋在上面。 */
     const stride = (front) => build((x, y) => {
@@ -491,12 +498,12 @@ function walkCycle(rows, foot, dir) {
       const fromBack = at(x + front, y);
       return fromBack !== '.' && x + front < mid ? fromBack : '.';
     });
-    return [stride(1), bob, stride(-1), bob];
+    return [stride(k), bob, stride(-k), bob];
   }
-  /** 抬腳：腳部中線一側的像素往上移 2 格。 */
+  /** 抬腳：腳部中線一側的像素往上移 2 格（乘解析度倍率）。 */
   const lift = (left) => build((x, y) => {
     if (y < legTop || y >= H || (x < mid) !== left) return at(x, y);
-    return y + 2 < H ? at(x, y + 2) : '.';
+    return y + 2 * k < H ? at(x, y + 2 * k) : '.';
   });
   return [lift(true), bob, lift(false), bob];
 }
@@ -519,7 +526,7 @@ function place(h, f) {
  * 取得角色圖（含受傷閃白的版本）。
  * dirs 依方向（down 正面、up 背面、side 面向右，面向左時翻轉）提供待機、走路 4 格（踏步、上浮、換腳、上浮）與攻擊 6～8 格；
  * 沒有動作圖的職業 attack 為 null（攻擊時以程式變形表現）。frames 是側面的待機與兩個跨步幀（家園用），
- * portrait 是緊貼的正面待機圖（介面頭像用）。圖是 2 倍密度（density 2），腳底以下有 foot 列（特效用）。
+ * portrait 是緊貼的正面待機圖（介面頭像用）。圖是高密度（density 2 × HERO_RES），腳底以下有 foot 列（特效用）。
  * @param {string} cls 職業。
  * @returns {{palette: Record<string, string>, dirs: Record<string, {stand: HTMLCanvasElement, walk: HTMLCanvasElement[], attack: HTMLCanvasElement[] | null}>, flash: Record<string, {stand: HTMLCanvasElement, walk: HTMLCanvasElement[], attack: HTMLCanvasElement[] | null}>, frames: HTMLCanvasElement[], portrait: HTMLCanvasElement, scale: number, alpha: number, density: number, foot: number, standH: number}} 圖。
  */
@@ -534,7 +541,7 @@ export function heroArt(cls) {
         const stand = place(h, list[0]);
         dirs[d] = {
           stand: paint(stand, h.palette, tint),
-          walk: walkCycle(stand, h.foot, d).map((r) => paint(r, h.palette, tint)),
+          walk: walkCycle(stand, h.foot, d, HERO_RES).map((r) => paint(r, h.palette, tint)),
           attack: list.length > 1 ? list.map((f) => paint(place(h, f), h.palette, tint)) : null,
         };
       }
@@ -550,7 +557,7 @@ export function heroArt(cls) {
       portrait: paint(down.rows, h.palette),
       scale: 1,
       alpha: 1,
-      density: 2,
+      density: 2 * HERO_RES,
       foot: h.foot,
       standH: h.h - h.foot - down.y,
     });
@@ -662,7 +669,7 @@ function evolveColor(hex) {
 
 /**
  * 取得 Boss 的動作圖（bossSprites.js，4 格：待機 A、待機 B、蓄力、出招，面向右）；進化 Boss 依 evolveColor 換色（外框不變）。
- * 圖是高密度（density 2，繪製時依畫面放大倍率換算），腳底以下有 foot 列（特效用）。
+ * 圖是高密度（density 2 × MONSTER_RES，繪製時依畫面放大倍率換算），腳底以下有 foot 列（特效用）。
  * @param {string} type Boss 種類。
  * @param {boolean} evolved 是否為進化 Boss。
  * @returns {{frames: HTMLCanvasElement[], flash: HTMLCanvasElement[], scale: number, alpha: number, density: number, foot: number, poses: boolean}} 圖（poses 表示 4 格動作圖）。
@@ -678,7 +685,7 @@ function bossArt(type, evolved) {
       flash: rows.map((r) => paint(r, palette, '#ffffff')),
       scale: 1,
       alpha: 1,
-      density: 2,
+      density: 2 * MONSTER_RES,
       foot: b.foot,
       poses: true,
     });
@@ -693,6 +700,7 @@ function bossArt(type, evolved) {
  * @returns {{frames: HTMLCanvasElement[], flash: HTMLCanvasElement[], scale: number, alpha: number, density: number, foot: number, poses: boolean}} 圖。
  */
 function monsterSpriteArt(type) {
+  // 動作圖以 MONSTER_RES 倍解析度轉換：密度 2 × MONSTER_RES，顯示大小與以前相同、細節加倍。
   const key = `ms-${type}`;
   if (!cache.has(key)) {
     const b = MONSTER_SPRITES[type];
@@ -702,7 +710,7 @@ function monsterSpriteArt(type) {
       flash: rows.map((r) => paint(r, b.palette, '#ffffff')),
       scale: 1,
       alpha: MONSTER_ART[type]?.alpha || 1,
-      density: 2,
+      density: 2 * MONSTER_RES,
       foot: b.foot,
       poses: true,
     });
@@ -939,8 +947,9 @@ export function itemDataUrl(name, scale = 4) {
 export function heroDataUrl(cls, scale = 4) {
   const art = heroArt(cls);
   const src = art.portrait;
-  const k = Math.max(1, Math.round(scale / art.density));
-  const c = makeCanvas(src.width * k, src.height * k);
+  // 輸出大小與 2 倍密度時相同（scale 的一半取整數倍），高解析度的圖依倍率縮放。
+  const k = Math.max(1, Math.round(scale / 2)) * (2 / art.density);
+  const c = makeCanvas(Math.round(src.width * k), Math.round(src.height * k));
   const g = c.getContext('2d');
   g.imageSmoothingEnabled = false;
   g.drawImage(src, 0, 0, c.width, c.height);

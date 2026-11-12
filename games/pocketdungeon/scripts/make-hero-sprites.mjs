@@ -8,7 +8,7 @@
 // Chrome 預設為 macOS 的安裝位置，其他環境以環境變數 CHROME_PATH 指定。
 
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { SHEETS as HERO_SHEETS, BOSS_SHEETS, MONSTER_SHEETS, PROP_SHEETS } from './hero-sprites/sheets.mjs';
+import { SHEETS as HERO_SHEETS, BOSS_SHEETS, MONSTER_SHEETS, PROP_SHEETS, MONSTER_RES, HERO_RES } from './hero-sprites/sheets.mjs';
 import { MONSTERS } from '../src/js/pd/data.js';
 import { packFile } from './sprite-pack.mjs';
 
@@ -26,10 +26,10 @@ const SHEETS = PROPS ? PROP_SHEETS : MONS
     return ok;
   }))
   : BOSSES ? BOSS_SHEETS : HERO_SHEETS;
-/** 待機圖（第 1 個方向的第 1 格）換算後的預設高度（格）：角色 34，Boss 60（約 2.5 格高）；一般怪物以各自的 h 為準。 */
-const TARGET_H = BOSSES ? 60 : 34;
-/** 預設減色後的顏色數；一般怪物以各自的 colors 為準。 */
-const COLORS = 24;
+/** 待機圖（第 1 個方向的第 1 格）換算後的預設高度（格）：角色 34 × HERO_RES、Boss 60（約 2.5 格高）× MONSTER_RES（都是 2 倍解析度）；一般怪物以各自的 h 為準。 */
+const TARGET_H = BOSSES ? 60 * MONSTER_RES : 34 * HERO_RES;
+/** 預設減色後的顏色數（2 倍解析度保留 32 色）；一般怪物與裝飾物以各自的 colors 為準。 */
+const COLORS = 32;
 const NAMES = {
   warrior: '戰士', archer: '弓箭手', mage: '法師', thief: '盜賊', monk: '武僧', knight: '騎士',
   treant: '古樹守衛', golem: '熔岩魔像', lich: '霜之巫妖', bullKing: '巨角牛王', thunderbird: '雷鳥', necromancer: '死靈法師',
