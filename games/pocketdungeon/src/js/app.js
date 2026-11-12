@@ -14,7 +14,7 @@ import {
   HOME_ITEMS, HOME_ITEM_KEYS, HOME_MATS, HOME_RARITY, FURNITURE_CATS, DECOR_CATS, CROPS, CROP_KEYS, LAND, GOODS, GOOD_KEYS, MEALS, MEAL_KEYS, BREWS, ANIMALS, RANCH, LINKS, DIARY, DYE_KEYS, HOME_CHEST, SHELF_SLOTS, HOME_GIFT,
 } from './pd/homeData.js';
 import { homeArt, iconArt, cropArt, toDataUrl } from './pd/homeArt.js';
-import { HouseView } from './houseView.js';
+import { HouseView, HOUSE_HD } from './houseView.js';
 import { pendingTips, tipText } from './pd/tips.js';
 import { spritesReady } from './pd/spritePack.js';
 import { ICONS, PASSIVE_ICONS, fillIcons, skillIcon } from './icons.js';
@@ -1226,9 +1226,12 @@ function fitHouse() {
   const maxW = stage.clientWidth || window.innerWidth - 32;
   const editing = app.house.mode === 'edit';
   const maxH = editing ? stage.clientHeight || window.innerHeight * 0.5 : window.innerHeight * 0.62;
-  const scale = Math.max(Math.min(maxW / c.width, maxH / c.height), HOUSE_MIN_TILE / 32);
-  c.style.width = `${Math.floor(c.width * scale)}px`;
-  c.style.height = `${Math.floor(c.height * scale)}px`;
+  // 畫布是 HOUSE_HD 倍解析度，以家園像素（每格 32）計算顯示大小。
+  const w = c.width / HOUSE_HD;
+  const h = c.height / HOUSE_HD;
+  const scale = Math.max(Math.min(maxW / w, maxH / h), HOUSE_MIN_TILE / 32);
+  c.style.width = `${Math.floor(w * scale)}px`;
+  c.style.height = `${Math.floor(h * scale)}px`;
 }
 
 /**

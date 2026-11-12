@@ -21,10 +21,10 @@ function hero() {
   };
 }
 
-test('目錄有家具 50 種、裝飾 100 種，材料與來源都合法', () => {
+test('目錄有家具 50 種、裝飾 104 種，材料與來源都合法', () => {
   const items = Object.values(HOME_ITEMS);
   assert.equal(items.filter((i) => i.type === 'furniture').length, 50);
-  assert.equal(items.filter((i) => i.type === 'decor').length, 100);
+  assert.equal(items.filter((i) => i.type === 'decor').length, 104);
   assert.equal(new Set(items.map((i) => i.name)).size, items.length, '名稱不重複');
   // 牧場動物與節慶裝飾另外計算。
   assert.equal(items.filter((i) => i.type === 'animal').length, 4);

@@ -17,6 +17,10 @@ import { FURNITURE_SPRITES } from './homeArt/furnitureSprites.js';
 import { ICON_SPRITES } from './homeArt/iconSprites.js';
 import { CROP_SPRITES } from './homeArt/cropSprites.js';
 import { TILE_SPRITES } from './homeArt/tileSprites.js';
+import { YARD_SPRITES } from './homeArt/yardSprites.js';
+
+/** 庭院造景第二版圖（yardSprites.js）的密度：畫布是一般家具的 2 倍，顯示時縮回相同大小。 */
+export const YARD_DENSITY = 2;
 
 /**
  * 把設計圖轉換的像素圖畫到新畫布（'.' 透明）。
@@ -793,6 +797,20 @@ Object.assign(ICON_ART, farmIcons);
  * @returns {HTMLCanvasElement | null} 畫布。
  */
 export function homeArt(key, frame = 0) {
+  // 庭院造景第二版（密度 2，畫布帶 density 屬性）；噴水池等動態物件在同一張圖上加水光閃動。
+  const yd = YARD_SPRITES[key];
+  if (yd) {
+    const n = homeFrames(key);
+    const f = frame % n;
+    const id = `ys-${key}-${f}`;
+    if (!cache.has(id)) {
+      const c = paintSprite(yd);
+      if (n > 1) shimmer(c, f, n);
+      c.density = YARD_DENSITY;
+      cache.set(id, c);
+    }
+    return cache.get(id);
+  }
   // 沒有動態幀、且有設計圖的物件：使用 furnitureSprites.js 的圖（畫布大小與原本相同）。
   const sp = FURNITURE_SPRITES[key];
   if (sp && homeFrames(key) === 1) {
@@ -801,6 +819,33 @@ export function homeArt(key, frame = 0) {
     return cache.get(id);
   }
   return homeArtLegacy(key, frame);
+}
+
+/**
+ * 水面閃動：把圖上的水色像素依幀數沿斜下方向輪流提亮，做出水流往下流、池面波光的動態。
+ * @param {HTMLCanvasElement} c 畫布（會被修改）。
+ * @param {number} f 目前的幀。
+ * @param {number} n 總幀數。
+ */
+function shimmer(c, f, n) {
+  const g = c.getContext('2d');
+  const img = g.getImageData(0, 0, c.width, c.height);
+  const d = img.data;
+  for (let y = 0; y < c.height; y++) {
+    for (let x = 0; x < c.width; x++) {
+      const i = (y * c.width + x) * 4;
+      const r = d[i], gg = d[i + 1], b = d[i + 2];
+      // 水：藍色明顯高於紅色、不透明。
+      if (d[i + 3] < 200 || b < 120 || b - r < 50 || gg < r) continue;
+      const phase = (y - f * (8 / n) + ((x * 7) % 5) + 64) % 8;
+      if (phase < 1) {
+        d[i] = Math.min(255, r + 70);
+        d[i + 1] = Math.min(255, gg + 60);
+        d[i + 2] = Math.min(255, b + 40);
+      }
+    }
+  }
+  g.putImageData(img, 0, 0);
 }
 
 /**
@@ -875,6 +920,7 @@ export function dyedArt(key, frame, hue) {
   const id = `d-${key}-${frame % homeFrames(key)}-${hue}`;
   if (cache.has(id)) return cache.get(id);
   const c = makeCanvas(src.width, src.height);
+  c.density = src.density;
   const g = c.getContext('2d');
   g.drawImage(src, 0, 0);
   const img = g.getImageData(0, 0, c.width, c.height);

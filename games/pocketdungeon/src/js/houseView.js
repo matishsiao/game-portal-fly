@@ -13,6 +13,16 @@ const TOP = 16;
 const SPEED = 4.5;
 /** 放在桌面上的小擺設往上抬的像素。 */
 const TABLE_LIFT = 14;
+
+/** 畫布解析度倍率：畫布以 2 倍解析度繪製（座標仍以家園像素計算），高密度的圖（庭院造景第二版、角色）才看得到細節。 */
+export const HOUSE_HD = 2;
+
+/**
+ * 物件圖的顯示高度（高密度的圖，例如庭院造景第二版，換算回一般大小）。
+ * @param {HTMLCanvasElement} art 物件圖。
+ * @returns {number} 顯示高度（家園像素）。
+ */
+const artH = (art) => art.height / (art.density || 1);
 /** 小地圖每格的像素。 */
 const MINI_CELL = 4;
 /** 小地圖的顏色。 */
@@ -145,8 +155,8 @@ export class HouseView {
   /** 依地圖大小調整畫布（原始解析度），畫面大小由 CSS 縮放。 */
   resize() {
     const l = homeLayout(this.ch.home.level);
-    this.canvas.width = l.cols * HT;
-    this.canvas.height = l.rows * HT + TOP;
+    this.canvas.width = l.cols * HT * HOUSE_HD;
+    this.canvas.height = (l.rows * HT + TOP) * HOUSE_HD;
     if (this.mini) {
       const max = homeLayout(LAND.length);
       this.mini.width = Math.max(max.cols, l.cols) * MINI_CELL;
@@ -310,8 +320,8 @@ export class HouseView {
    */
   cellOf(e) {
     const r = this.canvas.getBoundingClientRect();
-    const sx = ((e.clientX - r.left) / r.width) * this.canvas.width;
-    const sy = ((e.clientY - r.top) / r.height) * this.canvas.height;
+    const sx = ((e.clientX - r.left) / r.width) * (this.canvas.width / HOUSE_HD);
+    const sy = ((e.clientY - r.top) / r.height) * (this.canvas.height / HOUSE_HD);
     return { x: Math.floor(sx / HT), y: Math.floor((sy - TOP) / HT) };
   }
 
@@ -322,7 +332,7 @@ export class HouseView {
    */
   canvasPx(e) {
     const r = this.canvas.getBoundingClientRect();
-    return { x: ((e.clientX - r.left) / r.width) * this.canvas.width, y: ((e.clientY - r.top) / r.height) * this.canvas.height };
+    return { x: ((e.clientX - r.left) / r.width) * (this.canvas.width / HOUSE_HD), y: ((e.clientY - r.top) / r.height) * (this.canvas.height / HOUSE_HD) };
   }
 
   /**
@@ -337,7 +347,7 @@ export class HouseView {
     const r = placedRect({ id, at: pv.at, x: pv.x, y: pv.y }, homeLayout(this.ch.home.level));
     const art = homeArt(id);
     const bottom = pv.at === 'wall' ? TOP + HT : TOP + (r.y + r.h) * HT;
-    const top = pv.at === 'wall' ? 0 : bottom - Math.max(r.h * HT, art ? art.height : 0);
+    const top = pv.at === 'wall' ? 0 : bottom - Math.max(r.h * HT, art ? artH(art) : 0);
     const m = 10;
     const c = this.canvasPx(e);
     return c.x >= r.x * HT - m && c.x <= (r.x + r.w) * HT + m && c.y >= top - m && c.y <= bottom + m;
@@ -530,11 +540,11 @@ export class HouseView {
   }
 
   /**
-   * 畫布每個原始像素在畫面上的大小（CSS 像素）。
+   * 每個家園像素在畫面上的大小（CSS 像素）。
    * @returns {number} 縮放倍率。
    */
   viewScale() {
-    return this.canvas.clientWidth / this.canvas.width || 1;
+    return this.canvas.clientWidth / (this.canvas.width / HOUSE_HD) || 1;
   }
 
   /**
@@ -694,6 +704,8 @@ export class HouseView {
     const g = this.g;
     const h = this.ch.home;
     const l = homeLayout(h.level);
+    // 以家園像素座標繪製，畫布本身是 HOUSE_HD 倍解析度。
+    g.setTransform(HOUSE_HD, 0, 0, HOUSE_HD, 0, 0);
     g.imageSmoothingEnabled = false;
     g.fillStyle = '#1a1020';
     g.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -728,7 +740,7 @@ export class HouseView {
       const art = artOf(p);
       if (!art) continue;
       const r = placedRect(p, l);
-      this.blit(art, r.x * HT, place === 'wall' ? Y(0) - 4 : Y(r.y + r.h) - art.height, p.rot);
+      this.blit(art, r.x * HT, place === 'wall' ? Y(0) - 4 : Y(r.y + r.h) - artH(art), p.rot);
     }
     // 家具、小擺設與角色依底部高度排序（下面的蓋住上面的）。
     const sprites = [];
@@ -743,9 +755,9 @@ export class HouseView {
         z: base + (onTable ? 1 : 0),
         // 畫出物件，以及展示架上的裝備、動物的狀態泡泡。
         draw: () => {
-          if (art) this.blit(art, r.x * HT, base - art.height - (onTable ? TABLE_LIFT : 0), p.rot);
+          if (art) this.blit(art, r.x * HT, base - artH(art) - (onTable ? TABLE_LIFT : 0), p.rot);
           else this.placeholder(r, Y);
-          if (p.show && p.show.length && art) this.drawShelf(p, r, base - art.height);
+          if (p.show && p.show.length && art) this.drawShelf(p, r, base - artH(art));
           if (it.type === 'animal') this.drawBubble(p, r, Y);
         },
       });
@@ -801,14 +813,18 @@ export class HouseView {
    */
   blit(art, x, y, rot) {
     const g = this.g;
+    // 高密度的圖縮回一般大小（地圖畫布放大顯示時保留細節）。
+    const dn = art.density || 1;
+    const w = art.width / dn;
+    const h = art.height / dn;
     if (!rot) {
-      g.drawImage(art, x, y);
+      g.drawImage(art, x, y, w, h);
       return;
     }
     g.save();
-    g.translate(x + art.width, y);
+    g.translate(x + w, y);
     g.scale(-1, 1);
-    g.drawImage(art, 0, 0);
+    g.drawImage(art, 0, 0, w, h);
     g.restore();
   }
 
@@ -967,7 +983,7 @@ export class HouseView {
       if (art) {
         const bob = Math.round(Math.sin(this.time * 5) * 1.5) - 3;
         g.globalAlpha = 0.85;
-        this.blit(art, r.x * HT, (pv.at === 'wall' ? Y(0) - 4 : Y(r.y + r.h) - art.height) + bob, lift ? lift.rot : 0);
+        this.blit(art, r.x * HT, (pv.at === 'wall' ? Y(0) - 4 : Y(r.y + r.h) - artH(art)) + bob, lift ? lift.rot : 0);
         g.globalAlpha = 1;
       }
       // 外框（擺放中的整體範圍）。

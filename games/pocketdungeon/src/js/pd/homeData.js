@@ -156,7 +156,7 @@ const FURNITURE = [
   F('yardF', 'gazebo', '涼亭', [2, 2], 3, 'wood:16,stone:6,cloth:4', { yard: true }),
 ];
 
-/** 裝飾（100 種）。 */
+/** 裝飾（104 種）。 */
 const DECOR = [
   // 地板（7 種地板樣式、3 種地毯）
   D('floorD', 'woodFloor', '木地板', 'floorTile', [1, 1], 0, 'wood:2', { src: 'default' }),
@@ -239,6 +239,10 @@ const DECOR = [
   D('garden', 'pond', '池塘', 'floor', [2, 2], 2, 'stone:4,shell:2', { yard: true }),
   D('garden', 'windmill', '風車', 'floor', [1, 1], 3, 'wood:8,gear:2,cloth:2', { yard: true }),
   D('garden', 'mushroomLamp', '蘑菇燈', 'floor', [1, 1], 1, 'wood:1,ice:1', { yard: true }),
+  D('garden', 'pineTree', '松樹', 'floor', [1, 1], 1, 'wood:3', { yard: true }),
+  D('garden', 'roundBush', '圓灌木', 'floor', [1, 1], 0, 'wood:1', { yard: true }),
+  D('garden', 'lupineBed', '魯冰花叢', 'floor', [1, 1], 1, 'clay:1,cloth:1', { yard: true }),
+  D('garden', 'stonePlanter', '石砌花台', 'floor', [2, 1], 2, 'stone:4,clay:1', { yard: true }),
   // 區域主題（只在對應區域掉落製作書）
   D('theme', 'slimeCushion', '史萊姆抱枕', 'small', [1, 1], 1, 'wood:2,cloth:2', { src: 'grass' }),
   D('theme', 'mushroomStool', '蘑菇凳', 'floor', [1, 1], 1, 'stone:2,wood:1', { src: 'easy' }),
