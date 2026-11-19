@@ -444,3 +444,15 @@ test('掉落物落在牆壁裡時移到最近的可走格子，角色撿得到',
   w.updatePickups(0);
   assert.equal(w.ch.gold - gold, 7);
 });
+
+// 強化石與升級石：Boss 依機率掉落（強化石一次 3 顆），撿到後放進石頭袋並記在這趟的所得。
+test('強化石與升級石掉落與拾取', () => {
+  const w = new World(hero('warrior', 20), { area: 'easy', depth: 1, seed: 3, floor: 3 }, () => 0.01);
+  w.killMonster(w.boss());
+  const stones = w.pickups.filter((p) => p.kind === 'stone');
+  assert.deepEqual(stones.map((p) => [p.stone, p.n]).sort(), [['enhance', 3], ['upgrade', 1]]);
+  for (const p of stones) { p.x = w.player.x; p.y = w.player.y; p.t = 1; }
+  w.updatePickups(0);
+  assert.deepEqual(w.ch.stones, { enhance: 3, upgrade: 1 });
+  assert.deepEqual(w.loot.stones, { enhance: 3, upgrade: 1 });
+});

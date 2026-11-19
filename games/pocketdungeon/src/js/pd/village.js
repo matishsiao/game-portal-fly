@@ -1,10 +1,10 @@
 // 村莊規則（純邏輯）：商店刷新與買賣、裝備穿脫、強化、區域與深度解鎖、探險開始與結算。
 // 所有函式直接修改傳入的角色資料，回傳結果與要顯示的訊息。
 
-import { AREAS, AREA_KEYS, LIMITS, MAX_DEPTH, RARITIES, ENHANCE, EQUIP_SLOTS, SHARED_SLOTS, CLASSES, REBIRTH, GEMS, GEM_RULES, MATERIALS, CRAFT, ITEM_SLOTS, BAG_EXPAND, SKILL_BOOK, GIFT, TICKET } from './data.js';
+import { AREAS, AREA_KEYS, LIMITS, MAX_DEPTH, RARITIES, ENHANCE, EQUIP_SLOTS, SHARED_SLOTS, CLASSES, REBIRTH, GEMS, GEM_RULES, MATERIALS, CRAFT, ITEM_SLOTS, BAG_EXPAND, SKILL_BOOK, GIFT, TICKET, STONES } from './data.js';
 import { giftHome } from './home.js';
 import { learnBook, SKILLS, bookSkillIds, passiveBonus } from './skills.js';
-import { makeItem, itemValue, sellPrice, enhanceCost, tryEnhance, rollRarity, dungeonLevel, levelCap, parseGem, gemName, socketCount, weaponHands, characterStats, powerScore } from './rules.js';
+import { makeItem, itemValue, sellPrice, enhanceCost, tryEnhance, enhanceStones, upgradeTarget, upgradeCost, setItemLevel, rollRarity, dungeonLevel, levelCap, parseGem, gemName, socketCount, weaponHands, characterStats, powerScore } from './rules.js';
 
 /** 商店一次陳列的裝備數。 */
 export const SHOP_SIZE = 8;
@@ -951,7 +951,7 @@ export function unequip(ch, slot) {
 }
 
 /**
- * 在鐵匠強化裝備：先扣金幣，+6 起可能失敗（失敗不降級）。
+ * 在鐵匠強化裝備：先扣強化石與金幣，+6 起可能失敗；失敗時強化值不變，強化石與金幣照樣消耗。
  * @param {object} ch 角色。
  * @param {string} id 裝備 id（背包或裝備欄）。
  * @param {() => number} rng 亂數函式。
@@ -963,10 +963,81 @@ export function enhance(ch, id, rng) {
   const item = found.item;
   if (item.enhance >= ENHANCE.max) return { ok: false, message: `已強化到上限 +${ENHANCE.max}` };
   const cost = enhanceCost(item);
+  const stones = enhanceStones(item);
+  const have = stoneCount(ch, 'enhance');
+  if (have < stones) return { ok: false, message: `強化石不足（需要 ${stones} 顆，持有 ${have} 顆）` };
   if (ch.gold < cost) return { ok: false, message: `金幣不足（需要 ${cost}G）` };
   ch.gold -= cost;
+  addStones(ch, 'enhance', -stones);
   const success = tryEnhance(item, rng);
-  return { ok: true, success, message: success ? `強化成功：${item.name} +${item.enhance}` : `強化失敗（花費 ${cost}G，等級不變）` };
+  return {
+    ok: true,
+    success,
+    message: success ? `強化成功：${item.name} +${item.enhance}` : `強化失敗：強化石 ${stones} 顆與 ${cost}G 已消耗，強化值維持 +${item.enhance}`,
+  };
+}
+
+/**
+ * 持有的強化石或升級石數量。
+ * @param {object} ch 角色。
+ * @param {'enhance' | 'upgrade'} kind 種類。
+ * @returns {number} 數量。
+ */
+export function stoneCount(ch, kind) {
+  return (ch.stones && ch.stones[kind]) || 0;
+}
+
+/**
+ * 增減強化石或升級石（不佔背包格，上限 STONES.hold）。
+ * @param {object} ch 角色（會被修改）。
+ * @param {'enhance' | 'upgrade'} kind 種類。
+ * @param {number} n 數量（負數為消耗）。
+ * @returns {number} 實際增減的數量（達到上限時可能少於 n）。
+ */
+export function addStones(ch, kind, n) {
+  ch.stones = ch.stones || {};
+  const before = stoneCount(ch, kind);
+  const after = Math.max(0, Math.min(STONES.hold, before + n));
+  ch.stones[kind] = after;
+  return after - before;
+}
+
+/**
+ * 在商店購買 1 顆強化石或升級石。
+ * @param {object} ch 角色（會被修改）。
+ * @param {'enhance' | 'upgrade'} kind 種類。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function buyStone(ch, kind) {
+  const st = STONES[kind];
+  if (stoneCount(ch, kind) >= STONES.hold) return { ok: false, message: `${st.name}最多持有 ${STONES.hold} 顆` };
+  if (ch.gold < st.price) return { ok: false, message: `金幣不足（需要 ${st.price}G）` };
+  ch.gold -= st.price;
+  addStones(ch, kind, 1);
+  return { ok: true, message: `買下${st.name}（持有 ${stoneCount(ch, kind)} 顆）` };
+}
+
+/**
+ * 用升級石升級裝備：裝備等級往上 UPGRADE.step 級（最高到角色目前的等級），基礎屬性依新等級換算；一定成功。
+ * @param {object} ch 角色（會被修改）。
+ * @param {string} id 裝備 id（背包或裝備欄）。
+ * @returns {{ok: boolean, message: string}} 結果。
+ */
+export function upgradeItem(ch, id) {
+  const found = findItem(ch, id);
+  if (!found) return { ok: false, message: '找不到這件裝備' };
+  const item = found.item;
+  const to = upgradeTarget(item, ch.level);
+  if (to <= item.level) return { ok: false, message: `裝備等級已達角色等級 Lv.${ch.level}，角色升級後才能再升級` };
+  const cost = upgradeCost(item);
+  const have = stoneCount(ch, 'upgrade');
+  if (have < cost.stones) return { ok: false, message: `升級石不足（需要 ${cost.stones} 顆，持有 ${have} 顆）` };
+  if (ch.gold < cost.gold) return { ok: false, message: `金幣不足（需要 ${cost.gold}G）` };
+  ch.gold -= cost.gold;
+  addStones(ch, 'upgrade', -cost.stones);
+  const from = item.level;
+  setItemLevel(item, to);
+  return { ok: true, message: `升級成功：${item.name} Lv.${from} → Lv.${to}` };
 }
 
 /**
@@ -1061,7 +1132,7 @@ export function packForRun(ch) {
  * @param {object} ch 角色（會被修改）。
  * @param {object} world 探險。
  * @param {'victory' | 'dead' | 'recall' | 'abandon'} result 結果。
- * @returns {{result: string, area: string, depth: number, ms: number, kills: number, damageTaken: number, xp: number, gold: number, goldLost: number, items: object[], unlocks: string[], levels: number, evo: boolean}} 結算內容（evo 為進化 Boss 挑戰）。
+ * @returns {{result: string, area: string, depth: number, ms: number, kills: number, damageTaken: number, xp: number, stones: Record<string, number>, gold: number, goldLost: number, items: object[], unlocks: string[], levels: number, evo: boolean}} 結算內容（evo 為進化 Boss 挑戰）。
  */
 export function settleRun(ch, world, result) {
   const loot = world.loot;
@@ -1089,7 +1160,7 @@ export function settleRun(ch, world, result) {
     ch.clears[key] = (ch.clears[key] || 0) + 1;
   }
   return {
-    result, area: world.area, depth: world.depth, ms, kills: loot.kills, damageTaken: loot.damageTaken, xp: loot.xp,
+    result, area: world.area, depth: world.depth, ms, kills: loot.kills, damageTaken: loot.damageTaken, xp: loot.xp, stones: { ...(loot.stones || {}) },
     gold: loot.gold - goldLost, goldLost, items: loot.items, gems: loot.gems || [], unlocks, levels: loot.levelsGained, potionsUsed: loot.potionsUsed,
     evolved: !!world.evolvedDefeated, clears: (ch.clears && ch.clears[world.stageKey()]) || 0, evo: !!world.evo,
   };

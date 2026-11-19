@@ -747,6 +747,32 @@ button:focus-visible {
   background: var(--surface-2);
 }
 
+/* 鐵匠的強化・升級：每件裝備右側兩個按鈕（窄畫面時換到下一行並排）；強化石或升級石不足時按鈕變淡。 */
+.smith-btns {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-left: auto;
+}
+
+.smith-btns .buy-btn,
+.smith-btns .muted {
+  min-height: 44px;
+  min-width: 108px;
+}
+
+.smith-btns .muted {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.buy-btn.short {
+  opacity: 0.5;
+}
+
 .row-actions {
   display: flex;
   gap: 6px;

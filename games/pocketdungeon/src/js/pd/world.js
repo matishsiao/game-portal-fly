@@ -5,13 +5,13 @@
 
 import { HOME_DROP, CROPS, MEAT, MEAL_BUFFS } from './homeData.js';
 import { addHomeMat, addSeed, addGood, gainRecipe, homeMatName, recipeName, rollHomeMat, rollRecipe, rollSeed, bossRecipe } from './home.js';
-import { CLASSES, MONSTERS, BOSSES, FLOORS, LIMITS, BOSS_HEAL, EVOLVE, REBIRTH, STATUS, STATUS_BOSS, STATUS_REPEAT, AUTO_SHIELD_HP, GEMS, GEM_RULES, DIFFICULTY, CRAFT, BAG_EXPAND, CRIT_MULT, SKILL_BOOK, MAT_DROP, MATERIALS } from './data.js';
+import { CLASSES, MONSTERS, BOSSES, FLOORS, LIMITS, BOSS_HEAL, EVOLVE, REBIRTH, STATUS, STATUS_BOSS, STATUS_REPEAT, AUTO_SHIELD_HP, GEMS, GEM_RULES, DIFFICULTY, CRAFT, BAG_EXPAND, CRIT_MULT, SKILL_BOOK, MAT_DROP, MATERIALS, STONES } from './data.js';
 import { generateFloor, walkable, STAIRS, SPIKES, WALL } from './dungeon.js';
 import {
   characterStats, speedProfile, damage, dungeonLevel, monsterStats, killReward, rollRarity, rarityWeights, makeItem, gainXp, sellPrice, rollGem, gemName, pick,
 } from './rules.js';
 import { equippedSkills, passiveBonus, bookSkillIds, SKILLS } from './skills.js';
-import { bagLimit, bagUsed, addBook, bookName, addSkillBook, addMaterial, skillBookPrice } from './village.js';
+import { bagLimit, bagUsed, addBook, bookName, addSkillBook, addMaterial, skillBookPrice, addStones } from './village.js';
 
 /** 玩家半徑（格）。 */
 const PLAYER_R = 0.34;
@@ -1269,6 +1269,19 @@ export class World {
   }
 
   /**
+   * 依來源的機率掉落強化石與升級石（Boss 與寶箱可能一次掉多顆）。
+   * @param {number} x 位置 x（格）。
+   * @param {number} y 位置 y（格）。
+   * @param {'monster' | 'elite' | 'boss' | 'chest'} src 來源。
+   */
+  dropStones(x, y, src) {
+    for (const [k, dx] of [['enhance', -0.3], ['upgrade', 0.3]]) {
+      const st = STONES[k];
+      if (this.rng() < st.drop[src]) this.addPickup({ kind: 'stone', stone: k, n: st.n[src] || 1, x: x + dx, y, t: 0 });
+    }
+  }
+
+  /**
    * 怪物死亡：給予經驗值與金幣、掉落裝備或藥水；Boss 死亡時可能復活成進化 Boss，否則開啟回城傳送點與寶箱。
    * @param {object} m 怪物。
    */
@@ -1295,6 +1308,8 @@ export class World {
     } else if (this.rng() < chance) this.dropItem(m.x + 0.3, m.y, m.boss ? 'boss' : m.elite ? 'elite' : 'monster');
     if (!m.boss && this.rng() < 0.05) this.addPickup({ kind: 'potion', x: m.x - 0.3, y: m.y, t: 0 });
     if (!m.boss && this.rng() < LIMITS.cureDrop) this.addPickup({ kind: 'cure', x: m.x + 0.3, y: m.y, t: 0 });
+    // 強化石與升級石（分裂的小史萊姆不掉）。
+    if (!m.small) this.dropStones(m.x, m.y + 0.4, m.boss ? 'boss' : m.elite ? 'elite' : 'monster');
     // 寶石：Boss 必掉（進化 Boss 掉 2 顆、等級 +1），菁英 25%，一般怪物 3%；分裂的小史萊姆不掉。
     if (m.boss) {
       for (let k = 0; k < (m.evolved ? 2 : 1); k++) this.dropGem(m.x - 0.4 - k * 0.4, m.y + 0.3, m.evolved ? 1 : 0);
@@ -1943,6 +1958,20 @@ export class World {
           this.loot.gold += LIMITS.potionPrice / 2;
         }
         this.events.push({ type: 'message', text: '撿到回復藥水' });
+      } else if (it.kind === 'stone') {
+        // 強化石、升級石：放進石頭袋（不佔背包格），頭上飄出名稱與數量；達到上限時換成金幣。
+        const st = STONES[it.stone];
+        const got = addStones(this.ch, it.stone, it.n);
+        if (got > 0) {
+          this.loot.stones = this.loot.stones || {};
+          this.loot.stones[it.stone] = (this.loot.stones[it.stone] || 0) + got;
+          this.effect('text', p.x, p.y - 1, { text: `+${st.name}×${got}`, color: it.stone === 'upgrade' ? '#f0d070' : '#9ad0ff' });
+        }
+        if (got < it.n) {
+          const gold = Math.round(st.price / 4) * (it.n - got);
+          this.ch.gold += gold;
+          this.loot.gold += gold;
+        }
       } else if (it.kind === 'cure') {
         // 淨化藥水：身上帶滿 5 瓶時放進村莊庫存，庫存也滿了才換成金幣。
         if (p.cures < LIMITS.cures) p.cures++;
@@ -1975,6 +2004,7 @@ export class World {
       if (c.boss && this.rng() < (c.evolved ? EVOLVE.pouch : 0.25)) this.addPickup({ kind: 'bagExpand', x: c.x, y: c.y + 0.5, t: 0 });
       if (this.rng() < 0.3) this.addPickup({ kind: 'potion', x: c.x - 0.4, y: c.y + 0.2, t: 0 });
       if (this.rng() < LIMITS.cureChestDrop) this.addPickup({ kind: 'cure', x: c.x + 0.4, y: c.y - 0.2, t: 0 });
+      if (!c.boss) this.dropStones(c.x - 0.4, c.y + 0.5, 'chest');
       if (!c.boss && this.rng() < GEM_RULES.drop.chest) this.dropGem(c.x, c.y + 0.5);
       this.effect('poof', c.x, c.y, { r: 0.4, color: '#e8b84a' });
     }

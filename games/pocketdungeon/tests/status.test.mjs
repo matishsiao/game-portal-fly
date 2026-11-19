@@ -791,6 +791,16 @@ test('技能書：每個職業 10 種（6 個職業）＋通用 15 種；非適�
   assert.ok(isValidCharacter({ ...newCharacter('mage', 'x'), skills: ch.skills, skillBooks: {} }));
 });
 
+// 新角色有起始的強化石與升級石；石頭袋只能有這兩種、數量為合法範圍。
+test('強化石與升級石的存檔驗證', () => {
+  const ch = newCharacter('warrior', 'a');
+  assert.ok(ch.stones.enhance > 0 && ch.stones.upgrade > 0);
+  assert.ok(isValidCharacter(ch));
+  assert.equal(isValidCharacter({ ...ch, stones: { gold: 1 } }), false);
+  assert.equal(isValidCharacter({ ...ch, stones: { enhance: -1 } }), false);
+  assert.ok(isValidCharacter({ ...ch, stones: undefined }));
+});
+
 test('技能書只有 Boss 會掉（一般 30%、進化必掉）', () => {
   const w = arena(hero('warrior', 20));
   w.rng = () => 0.01;

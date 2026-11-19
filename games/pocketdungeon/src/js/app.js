@@ -2,8 +2,8 @@
 
 import * as store from './storage.js';
 import { trackPlay, guardFreeze } from './playlog.js';
-import { CLASSES, CLASS_KEYS, AREAS, AREA_KEYS, RARITIES, LIMITS, EQUIP_SLOTS, ITEM_SLOTS, BAG_EXPAND, EVOLVE, SHARED_SLOTS, REBIRTH, STATUS, GEMS, GEM_RULES, MATERIALS, CRAFT, WEAPON_HANDS, BOSSES, GIFT, TICKET, FLOORS } from './pd/data.js';
-import { xpToNext, characterStats, speedProfile, describeStats, sellPrice, enhanceCost, levelCap, gemName, gemEffect, parseGem, socketCount, statusText, gemBonus, itemStats, weaponHands, dungeonLevel, powerScore } from './pd/rules.js';
+import { CLASSES, CLASS_KEYS, AREAS, AREA_KEYS, RARITIES, LIMITS, EQUIP_SLOTS, ITEM_SLOTS, BAG_EXPAND, EVOLVE, SHARED_SLOTS, REBIRTH, STATUS, GEMS, GEM_RULES, MATERIALS, CRAFT, WEAPON_HANDS, BOSSES, GIFT, TICKET, FLOORS, STONES, ENHANCE, UPGRADE } from './pd/data.js';
+import { xpToNext, characterStats, speedProfile, describeStats, sellPrice, enhanceCost, enhanceStones, upgradeTarget, upgradeCost, levelCap, gemName, gemEffect, parseGem, socketCount, statusText, gemBonus, itemStats, weaponHands, dungeonLevel, powerScore } from './pd/rules.js';
 import { World } from './pd/world.js';
 import { Renderer } from './pd/render.js';
 import { heroDataUrl, itemDataUrl, monsterDataUrl, itemArt } from './pd/sprites.js';
@@ -782,6 +782,7 @@ function shopPanel(ch) {
   if (!ch.shop || !ch.shopBooks) village.refreshShop(ch, Math.random);
   const goods = `<div class="shop-row"><img src="${itemDataUrl('potion')}" alt="" class="icon"><div class="item-main"><b>回復藥水</b><span class="item-stats">回復 40% HP・持有 ${ch.potions}／${LIMITS.potionHold}・每趟帶 ${LIMITS.potions} 瓶</span></div><button type="button" class="buy-btn" data-buy="potion">${LIMITS.potionPrice}G</button></div>
     <div class="shop-row"><img src="${itemDataUrl('cure')}" alt="" class="icon"><div class="item-main"><b>淨化藥水</b><span class="item-stats">解除中毒、睡眠、暈眩（睡眠或暈眩中也能喝）・持有 ${ch.cures || 0}／${LIMITS.cureHold}・每趟帶 ${LIMITS.cures} 瓶</span></div><button type="button" class="buy-btn" data-buy="cure">${LIMITS.curePrice}G</button></div>
+    ${['enhance', 'upgrade'].map((k) => `<div class="shop-row"><img src="${itemDataUrl(`${k}Stone`)}" alt="" class="icon"><div class="item-main"><b>${STONES[k].name}</b><span class="item-stats">${k === 'enhance' ? '在鐵匠強化裝備用（失敗時會消耗）' : '在鐵匠升級裝備等級用'}・持有 ${village.stoneCount(ch, k)} 顆</span></div><button type="button" class="buy-btn" data-buy="${k}Stone">${STONES[k].price}G</button></div>`).join('')}
     <div class="shop-row"><img src="${itemDataUrl('key')}" alt="" class="icon"><div class="item-main"><b>回城卷軸</b><span class="item-stats">帶著全部所得返回村莊・持有 ${ch.scroll}／1</span></div><button type="button" class="buy-btn" data-buy="scroll">${LIMITS.scrollPrice}G</button></div>
     <div class="shop-row"><img src="${itemDataUrl('pouch')}" alt="" class="icon"><div class="item-main"><b>背包擴充袋</b><span class="item-stats">背包上限 +${BAG_EXPAND.step} 格・目前 ${village.bagLimit(ch)}／${BAG_EXPAND.max} 格${ch.bagExpand ? `・持有 ${ch.bagExpand} 個` : ''}・商店剩 ${Math.max(0, BAG_EXPAND.shopMax - village.pouchesBought(ch))}／${BAG_EXPAND.shopMax} 個（賣完後打怪取得）</span></div><button type="button" class="buy-btn" data-buy="pouch"${village.bagExpandPrice(ch) === Infinity ? ' disabled' : ''}>${village.bagExpandPrice(ch) !== Infinity ? `${village.bagExpandPrice(ch)}G` : village.pouchesBought(ch) >= BAG_EXPAND.shopMax ? '已賣完' : '已達上限'}</button></div>`;
   // 入場卷：只賣已解鎖區域用得到的等級。
@@ -1740,16 +1741,36 @@ function smithPanel(ch) {
     return `<button type="button" class="inv-cell book-cell${have ? '' : ' none'}" data-craft-book="${slot}" aria-label="${village.bookName(slot)} ×${have}"><img src="${itemDataUrl(SLOT_ICONS[slot])}" alt=""><img class="book-badge" src="${itemDataUrl('book')}" alt=""><b class="cell-count">${have}</b><small class="cell-name">${ITEM_SLOTS[slot]}</small></button>`;
   }).join('');
   const list = [...Object.values(ch.equipped).filter(Boolean), ...ch.bag];
+  const stoneE = village.stoneCount(ch, 'enhance');
+  const stoneU = village.stoneCount(ch, 'upgrade');
   const rows = list.length ? list.map((it) => {
     const worn = wornTag(ch, it);
-    if (it.enhance >= 10) return `<div class="shop-row">${itemHtml(it)}${worn}<span class="muted">已達 +10</span></div>`;
-    const chance = Math.round(village.enhanceChance(it) * 100);
-    return `<div class="shop-row">${itemHtml(it)}${worn}<button type="button" class="buy-btn" data-enhance="${it.id}">+${it.enhance + 1}<small>${enhanceCost(it)}G・${chance}%</small></button></div>`;
+    // 強化：強化石與金幣、成功率；升級：升級石與金幣、升級後的等級（已達角色等級時不能升級）。
+    let enh;
+    if (it.enhance >= ENHANCE.max) enh = `<span class="muted small">已達 +${ENHANCE.max}</span>`;
+    else {
+      const need = enhanceStones(it);
+      const chance = Math.round(village.enhanceChance(it) * 100);
+      enh = `<button type="button" class="buy-btn${stoneE < need ? ' short' : ''}" data-enhance="${it.id}">強化 +${it.enhance + 1}<small>強化石 ${need}・${enhanceCost(it)}G・${chance}%</small></button>`;
+    }
+    const to = upgradeTarget(it, ch.level);
+    let up;
+    if (to <= it.level) up = `<span class="muted small">Lv.${it.level}（已達角色等級）</span>`;
+    else {
+      const c = upgradeCost(it);
+      up = `<button type="button" class="buy-btn${stoneU < c.stones ? ' short' : ''}" data-upgrade="${it.id}">升級 Lv.${to}<small>升級石 ${c.stones}・${c.gold}G</small></button>`;
+    }
+    return `<div class="shop-row smith-row">${itemHtml(it)}${worn}<div class="smith-btns">${enh}${up}</div></div>`;
   }).join('') : '<p class="muted">還沒有可以強化的裝備。</p>';
+  // 強化石與升級石的持有數量。
+  const stones = ['enhance', 'upgrade'].map((k) => `<span class="inv-cell stack static" title="${STONES[k].name}"><img src="${itemDataUrl(`${k}Stone`)}" alt="${STONES[k].name}"><b class="cell-count">${village.stoneCount(ch, k)}</b><small class="cell-name">${STONES[k].name}</small></span>`).join('');
   // 子頁面：製作、強化。
-  const tabs = [['craft', '製作'], ['enhance', '強化']].map(([k, name]) => `<button type="button" role="tab" data-smith-tab="${k}" aria-selected="${app.smithTab === k}">${name}</button>`).join('');
+  const tabs = [['craft', '製作'], ['enhance', '強化・升級']].map(([k, name]) => `<button type="button" role="tab" data-smith-tab="${k}" aria-selected="${app.smithTab === k}">${name}</button>`).join('');
   const body = app.smithTab === 'enhance'
-    ? `<p class="muted small">每級主屬性 +8%；+6 起可能失敗，失敗時等級不變、金幣照扣。</p>${rows}`
+    ? `<div class="inv-grid craft-grid">${stones}</div>
+    <p class="muted small">強化：每級主屬性 +8%，每次消耗強化石與金幣；+6 起可能失敗，失敗時強化值不變，強化石與金幣照樣消耗。<br>
+    升級：消耗升級石與金幣，裝備等級 +${UPGRADE.step} 級（最高到角色等級），基礎屬性依新等級提升，強化值與寶石保留，一定成功。<br>
+    強化石與升級石從打怪、寶箱、Boss 取得，也可以在商店購買。</p>${rows}`
     : `<h3>材料</h3><div class="inv-grid craft-grid">${mats}</div>
     <h3>製作書 <small class="muted">（點製作書選品質合成）</small></h3><div class="inv-grid craft-grid">${craft}</div>
     <p class="muted small">製作書 1 本＋同品質材料 ${CRAFT.cost} 個，做出保證該品質、等級為角色等級的裝備。材料來自分解裝備（在倉庫點裝備選「分解」）；製作書從打怪、寶箱或商店取得。</p>`;
@@ -2646,6 +2667,8 @@ async function onVillageClick(e) {
   } else if (d.passiveUp) r = skills.upgradePassive(ch, d.passiveUp);
   else if (d.buy === 'potion') r = village.buyPotion(ch);
   else if (d.buy === 'cure') r = village.buyCure(ch);
+  else if (d.buy === 'enhanceStone') r = village.buyStone(ch, 'enhance');
+  else if (d.buy === 'upgradeStone') r = village.buyStone(ch, 'upgrade');
   else if (d.gemCell) {
     const key = d.gemCell;
     const g = parseGem(key);
@@ -2714,6 +2737,7 @@ async function onVillageClick(e) {
   else if (d.skillSlot !== undefined) r = skills.equipSkill(ch, d.skill, Number(d.skillSlot));
   else if (d.skillReset) r = skills.resetSkills(ch);
   else if (d.enhance) r = village.enhance(ch, d.enhance, Math.random);
+  else if (d.upgrade) r = village.upgradeItem(ch, d.upgrade);
   else if (d.rebirth) {
     const next = REBIRTH.titles[ch.cls][(ch.rebirth || 0) + 1];
     if (!(await confirmDialog('轉職', `確定要轉職為「${next}」嗎？等級會回到 Lv.1（經驗值歸零），起始能力提升；裝備、金幣、技能與地城進度都會保留。`, '轉職'))) return;
@@ -3228,6 +3252,7 @@ async function finishRun(w, ch, result, { silent }) {
       <dt>擊倒數</dt><dd>${r.kills}</dd>
       <dt>受到傷害</dt><dd>${r.damageTaken}</dd>
       <dt>經驗值</dt><dd>+${r.xp}${r.levels ? `（升了 ${r.levels} 級）` : ''}</dd>
+      ${r.stones && (r.stones.enhance || r.stones.upgrade) ? `<dt>強化石／升級石</dt><dd>+${r.stones.enhance || 0}／+${r.stones.upgrade || 0}</dd>` : ''}
       <dt>金幣</dt><dd>+${r.gold}G${r.goldLost ? `<small class="muted">（倒下失去 ${r.goldLost}G）</small>` : ''}</dd>
     </dl>
     ${r.unlocks.length ? `<p class="unlock">解鎖：${r.unlocks.join('、')}</p>` : ''}

@@ -258,11 +258,33 @@ export const ITEM_NAMES = {
   飾品: ['銅戒指', '銀項鍊', '紅寶石墜飾', '星辰護符'],
 };
 
-/** 強化上限、每級主屬性加成與失敗機率（索引為目標強化值）。 */
+/**
+ * 強化上限、每級主屬性加成、失敗機率與每次消耗的強化石（索引為目標強化值）。
+ * 每次強化都要消耗強化石與金幣；失敗時強化值不變，強化石與金幣照樣消耗。
+ */
 export const ENHANCE = {
   max: 10,
   perLevel: 0.08,
   failRate: [0, 0, 0, 0, 0, 0, 0.1, 0.2, 0.3, 0.4, 0.5],
+  stones: [0, 1, 1, 1, 2, 2, 2, 3, 3, 4, 5],
+};
+
+/**
+ * 裝備升級：用升級石把裝備等級往上提（一次 step 級，最高到角色目前的等級），基礎屬性依新等級重新換算，強化值與寶石保留。
+ * 升級一定成功；每次消耗升級石 1 ＋ 裝備等級 ÷ stonePer 個與金幣 gold ＋ 裝備等級 × goldPer。
+ */
+export const UPGRADE = { step: 5, stonePer: 20, gold: 50, goldPer: 10 };
+
+/**
+ * 強化石與升級石：名稱、商店售價、持有上限，以及地城的掉落機率（一般怪物、菁英、Boss、寶箱；Boss 與寶箱每次掉 n 顆）。
+ * 撿到時直接放進角色的石頭袋（不佔背包格）。
+ */
+export const STONES = {
+  enhance: { name: '強化石', price: 150, drop: { monster: 0.04, elite: 0.3, boss: 1, chest: 0.35 }, n: { boss: 3, chest: 1 } },
+  upgrade: { name: '升級石', price: 600, drop: { monster: 0.006, elite: 0.06, boss: 0.5, chest: 0.08 }, n: { boss: 1, chest: 1 } },
+  hold: 9999,
+  /** 新角色與舊存檔第一次讀取時贈送的數量。 */
+  start: { enhance: 10, upgrade: 2 },
 };
 
 /**

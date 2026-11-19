@@ -120,7 +120,10 @@ async function currentArt(source, keys, sizes = {}) {
   for (const k of keys) {
     const [key, v] = k.split('@');
     let c = null;
-    if (source === 'item') c = (sprites.itemArtLegacy || sprites.itemArt)(key);
+    if (source === 'item') {
+      // 還沒有手寫圖的新道具（例如強化石）會找不到圖，改用 sizes。
+      try { c = (sprites.itemArtLegacy || sprites.itemArt)(key); } catch { c = null; }
+    }
     if (source === 'icon') c = (home.iconArtLegacy || home.iconArt)(key);
     if (source === 'crop') c = (home.cropArtLegacy || home.cropArt)(key, Number(v));
     if (source === 'furniture') c = (home.homeArtLegacy || home.homeArt)(key);

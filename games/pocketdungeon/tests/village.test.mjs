@@ -3,10 +3,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as v from '../src/js/pd/village.js';
-import { seededRng, makeItem, characterStats, levelCap, gainXp, dungeonLevel } from '../src/js/pd/rules.js';
+import { seededRng, makeItem, characterStats, levelCap, gainXp, dungeonLevel, setItemLevel } from '../src/js/pd/rules.js';
 import { skillLevel, skillPoints, bookSkillIds } from '../src/js/pd/skills.js';
 import { World } from '../src/js/pd/world.js';
-import { LIMITS, AREAS } from '../src/js/pd/data.js';
+import { LIMITS, AREAS, ENHANCE, STONES } from '../src/js/pd/data.js';
 
 /**
  * 建立測試用角色。
@@ -107,20 +107,76 @@ test('背包擴充袋：商店只賣 5 個（售價倍增），之後靠打怪�
   assert.equal(v.buyItem(ch, 0).ok, false);
 });
 
-test('強化：成功 +1；失敗只扣金幣', () => {
+test('強化：要有強化石；成功 +1；失敗時強化值不變、強化石與金幣照樣消耗', () => {
   const ch = hero();
   v.refreshShop(ch, seededRng(3));
   const item = ch.shop[0].item;
   ch.bag.push(item);
   ch.gold = 1e6;
+  ch.stones = {};
+  const none = v.enhance(ch, item.id, () => 0.99);
+  assert.equal(none.ok, false, '沒有強化石不能強化');
+  assert.equal(item.enhance, 0);
+  ch.stones = { enhance: 20 };
   assert.ok(v.enhance(ch, item.id, () => 0.99).success);
   assert.equal(item.enhance, 1);
+  assert.equal(v.stoneCount(ch, 'enhance'), 20 - ENHANCE.stones[1]);
   item.enhance = 7;
   const g = ch.gold;
+  const s0 = v.stoneCount(ch, 'enhance');
   const r = v.enhance(ch, item.id, () => 0);
   assert.equal(r.success, false);
   assert.equal(item.enhance, 7);
   assert.ok(ch.gold < g);
+  assert.equal(v.stoneCount(ch, 'enhance'), s0 - ENHANCE.stones[8], '失敗也消耗強化石');
+  // 強化石不夠這一級的數量時不能強化。
+  ch.stones.enhance = ENHANCE.stones[8] - 1;
+  assert.equal(v.enhance(ch, item.id, () => 0.99).ok, false);
+});
+
+test('升級：用升級石把裝備等級提升 5 級（最高到角色等級），屬性跟著提升，強化值與寶石保留', () => {
+  const ch = hero();
+  ch.level = 22;
+  ch.gold = 1e6;
+  const item = { ...makeItem({ slot: 'armor', level: 10, rarity: 2 }, seededRng(7)), id: 'up', enhance: 4, gems: ['atk-1'] };
+  ch.bag.push(item);
+  ch.stones = {};
+  assert.equal(v.upgradeItem(ch, 'up').ok, false, '沒有升級石不能升級');
+  ch.stones = { upgrade: 10 };
+  const before = { ...item.stats };
+  const r = v.upgradeItem(ch, 'up');
+  assert.ok(r.ok, r.message);
+  assert.equal(item.level, 15);
+  assert.ok(item.stats.def > before.def && item.stats.hp > before.hp);
+  assert.equal(item.enhance, 4);
+  assert.deepEqual(item.gems, ['atk-1']);
+  assert.equal(v.stoneCount(ch, 'upgrade'), 9);
+  // 升到 20 之後只能再升到角色等級 22，之後就不能再升。
+  v.upgradeItem(ch, 'up');
+  assert.equal(item.level, 20);
+  v.upgradeItem(ch, 'up');
+  assert.equal(item.level, 22);
+  assert.equal(v.upgradeItem(ch, 'up').ok, false);
+});
+
+test('升級後的屬性與直接產生該等級的裝備相當', () => {
+  for (const slot of ['weapon', 'offhand', 'helmet', 'armor', 'boots', 'accessory']) {
+    const low = makeItem({ slot, cls: 'warrior', level: 10, rarity: 1 }, () => 0.5);
+    const high = makeItem({ slot, cls: 'warrior', level: 40, rarity: 1 }, () => 0.5);
+    setItemLevel(low, 40);
+    for (const [k, val] of Object.entries(high.stats)) assert.ok(Math.abs(low.stats[k] - val) <= Math.max(1, val * 0.03), `${slot} ${k}：${low.stats[k]} ≈ ${val}`);
+  }
+});
+
+test('商店購買強化石與升級石', () => {
+  const ch = hero();
+  ch.stones = {};
+  ch.gold = STONES.enhance.price + STONES.upgrade.price;
+  assert.ok(v.buyStone(ch, 'enhance').ok);
+  assert.ok(v.buyStone(ch, 'upgrade').ok);
+  assert.equal(v.buyStone(ch, 'enhance').ok, false, '金幣不足');
+  assert.deepEqual(ch.stones, { enhance: 1, upgrade: 1 });
+  assert.equal(ch.gold, 0);
 });
 
 test('擊敗 Boss 解鎖下一個深度與下一個區域；每個區域深度上限 5', () => {

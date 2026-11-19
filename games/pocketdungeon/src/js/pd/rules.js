@@ -1,6 +1,6 @@
 // 成長與裝備規則（純邏輯）：亂數、經驗曲線、角色屬性、傷害公式、怪物強度、裝備產生與強化、獎勵。
 
-import { CLASSES, MAX_LEVEL, MAX_DUNGEON_LEVEL, AREAS, MONSTERS, BOSSES, RARITIES, ACCESSORY_STATS, ITEM_NAMES, ENHANCE, EVOLVE, REBIRTH, STATUS, GEMS, GEM_RULES, WEAPON_HANDS, ONE_HAND_ATK } from './data.js';
+import { CLASSES, MAX_LEVEL, MAX_DUNGEON_LEVEL, AREAS, MONSTERS, BOSSES, RARITIES, ACCESSORY_STATS, ITEM_NAMES, ENHANCE, UPGRADE, EVOLVE, REBIRTH, STATUS, GEMS, GEM_RULES, WEAPON_HANDS, ONE_HAND_ATK } from './data.js';
 
 /**
  * 建立可重現的亂數產生器（mulberry32）。
@@ -353,6 +353,33 @@ export function rarityWeights(source, depth, rebirth = 0) {
 }
 
 /**
+ * 各部位基礎屬性的公式（基礎值 ＋ 每級成長 × 裝備等級，再乘稀有度倍率與 ±10% 隨機）：
+ * 武器攻擊（單手武器再乘 ONE_HAND_ATK）；副手、頭盔、鎧甲的防禦與 HP；鞋子的防禦與速度。飾品的屬性見 ACCESSORY_STATS。
+ */
+const SLOT_STATS = {
+  weapon: { atk: [3, 1.6] },
+  offhand: { def: [1, 0.65], hp: [6, 3.5] },
+  helmet: { def: [1, 0.45], hp: [4, 2.5] },
+  boots: { def: [0.5, 0.3], spd: [2, 0.15] },
+  armor: { def: [1.5, 0.9], hp: [8, 5] },
+};
+
+/**
+ * 某個屬性在某個裝備等級的基礎值（未乘稀有度與隨機）。
+ * @param {string} slot 部位。
+ * @param {string} key 屬性。
+ * @param {number} lv 裝備等級。
+ * @param {string} [type] 武器類型（單手武器攻擊較低）。
+ * @returns {number} 基礎值。
+ */
+function baseStat(slot, key, lv, type) {
+  if (slot === 'accessory') return ACCESSORY_STATS[key].base + ACCESSORY_STATS[key].per * lv;
+  const [b, per] = SLOT_STATS[slot][key];
+  const hand = slot === 'weapon' && WEAPON_HANDS[type] === 1 ? ONE_HAND_ATK : 1;
+  return (b + per * lv) * hand;
+}
+
+/**
  * 產生一件裝備。
  * 武器：單手武器的攻擊為雙手的 80%；鎧甲：防禦＋HP；頭盔：約鎧甲一半的防禦與 HP；鞋子：少量防禦＋速度；
  * 副手（盾牌，只能搭配單手武器）：防禦與 HP 約為鎧甲的 70%。
@@ -368,34 +395,18 @@ export function makeItem({ slot, cls, level, rarity, type: forceType }, rng) {
   if (slot === 'weapon') {
     const types = CLASSES[cls || 'warrior'].weapon;
     type = types.includes(forceType) ? forceType : pick(types, rng);
-    const hand = WEAPON_HANDS[type] === 1 ? ONE_HAND_ATK : 1;
-    stats.atk = Math.round((3 + 1.6 * lv) * mult * hand * (0.9 + rng() * 0.2));
-  } else if (slot === 'offhand') {
-    type = '盾牌';
-    stats.def = Math.round((1 + 0.65 * lv) * mult * (0.9 + rng() * 0.2));
-    stats.hp = Math.round((6 + 3.5 * lv) * mult * (0.9 + rng() * 0.2));
-  } else if (slot === 'helmet') {
-    type = '頭盔';
-    stats.def = Math.round((1 + 0.45 * lv) * mult * (0.9 + rng() * 0.2));
-    stats.hp = Math.round((4 + 2.5 * lv) * mult * (0.9 + rng() * 0.2));
-  } else if (slot === 'boots') {
-    type = '鞋子';
-    stats.def = Math.round((0.5 + 0.3 * lv) * mult * (0.9 + rng() * 0.2));
-    stats.spd = Math.round((2 + 0.15 * lv) * mult * (0.9 + rng() * 0.2));
-  } else if (slot === 'armor') {
-    type = '鎧甲';
-    stats.def = Math.round((1.5 + 0.9 * lv) * mult * (0.9 + rng() * 0.2));
-    stats.hp = Math.round((8 + 5 * lv) * mult * (0.9 + rng() * 0.2));
-  } else {
-    type = '飾品';
+  } else if (slot === 'accessory') type = '飾品';
+  else type = { offhand: '盾牌', helmet: '頭盔', boots: '鞋子', armor: '鎧甲' }[slot];
+  if (slot === 'accessory') {
     const keys = Object.keys(ACCESSORY_STATS);
     const count = rarity >= 2 ? 2 : 1;
     while (Object.keys(stats).length < count) {
       // 只從尚未選到的屬性中挑（不會重複，也不會因亂數固定而一直挑到同一個）。
       const k = pick(keys.filter((key) => !(key in stats)), rng);
-      const a = ACCESSORY_STATS[k];
-      stats[k] = Math.round((a.base + a.per * lv) * mult);
+      stats[k] = Math.round(baseStat(slot, k, lv, type) * mult);
     }
+  } else {
+    for (const k of Object.keys(SLOT_STATS[slot])) stats[k] = Math.round(baseStat(slot, k, lv, type) * mult * (0.9 + rng() * 0.2));
   }
   const name = ITEM_NAMES[type][Math.min(3, rarity)];
   const id = `${Date.now().toString(36)}${Math.floor(rng() * 1e9).toString(36)}`;
@@ -451,7 +462,7 @@ export function enhanceCost(item) {
 }
 
 /**
- * 嘗試強化裝備：+6 起有失敗機率，失敗時不降級，只失去金幣。
+ * 嘗試強化裝備：+6 起有失敗機率，失敗時不降級（消耗的強化石與金幣由呼叫端處理）。
  * @param {object} item 裝備（成功時會被修改）。
  * @param {() => number} rng 亂數函式。
  * @returns {boolean} 是否成功。
@@ -462,6 +473,54 @@ export function tryEnhance(item, rng) {
   if (rng() < fail) return false;
   item.enhance++;
   return true;
+}
+
+/**
+ * 強化到下一級要消耗的強化石數。
+ * @param {object} item 裝備。
+ * @returns {number} 強化石數；已達上限時為 Infinity。
+ */
+export function enhanceStones(item) {
+  if (item.enhance >= ENHANCE.max) return Infinity;
+  return ENHANCE.stones[item.enhance + 1];
+}
+
+/**
+ * 升級後的裝備等級：一次往上 UPGRADE.step 級，最高到 cap（角色目前的等級）。
+ * @param {object} item 裝備。
+ * @param {number} cap 等級上限。
+ * @returns {number} 新等級；已達上限時與目前等級相同。
+ */
+export function upgradeTarget(item, cap) {
+  return Math.max(item.level, Math.min(cap, item.level + UPGRADE.step));
+}
+
+/**
+ * 升級一次的費用（升級石與金幣，依目前的裝備等級）。
+ * @param {object} item 裝備。
+ * @returns {{stones: number, gold: number}} 費用。
+ */
+export function upgradeCost(item) {
+  return { stones: 1 + Math.floor(item.level / UPGRADE.stonePer), gold: UPGRADE.gold + item.level * UPGRADE.goldPer };
+}
+
+/**
+ * 把裝備升到新等級：每個基礎屬性加上新舊等級公式的差（乘稀有度倍率與原本的隨機浮動），強化值、寶石與附帶的異常狀態不變。
+ * @param {object} item 裝備（會被修改）。
+ * @param {number} lv 新等級（不低於目前等級）。
+ */
+export function setItemLevel(item, lv) {
+  const to = Math.max(item.level, Math.round(lv));
+  if (to === item.level) return;
+  const mult = RARITIES[item.rarity].mult;
+  for (const [k, v] of Object.entries(item.stats)) {
+    const from = baseStat(item.slot, k, item.level, item.type) * mult;
+    const next = baseStat(item.slot, k, to, item.type) * mult;
+    // 原本的隨機浮動（約 0.9～1.1）由目前數值推回，只把增加的部分乘上去；數值太小（< 20）時捨入誤差太大，當成 1。
+    const roll = from >= 20 ? Math.min(1.1, Math.max(0.9, v / from)) : 1;
+    item.stats[k] = Math.max(v, Math.round(v + (next - from) * roll));
+  }
+  item.level = to;
 }
 
 /**
