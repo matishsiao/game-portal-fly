@@ -847,6 +847,20 @@ function gemArt() {
   return out;
 }
 
+/** 各部位裝備的預設圖示（ITEM_ART 的鍵）。 */
+export const SLOT_ICONS = { weapon: 'sword', offhand: 'shield', helmet: 'helmet', armor: 'armor', boots: 'boots', accessory: 'ring' };
+
+/**
+ * 裝備的圖示：武器依類型（劍與騎士劍、斧、弓弩、法杖、匕首、拳套、長槍），其他依部位。
+ * 背包格子與地城掉在地上的裝備共用，讓不同裝備一眼就能分辨。
+ * @param {object} item 裝備。
+ * @returns {string} 圖示名稱（ITEM_ART 的鍵）。
+ */
+export function itemIconName(item) {
+  if (item.slot === 'weapon') return { 劍: 'sword', 斧: 'axe', 弓: 'bow', 弩: 'bow', 法杖: 'staff', 魔杖: 'staff', 匕首: 'dagger', 雙匕: 'daggers', 拳套: 'fist', 騎士劍: 'sword', 長槍: 'spear' }[item.type] || 'sword';
+  return SLOT_ICONS[item.slot] || 'bag';
+}
+
 /**
  * 取得道具圖。
  * @param {string} name 名稱。

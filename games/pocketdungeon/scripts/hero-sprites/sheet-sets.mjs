@@ -69,8 +69,8 @@ export const DUNGEON_THEMES = ['moss', 'lava', 'ice', 'grass', 'sky', 'necro', '
 export const SETS = {
   drops: {
     dir: 'design/items', out: 'src/js/pd/itemSprites.js', name: 'ITEM_SPRITES', source: 'item', density: 2, colors: 14,
-    // 強化石與升級石（新道具，沒有手寫圖）放在另一張設計圖，原本 5 張的排列不變。
-    sizes: { enhanceStone: [16, 16], upgradeStone: [16, 16] },
+    // 強化石與升級石（新道具，沒有手寫圖）放在另一張設計圖，原本 5 張的排列不變；尺寸與寶石（8×7）相近，掉在地上才不會比其他道具大。
+    sizes: { enhanceStone: [8, 8], upgradeStone: [8, 8] },
     sheets: [...chunk(DROPS, 8).map((keys, i) => ({ file: `drops-${i + 1}.png`, keys, cols: 4 })), { file: 'drops-6.png', keys: ['enhanceStone', 'upgradeStone'], cols: 2 }],
   },
   homeIcons: {

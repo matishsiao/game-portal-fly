@@ -3,7 +3,7 @@
 
 import { AREAS, RARITIES, STATUS } from './data.js';
 import { WALL, STAIRS, SPIKES, walkable } from './dungeon.js';
-import { heroArt, monsterArt, itemArt } from './sprites.js';
+import { heroArt, monsterArt, itemArt, itemIconName } from './sprites.js';
 import { PROP_SPRITES } from './propSprites.js';
 import { DUNGEON_TILES } from './dungeonTiles.js';
 import { drawTerrain } from './terrain.js';
@@ -2469,7 +2469,7 @@ export class Renderer {
     }
     for (const it of world.pickups) {
       const bob = Math.round(Math.sin(world.time * 5 + it.x) * 1);
-      const name = it.kind === 'gem' ? `gem-${it.gem.split('-')[0]}` : it.kind === 'mat' ? it.mat : it.kind === 'homeMat' ? `hm-${it.mat}` : it.kind === 'stone' ? `${it.stone}Stone` : { gold: 'coin', potion: 'potion', cure: 'cure', bagExpand: 'pouch', book: 'book', skillBook: 'skillbook', recipe: 'blueprint', seed: 'seedBag', meat: 'meat' }[it.kind] || 'bag';
+      const name = it.kind === 'item' ? itemIconName(it.item) : it.kind === 'gem' ? `gem-${it.gem.split('-')[0]}` : it.kind === 'mat' ? it.mat : it.kind === 'homeMat' ? `hm-${it.mat}` : it.kind === 'stone' ? `${it.stone}Stone` : { gold: 'coin', potion: 'potion', cure: 'cure', bagExpand: 'pouch', book: 'book', skillBook: 'skillbook', recipe: 'blueprint', seed: 'seedBag', meat: 'meat' }[it.kind] || 'bag';
       const img = itemArt(name);
       // 高密度的道具圖（density）以實際大小（世界像素）繪製。
       const iw = (img.width / (img.density || 1)) * PICKUP_SCALE;

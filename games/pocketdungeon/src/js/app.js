@@ -6,7 +6,7 @@ import { CLASSES, CLASS_KEYS, AREAS, AREA_KEYS, RARITIES, LIMITS, EQUIP_SLOTS, I
 import { xpToNext, characterStats, speedProfile, describeStats, sellPrice, enhanceCost, enhanceStones, upgradeTarget, upgradeCost, levelCap, gemName, gemEffect, parseGem, socketCount, statusText, gemBonus, itemStats, weaponHands, dungeonLevel, powerScore } from './pd/rules.js';
 import { World } from './pd/world.js';
 import { Renderer } from './pd/render.js';
-import { heroDataUrl, itemDataUrl, monsterDataUrl, itemArt } from './pd/sprites.js';
+import { heroDataUrl, itemDataUrl, monsterDataUrl, itemArt, itemIconName, SLOT_ICONS } from './pd/sprites.js';
 import * as village from './pd/village.js';
 import * as skills from './pd/skills.js';
 import * as home from './pd/home.js';
@@ -1892,16 +1892,6 @@ function bagPanel(ch) {
 }
 
 /**
- * 裝備的格子圖示：武器依類型（劍與騎士劍、斧、弓弩、法杖、匕首、拳套、長槍），其他依部位。
- * @param {object} item 裝備。
- * @returns {string} 圖示名稱（ITEM_ART 的鍵）。
- */
-function itemIconName(item) {
-  if (item.slot === 'weapon') return { 劍: 'sword', 斧: 'axe', 弓: 'bow', 弩: 'bow', 法杖: 'staff', 魔杖: 'staff', 匕首: 'dagger', 雙匕: 'daggers', 拳套: 'fist', 騎士劍: 'sword', 長槍: 'spear' }[item.type] || 'sword';
-  return SLOT_ICONS[item.slot];
-}
-
-/**
  * 一件裝備的背包格子：圖示、稀有度外框、強化值與鑲嵌的寶石色點；比目前穿的更好時高亮。
  * @param {object} it 裝備。
  * @param {string} key 點擊時的代碼。
@@ -2196,8 +2186,6 @@ async function openSharedCell(ch, id) {
 }
 
 /** 裝備欄格子的圖示（依部位）。 */
-const SLOT_ICONS = { weapon: 'sword', offhand: 'shield', helmet: 'helmet', armor: 'armor', boots: 'boots', accessory: 'ring' };
-
 /**
  * 人物裝備圖：角色在中間，頭盔、飾品 1、飾品 2 在上排，武器與副手在左右，鎧甲與鞋子在下排。
  * 拿雙手武器時副手格顯示「雙手武器佔用」。
