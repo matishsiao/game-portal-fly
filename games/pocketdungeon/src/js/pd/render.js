@@ -1,7 +1,7 @@
 // 畫面繪製：把 World 的狀態畫到 canvas。內部單位為像素（1 格 = 16 像素），以整數倍放大、不平滑。
 // 只讀取 World 的狀態，不修改遊戲邏輯。
 
-import { AREAS, RARITIES, STATUS } from './data.js';
+import { AREAS, RARITIES, STATUS, WEAPON_HANDS } from './data.js';
 import { WALL, STAIRS, SPIKES, walkable } from './dungeon.js';
 import { heroArt, monsterArt, itemArt, itemIconName } from './sprites.js';
 import { PROP_SPRITES } from './propSprites.js';
@@ -10,6 +10,103 @@ import { drawTerrain } from './terrain.js';
 
 /** 一格的像素數。 */
 const T = 16;
+
+/** 裝備光暈的範圍（角色圖像素，密度 4 時約 2 世界像素）。 */
+const GLOW_R = 8;
+
+/**
+ * 一件裝備的光暈顏色與強度：傳說裝備為金色，強化值愈高愈亮；其他稀有度沒有光暈（見 drawHeroGlow：全身都是傳說才發光）。
+ * @param {object | null | undefined} item 裝備。
+ * @returns {[number, number, number, number] | null} [r, g, b, 透明度]；沒有光暈時為 null。
+ */
+function itemGlow(item) {
+  if (!item || item.rarity < 3) return null;
+  const hex = RARITIES[item.rarity].color;
+  return [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).concat(Math.min(1, 0.75 + (item.enhance || 0) * 0.025));
+}
+
+/** 光暈圖的快取：角色圖 → (方向與顏色組合 → 畫布)。 */
+const glowCache = new WeakMap();
+
+/**
+ * 產生角色圖外圍的裝備光暈（只畫在角色外面，往外漸淡；各部位的亮度依該部位裝備的強化值）：依位置分區上色——頭部為頭盔、軀幹中段為鎧甲、腳部為鞋子，
+ * 軀幹兩側伸出去的部分為武器與盾牌（正面時武器在圖的左邊、背面與側面在右邊，盾牌在另一邊）。
+ * 畫布四周多留 GLOW_R 像素。
+ * @param {HTMLCanvasElement} img 角色圖。
+ * @param {string} dir 方向（down、up、side）。
+ * @param {Record<string, [number, number, number, number] | null>} zones 各部位的光暈（helmet、armor、boots、weapon、offhand）。
+ * @param {string} key 快取鍵（顏色組合）。
+ * @returns {HTMLCanvasElement} 光暈畫布（帶 pad 屬性）。
+ */
+function glowArt(img, dir, zones, key) {
+  let m = glowCache.get(img);
+  if (!m) glowCache.set(img, (m = new Map()));
+  const ck = `${dir}|${key}`;
+  if (m.has(ck)) return m.get(ck);
+  const R = GLOW_R;
+  const w = img.width, h = img.height, W = w + R * 2, H = h + R * 2;
+  const src = img.getContext ? img.getContext('2d').getImageData(0, 0, w, h).data : null;
+  const out = document.createElement('canvas');
+  out.width = W;
+  out.height = H;
+  out.pad = R;
+  if (!src) return out;
+  // 角色的不透明範圍（決定分區）。
+  let top = h, bot = -1, left = w, right = -1;
+  const solid = new Uint8Array(W * H);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    if (src[(y * w + x) * 4 + 3] < 128) continue;
+    solid[(y + R) * W + x + R] = 1;
+    if (y < top) top = y; if (y > bot) bot = y; if (x < left) left = x; if (x > right) right = x;
+  }
+  if (bot < 0) return out;
+  // 每個透明像素到角色的距離（只算到 R），由近到遠逐圈往外擴。
+  const dist = new Uint8Array(W * H).fill(255);
+  let ring = [];
+  for (let i = 0; i < W * H; i++) if (solid[i]) { dist[i] = 0; ring.push(i); }
+  for (let d = 1; d <= R; d++) {
+    const next = [];
+    for (const i of ring) {
+      const x = i % W, y = (i / W) | 0;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]]) {
+        const nx = x + dx, ny = y + dy;
+        if (nx < 0 || ny < 0 || nx >= W || ny >= H) continue;
+        const n = ny * W + nx;
+        if (dist[n] !== 255) continue;
+        dist[n] = d;
+        next.push(n);
+      }
+    }
+    ring = next;
+  }
+  const g = out.getContext('2d');
+  const data = g.createImageData(W, H);
+  const bh = bot - top + 1;
+  const cx = (left + right) / 2 + R;
+  const half = Math.max(4, (right - left + 1) * 0.18);
+  const weaponLeft = dir === 'down';
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const i = y * W + x;
+    const d = dist[i];
+    if (!d || d === 255) continue;
+    const fy = (y - R - top) / bh;
+    let z;
+    if (fy < 0.3) z = 'helmet';
+    else if (fy > 0.8) z = 'boots';
+    else if (Math.abs(x - cx) <= half) z = 'armor';
+    else z = (x < cx) === weaponLeft ? 'weapon' : 'offhand';
+    const c = zones[z];
+    if (!c) continue;
+    const k = i * 4;
+    data.data[k] = c[0];
+    data.data[k + 1] = c[1];
+    data.data[k + 2] = c[2];
+    data.data[k + 3] = Math.round(255 * c[3] * (1 - (d - 1) / R) ** 1.2);
+  }
+  g.putImageData(data, 0, 0);
+  m.set(ck, out);
+  return out;
+}
 /** 普通攻擊的出手動畫長度（秒，與 World.playerAttack 設定的 attackAnim 相同）。 */
 const ATTACK_TIME = 0.24;
 /** 地城中角色圖的目標顯示密度（每個世界像素約 1.45 個圖像素，角色約 1.4 格高）；實際值依放大倍率取能整除的值（Renderer.heroDensity）。 */
@@ -2129,9 +2226,40 @@ export class Renderer {
     this.drawFx(dt);
     this.drawLighting(world);
     this.drawEmissive();
+    this.drawHeroGlow(world);
     this.drawFog(world);
     this.drawScreenFlash(dt);
     if (this.frame % 6 === 0) this.drawMinimap(world);
+  }
+
+  /**
+   * 角色的裝備光暈：頭盔、鎧甲、鞋子、武器與盾牌（拿雙手武器時不需要盾牌）全部是傳說時，全身發出金色光暈，
+   * 各部位依自己的強化值愈高愈亮，緩慢脈動。
+   * 在光照層之後以加亮混合畫在角色外圍，位置與角色圖完全對齊（含翻轉、伸縮與傾斜）。
+   * @param {object} world 探險。
+   */
+  drawHeroGlow(world) {
+    const h = this.heroGlow;
+    this.heroGlow = null;
+    if (!h) return;
+    const eq = h.eq || {};
+    // 全身都是傳說才發光：頭盔、鎧甲、鞋子、武器與盾牌（拿雙手武器時不需要盾牌）。
+    const twoHanded = eq.weapon && WEAPON_HANDS[eq.weapon.type] === 2;
+    const zones = { helmet: itemGlow(eq.helmet), armor: itemGlow(eq.armor), boots: itemGlow(eq.boots), weapon: itemGlow(eq.weapon), offhand: itemGlow(eq.offhand) };
+    if (twoHanded) zones.offhand = zones.weapon;
+    const parts = Object.values(zones);
+    if (!parts.every(Boolean)) return;
+    const key = parts.map((c) => (c ? c.join(',') : '-')).join('|');
+    const art = glowArt(h.img, h.dir, zones, key);
+    const g = this.ctx;
+    // 光暈緩慢脈動。
+    const pulse = 0.8 + 0.2 * Math.sin(world.time * 3);
+    g.save();
+    g.globalCompositeOperation = 'lighter';
+    g.globalAlpha = h.alpha * pulse;
+    // 光暈圖四周多 pad 像素：底邊往下移 pad，寬度置中不變。
+    this.sprite(art, h.x, h.y + art.pad / h.dens / T, h.flip, 1, h.bob, h.sy, h.dens, h.tilt);
+    g.restore();
   }
 
   /**
@@ -2587,6 +2715,8 @@ export class Renderer {
         const dens = (this.heroDensity || 2) * (art.density / 2);
         if (!hidden) this.sprite(img, px / T, py / T + art.foot / dens / T, flip, 1, bob, sy, dens, tilt);
         g.globalAlpha = 1;
+        // 裝備光暈：光照之後再畫（見 drawHeroGlow），暗處也看得到。
+        this.heroGlow = hidden ? null : { img, dir, x: px / T, y: py / T + art.foot / dens / T, flip, bob, sy, dens, tilt, alpha: p.dodgeT > 0 ? 0.55 : 1, eq: world.ch.equipped };
         this.drawPlayerAuras(world);
         const head = Math.round(p.y * T + 5 - art.standH / dens);
         this.statusMarks(world, p.x * T, head - 16, p.status);
