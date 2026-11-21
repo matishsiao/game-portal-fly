@@ -2,8 +2,8 @@
 
 import * as store from './storage.js';
 import { trackPlay, guardFreeze } from './playlog.js';
-import { CLASSES, CLASS_KEYS, AREAS, AREA_KEYS, RARITIES, LIMITS, EQUIP_SLOTS, ITEM_SLOTS, BAG_EXPAND, EVOLVE, SHARED_SLOTS, REBIRTH, STATUS, GEMS, GEM_RULES, MATERIALS, CRAFT, WEAPON_HANDS, BOSSES, GIFT, TICKET, FLOORS, STONES, ENHANCE, UPGRADE } from './pd/data.js';
-import { xpToNext, characterStats, speedProfile, describeStats, sellPrice, enhanceCost, enhanceStones, upgradeTarget, upgradeCost, levelCap, gemName, gemEffect, parseGem, socketCount, statusText, gemBonus, itemStats, weaponHands, dungeonLevel, powerScore } from './pd/rules.js';
+import { CLASSES, CLASS_KEYS, AREAS, AREA_KEYS, RARITIES, LIMITS, EQUIP_SLOTS, ITEM_SLOTS, BAG_EXPAND, EVOLVE, SHARED_SLOTS, REBIRTH, STATUS, GEMS, GEM_RULES, MATERIALS, CRAFT, WEAPON_HANDS, BOSSES, GIFT, TICKET, FLOORS, STONES, ENHANCE, UPGRADE, VARIANT_STYLE_NAMES } from './pd/data.js';
+import { xpToNext, characterStats, speedProfile, describeStats, sellPrice, enhanceCost, enhanceStones, upgradeTarget, upgradeCost, levelCap, gemName, gemEffect, parseGem, socketCount, statusText, gemBonus, itemStats, weaponHands, dungeonLevel, powerScore, variantOf } from './pd/rules.js';
 import { World } from './pd/world.js';
 import { Renderer } from './pd/render.js';
 import { heroDataUrl, itemDataUrl, monsterDataUrl, itemArt, itemIconName, SLOT_ICONS } from './pd/sprites.js';
@@ -168,8 +168,11 @@ function itemTitle(item) {
  */
 function itemHtml(item) {
   const extra = item.status ? `<span class="item-stats status-line">附帶：${statusText(item.status)}</span>` : '';
+  // 款式的屬性特色（經典款不顯示）。
+  const v = variantOf(item.type, item.variant);
+  const style = v ? `<span class="item-stats muted">款式特色：${VARIANT_STYLE_NAMES[v.style] || v.style}</span>` : '';
   const hands = weaponHands(item) ? `（${weaponHands(item) === 2 ? '雙手' : '單手'}）` : '';
-  return `<div class="item-main">${itemTitle(item)}<span class="item-stats">${ITEM_SLOTS[item.slot]}${hands}・${describeStats(item)}</span>${extra}${socketsHtml(item)}</div>`;
+  return `<div class="item-main">${itemTitle(item)}<span class="item-stats">${ITEM_SLOTS[item.slot]}${hands}・${describeStats(item)}</span>${style}${extra}${socketsHtml(item)}</div>`;
 }
 
 /**
@@ -1807,7 +1810,7 @@ function gemPanel(ch) {
   const fusable = owned.some(([key, n]) => n >= GEM_RULES.fuse && !GEMS[parseGem(key).kind].active && parseGem(key).tier < GEM_RULES.max);
   return `<div class="bag-head"><h3>寶石袋 <small class="muted">（點寶石查看效果與合成）</small></h3>${fusable ? '<button type="button" class="expand-btn ready" data-fuse-all="1"><span><b>全部合成</b><small>合成到最高等級</small></span></button>' : ''}</div>${pouch}
     <h3>鑲嵌 <small class="muted">（點「＋」鑲嵌，點寶石取下）</small></h3>${cards}
-    <p class="muted small">普通與精良裝備 1 孔、稀有與傳說 2 孔。持續型寶石 ${GEM_RULES.fuse} 顆同級可合成高一級（Ⅰ～Ⅴ，效果 5%～15%）；寶石的吸血合計最多 ${GEM_RULES.leechCap}%。主動寶石在地城以按鈕使用，同種只算一個、最多 ${GEM_RULES.actives} 個按鈕。取下寶石免費，寶石不會損壞。</p>`;
+    <p class="muted small">普通與精良裝備 1 孔、稀有與傳說 2 孔。持續型寶石 ${GEM_RULES.fuse} 顆同級可合成高一級（Ⅰ～Ⅴ，效果 5%～15%）；寶石的吸血合計最多 ${GEM_RULES.leechCap}%。主動寶石在地城以按鈕使用，同種只算一個、最多 ${GEM_RULES.actives} 個按鈕。附魔石（毒、眠、雷）只能鑲在武器上，普通攻擊命中時有機率使敵人中毒、睡眠或暈眩（同種最多 ${GEM_RULES.enchantCap}%），也可以合成。取下寶石免費，寶石不會損壞。</p>`;
 }
 
 /**
@@ -1838,7 +1841,7 @@ const TIER_MARK = ['Ⅰ', 'Ⅱ', 'Ⅲ', 'Ⅳ', 'Ⅴ'];
 function gemCell(key, n, attrs, label = false) {
   const g = parseGem(key);
   const d = GEMS[g.kind];
-  return `<button type="button" class="gem-cell" style="--gem:${d.color}" ${attrs} aria-label="${gemName(key)}${n ? ` ×${n}` : ''}">${gemIconImg(key)}<b class="cell-tier">${d.active ? '主' : TIER_MARK[g.tier - 1]}</b>${n ? `<b class="cell-count">${n}</b>` : ''}${label ? `<small class="gem-label">${d.active ? d.label : `${d.stat} +${d.values[g.tier - 1]}%`}</small>` : ''}</button>`;
+  return `<button type="button" class="gem-cell" style="--gem:${d.color}" ${attrs} aria-label="${gemName(key)}${n ? ` ×${n}` : ''}">${gemIconImg(key)}<b class="cell-tier">${d.active ? '主' : TIER_MARK[g.tier - 1]}</b>${n ? `<b class="cell-count">${n}</b>` : ''}${label ? `<small class="gem-label">${d.active ? d.label : `${d.stat}${d.enchant ? " " : " +"}${d.values[g.tier - 1]}%`}</small>` : ''}</button>`;
 }
 
 /**
@@ -2399,7 +2402,9 @@ function effectsHtml(ch) {
   const pb = skills.passiveBonus(ch);
 
   const cap = GEM_RULES.leechCap;
-  const weapon = ch.equipped.weapon && ch.equipped.weapon.status ? statusText(ch.equipped.weapon.status) : '<span class="muted">—</span>';
+  // 武器本身的異常，加上武器上的附魔石。
+  const procs = [ch.equipped.weapon && ch.equipped.weapon.status && statusText(ch.equipped.weapon.status), ...Object.entries(gem.enchant || {}).map(([k, v]) => statusText([k, v / 100]))].filter(Boolean);
+  const weapon = procs.length ? procs.join('、') : '<span class="muted">—</span>';
   const actives = gem.actives.length ? gem.actives.map((k) => GEMS[k].label).join('、') : '<span class="muted">—</span>';
   // 整體效果以小標籤呈現：數值為主，來源可從屬性方塊查看。
   const chip = (name, value, extra = '') => `<span class="fx-chip"><small>${name}</small><b>${value}</b>${extra}</span>`;

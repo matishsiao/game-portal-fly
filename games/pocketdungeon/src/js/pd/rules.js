@@ -1,6 +1,6 @@
 // 成長與裝備規則（純邏輯）：亂數、經驗曲線、角色屬性、傷害公式、怪物強度、裝備產生與強化、獎勵。
 
-import { CLASSES, MAX_LEVEL, MAX_DUNGEON_LEVEL, AREAS, MONSTERS, BOSSES, RARITIES, ACCESSORY_STATS, ITEM_NAMES, ENHANCE, UPGRADE, EVOLVE, REBIRTH, STATUS, GEMS, GEM_RULES, WEAPON_HANDS, ONE_HAND_ATK } from './data.js';
+import { CLASSES, MAX_LEVEL, MAX_DUNGEON_LEVEL, AREAS, MONSTERS, BOSSES, RARITIES, ACCESSORY_STATS, ITEM_NAMES, ITEM_VARIANTS, VARIANT_STYLES, VARIANT_CHANCE, ENHANCE, UPGRADE, EVOLVE, REBIRTH, STATUS, GEMS, GEM_RULES, WEAPON_HANDS, ONE_HAND_ATK } from './data.js';
 
 /**
  * 建立可重現的亂數產生器（mulberry32）。
@@ -99,7 +99,7 @@ export function powerScore(s) {
  * @param {object[]} [equipped=[]] 穿戴中的裝備。
  * @param {number} [rebirth=0] 轉職次數（決定起始屬性）。
  * @param {{hpPct?: number, atkPct?: number, defPct?: number, spd?: number}} [passive={}] 被動技能的加成（百分比與飾品、寶石相加）。
- * @returns {{hp: number, atk: number, def: number, spd: number, goldPct: number, xpPct: number, leech: number, actives: string[]}} 屬性（四捨五入到整數）、吸血（%）與主動寶石。
+ * @returns {{hp: number, atk: number, def: number, spd: number, goldPct: number, xpPct: number, leech: number, actives: string[], enchant: Record<string, number>}} 屬性（四捨五入到整數）、吸血（%）、主動寶石與附魔石的異常機率（%）。
  */
 export function characterStats(cls, level, equipped = [], rebirth = 0, passive = {}) {
   const c = CLASSES[cls];
@@ -129,6 +129,7 @@ export function characterStats(cls, level, equipped = [], rebirth = 0, passive =
     xpPct: pct.xpPct,
     leech: Math.min(GEM_RULES.leechCap, gem.leech),
     actives: gem.actives,
+    enchant: gem.enchant,
   };
 }
 
@@ -176,6 +177,7 @@ export function gemEffect(key) {
   const d = GEMS[g.kind];
   if (g.kind === 'shield') return `${d.label}：護盾量為最大 HP 的 ${Math.round(d.pct * 100)}%，持續 ${d.dur} 秒，冷卻 ${d.cd} 秒`;
   if (g.kind === 'ward') return `${d.label}：${d.dur} 秒內不受異常狀態影響，冷卻 ${d.cd} 秒`;
+  if (d.enchant) return `普通攻擊命中時 ${d.values[g.tier - 1]}% 機率使敵人${STATUS[d.enchant].name}（只能鑲在武器上）`;
   return `${d.stat} +${d.values[g.tier - 1]}%${g.kind === 'leech' ? '（造成傷害的比例回復 HP）' : ''}`;
 }
 
@@ -189,18 +191,22 @@ export function socketCount(item) {
 }
 
 /**
- * 穿戴中裝備的寶石加成：持續型寶石的百分比加總，以及主動寶石的種類（同種只算一個，最多 2 個）。
+ * 穿戴中裝備的寶石加成：持續型寶石的百分比加總、主動寶石的種類（同種只算一個，最多 2 個），以及武器上附魔石的異常機率。
  * @param {object[]} equipped 穿戴中的裝備。
- * @returns {{atk: number, hp: number, def: number, spd: number, leech: number, actives: string[]}} 加成（%）與主動寶石。
+ * @returns {{atk: number, hp: number, def: number, spd: number, leech: number, actives: string[], enchant: Record<string, number>}} 加成（%）、主動寶石與附魔石的異常機率（%，依狀態）。
  */
 export function gemBonus(equipped) {
-  const out = { atk: 0, hp: 0, def: 0, spd: 0, leech: 0, actives: [] };
+  const out = { atk: 0, hp: 0, def: 0, spd: 0, leech: 0, actives: [], enchant: {} };
   for (const item of equipped) {
     if (!item || !Array.isArray(item.gems)) continue;
     for (const key of item.gems) {
       const g = parseGem(key);
       if (!g) continue;
-      if (GEMS[g.kind].active) {
+      const d = GEMS[g.kind];
+      if (d.enchant) {
+        // 附魔石只在武器上有效；同種相加，最多 enchantCap%。
+        if (item.slot === 'weapon') out.enchant[d.enchant] = Math.min(GEM_RULES.enchantCap, (out.enchant[d.enchant] || 0) + d.values[g.tier - 1]);
+      } else if (GEMS[g.kind].active) {
         if (!out.actives.includes(g.kind) && out.actives.length < GEM_RULES.actives) out.actives.push(g.kind);
       } else out[g.kind] += GEMS[g.kind].values[g.tier - 1];
     }
@@ -211,7 +217,7 @@ export function gemBonus(equipped) {
 }
 
 /**
- * 隨機決定掉落的寶石：主動寶石 6%；持續型寶石的等級依地城等級，愈深愈容易出現 2、3 級。
+ * 隨機決定掉落的寶石：主動寶石 6%；其餘有 15% 是附魔石；持續型寶石與附魔石的等級依地城等級，愈深愈容易出現 2、3 級。
  * @param {number} level 地城等級。
  * @param {() => number} rng 亂數函式。
  * @param {number} [bonus=0] 等級加成（Boss、進化 Boss 用）。
@@ -219,7 +225,9 @@ export function gemBonus(equipped) {
  */
 export function rollGem(level, rng, bonus = 0) {
   if (rng() < GEM_RULES.activeChance) return rng() < 0.5 ? 'shield-1' : 'ward-1';
-  const kinds = Object.keys(GEMS).filter((k) => !GEMS[k].active);
+  // 附魔石 enchantChance，其餘為持續型寶石。
+  const enchant = rng() < GEM_RULES.enchantChance;
+  const kinds = Object.keys(GEMS).filter((k) => !GEMS[k].active && !!GEMS[k].enchant === enchant);
   const kind = pick(kinds, rng);
   const r = rng();
   const t3 = Math.min(0.15, Math.max(0, (level - 25) / 100));
@@ -365,18 +373,37 @@ const SLOT_STATS = {
 };
 
 /**
+ * 裝備款式的資料：名稱、特色代碼與特色（主屬性倍率 mod、額外屬性 extra）。
+ * @param {string} type 裝備類型（ITEM_VARIANTS 的鍵）。
+ * @param {string} [key] 款式代碼；省略或找不到時為 null（經典款）。
+ * @returns {{key: string, name: string, style: string, mod: Record<string, number>, extra: Record<string, number>} | null} 款式。
+ */
+export function variantOf(type, key) {
+  if (!key) return null;
+  const row = (ITEM_VARIANTS[type] || []).find((v) => v[0] === key);
+  if (!row) return null;
+  const group = type === '飾品' ? 'accessory' : type === '鞋子' ? 'boots' : ['盾牌', '頭盔', '鎧甲'].includes(type) ? 'armor' : 'weapon';
+  const st = VARIANT_STYLES[group][row[2]] || {};
+  return { key: row[0], name: row[1], style: row[2], mod: st.mod || {}, extra: st.extra || {} };
+}
+
+/**
  * 某個屬性在某個裝備等級的基礎值（未乘稀有度與隨機）。
+ * 部位本身沒有的屬性（款式的額外屬性）以飾品同屬性的數值計算；款式的特色倍率也乘在這裡，升級時依同一個公式換算。
  * @param {string} slot 部位。
  * @param {string} key 屬性。
  * @param {number} lv 裝備等級。
  * @param {string} [type] 武器類型（單手武器攻擊較低）。
+ * @param {string} [variant] 款式代碼。
  * @returns {number} 基礎值。
  */
-function baseStat(slot, key, lv, type) {
-  if (slot === 'accessory') return ACCESSORY_STATS[key].base + ACCESSORY_STATS[key].per * lv;
+function baseStat(slot, key, lv, type, variant) {
+  const v = variantOf(type, variant);
+  const own = slot !== 'accessory' && SLOT_STATS[slot] && key in SLOT_STATS[slot];
+  if (!own) return (ACCESSORY_STATS[key].base + ACCESSORY_STATS[key].per * lv) * ((v && v.extra[key]) || 1);
   const [b, per] = SLOT_STATS[slot][key];
   const hand = slot === 'weapon' && WEAPON_HANDS[type] === 1 ? ONE_HAND_ATK : 1;
-  return (b + per * lv) * hand;
+  return (b + per * lv) * hand * ((v && v.mod[key]) || 1);
 }
 
 /**
@@ -387,7 +414,7 @@ function baseStat(slot, key, lv, type) {
  * @param {() => number} rng 亂數函式。
  * @returns {object} 裝備 {id, slot, type, name, level, rarity, enhance, stats, gems, status?}。
  */
-export function makeItem({ slot, cls, level, rarity, type: forceType }, rng) {
+export function makeItem({ slot, cls, level, rarity, type: forceType, variant: forceVariant }, rng) {
   const mult = RARITIES[rarity].mult;
   const lv = Math.max(1, Math.round(level));
   const stats = {};
@@ -397,20 +424,30 @@ export function makeItem({ slot, cls, level, rarity, type: forceType }, rng) {
     type = types.includes(forceType) ? forceType : pick(types, rng);
   } else if (slot === 'accessory') type = '飾品';
   else type = { offhand: '盾牌', helmet: '頭盔', boots: '鞋子', armor: '鎧甲' }[slot];
+  // 款式：指定的款式，或依 VARIANT_CHANCE 從 5 種款式中隨機挑一種（其餘為依稀有度命名的經典款）。
+  const variants = ITEM_VARIANTS[type] || [];
+  let v = variantOf(type, forceVariant);
+  if (!v && forceVariant === undefined && variants.length && rng() < VARIANT_CHANCE) v = variantOf(type, pick(variants, rng)[0]);
+  const vk = v ? v.key : undefined;
   if (slot === 'accessory') {
     const keys = Object.keys(ACCESSORY_STATS);
     const count = rarity >= 2 ? 2 : 1;
+    // 飾品款式保證出現它的屬性。
+    for (const k of Object.keys(v ? v.extra : {})) stats[k] = Math.round(baseStat(slot, k, lv, type, vk) * mult);
     while (Object.keys(stats).length < count) {
       // 只從尚未選到的屬性中挑（不會重複，也不會因亂數固定而一直挑到同一個）。
       const k = pick(keys.filter((key) => !(key in stats)), rng);
-      stats[k] = Math.round(baseStat(slot, k, lv, type) * mult);
+      stats[k] = Math.round(baseStat(slot, k, lv, type, vk) * mult);
     }
   } else {
-    for (const k of Object.keys(SLOT_STATS[slot])) stats[k] = Math.round(baseStat(slot, k, lv, type) * mult * (0.9 + rng() * 0.2));
+    for (const k of Object.keys(SLOT_STATS[slot])) stats[k] = Math.round(baseStat(slot, k, lv, type, vk) * mult * (0.9 + rng() * 0.2));
+    // 款式的額外屬性（不浮動）。
+    for (const k of Object.keys(v ? v.extra : {})) stats[k] = Math.max(1, Math.round(baseStat(slot, k, lv, type, vk) * mult));
   }
-  const name = ITEM_NAMES[type][Math.min(3, rarity)];
+  const name = v ? v.name : ITEM_NAMES[type][Math.min(3, rarity)];
   const id = `${Date.now().toString(36)}${Math.floor(rng() * 1e9).toString(36)}`;
   const item = { id, slot, type, name, level: lv, rarity, enhance: 0, stats, gems: [] };
+  if (v) item.variant = v.key;
   // 武器有機會附帶異常狀態（稀有度愈高機會與機率愈高）：普通攻擊命中時觸發。
   if (slot === 'weapon' && rng() < 0.15 + 0.1 * rarity) {
     item.status = [pick(Object.keys(STATUS), rng), Math.round((0.1 + 0.03 * rarity) * 100) / 100];
@@ -514,8 +551,8 @@ export function setItemLevel(item, lv) {
   if (to === item.level) return;
   const mult = RARITIES[item.rarity].mult;
   for (const [k, v] of Object.entries(item.stats)) {
-    const from = baseStat(item.slot, k, item.level, item.type) * mult;
-    const next = baseStat(item.slot, k, to, item.type) * mult;
+    const from = baseStat(item.slot, k, item.level, item.type, item.variant) * mult;
+    const next = baseStat(item.slot, k, to, item.type, item.variant) * mult;
     // 原本的隨機浮動（約 0.9～1.1）由目前數值推回，只把增加的部分乘上去；數值太小（< 20）時捨入誤差太大，當成 1。
     const roll = from >= 20 ? Math.min(1.1, Math.max(0.9, v / from)) : 1;
     item.stats[k] = Math.max(v, Math.round(v + (next - from) * roll));

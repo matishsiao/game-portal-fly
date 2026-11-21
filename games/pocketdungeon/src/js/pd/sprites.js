@@ -839,6 +839,7 @@ function gemArt() {
   const colors = {
     atk: ['#e04a5a', '#ff9aa8', '#8a1a2a'], hp: ['#3fae58', '#9af0aa', '#1a5a2a'], def: ['#3a7ae0', '#a8d0ff', '#1a3a7a'],
     spd: ['#e8c030', '#fff0a0', '#8a6a10'], leech: ['#a8243a', '#ff6a80', '#4a0a18'], shield: ['#c8d8f0', '#ffffff', '#6a7a9a'], ward: ['#a888e8', '#e8d8ff', '#4a2a8a'],
+    venom: ['#9a4ae0', '#d8a8ff', '#4a1a7a'], dream: ['#6a8aff', '#c8d8ff', '#2a3a8a'], thunder: ['#f0c020', '#fff4a0', '#8a6a10'],
   };
   const out = {};
   for (const [kind, [m, l, d]] of Object.entries(colors)) {
@@ -847,16 +848,27 @@ function gemArt() {
   return out;
 }
 
+/**
+ * 是否有某個道具的設計圖（itemSprites.js）。
+ * @param {string} name 名稱。
+ * @returns {boolean} 有設計圖時為 true。
+ */
+function hasItemArt(name) {
+  return !!ITEM_SPRITES[name];
+}
+
 /** 各部位裝備的預設圖示（ITEM_ART 的鍵）。 */
 export const SLOT_ICONS = { weapon: 'sword', offhand: 'shield', helmet: 'helmet', armor: 'armor', boots: 'boots', accessory: 'ring' };
 
 /**
- * 裝備的圖示：武器依類型（劍與騎士劍、斧、弓弩、法杖、匕首、拳套、長槍），其他依部位。
+ * 裝備的圖示：款式有自己的圖示；經典款的武器依類型（劍與騎士劍、斧、弓弩、法杖、匕首、拳套、長槍），其他依部位。
  * 背包格子與地城掉在地上的裝備共用，讓不同裝備一眼就能分辨。
  * @param {object} item 裝備。
  * @returns {string} 圖示名稱（ITEM_ART 的鍵）。
  */
 export function itemIconName(item) {
+  // 款式有自己的圖示（鍵同款式代碼）。
+  if (item.variant && hasItemArt(item.variant)) return item.variant;
   if (item.slot === 'weapon') return { 劍: 'sword', 斧: 'axe', 弓: 'bow', 弩: 'bow', 法杖: 'staff', 魔杖: 'staff', 匕首: 'dagger', 雙匕: 'daggers', 拳套: 'fist', 騎士劍: 'sword', 長槍: 'spear' }[item.type] || 'sword';
   return SLOT_ICONS[item.slot] || 'bag';
 }

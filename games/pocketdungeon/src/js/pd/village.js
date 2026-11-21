@@ -177,7 +177,7 @@ export function fuseGem(ch, key) {
 }
 
 /**
- * 把寶石袋中的寶石鑲嵌到裝備（背包或裝備欄中的裝備）的空孔。同一件裝備不能鑲兩顆相同的主動寶石。
+ * 把寶石袋中的寶石鑲嵌到裝備（背包或裝備欄中的裝備）的空孔。同一件裝備不能鑲兩顆相同的主動寶石；附魔石只能鑲在武器上。
  * @param {object} ch 角色（會被修改）。
  * @param {string} id 裝備 id。
  * @param {string} key 寶石代碼。
@@ -192,6 +192,7 @@ export function socketGem(ch, id, key) {
   item.gems = item.gems || [];
   if (item.gems.length >= socketCount(item)) return { ok: false, message: `${item.name}的 ${socketCount(item)} 個孔都已經鑲滿` };
   if (GEMS[g.kind].active && item.gems.includes(key)) return { ok: false, message: `同一件裝備不能鑲兩顆${gemName(key)}` };
+  if (GEMS[g.kind].enchant && item.slot !== 'weapon') return { ok: false, message: `${gemName(key)}只能鑲在武器上` };
   addGem(ch, key, -1);
   item.gems.push(key);
   return { ok: true, message: `${item.name}鑲上${gemName(key)}` };

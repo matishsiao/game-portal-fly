@@ -143,8 +143,10 @@ export class World {
     p.leech = s.leech / 100;
     /** 主動寶石的種類（最多 2 個按鈕）。 */
     p.actives = s.actives;
-    // 普通攻擊命中時的異常狀態：武器附帶的，加上被動技能（毒塗箭、冰心）。
+    // 普通攻擊命中時的異常狀態：武器附帶的，加上被動技能（毒塗箭、冰心）與附魔石。
     p.attackStatus = [this.ch.equipped.weapon && this.ch.equipped.weapon.status, pb.poisonProc && ['poison', pb.poisonProc / 100], pb.stunProc && ['stun', pb.stunProc / 100]].filter(Boolean);
+    // 武器上的附魔石（毒、眠、雷）。
+    for (const [kind, pct] of Object.entries(s.enchant || {})) if (pct > 0) p.attackStatus.push([kind, pct / 100]);
     // 料理加成：最大 HP、攻擊、移動速度、經驗值（裝備掉落率在掉落時套用）。
     const meal = this.meal;
     // 料理對某種屬性的倍率。

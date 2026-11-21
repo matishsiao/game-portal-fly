@@ -2,6 +2,8 @@
 // 以及取得目前圖片的方式（source，用來產生給 Codex 的參考圖，並量出新圖要放進的範圍）。
 // 物件代碼中的 @ 後面是變化或階段（例如 apple@0 為蘋果第 1 階段、woodFloor@1 為木地板第 2 種變化）。
 
+import { ITEM_VARIANTS } from '../../src/js/pd/data.js';
+
 /**
  * 把清單每 n 個切成一組。
  * @param {string[]} list 清單。
@@ -20,6 +22,9 @@ const DROPS = ['coin', 'potion', 'cure', 'bag', 'pouch', 'key', 'book', 'skillbo
   'fist', 'spear', 'bow', 'staff', 'axe', 'gift', 'shard', 'star',
   'iron', 'steel', 'mithril', 'blueprint', 'seedBag', 'meat', 'ticket1', 'gem-atk',
   'gem-hp', 'gem-def', 'gem-spd', 'gem-leech', 'gem-shield', 'gem-ward'];
+
+/** 裝備款式的圖示（ITEM_VARIANTS 依類型順序）。 */
+const VARIANT_KEYS = Object.values(ITEM_VARIANTS).flatMap((list) => list.map((v) => v[0]));
 
 /** 家園圖示（ICON_ART）與家園材料（MAT_ART）。 */
 const HOME_ICONS = ['seed', 'fertilizer', 'blueprint', 'apple', 'orange', 'grape', 'redHerb', 'blueHerb', 'antidote', 'starflower', 'cotton', 'hay',
@@ -70,8 +75,14 @@ export const SETS = {
   drops: {
     dir: 'design/items', out: 'src/js/pd/itemSprites.js', name: 'ITEM_SPRITES', source: 'item', density: 2, colors: 14,
     // 強化石與升級石（新道具，沒有手寫圖）放在另一張設計圖，原本 5 張的排列不變；尺寸與寶石（8×7）相近，掉在地上才不會比其他道具大。
-    sizes: { enhanceStone: [8, 8], upgradeStone: [8, 8] },
-    sheets: [...chunk(DROPS, 8).map((keys, i) => ({ file: `drops-${i + 1}.png`, keys, cols: 4 })), { file: 'drops-6.png', keys: ['enhanceStone', 'upgradeStone'], cols: 2 }],
+    // 裝備款式（每種類型 5 種，各有自己的圖示）沒有手寫圖，與經典款武器同樣以 8 × 8 為範圍。
+    sizes: { enhanceStone: [8, 8], upgradeStone: [8, 8], ...Object.fromEntries(VARIANT_KEYS.map((k) => [k, [8, 8]])) },
+    sheets: [
+      ...chunk(DROPS, 8).map((keys, i) => ({ file: `drops-${i + 1}.png`, keys, cols: 4 })),
+      { file: 'drops-6.png', keys: ['enhanceStone', 'upgradeStone'], cols: 2 },
+      ...chunk(VARIANT_KEYS, 8).map((keys, i) => ({ file: `drops-${i + 7}.png`, keys, cols: 4 })),
+      { file: 'drops-17.png', keys: ['gem-venom', 'gem-dream', 'gem-thunder'], cols: 3 },
+    ],
   },
   homeIcons: {
     dir: 'design/home', out: 'src/js/pd/homeArt/iconSprites.js', name: 'ICON_SPRITES', source: 'icon', density: 1, colors: 16,

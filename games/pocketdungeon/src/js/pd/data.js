@@ -259,6 +259,75 @@ export const ITEM_NAMES = {
 };
 
 /**
+ * 裝備款式的屬性特色（依部位分組）：mod 為主屬性倍率，extra 為額外屬性（ACCESSORY_STATS 的鍵）與其倍率（相對於飾品同屬性的數值）。
+ * 每種特色的總強度大致相同，只是偏向不同。weapon：武器；armor：副手、頭盔、鎧甲；boots：鞋子；飾品的特色是保證出現某個屬性並提高 10%。
+ */
+export const VARIANT_STYLES = {
+  weapon: {
+    heavy: { mod: { atk: 1.12 } },
+    swift: { mod: { atk: 0.9 }, extra: { spd: 0.8 } },
+    sharp: { mod: { atk: 0.95 }, extra: { atkPct: 0.6 } },
+    vital: { mod: { atk: 0.95 }, extra: { hpPct: 0.6 } },
+    wise: { mod: { atk: 0.95 }, extra: { xpPct: 0.6 } },
+    lucky: { mod: { atk: 0.95 }, extra: { goldPct: 0.6 } },
+  },
+  armor: {
+    heavy: { mod: { def: 1.2, hp: 0.85 } },
+    light: { mod: { def: 0.85, hp: 0.9 }, extra: { spd: 0.8 } },
+    vital: { mod: { def: 0.85, hp: 1.25 } },
+    guard: { mod: { def: 0.95, hp: 0.95 }, extra: { defPct: 0.6 } },
+    sage: { mod: { def: 0.9, hp: 0.9 }, extra: { xpPct: 0.6 } },
+    fierce: { mod: { def: 0.9, hp: 0.9 }, extra: { atkPct: 0.6 } },
+  },
+  boots: {
+    heavy: { mod: { def: 1.25, spd: 0.8 } },
+    swift: { mod: { def: 0.8, spd: 1.25 } },
+    vital: { mod: { def: 0.9, spd: 0.9 }, extra: { hpPct: 0.6 } },
+    lucky: { mod: { def: 0.9, spd: 0.9 }, extra: { goldPct: 0.7 } },
+    guard: { mod: { def: 1, spd: 0.9 }, extra: { defPct: 0.5 } },
+  },
+  accessory: {
+    atkPct: { extra: { atkPct: 1.1 } },
+    defPct: { extra: { defPct: 1.1 } },
+    hpPct: { extra: { hpPct: 1.1 } },
+    goldPct: { extra: { goldPct: 1.1 } },
+    xpPct: { extra: { xpPct: 1.1 } },
+  },
+};
+
+/** 特色的簡短說明（裝備資訊顯示用）。 */
+export const VARIANT_STYLE_NAMES = {
+  heavy: '重型', swift: '輕快', sharp: '銳利', vital: '堅韌', wise: '智慧', lucky: '幸運', light: '輕便', guard: '守護', sage: '賢者', fierce: '猛攻',
+  atkPct: '力量', defPct: '守護', hpPct: '生命', goldPct: '幸運', xpPct: '智慧',
+};
+
+/**
+ * 裝備款式：每種類型除了依稀有度命名的經典款（ITEM_NAMES，共用類型圖示），另有 5 種款式，各有自己的名稱、圖示（鍵同款式代碼）與屬性特色（VARIANT_STYLES）。
+ * 掉落時有 VARIANT_CHANCE 的機率是這 5 種款式之一；每項為 [款式代碼, 名稱, 特色]。
+ */
+export const ITEM_VARIANTS = {
+  劍: [['scimitar', '彎刀', 'swift'], ['broadsword', '闊劍', 'heavy'], ['rapier', '細劍', 'sharp'], ['runeblade', '符文劍', 'wise'], ['flamberge', '波紋劍', 'vital']],
+  斧: [['warHammer', '戰鎚', 'heavy'], ['tomahawk', '飛斧', 'swift'], ['crescentAxe', '月刃斧', 'sharp'], ['frostAxe', '冰霜斧', 'vital'], ['goldAxe', '黃金斧', 'lucky']],
+  弓: [['recurveBow', '反曲弓', 'sharp'], ['elvenBow', '精靈弓', 'swift'], ['warBow', '戰弓', 'heavy'], ['vineBow', '藤蔓弓', 'vital'], ['moonBow', '月牙弓', 'wise']],
+  法杖: [['emberStaff', '火焰杖', 'heavy'], ['frostStaff', '冰霜杖', 'vital'], ['leafStaff', '樹精杖', 'wise'], ['skullStaff', '骷髏杖', 'sharp'], ['sunStaff', '太陽杖', 'swift']],
+  弩: [['heavyXbow', '重弩', 'heavy'], ['handXbow', '手弩', 'swift'], ['repeaterXbow', '機關弩', 'sharp'], ['boneXbow', '骨弩', 'vital'], ['goldXbow', '黃金弩', 'lucky']],
+  魔杖: [['starWand', '星星魔杖', 'wise'], ['boneWand', '骨魔杖', 'sharp'], ['flowerWand', '花朵魔杖', 'vital'], ['thunderWand', '雷電魔杖', 'heavy'], ['featherWand', '羽毛魔杖', 'swift']],
+  盾牌: [['buckler', '小圓盾', 'light'], ['towerShield', '塔盾', 'heavy'], ['kiteShield', '鳶形盾', 'guard'], ['spikeShield', '尖刺盾', 'fierce'], ['lionShield', '獅紋盾', 'vital']],
+  匕首: [['kunai', '苦無', 'swift'], ['stiletto', '錐刺', 'sharp'], ['kris', '波刃匕', 'heavy'], ['boneKnife', '骨刀', 'vital'], ['goldKnife', '黃金匕首', 'lucky']],
+  雙匕: [['twinFangs', '雙牙刃', 'sharp'], ['twinSickles', '雙鐮', 'heavy'], ['twinKunai', '雙苦無', 'swift'], ['twinCrescent', '雙月刃', 'wise'], ['twinThorns', '雙棘刃', 'vital']],
+  拳套: [['spikeKnuckle', '尖刺指虎', 'sharp'], ['ironClaw', '鐵爪', 'heavy'], ['tigerFist', '虎爪拳套', 'swift'], ['stoneFist', '岩石拳套', 'vital'], ['goldFist', '黃金拳套', 'lucky']],
+  騎士劍: [['holyBlade', '聖光劍', 'vital'], ['templarSword', '聖殿劍', 'heavy'], ['saber', '軍刀', 'swift'], ['lionBlade', '獅心劍', 'sharp'], ['crownBlade', '王冠劍', 'wise']],
+  長槍: [['trident', '三叉戟', 'sharp'], ['halberd', '方天戟', 'heavy'], ['lance', '騎槍', 'vital'], ['glaive', '偃月刀', 'swift'], ['sunSpear', '日輪槍', 'wise']],
+  鎧甲: [['mageRobe', '法袍', 'sage'], ['leatherVest', '皮背心', 'light'], ['scaleMail', '鱗甲', 'heavy'], ['knightPlate', '騎士鎧', 'guard'], ['lifeMail', '生命鎧', 'vital']],
+  頭盔: [['hood', '兜帽', 'light'], ['wizardHat', '法師帽', 'sage'], ['hornHelm', '角盔', 'fierce'], ['greatHelm', '大盔', 'heavy'], ['circlet', '頭環', 'vital']],
+  鞋子: [['wingBoots', '羽翼靴', 'swift'], ['strawSandals', '草鞋', 'lucky'], ['greaves', '護脛', 'heavy'], ['furBoots', '毛皮靴', 'vital'], ['plateBoots', '戰靴', 'guard']],
+  飾品: [['powerBand', '力量手環', 'atkPct'], ['guardBrooch', '守護胸針', 'defPct'], ['lifeNecklace', '生命項鍊', 'hpPct'], ['luckyEarring', '幸運耳環', 'goldPct'], ['sageBadge', '學者徽章', 'xpPct']],
+};
+
+/** 掉落的裝備是 5 種款式之一的機率（其餘為經典款）。 */
+export const VARIANT_CHANCE = 0.6;
+
+/**
  * 強化上限、每級主屬性加成、失敗機率與每次消耗的強化石（索引為目標強化值）。
  * 每次強化都要消耗強化石與金幣；失敗時強化值不變，強化石與金幣照樣消耗。
  */
@@ -319,6 +388,7 @@ export const STATUS_BOSS = 0.3;
 /**
  * 寶石：鑲嵌在裝備的孔裡。持續型寶石（攻擊、HP、防禦、速度、吸血）依等級 1～5 提升 5%～15%；
  * 主動型寶石（血量護盾、抗異常護盾）在地城中以按鈕使用，只有一個等級，不能合成。
+ * 附魔石（毒、眠、雷）只能鑲在武器上：普通攻擊命中時依等級有 6%～16% 機率使敵人中毒、睡眠或暈眩（同種相加，最多 GEM_RULES.enchantCap%）。
  */
 export const GEMS = {
   atk: { name: '紅寶石', stat: '攻擊', values: [5, 7, 10, 12, 15], color: '#e04a5a' },
@@ -328,6 +398,9 @@ export const GEMS = {
   leech: { name: '血石', stat: '吸血', values: [5, 7, 10, 12, 15], color: '#a8243a' },
   shield: { name: '守護鑽石', active: true, label: '血量護盾', short: '護盾', pct: 0.25, dur: 10, cd: 60, color: '#e8f4ff' },
   ward: { name: '月光石', active: true, label: '抗異常護盾', short: '抗異常', dur: 30, cd: 60, color: '#c8a8ff' },
+  venom: { name: '毒之附魔石', stat: '中毒', enchant: 'poison', values: [6, 8, 10, 13, 16], color: '#9a4ae0' },
+  dream: { name: '眠之附魔石', stat: '睡眠', enchant: 'sleep', values: [6, 8, 10, 13, 16], color: '#6a8aff' },
+  thunder: { name: '雷之附魔石', stat: '暈眩', enchant: 'stun', values: [6, 8, 10, 13, 16], color: '#f0c020' },
 };
 
 /**
@@ -348,6 +421,9 @@ export const GEM_RULES = {
   actives: 2,
   drop: { monster: 0.02, elite: 0.2, chest: 0.12 },
   activeChance: 0.06,
+  /** 掉落的寶石是附魔石的機率，以及同種附魔石的觸發機率上限（%）。 */
+  enchantChance: 0.15,
+  enchantCap: 30,
 };
 
 /** 共用倉庫：所有角色共用的裝備格數（固定，不能擴充）。金幣另外共用，沒有上限。 */
